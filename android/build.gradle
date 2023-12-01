@@ -53,11 +53,16 @@ android {
     minSdkVersion getExtOrIntegerDefault("minSdkVersion")
     targetSdkVersion getExtOrIntegerDefault("targetSdkVersion")
     buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
-
+    externalNativeBuild {
+      cmake {
+        arguments "-DANDROID_STL=c++_shared", "-DANDROID_TOOLCHAIN=clang"
+      }
+    }
   }
 
   buildFeatures {
     buildConfig true
+    prefab true
   }
 
   buildTypes {
@@ -88,6 +93,25 @@ android {
       }
     }
   }
+
+  externalNativeBuild {
+    cmake {
+      path file('src/main/cpp/CMakeLists.txt')
+      version '3.22.1'
+    }
+  }
+
+  packagingOptions {
+    doNotStrip '**/**/*.so'
+    excludes = [
+      "META-INF",
+      "META-INF/**",
+      "**/libc++_shared.so",
+      "**/libfbjni.so",
+      "**/libjsi.so",
+      "**/libreactnativejni.so",
+    ]
+  }
 }
 
 repositories {
@@ -97,10 +121,8 @@ repositories {
 
 
 dependencies {
-  // For < 0.71, this will be from the local maven repo
-  // For > 0.71, this will be replaced by `com.facebook.react:react-android:$version` by react gradle plugin
-  //noinspection GradleDynamicVersion
-  implementation "com.facebook.react:react-native:+"
+  implementation "com.facebook.react:react-android" // version substituted by RNGP
+  implementation "com.facebook.react:hermes-android" // version substituted by RNGP
 }
 
 if (isNewArchitectureEnabled()) {
