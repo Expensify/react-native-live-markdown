@@ -30,18 +30,14 @@ public class MarkdownTextWatcher implements TextWatcher {
   @Override
   public void afterTextChanged(Editable editable) {
     if (!mIsFormatting) {
-      mIsFormatting = true;
+      mIsFormatting = true; // prevent recursive calls
       if (editable instanceof SpannableStringBuilder) {
         SpannableStringBuilder ssb = (SpannableStringBuilder) editable;
         int selectionStart = mReactEditText.getSelectionStart();
         int selectionEnd = mReactEditText.getSelectionEnd();
-        String text = ssb.toString();
-        int length = text.length();
-        ssb.clear();
-        ssb.append(text);
+        MarkdownUtils.applyMarkdownFormatting(ssb);
+        int length = ssb.length();
         mReactEditText.setSelection(Math.min(selectionStart, length), Math.min(selectionEnd, length));
-        int flag = Spanned.SPAN_EXCLUSIVE_EXCLUSIVE;
-        ssb.setSpan(new StyleSpan(Typeface.BOLD), 0, Math.min(3, ssb.length()), flag);
       }
       mIsFormatting = false;
     }
