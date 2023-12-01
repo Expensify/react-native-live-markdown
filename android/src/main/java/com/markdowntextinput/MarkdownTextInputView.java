@@ -3,12 +3,7 @@ package com.markdowntextinput;
 import androidx.annotation.Nullable;
 
 import android.content.Context;
-import android.graphics.Typeface;
-import android.text.Editable;
-import android.text.SpannableStringBuilder;
-import android.text.Spanned;
 import android.text.TextWatcher;
-import android.text.style.StyleSpan;
 import android.util.AttributeSet;
 
 import android.view.View;
@@ -52,39 +47,7 @@ public class MarkdownTextInputView extends View {
     }
     if (previousSibling instanceof ReactEditText) {
       mReactEditText = (ReactEditText) previousSibling;
-      mTextWatcher = new TextWatcher() {
-        @Override
-        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-        }
-
-        @Override
-        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-        }
-
-        private boolean mIsFormatting = false;
-
-        @Override
-        public void afterTextChanged(Editable editable) {
-          if (!mIsFormatting) {
-            mIsFormatting = true;
-            if (editable instanceof SpannableStringBuilder) {
-              SpannableStringBuilder ssb = (SpannableStringBuilder) editable;
-              int selectionStart = mReactEditText.getSelectionStart();
-              int selectionEnd = mReactEditText.getSelectionEnd();
-              String text = ssb.toString();
-              int length = text.length();
-              ssb.clear();
-              ssb.append(text);
-              mReactEditText.setSelection(Math.min(selectionStart, length), Math.min(selectionEnd, length));
-              int flag = Spanned.SPAN_EXCLUSIVE_EXCLUSIVE;
-              ssb.setSpan(new StyleSpan(Typeface.BOLD), 0, Math.min(3, ssb.length()), flag);
-            }
-            mIsFormatting = false;
-          }
-        }
-      };
+      mTextWatcher = new MarkdownTextWatcher(mReactEditText);
       mReactEditText.addTextChangedListener(mTextWatcher);
     }
   }
