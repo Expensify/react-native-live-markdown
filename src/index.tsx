@@ -1,2 +1,2 @@
-export { default as MarkdownTextInputView } from './MarkdownTextInputViewNativeComponent';
-export * from './MarkdownTextInputViewNativeComponent';
+export { default as MarkdownTextInput } from './MarkdownTextInput';
+export type { MarkdownTextInputProps } from './MarkdownTextInput';
