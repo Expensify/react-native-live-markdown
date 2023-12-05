@@ -3,6 +3,26 @@
 #import "RCTBridge.h"
 #import "Utils.h"
 
+#import <react-native-markdown-text-input/RCTMarkdownUtils.h>
+
+@interface MarkdownTextInputView : UIView
+@end
+
+@implementation MarkdownTextInputView
+
+- (void)didMoveToWindow {
+  NSArray *viewsArray = self.superview.subviews;
+  NSUInteger currentIndex = [viewsArray indexOfObject:self];
+  if (currentIndex == 0 || currentIndex == NSNotFound) {
+    return;
+  }
+  UIView *found = [viewsArray objectAtIndex:currentIndex - 1];
+  // TODO: enable Markdown only for this specific view
+  return;
+}
+
+@end
+
 @interface MarkdownTextInputViewManager : RCTViewManager
 @end
 
@@ -12,7 +32,7 @@ RCT_EXPORT_MODULE(MarkdownTextInputView)
 
 - (UIView *)view
 {
-  return [[UIView alloc] init];
+  return [[MarkdownTextInputView alloc] init];
 }
 
 RCT_CUSTOM_VIEW_PROPERTY(color, NSString, UIView)
