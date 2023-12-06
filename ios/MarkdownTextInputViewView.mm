@@ -21,24 +21,15 @@
   NSUInteger currentIndex = [viewsArray indexOfObject:self];
 #endif /* RCT_NEW_ARCH_ENABLED */
 
-  if (currentIndex == 0 || currentIndex == NSNotFound) {
-    NSLog(@"Error while finding current component.");
-    return;
-  }
+  react_native_assert(currentIndex != 0 && currentIndex != NSNotFound && "Error while finding current component.");
   UIView *view = [viewsArray objectAtIndex:currentIndex - 1];
 
 #ifdef RCT_NEW_ARCH_ENABLED
-  if (![view isKindOfClass:[RCTTextInputComponentView class]]) {
-    NSLog(@"Previous sibling component is not an instance of RCTTextInputComponentView.");
-    return;
-  }
+  react_native_assert([view isKindOfClass:[RCTTextInputComponentView class]] && "Previous sibling component is not an instance of RCTTextInputComponentView.");
   RCTTextInputComponentView *textInput = (RCTTextInputComponentView *)view;
   UIView<RCTBackedTextInputViewProtocol> *backedTextInputView = [textInput valueForKey:@"_backedTextInputView"];
 #else
-  if (![view isKindOfClass:[RCTBaseTextInputView class]]) {
-    NSLog(@"Previous sibling component is not an instance of RCTBaseTextInputView.");
-    return;
-  }
+  react_native_assert([view isKindOfClass:[RCTBaseTextInputView class]] && "Previous sibling component is not an instance of RCTBaseTextInputView.");
   RCTBaseTextInputView *textInput = (RCTBaseTextInputView *)view;
   UIView<RCTBackedTextInputViewProtocol> *backedTextInputView = textInput.backedTextInputView;
 #endif /* RCT_NEW_ARCH_ENABLED */
@@ -52,7 +43,7 @@
     RCTUITextView *textView = (RCTUITextView *)backedTextInputView;
     [textView setMarkdownEnabled:YES];
   } else {
-    NSLog(@"Cannot enable Markdown for this type of TextInput.");
+    react_native_assert(false && "Cannot enable Markdown for this type of TextInput.");
   }
 }
 
