@@ -17,7 +17,7 @@
 @implementation MarkdownTextInputView
 
 - (void)didMoveToWindow {
-  NSArray *viewsArray = self.superview.subviews;
+  NSArray *viewsArray = self.reactSuperview.reactSubviews;
   NSUInteger currentIndex = [viewsArray indexOfObject:self];
   if (currentIndex == 0 || currentIndex == NSNotFound) {
     return;
