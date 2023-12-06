@@ -12,17 +12,42 @@ export default function App() {
 
   return (
     <View style={styles.container}>
+      <Text>MarkdownTextInput singleline</Text>
       <MarkdownTextInput
-        multiline
         autoCapitalize="none"
         value={value}
         onChangeText={setValue}
         style={styles.input}
         ref={ref}
       />
+      <Text>MarkdownTextInput multiline</Text>
+      <MarkdownTextInput
+        multiline
+        autoCapitalize="none"
+        value={value}
+        onChangeText={setValue}
+        style={styles.input}
+      />
+      <Text>TextInput singleline</Text>
+      <TextInput
+        autoCapitalize="none"
+        value={value}
+        onChangeText={setValue}
+        style={styles.input}
+      />
+      <Text>TextInput multiline</Text>
+      <TextInput
+        multiline
+        autoCapitalize="none"
+        value={value}
+        onChangeText={setValue}
+        style={styles.input}
+      />
       <Text style={styles.text}>{JSON.stringify(value)}</Text>
       <Button title="Focus" onPress={() => ref.current?.focus()} />
       <Button title="Blur" onPress={() => ref.current?.blur()} />
+      <Button title="Reset" onPress={() => setValue('Hello, *world*!')} />
+      <Button title="Clear" onPress={() => setValue('')} />
     </View>
   );
 }

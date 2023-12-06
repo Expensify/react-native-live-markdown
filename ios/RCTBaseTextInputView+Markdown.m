@@ -4,9 +4,19 @@
 
 @implementation RCTBaseTextInputView (Markdown)
 
+- (void)setMarkdownEnabled:(BOOL)markdownEnabled {
+  NSNumber *markdownEnabledNumber = [NSNumber numberWithBool:markdownEnabled];
+  objc_setAssociatedObject(self, @selector(isMarkdownEnabled), markdownEnabledNumber, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (BOOL)isMarkdownEnabled {
+  NSNumber *markdownEnabledNumber = objc_getAssociatedObject(self, @selector(isMarkdownEnabled));
+  return [markdownEnabledNumber boolValue];
+}
+
 - (void)markdown_setAttributedText:(NSAttributedString *)attributedText
 {
-  if (attributedText != nil) {
+  if ([self isMarkdownEnabled] && attributedText != nil) {
     attributedText = [RCTMarkdownUtils parseMarkdown:attributedText.string];
   }
 

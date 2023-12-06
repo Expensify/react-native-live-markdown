@@ -4,13 +4,25 @@
 
 @implementation RCTUITextView (Markdown)
 
+- (void)setMarkdownEnabled:(BOOL)markdownEnabled {
+  NSNumber *markdownEnabledNumber = [NSNumber numberWithBool:markdownEnabled];
+  objc_setAssociatedObject(self, @selector(isMarkdownEnabled), markdownEnabledNumber, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (BOOL)isMarkdownEnabled {
+  NSNumber *markdownEnabledNumber = objc_getAssociatedObject(self, @selector(isMarkdownEnabled));
+  return [markdownEnabledNumber boolValue];
+}
+
 - (void)markdown_textDidChange
 {
-  UITextRange *range = self.selectedTextRange;
-  super.attributedText = [RCTMarkdownUtils parseMarkdown:self.attributedText.string];
-  [super setSelectedTextRange:range]; // prevents cursor from jumping at the end when typing in the middle of the text
-  self.typingAttributes = @{NSFontAttributeName: [UIFont boldSystemFontOfSize:20]}; // removes indent in new line when typing after quote
-
+  if ([self isMarkdownEnabled]) {
+    UITextRange *range = self.selectedTextRange;
+    super.attributedText = [RCTMarkdownUtils parseMarkdown:self.attributedText.string];
+    [super setSelectedTextRange:range]; // prevents cursor from jumping at the end when typing in the middle of the text
+    self.typingAttributes = @{NSFontAttributeName: [UIFont boldSystemFontOfSize:20]}; // removes indent in new line when typing after quote
+  }
+    
   // Call the original method
   [self markdown_textDidChange];
 }

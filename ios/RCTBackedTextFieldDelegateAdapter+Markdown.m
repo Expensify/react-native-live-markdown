@@ -5,12 +5,24 @@
 
 @implementation RCTBackedTextFieldDelegateAdapter (Markdown)
 
+- (void)setMarkdownEnabled:(BOOL)markdownEnabled {
+  NSNumber *markdownEnabledNumber = [NSNumber numberWithBool:markdownEnabled];
+  objc_setAssociatedObject(self, @selector(isMarkdownEnabled), markdownEnabledNumber, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (BOOL)isMarkdownEnabled {
+  NSNumber *markdownEnabledNumber = objc_getAssociatedObject(self, @selector(isMarkdownEnabled));
+  return [markdownEnabledNumber boolValue];
+}
+
 - (void)markdown_textFieldDidChange
 {
-  RCTUITextField *backedTextInputView = [self valueForKey:@"_backedTextInputView"];
-  UITextRange *range = backedTextInputView.selectedTextRange;
-  backedTextInputView.attributedText = [RCTMarkdownUtils parseMarkdown:backedTextInputView.attributedText.string];
-  [backedTextInputView setSelectedTextRange:range notifyDelegate:YES];
+  if ([self isMarkdownEnabled]) {
+    RCTUITextField *backedTextInputView = [self valueForKey:@"_backedTextInputView"];
+    UITextRange *range = backedTextInputView.selectedTextRange;
+    backedTextInputView.attributedText = [RCTMarkdownUtils parseMarkdown:backedTextInputView.attributedText.string];
+    [backedTextInputView setSelectedTextRange:range notifyDelegate:YES];
+  }
 
   // Call the original method
   [self markdown_textFieldDidChange];
