@@ -12,6 +12,7 @@ export default function App() {
 
   return (
     <View style={styles.container}>
+      <Text>{'nativeFabricUIManager' in global ? 'Fabric' : 'Paper'}</Text>
       <Text>MarkdownTextInput singleline</Text>
       <MarkdownTextInput
         autoCapitalize="none"
