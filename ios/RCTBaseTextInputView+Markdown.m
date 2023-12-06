@@ -24,16 +24,34 @@
   [self markdown_setAttributedText:attributedText];
 }
 
+-(void)markdown_updateLocalData
+{
+  if([self isMarkdownEnabled]) {
+    NSAttributedString *postParseString = [RCTMarkdownUtils parseMarkdown:self.backedTextInputView.attributedText.string];
+    [self.backedTextInputView setAttributedText:postParseString];
+  }
+
+    [self markdown_updateLocalData];
+}
+
 + (void)load
 {
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
+    // swizzle setAttributedText
     Class cls = [self class];
-    SEL originalSelector = @selector(setAttributedText:);
-    SEL swizzledSelector = @selector(markdown_setAttributedText:);
-    Method originalMethod = class_getInstanceMethod(cls, originalSelector);
-    Method swizzledMethod = class_getInstanceMethod(cls, swizzledSelector);
-    method_exchangeImplementations(originalMethod, swizzledMethod);
+    SEL originalSelectorSetAttributedText = @selector(setAttributedText:);
+    SEL swizzledSelectorSetAttributedText = @selector(markdown_setAttributedText:);
+    Method originalSetAttributedText = class_getInstanceMethod(cls, originalSelectorSetAttributedText);
+    Method swizzledSetAttributedText = class_getInstanceMethod(cls, swizzledSelectorSetAttributedText);
+    method_exchangeImplementations(originalSetAttributedText, swizzledSetAttributedText);
+      
+    // swizzle updateLocalData
+    SEL originalSelectorUpdateLocalData = @selector(updateLocalData:);
+    SEL swizzledSelectorUpdateLocalData = @selector(markdown_updateLocalData);
+    Method originalUpdateLocalData = class_getInstanceMethod(cls, originalSelectorUpdateLocalData);
+    Method swizzledUpdateLocalData = class_getInstanceMethod(cls, swizzledSelectorUpdateLocalData);
+    method_exchangeImplementations(originalUpdateLocalData, swizzledUpdateLocalData);
   });
 }
 
