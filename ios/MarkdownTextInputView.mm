@@ -6,6 +6,8 @@
 #import <react/renderer/components/RNMarkdownTextInputViewSpec/Props.h>
 #import <react/renderer/components/RNMarkdownTextInputViewSpec/RCTComponentViewHelpers.h>
 
+#import <react-native-markdown-text-input/MarkdownTextInputViewView.h>
+
 #import "RCTFabricComponentsPlugins.h"
 #import "Utils.h"
 
@@ -30,7 +32,7 @@ using namespace facebook::react;
     static const auto defaultProps = std::make_shared<const MarkdownTextInputViewProps>();
     _props = defaultProps;
 
-    _view = [[UIView alloc] init];
+    _view = [[MarkdownTextInputViewView alloc] init];
 
     self.contentView = _view;
   }
