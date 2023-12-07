@@ -1,8 +1,27 @@
 import * as React from 'react';
 
-import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
+import {
+  Button,
+  Platform,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 
 import { MarkdownTextInput } from 'react-native-markdown-text-input';
+
+function getPlatform() {
+  return Platform.select({
+    android: 'Android',
+    ios: 'iOS',
+    default: Platform.OS,
+  });
+}
+
+function getArchitecture() {
+  return 'nativeFabricUIManager' in global ? 'Fabric' : 'Paper';
+}
 
 export default function App() {
   const [value, setValue] = React.useState('Hello, *world*!');
@@ -12,7 +31,8 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <Text>{'nativeFabricUIManager' in global ? 'Fabric' : 'Paper'}</Text>
+      <Text>{getPlatform()}</Text>
+      <Text>{getArchitecture()}</Text>
       <Text>MarkdownTextInput singleline</Text>
       <MarkdownTextInput
         autoCapitalize="none"
