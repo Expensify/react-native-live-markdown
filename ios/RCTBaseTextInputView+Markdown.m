@@ -27,8 +27,8 @@
 - (void)markdown_updateLocalData
 {
   if ([self isMarkdownEnabled]) {
-    NSAttributedString *postParseString = [RCTMarkdownUtils parseMarkdown:self.backedTextInputView.attributedText.string];
-    [self.backedTextInputView setAttributedText:postParseString];
+    NSAttributedString *attributedText = [RCTMarkdownUtils parseMarkdown:self.backedTextInputView.attributedText.string];
+    [self.backedTextInputView setAttributedText:attributedText];
   }
 
   // Call the original method
