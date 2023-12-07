@@ -8,6 +8,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)markdown_setAttributedText:(NSAttributedString *)attributedText;
 
+- (void)markdown_updateLocalData;
+
 @end
 
 NS_ASSUME_NONNULL_END
