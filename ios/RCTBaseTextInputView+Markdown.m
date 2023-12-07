@@ -45,9 +45,9 @@
     Method originalSetAttributedText = class_getInstanceMethod(cls, originalSelectorSetAttributedText);
     Method swizzledSetAttributedText = class_getInstanceMethod(cls, swizzledSelectorSetAttributedText);
     method_exchangeImplementations(originalSetAttributedText, swizzledSetAttributedText);
-      
+
     // swizzle updateLocalData
-    SEL originalSelectorUpdateLocalData = @selector(updateLocalData:);
+    SEL originalSelectorUpdateLocalData = @selector(updateLocalData);
     SEL swizzledSelectorUpdateLocalData = @selector(markdown_updateLocalData);
     Method originalUpdateLocalData = class_getInstanceMethod(cls, originalSelectorUpdateLocalData);
     Method swizzledUpdateLocalData = class_getInstanceMethod(cls, swizzledSelectorUpdateLocalData);
