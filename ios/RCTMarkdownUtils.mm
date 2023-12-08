@@ -39,7 +39,7 @@
     UIFontDescriptorSymbolicTraits existingTraits = fontDescriptor.symbolicTraits;
     UIFontDescriptorSymbolicTraits desiredTraits = UIFontDescriptorClassMask;
 
-    if ([type isEqualToString:@"bold"] || [type isEqualToString:@"mention"] || [type isEqualToString:@"h1"]) {
+    if ([type isEqualToString:@"bold"] || [type isEqualToString:@"mention"] || [type isEqualToString:@"h1"] || [type isEqualToString:@"mention-user"]) {
       desiredTraits = existingTraits | UIFontDescriptorTraitBold;
     } else if ([type isEqualToString:@"italic"]) {
       desiredTraits = existingTraits | UIFontDescriptorTraitItalic;
@@ -65,7 +65,11 @@
       [attributedString addAttribute:NSForegroundColorAttributeName value:[[UIColor alloc] initWithRed:6/255.0 green:25/255.0 blue:109/255.0 alpha:1.0] range:range];
       [attributedString addAttribute:NSBackgroundColorAttributeName value:[[UIColor alloc] initWithRed:0.95 green:0.95 blue:0.95 alpha:1.0] range:range];
     } else if ([type isEqualToString:@"mention"]) {
-      [attributedString addAttribute:NSBackgroundColorAttributeName value:[[UIColor alloc] initWithRed:252/255.0 green:232/255.0 blue:142/255.0 alpha:1.0] range:range];
+        [attributedString addAttribute:NSBackgroundColorAttributeName value:[[UIColor alloc] initWithRed:252/255.0 green:232/255.0 blue:142/255.0 alpha:1.0] range:range];
+    } else if ([type isEqualToString:@"mention-user"]) {
+
+        // TODO: change mention color when it mentions current user
+        [attributedString addAttribute:NSBackgroundColorAttributeName value:[[UIColor alloc] initWithRed:176/255.0 green:217/255.0 blue:255/255.0 alpha:1.0] range:range];
     } else if ([type isEqualToString:@"link"]) {
       [attributedString addAttribute:NSUnderlineStyleAttributeName value:[NSNumber numberWithInteger:NSUnderlineStyleSingle] range:range];
       [attributedString addAttribute:NSForegroundColorAttributeName value:[UIColor blueColor] range:range];
