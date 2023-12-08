@@ -37,11 +37,14 @@
 - (void)didMoveToWindow {
 #ifdef RCT_NEW_ARCH_ENABLED
   if (self.superview.superview == nil) {
-    // happens on reload on Fabric
+    return;
+  }
+#else
+  if (self.superview == nil) {
     return;
   }
 #endif /* RCT_NEW_ARCH_ENABLED */
-    
+
 #ifdef RCT_NEW_ARCH_ENABLED
   NSArray *viewsArray = self.superview.superview.subviews;
   NSUInteger currentIndex = [viewsArray indexOfObject:self.superview];
