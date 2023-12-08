@@ -58,6 +58,8 @@ public class MarkdownTextInputView extends View {
     super.onDetachedFromWindow();
     if (mReactEditText != null) {
       mReactEditText.removeTextChangedListener(mTextWatcher);
+      mReactEditText = null;
+      mTextWatcher = null;
     }
   }
 }
