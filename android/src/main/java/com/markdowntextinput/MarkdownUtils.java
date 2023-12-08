@@ -31,8 +31,7 @@ public class MarkdownUtils {
     try {
       JSONArray array = new JSONArray(output);
       String text = array.getString(0);
-      ssb.clear();
-      ssb.append(text);
+      ssb.replace(0, ssb.length(), text, 0, text.length());
       JSONArray ranges = array.getJSONArray(1);
       for (int i = 0; i < ranges.length(); i++) {
         JSONArray range = ranges.getJSONArray(i);
