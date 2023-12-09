@@ -53,6 +53,11 @@ public class MarkdownUtils {
             ssb.setSpan(new StyleSpan(Typeface.BOLD), start, end, flag);
             ssb.setSpan(new BackgroundColorSpan(Color.rgb(252, 232, 142)), start, end, flag);
             break;
+          case "mention-user":
+            ssb.setSpan(new StyleSpan(Typeface.BOLD), start, end, flag);
+            // TODO: change mention color when it mentions current user
+            ssb.setSpan(new BackgroundColorSpan(Color.rgb(176, 217, 255)), start, end, flag);
+            break;
           case "syntax":
             ssb.setSpan(new StyleSpan(Typeface.BOLD), start, end, flag);
             ssb.setSpan(new ForegroundColorSpan(Color.GRAY), start, end, flag);
