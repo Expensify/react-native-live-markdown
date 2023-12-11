@@ -51,12 +51,12 @@ public class MarkdownUtils {
             break;
           case "mention":
             ssb.setSpan(new StyleSpan(Typeface.BOLD), start, end, flag);
-            ssb.setSpan(new BackgroundColorSpan(Color.rgb(252, 232, 142)), start, end, flag);
+            ssb.setSpan(new BackgroundColorSpan(Color.argb(100, 252, 232, 142)), start, end, flag);
             break;
           case "mention-user":
             ssb.setSpan(new StyleSpan(Typeface.BOLD), start, end, flag);
             // TODO: change mention color when it mentions current user
-            ssb.setSpan(new BackgroundColorSpan(Color.rgb(176, 217, 255)), start, end, flag);
+            ssb.setSpan(new BackgroundColorSpan(Color.argb(100, 176, 217, 255)), start, end, flag);
             break;
           case "syntax":
             ssb.setSpan(new StyleSpan(Typeface.BOLD), start, end, flag);
@@ -70,7 +70,7 @@ public class MarkdownUtils {
           case "pre":
             ssb.setSpan(new TypefaceSpan("monospace"), start, end, flag);
             ssb.setSpan(new ForegroundColorSpan(Color.rgb(6, 25, 109)), start, end, flag);
-            ssb.setSpan(new BackgroundColorSpan(Color.LTGRAY), start, end, flag);
+            ssb.setSpan(new BackgroundColorSpan(Color.argb(100, 211, 211, 211)), start, end, flag);
             break;
           case "h1":
             ssb.setSpan(new AbsoluteSizeSpan(25, true), start, end, flag);
