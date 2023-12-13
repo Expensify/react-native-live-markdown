@@ -113,6 +113,11 @@ test('link with same label as href', () => {
   );
 });
 
+test('no nesting links while typing', () => {
+  expect('[link](www.google.com').toBeParsedAs(SAME, []);
+});
+
+
 test('link with query string', () => {
   expect('https://example.com?name=John&age=25&city=NewYork').toBeParsedAs(
     SAME,
