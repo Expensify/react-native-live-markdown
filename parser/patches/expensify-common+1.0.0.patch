@@ -12,7 +12,7 @@ index 66de942..8d0eac3 100644
  
      REPORT: {
 diff --git a/node_modules/expensify-common/lib/ExpensiMark.js b/node_modules/expensify-common/lib/ExpensiMark.js
-index 2d77cc3..9aa4080 100644
+index 2d77cc3..115f8a4 100644
 --- a/node_modules/expensify-common/lib/ExpensiMark.js
 +++ b/node_modules/expensify-common/lib/ExpensiMark.js
 @@ -7,8 +7,8 @@ const MARKDOWN_LINK_REGEX = new RegExp(`\\[([^\\][]*(?:\\[[^\\][]*][^\\][]*)*)]\
@@ -54,6 +54,15 @@ index 2d77cc3..9aa4080 100644
                  },
              },
  
+@@ -85,7 +90,7 @@ export default class ExpensiMark {
+                     if (g1.match(CONST.REG_EXP.EMOJIS) || !g1.trim()) {
+                         return match;
+                     }
+-                    return `<a href="${Str.sanitizeURL(g2)}" target="_blank" rel="noreferrer noopener">${g1.trim()}</a>`;
++                    return `<a href="${Str.sanitizeURL(g2)}" data-raw-href="${g2}" target="_blank" rel="noreferrer noopener">${g1.trim()}</a>`;
+                 },
+             },
+ 
 @@ -95,9 +100,9 @@ export default class ExpensiMark {
               *
               * Also, apply the mention rule after email/link to prevent mention appears in an email/link.
@@ -66,6 +75,15 @@ index 2d77cc3..9aa4080 100644
                  replacement: (match, g1, g2, g3) => {
                      if (!Str.isValidMention(match)) {
                          return match;
+@@ -141,7 +146,7 @@ export default class ExpensiMark {
+ 
+                 replacement: (match, g1, g2) => {
+                     const href = Str.sanitizeURL(g2);
+-                    return `${g1}<a href="${href}" target="_blank" rel="noreferrer noopener">${g2}</a>${g1}`;
++                    return `${g1}<a href="${href}" data-raw-href="${g2}" target="_blank" rel="noreferrer noopener">${g2}</a>${g1}`;
+                 },
+             },
+             {
 @@ -185,7 +190,10 @@ export default class ExpensiMark {
  
              {
