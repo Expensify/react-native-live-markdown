@@ -12,7 +12,7 @@ index 66de942..8d0eac3 100644
  
      REPORT: {
 diff --git a/node_modules/expensify-common/lib/ExpensiMark.js b/node_modules/expensify-common/lib/ExpensiMark.js
-index 2d77cc3..7f5a2a6 100644
+index 2d77cc3..a580a98 100644
 --- a/node_modules/expensify-common/lib/ExpensiMark.js
 +++ b/node_modules/expensify-common/lib/ExpensiMark.js
 @@ -7,8 +7,8 @@ const MARKDOWN_LINK_REGEX = new RegExp(`\\[([^\\][]*(?:\\[[^\\][]*][^\\][]*)*)]\
@@ -26,7 +26,7 @@ index 2d77cc3..7f5a2a6 100644
          /**
           * The list of regex replacements to do on a comment. Check the link regex is first so links are processed
           * before other delimiters
-@@ -56,19 +56,26 @@ export default class ExpensiMark {
+@@ -56,19 +56,25 @@ export default class ExpensiMark {
               * We need to convert before the auto email link rule and the manual link rule since it will not try to create a link
               * from an existing anchor tag.
               */
@@ -46,7 +46,6 @@ index 2d77cc3..7f5a2a6 100644
                          return match;
                      }
 -                    return `<a href="mailto:${g2}">${g1.trim()}</a>`;
-+                    console.log(g1);
 +                    let label = g1.trim();
 +                    const dataRawHref = g2 ? g2 + g3 : g3;
 +                    const href = `mailto:${g3}`;
@@ -57,7 +56,7 @@ index 2d77cc3..7f5a2a6 100644
                  },
              },
  
-@@ -85,7 +92,7 @@ export default class ExpensiMark {
+@@ -85,7 +91,7 @@ export default class ExpensiMark {
                      if (g1.match(CONST.REG_EXP.EMOJIS) || !g1.trim()) {
                          return match;
                      }
@@ -66,7 +65,7 @@ index 2d77cc3..7f5a2a6 100644
                  },
              },
  
-@@ -95,9 +102,9 @@ export default class ExpensiMark {
+@@ -95,9 +101,9 @@ export default class ExpensiMark {
               *
               * Also, apply the mention rule after email/link to prevent mention appears in an email/link.
               */
@@ -78,7 +77,7 @@ index 2d77cc3..7f5a2a6 100644
                  replacement: (match, g1, g2, g3) => {
                      if (!Str.isValidMention(match)) {
                          return match;
-@@ -141,7 +148,7 @@ export default class ExpensiMark {
+@@ -141,7 +147,7 @@ export default class ExpensiMark {
  
                  replacement: (match, g1, g2) => {
                      const href = Str.sanitizeURL(g2);
@@ -87,7 +86,7 @@ index 2d77cc3..7f5a2a6 100644
                  },
              },
              {
-@@ -180,12 +187,15 @@ export default class ExpensiMark {
+@@ -180,12 +186,15 @@ export default class ExpensiMark {
                      `(?![^<]*>|[^<>]*<\\/(?!em))([^\\w'#%+-]|^|<em>)${CONST.REG_EXP.MARKDOWN_EMAIL}(?!((?:(?!<a).)+)?<\\/a>|[^<]*(<\\/pre>|<\\/code>))`,
                      'gim',
                  ),
@@ -105,7 +104,7 @@ index 2d77cc3..7f5a2a6 100644
                  replacement: '<h1>$1</h1>',
              },
              {
-@@ -194,15 +204,25 @@ export default class ExpensiMark {
+@@ -194,15 +203,25 @@ export default class ExpensiMark {
                  // We also want to capture a blank line before or after the quote so that we do not add extra spaces.
                  // block quotes naturally appear on their own line. Blockquotes should not appear in code fences or
                  // inline code blocks. A single prepending space should be stripped if it exists
@@ -136,7 +135,7 @@ index 2d77cc3..7f5a2a6 100644
                  },
              },
              {
-@@ -388,7 +408,19 @@ export default class ExpensiMark {
+@@ -388,7 +407,19 @@ export default class ExpensiMark {
                  replacement: '',
              },
          ];
@@ -157,7 +156,7 @@ index 2d77cc3..7f5a2a6 100644
  
      /**
       * Replaces markdown with html elements
-@@ -401,11 +433,11 @@ export default class ExpensiMark {
+@@ -401,11 +432,11 @@ export default class ExpensiMark {
       *
       * @returns {String}
       */
@@ -172,7 +171,7 @@ index 2d77cc3..7f5a2a6 100644
  
          try {
              rules.forEach((rule) => {
-@@ -415,7 +447,7 @@ export default class ExpensiMark {
+@@ -415,7 +446,7 @@ export default class ExpensiMark {
                  }
  
                  if (rule.process) {
@@ -181,7 +180,7 @@ index 2d77cc3..7f5a2a6 100644
                  } else {
                      replacedText = replacedText.replace(rule.regex, rule.replacement);
                  }
-@@ -434,7 +466,7 @@ export default class ExpensiMark {
+@@ -434,7 +465,7 @@ export default class ExpensiMark {
          }
  
          return replacedText;
@@ -190,7 +189,7 @@ index 2d77cc3..7f5a2a6 100644
  
      /**
       * Checks matched URLs for validity and replace valid links with html elements
-@@ -519,7 +551,7 @@ export default class ExpensiMark {
+@@ -519,7 +550,7 @@ export default class ExpensiMark {
          }
  
          return replacedText;
@@ -199,7 +198,7 @@ index 2d77cc3..7f5a2a6 100644
  
      /**
       * Checks matched Emails for validity and replace valid links with html elements
-@@ -544,7 +576,7 @@ export default class ExpensiMark {
+@@ -544,7 +575,7 @@ export default class ExpensiMark {
                  filterRules: ['bold', 'strikethrough', 'italic'],
                  shouldEscapeText: false,
              });
@@ -208,7 +207,7 @@ index 2d77cc3..7f5a2a6 100644
              startIndex = match.index + (match[0].length);
  
              // Now we move to the next match that the js regex found in the text
-@@ -554,7 +586,7 @@ export default class ExpensiMark {
+@@ -554,7 +585,7 @@ export default class ExpensiMark {
              replacedText = replacedText.concat(textToCheck.substr(startIndex));
          }
          return replacedText;
@@ -217,7 +216,7 @@ index 2d77cc3..7f5a2a6 100644
  
      /**
       * replace block element with '\n' if :
-@@ -594,7 +626,7 @@ export default class ExpensiMark {
+@@ -594,7 +625,7 @@ export default class ExpensiMark {
          });
  
          return joinedText;
@@ -226,7 +225,7 @@ index 2d77cc3..7f5a2a6 100644
  
      /**
       * Replaces HTML with markdown
-@@ -621,7 +653,7 @@ export default class ExpensiMark {
+@@ -621,7 +652,7 @@ export default class ExpensiMark {
              generatedMarkdown = generatedMarkdown.replace(rule.regex, rule.replacement);
          });
          return Str.htmlDecode(this.replaceBlockElementWithNewLine(generatedMarkdown));
@@ -235,7 +234,7 @@ index 2d77cc3..7f5a2a6 100644
  
      /**
       * Convert HTML to text
-@@ -640,7 +672,7 @@ export default class ExpensiMark {
+@@ -640,7 +671,7 @@ export default class ExpensiMark {
          // We use 'htmlDecode' instead of 'unescape' to replace entities like '&#32;'
          replacedText = Str.htmlDecode(replacedText);
          return replacedText;
@@ -244,7 +243,7 @@ index 2d77cc3..7f5a2a6 100644
  
      /**
       * Modify text for Quotes replacing chevrons with html elements
-@@ -703,7 +735,7 @@ export default class ExpensiMark {
+@@ -703,7 +734,7 @@ export default class ExpensiMark {
              replacedText = textToCheck;
          }
          return replacedText;
@@ -253,7 +252,7 @@ index 2d77cc3..7f5a2a6 100644
  
      /**
       * Format the content of blockquote if the text matches the regex or else just return the original text
-@@ -724,7 +756,7 @@ export default class ExpensiMark {
+@@ -724,7 +755,7 @@ export default class ExpensiMark {
              return replacement(textToFormat);
          }
          return textToCheck;
@@ -262,7 +261,7 @@ index 2d77cc3..7f5a2a6 100644
  
      /**
       * Check if the input text includes only the open or the close tag of an element.
-@@ -763,7 +795,7 @@ export default class ExpensiMark {
+@@ -763,7 +794,7 @@ export default class ExpensiMark {
  
          // If there are any tags left in the stack, they're unclosed
          return tagStack.length !== 0;
@@ -271,7 +270,7 @@ index 2d77cc3..7f5a2a6 100644
  
      /**
       * @param {String} comment
-@@ -785,7 +817,7 @@ export default class ExpensiMark {
+@@ -785,7 +816,7 @@ export default class ExpensiMark {
              console.warn('Error parsing url in ExpensiMark.extractLinksInMarkdownComment', {error: e});
              return undefined;
          }
@@ -280,7 +279,7 @@ index 2d77cc3..7f5a2a6 100644
  
      /**
       * Compares two markdown comments and returns a list of the links removed in a new comment.
-@@ -800,3 +832,5 @@ export default class ExpensiMark {
+@@ -800,3 +831,5 @@ export default class ExpensiMark {
          return linksInOld === undefined || linksInNew === undefined ? [] : _.difference(linksInOld, linksInNew);
      }
  }
