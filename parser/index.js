@@ -129,13 +129,18 @@ function parseTreeToTextAndRanges(tree) {
         appendSyntax('```');
       } else if (node.tag.startsWith('<a href="')) {
         const href = _.unescape(node.tag.match(/href="([^"]*)"/)[1]); // always present
+        const isLabeledLink =
+          node.tag.match(/link-variant="([^"]*)"/)[1] === 'labeled';
         const dataRawHref = node.tag.match(/data-raw-href="([^"]*)"/);
+        const dataRawLabel = node.tag.match(/data-raw-label="([^"]*)"/);
         const matchString = dataRawHref ? _.unescape(dataRawHref[1]) : href;
         const previousNode = siblingNodes.at(currentNodeIndex - 1);
 
+        // stop processing as link while user is typing labeled link
         if (typeof previousNode === 'string' && previousNode.endsWith('](')) {
           processChildren(node);
         } else if (
+          !isLabeledLink &&
           node.children.length === 1 &&
           typeof node.children[0] === 'string' &&
           (node.children[0] === matchString ||
@@ -144,7 +149,7 @@ function parseTreeToTextAndRanges(tree) {
           addChildrenWithStyle(node.children[0], 'link');
         } else {
           appendSyntax('[');
-          processChildren(node);
+          processChildren(dataRawLabel ? _.unescape(dataRawLabel[1]) : node);
           appendSyntax('](');
           addChildrenWithStyle(matchString, 'link');
           appendSyntax(')');
