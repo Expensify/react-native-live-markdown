@@ -91,30 +91,19 @@ public class MarkdownUtils {
     return new LeadingMarginSpan.Standard(20);
   }
 
-  private void setSpan(SpannableStringBuilder ssb, Object span, int start, int end) {
-    mSpans.add(span);
-    ssb.setSpan(span, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-  }
-
   public void applyMarkdownFormatting(SpannableStringBuilder ssb) {
+    removeSpans(ssb);
+
     String input = ssb.toString();
     String output = nativeParseMarkdown(input);
     try {
       JSONArray array = new JSONArray(output);
       String text = array.getString(0);
 
-      if (ssb.toString().equals(text)) {
-        // The transformed text matches the original input so we only need to update spans.
-        // We shouldn't use `removeSpans()` because it also removes SpellcheckSpan, SuggestionSpan etc.
-        for (Object span : mSpans) {
-          ssb.removeSpan(span);
-        }
-        mSpans.clear();
-      } else {
-        // TODO: ensure that input stays the same and eventually remove this branch
-        // NOTE: If the input changes, the selection will not match.
-        // NOTE: Calling `replace` here causes layout jumps.
-        ssb.replace(0, ssb.length(), text, 0, text.length());
+
+
+      if (!ssb.toString().equals(text)) {
+        return;
       }
 
       JSONArray ranges = array.getJSONArray(1);
@@ -123,52 +112,69 @@ public class MarkdownUtils {
         String type = range.getString(0);
         int start = range.getInt(1);
         int end = start + range.getInt(2);
-        switch (type) {
-          case "bold":
-            setSpan(ssb, makeBoldSpan(), start, end);
-            break;
-          case "italic":
-            setSpan(ssb, makeItalicSpan(), start, end);
-            break;
-          case "strikethrough":
-            setSpan(ssb, makeStrikethroughSpan(), start, end);
-            break;
-          case "mention":
-            setSpan(ssb, makeBoldSpan(), start, end);
-            setSpan(ssb, makeMentionHereBackgroundSpan(), start, end);
-            break;
-          case "mention-user":
-            setSpan(ssb, makeBoldSpan(), start, end);
-            // TODO: change mention color when it mentions current user
-            setSpan(ssb, makeMentionUserBackgroundSpan(), start, end);
-            break;
-          case "syntax":
-            setSpan(ssb, makeBoldSpan(), start, end);
-            setSpan(ssb, makeSyntaxColorSpan(), start, end);
-            break;
-          case "link":
-            setSpan(ssb, makeUnderlineSpan(), start, end);
-            setSpan(ssb, makeLinkColorSpan(), start, end);
-            break;
-          case "code":
-          case "pre":
-            setSpan(ssb, makeMonospaceSpan(), start, end);
-            setSpan(ssb, makeCodeColorSpan(), start, end);
-            setSpan(ssb, makeCodeBackgroundSpan(), start, end);
-            break;
-          case "h1":
-            setSpan(ssb, makeBoldSpan(), start, end);
-            setSpan(ssb, makeHeadingSizeSpan(), start, end);
-            break;
-          case "blockquote":
-            setSpan(ssb, makeBlockquoteMarginSpan(), start, end);
-            break;
-          default:
-            throw new IllegalStateException("Unsupported type: " + type);
-        }
+        applyRange(ssb, type, start, end);
       }
     } catch (JSONException e) {
       // Do nothing
     }
+  }
+
+  private void applyRange(SpannableStringBuilder ssb, String type, int start, int end) {
+    switch (type) {
+      case "bold":
+        setSpan(ssb, makeBoldSpan(), start, end);
+        break;
+      case "italic":
+        setSpan(ssb, makeItalicSpan(), start, end);
+        break;
+      case "strikethrough":
+        setSpan(ssb, makeStrikethroughSpan(), start, end);
+        break;
+      case "mention":
+        setSpan(ssb, makeBoldSpan(), start, end);
+        setSpan(ssb, makeMentionHereBackgroundSpan(), start, end);
+        break;
+      case "mention-user":
+        setSpan(ssb, makeBoldSpan(), start, end);
+        // TODO: change mention color when it mentions current user
+        setSpan(ssb, makeMentionUserBackgroundSpan(), start, end);
+        break;
+      case "syntax":
+        setSpan(ssb, makeBoldSpan(), start, end);
+        setSpan(ssb, makeSyntaxColorSpan(), start, end);
+        break;
+      case "link":
+        setSpan(ssb, makeUnderlineSpan(), start, end);
+        setSpan(ssb, makeLinkColorSpan(), start, end);
+        break;
+      case "code":
+      case "pre":
+        setSpan(ssb, makeMonospaceSpan(), start, end);
+        setSpan(ssb, makeCodeColorSpan(), start, end);
+        setSpan(ssb, makeCodeBackgroundSpan(), start, end);
+        break;
+      case "h1":
+        setSpan(ssb, makeBoldSpan(), start, end);
+        setSpan(ssb, makeHeadingSizeSpan(), start, end);
+        break;
+      case "blockquote":
+        setSpan(ssb, makeBlockquoteMarginSpan(), start, end);
+        break;
+      default:
+        throw new IllegalStateException("Unsupported type: " + type);
+    }
+  }
+
+  private void setSpan(SpannableStringBuilder ssb, Object span, int start, int end) {
+    mSpans.add(span);
+    ssb.setSpan(span, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+  }
+
+  private void removeSpans(SpannableStringBuilder ssb) {
+    // We shouldn't use `removeSpans()` because it also removes SpellcheckSpan, SuggestionSpan etc.
+    for (Object span : mSpans) {
+      ssb.removeSpan(span);
+    }
+    mSpans.clear();
   }
 }
