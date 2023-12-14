@@ -10,12 +10,7 @@ import android.text.style.StyleSpan;
 import com.facebook.react.views.textinput.ReactEditText;
 
 public class MarkdownTextWatcher implements TextWatcher {
-  private final ReactEditText mReactEditText;
-  private boolean mIsFormatting = false;
-
-  public MarkdownTextWatcher(ReactEditText reactEditText) {
-    mReactEditText = reactEditText;
-  }
+  private final MarkdownUtils mMarkdownUtils = new MarkdownUtils();
 
   @Override
   public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -29,17 +24,8 @@ public class MarkdownTextWatcher implements TextWatcher {
 
   @Override
   public void afterTextChanged(Editable editable) {
-    if (!mIsFormatting) {
-      mIsFormatting = true; // prevent recursive calls
-      if (editable instanceof SpannableStringBuilder) {
-        SpannableStringBuilder ssb = (SpannableStringBuilder) editable;
-        int selectionStart = mReactEditText.getSelectionStart();
-        int selectionEnd = mReactEditText.getSelectionEnd();
-        MarkdownUtils.applyMarkdownFormatting(ssb);
-        int length = ssb.length();
-        mReactEditText.setSelection(Math.min(selectionStart, length), Math.min(selectionEnd, length));
-      }
-      mIsFormatting = false;
+    if (editable instanceof SpannableStringBuilder) {
+      mMarkdownUtils.applyMarkdownFormatting((SpannableStringBuilder) editable);
     }
   }
 }
