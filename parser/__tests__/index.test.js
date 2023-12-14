@@ -107,16 +107,17 @@ test('labeled link', () => {
 });
 
 test('link with same label as href', () => {
-  expect('[https://example.com](https://example.com)').toBeParsedAs(
-    'https://example.com',
-    [['link', 0, 19]]
-  );
+  expect('[https://example.com](https://example.com)').toBeParsedAs(SAME, [
+    ['syntax', 0, 1],
+    ['syntax', 20, 2],
+    ['link', 22, 19],
+    ['syntax', 41, 1],
+  ]);
 });
 
 test('no nesting links while typing', () => {
   expect('[link](www.google.com').toBeParsedAs(SAME, []);
 });
-
 
 test('link with query string', () => {
   expect('https://example.com?name=John&age=25&city=NewYork').toBeParsedAs(
@@ -140,30 +141,47 @@ test('labeled email', () => {
 
 describe('email with same label as address', () => {
   test('label and address without "mailto:"', () => {
-    expect('[someone@example.com](someone@example.com)').toBeParsedAs(
-      'someone@example.com',
-      [['link', 0, 19]]
-    );
+    expect('[someone@example.com](someone@example.com)').toBeParsedAs(SAME, [
+      ['syntax', 0, 1],
+      ['syntax', 20, 2],
+      ['link', 22, 19],
+      ['syntax', 41, 1],
+    ]);
   });
 
   test('label with "mailto:"', () => {
     expect('[mailto:someone@example.com](someone@example.com)').toBeParsedAs(
-      'someone@example.com',
-      [['link', 0, 19]]
+      SAME,
+      [
+        ['syntax', 0, 1],
+        ['syntax', 27, 2],
+        ['link', 29, 19],
+        ['syntax', 48, 1],
+      ]
     );
   });
 
   test('address with "mailto:"', () => {
     expect('[someone@example.com](mailto:someone@example.com)').toBeParsedAs(
-      'someone@example.com',
-      [['link', 0, 19]]
+      SAME,
+      [
+        ['syntax', 0, 1],
+        ['syntax', 20, 2],
+        ['link', 22, 26],
+        ['syntax', 48, 1],
+      ]
     );
   });
 
   test('label and address with "mailto:"', () => {
     expect(
       '[mailto:someone@example.com](mailto:someone@example.com)'
-    ).toBeParsedAs('someone@example.com', [['link', 0, 19]]);
+    ).toBeParsedAs(SAME, [
+      ['syntax', 0, 1],
+      ['syntax', 27, 2],
+      ['link', 29, 26],
+      ['syntax', 55, 1],
+    ]);
   });
 });
 
