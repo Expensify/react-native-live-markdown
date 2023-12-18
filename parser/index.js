@@ -83,7 +83,7 @@ function parseTreeToTextAndRanges(tree) {
   }
 
   const ranges = [];
-  function dfs(node, currentNodeIndex, siblingNodes) {
+  function dfs(node) {
     if (typeof node === 'string') {
       text += node;
     } else {
@@ -134,12 +134,8 @@ function parseTreeToTextAndRanges(tree) {
         const dataRawHref = node.tag.match(/data-raw-href="([^"]*)"/);
         const dataRawLabel = node.tag.match(/data-raw-label="([^"]*)"/);
         const matchString = dataRawHref ? _.unescape(dataRawHref[1]) : href;
-        const previousNode = siblingNodes.at(currentNodeIndex - 1);
 
-        // stop processing as link while user is typing labeled link
-        if (typeof previousNode === 'string' && previousNode.endsWith('](')) {
-          processChildren(node);
-        } else if (
+        if (
           !isLabeledLink &&
           node.children.length === 1 &&
           typeof node.children[0] === 'string' &&
