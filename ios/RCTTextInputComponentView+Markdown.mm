@@ -11,11 +11,11 @@
 - (void)setMarkdownEnabled:(BOOL)markdownEnabled {
   NSNumber *markdownEnabledNumber = [NSNumber numberWithBool:markdownEnabled];
   objc_setAssociatedObject(self, @selector(isMarkdownEnabled), markdownEnabledNumber, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
- 
+
   if (markdownEnabled) {
     // force Markdown formatting on first render because `_setAttributedText` is called before `setMarkdownEnabled`
     RCTUITextField *backedTextInputView = [self valueForKey:@"_backedTextInputView"];
-    backedTextInputView.attributedText = [RCTMarkdownUtils parseMarkdown:backedTextInputView.attributedText.string];
+    backedTextInputView.attributedText = [RCTMarkdownUtils parseMarkdown:backedTextInputView.attributedText];
   }
 }
 
@@ -26,8 +26,8 @@
 
 - (void)markdown__setAttributedString:(NSAttributedString *)attributedString
 {
-  if ([self isMarkdownEnabled] && attributedString != nil) {
-    attributedString = [RCTMarkdownUtils parseMarkdown:attributedString.string];
+  if ([self isMarkdownEnabled]) {
+    attributedString = [RCTMarkdownUtils parseMarkdown:attributedString];
   }
 
   // Call the original method

@@ -16,8 +16,8 @@
 
 - (void)markdown_setAttributedText:(NSAttributedString *)attributedText
 {
-  if ([self isMarkdownEnabled] && attributedText != nil) {
-    attributedText = [RCTMarkdownUtils parseMarkdown:attributedText.string];
+  if ([self isMarkdownEnabled]) {
+    attributedText = [RCTMarkdownUtils parseMarkdown:attributedText];
   }
 
   // Call the original method
@@ -27,7 +27,7 @@
 - (void)markdown_updateLocalData
 {
   if ([self isMarkdownEnabled]) {
-    NSAttributedString *attributedText = [RCTMarkdownUtils parseMarkdown:self.backedTextInputView.attributedText.string];
+    NSAttributedString *attributedText = [RCTMarkdownUtils parseMarkdown:self.backedTextInputView.attributedText];
     [self.backedTextInputView setAttributedText:attributedText];
   }
 
@@ -49,7 +49,7 @@
       Method swizzledMethod = class_getInstanceMethod(cls, swizzledSelector);
       method_exchangeImplementations(originalMethod, swizzledMethod);
     }
-      
+
     {
       // swizzle setAttributedText
       SEL originalSelector = @selector(updateLocalData);
