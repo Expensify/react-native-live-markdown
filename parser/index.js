@@ -118,13 +118,13 @@ function parseTreeToTextAndRanges(tree) {
       } else if (node.tag === '<h1>') {
         appendSyntax('# ');
         addChildrenWithStyle(node, 'h1');
-      } else if (node.tag === '<pre>') {
+      } else if (node.tag.startsWith('<pre')) {
+        const dataRaw = node.tag.match(/data-code-raw="([^"]*)"/);
+        const content = dataRaw
+          ? _.unescape(dataRaw[1])
+          : node.children.join('').replaceAll('&#32;', ' ');
+
         appendSyntax('```');
-        text += '\n';
-        if (!node.children.every((child) => typeof child === 'string')) {
-          throw new Error('Invalid HTML: <pre> must contain only text');
-        }
-        const content = node.children.join('').replaceAll('&#32;', ' ');
         addChildrenWithStyle(content, 'pre');
         appendSyntax('```');
       } else if (node.tag.startsWith('<a href="')) {
