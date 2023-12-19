@@ -3,7 +3,13 @@
 
 @implementation RCTMarkdownUtils
 
-+ (NSAttributedString *)parseMarkdown:(nonnull NSString *)input {
++ (NSAttributedString *)parseMarkdown:(NSAttributedString *)input {
+  if (input == nil) {
+    return nil;
+  }
+
+  // TODO: memoize outputs in LRU cache
+
   static JSContext *ctx = nil;
   static JSValue *function = nil;
   if (ctx == nil) {
@@ -14,20 +20,21 @@
     function = ctx[@"parseMarkdownToTextAndRanges"];
   }
 
-  JSValue *result = [function callWithArguments:@[input]];
-  NSString *text = [result[0] toString];
+  NSString *inputString = [input string];
+  JSValue *result = [function callWithArguments:@[inputString]];
+  NSString *outputString = [result[0] toString];
   NSArray *ranges = [result[1] toArray];
 
-  NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:text];
-  [attributedString beginEditing];
+  if (![outputString isEqualToString:inputString]) {
+    return input;
+  }
 
-  [attributedString addAttribute:NSFontAttributeName
-                           value:[UIFont systemFontOfSize:20]
-                           range:NSMakeRange(0, [text length])];
+  NSMutableAttributedString *attributedString = [input mutableCopy];
+  [attributedString beginEditing];
 
   NSMutableArray *quoteRanges = [NSMutableArray new];
 
-  [ranges enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+  [ranges enumerateObjectsUsingBlock:^(id _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
     NSArray *item = obj;
     NSString *type = item[0];
     NSUInteger location = [item[1] unsignedIntegerValue];

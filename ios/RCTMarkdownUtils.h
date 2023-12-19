@@ -1,5 +1,5 @@
 @interface RCTMarkdownUtils : NSObject
 
-+ (nonnull NSAttributedString *)parseMarkdown:(nonnull NSString *)input;
++ (NSAttributedString *)parseMarkdown:(NSAttributedString *)input;
 
 @end

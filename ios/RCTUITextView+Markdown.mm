@@ -18,7 +18,7 @@
 {
   if ([self isMarkdownEnabled]) {
     UITextRange *range = self.selectedTextRange;
-    super.attributedText = [RCTMarkdownUtils parseMarkdown:self.attributedText.string];
+    super.attributedText = [RCTMarkdownUtils parseMarkdown:self.attributedText];
     [super setSelectedTextRange:range]; // prevents cursor from jumping at the end when typing in the middle of the text
 
     if ([self.attributedText length] > 0) {
@@ -26,7 +26,7 @@
       self.typingAttributes = @{NSFontAttributeName:font}; // removes indent in new line when typing after quote
     }
   }
-    
+
   // Call the original method
   [self markdown_textDidChange];
 }
