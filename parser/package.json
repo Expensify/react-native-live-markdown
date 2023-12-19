@@ -7,7 +7,7 @@
   "scripts": {
     "test": "jest",
     "build": "esbuild index.js --bundle --minify --outfile=out.js",
-    "build-ts": "esbuild index.ts --bundle --minify --outfile=outtest.js",
+    "build-ts": "esbuild index.ts --bundle --minify --outfile=out.js",
     "run": "node out.js",
     "postinstall": "patch-package"
   },

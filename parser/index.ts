@@ -1,13 +1,14 @@
 import ExpensiMark from 'expensify-common/lib/ExpensiMark';
 import _ from 'underscore';
-import type { ReactNode } from 'react';
 
-type Token = [string, string];
+type Range = [string, number, number];
+type Token = ['TEXT' | 'HTML', string];
+type StackItem = {tag: string, children: Array<StackItem | string>};
 
 function parseMarkdownToHTML(markdown: string): string {
   const parser = new ExpensiMark;
   const html = parser.replace(markdown, {
-    // TODO ask Tomek about it
+    // TODO remove ts-ignore after patch is added
     // @ts-ignore
     shouldKeepWhitespace: true,
   });
@@ -38,9 +39,7 @@ function parseHTMLToTokens(html: string): Token[] {
   return tokens;
 }
 
-type StackItem = {tag: string, children: Array<string | StackItem>};
-
-function parseTokensToTree(tokens: Token[]): StackItem | undefined {
+function parseTokensToTree(tokens: Token[]): StackItem {
   const stack: StackItem[] = [{ tag: '<>', children: [] }];
   tokens.forEach(([type, payload]) => {
     if (type === 'TEXT') {
@@ -64,19 +63,16 @@ function parseTokensToTree(tokens: Token[]): StackItem | undefined {
   if (stack.length !== 1) {
     throw new Error('Invalid HTML: unclosed tags');
   }
-  return stack[0];
+  return (stack[0] as StackItem);
 }
-
-type Range = [string, number, number];
 
 function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
   let text = '';
 
-  function processChildren(node: ReactNode) {
+  function processChildren(node: StackItem | string) {
     if (typeof node === 'string') {
       text += node;
     } else {
-      // TODO - figure out a way to have the same type for all nodes in this file
       node.children.forEach(dfs);
     }
   }
@@ -85,7 +81,7 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
     addChildrenWithStyle(syntax, 'syntax');
   }
 
-  function addChildrenWithStyle(node: string, style: string) {
+  function addChildrenWithStyle(node: StackItem | string, style: string) {
     const start = text.length;
     processChildren(node);
     const end = text.length;
@@ -93,14 +89,14 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
   }
 
   const ranges: Range[] = [];
-  function dfs(node) {
+  function dfs(node: StackItem | string) {
     if (typeof node === 'string') {
       text += node;
     } else {
       if (node.tag === '<>') {
         processChildren(node);
       } else if (node.tag === '<strong>') {
-        appendSyntax('*', 'syntax');
+        appendSyntax('*');
         addChildrenWithStyle(node, 'bold');
         appendSyntax('*');
       } else if (node.tag === '<em>') {
@@ -141,7 +137,7 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
         addChildrenWithStyle(content, 'pre');
         appendSyntax('```');
       } else if (node.tag.startsWith('<a href="')) {
-        const href = _.unescape(node.tag.match(/href="([^"]*)"/)[1]);
+        const href = _.unescape(node.tag.match(/href="([^"]*)"/)?.[1] ?? '');
         if (
           node.children.length === 1 &&
           typeof node.children[0] === 'string' &&
@@ -164,14 +160,17 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
   return [text, ranges];
 }
 
-function parseMarkdownToTextAndRanges(markdown: string): [string, Range[]] | undefined {
+function sortRanges(ranges: Range[]): Range[] {
+  return ranges.sort((a, b) => a[1] - b[1]); // sort by location to properly handle bold+italic
+}
+
+function parseMarkdownToTextAndRanges(markdown: string): [string, Range[]] {
   const html = parseMarkdownToHTML(markdown);
   const tokens = parseHTMLToTokens(html);
   const tree = parseTokensToTree(tokens);
-  if (!tree) return;
   const [text, ranges] = parseTreeToTextAndRanges(tree);
-  ranges.sort((a, b) => a[1] - b[1]); // sort by location to properly handle bold+italic
-  return [text, ranges];
+  const sortedRanges = sortRanges(ranges);
+  return [text, sortedRanges];
 }
 
 // eslint-disable-next-line no-undef
