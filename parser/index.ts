@@ -130,7 +130,7 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
       } else if (node.tag === '<pre>') {
         appendSyntax('```');
         text += '\n';
-        if (!node.children.every((child: ReactNode) => typeof child === 'string')) {
+        if (!node.children.every((child) => typeof child === 'string')) {
           throw new Error('Invalid HTML: <pre> must contain only text');
         }
         const content = node.children.join('').replaceAll('&#32;', ' ');

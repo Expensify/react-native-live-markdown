@@ -23,6 +23,8 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "esnext",
-    "verbatimModuleSyntax": true
-  }
+    "verbatimModuleSyntax": true,
+    "typeRoots": ["node_modules/@types"]
+  },
+  "include": ["src/**/*", "types/global.d.ts"]
 }

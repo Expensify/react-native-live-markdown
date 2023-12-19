@@ -23,5 +23,6 @@
     "strict": true,
     "target": "esnext",
     "verbatimModuleSyntax": true
-  }
+  },
+  "include": ["./**/*", "../types/global.d.ts"]
 }
