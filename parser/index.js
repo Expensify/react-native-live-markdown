@@ -4,7 +4,7 @@ import _ from 'underscore';
 function parseMarkdownToHTML(markdown) {
   const parser = ExpensiMark;
   const html = parser.replace(markdown, {
-    shouldKeepWhitespace: true,
+    shouldKeepRawInput: true,
   });
   return html;
 }
@@ -119,10 +119,9 @@ function parseTreeToTextAndRanges(tree) {
         appendSyntax('# ');
         addChildrenWithStyle(node, 'h1');
       } else if (node.tag.startsWith('<pre')) {
-        const dataRaw = node.tag.match(/data-code-raw="([^"]*)"/);
-        const content = dataRaw
-          ? _.unescape(dataRaw[1])
-          : node.children.join('').replaceAll('&#32;', ' ');
+        const content = _.unescape(
+          node.tag.match(/data-code-raw="([^"]*)"/)[1]
+        );
 
         appendSyntax('```');
         addChildrenWithStyle(content, 'pre');
@@ -132,9 +131,7 @@ function parseTreeToTextAndRanges(tree) {
         const isLabeledLink =
           node.tag.match(/link-variant="([^"]*)"/)[1] === 'labeled';
         const dataRawHref = node.tag.match(/data-raw-href="([^"]*)"/);
-        const dataRawLabel = node.tag.match(/data-raw-label="([^"]*)"/);
         const matchString = dataRawHref ? _.unescape(dataRawHref[1]) : href;
-
         if (
           !isLabeledLink &&
           node.children.length === 1 &&
@@ -145,7 +142,7 @@ function parseTreeToTextAndRanges(tree) {
           addChildrenWithStyle(node.children[0], 'link');
         } else {
           appendSyntax('[');
-          processChildren(dataRawLabel ? _.unescape(dataRawLabel[1]) : node);
+          processChildren(node);
           appendSyntax('](');
           addChildrenWithStyle(matchString, 'link');
           appendSyntax(')');
