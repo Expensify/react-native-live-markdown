@@ -17,7 +17,7 @@
     "jest": "^29.7.0"
   },
   "dependencies": {
-    "expensify-common": "git+ssh://git@github.com/Expensify/expensify-common.git#b7f2a13bf32c9780ff407aa65046513584fc425d",
+    "expensify-common": "git+ssh://git@github.com/Expensify/expensify-common.git#c6bb3cfa56d12af9fa02e2bfc729646f5b64ef44",
     "patch-package": "^8.0.0",
     "underscore": "^1.13.6"
   }

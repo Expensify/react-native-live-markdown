@@ -1,5 +1,5 @@
 diff --git a/node_modules/expensify-common/lib/ExpensiMark.js b/node_modules/expensify-common/lib/ExpensiMark.js
-index a8fa687..11905bc 100644
+index 6b198e2..90ec211 100644
 --- a/node_modules/expensify-common/lib/ExpensiMark.js
 +++ b/node_modules/expensify-common/lib/ExpensiMark.js
 @@ -7,8 +7,8 @@ const MARKDOWN_LINK_REGEX = new RegExp(`\\[([^\\][]*(?:\\[[^\\][]*][^\\][]*)*)]\
@@ -85,17 +85,9 @@ index a8fa687..11905bc 100644
 +                    return `${g1}<a href="${href}" data-raw-href="${g2}" data-link-variant="auto" target="_blank" rel="noreferrer noopener">${g2}</a>${g1}`;
 +                }
              },
-             {
-                 /**
-@@ -200,6 +224,7 @@ export default class ExpensiMark {
-                     'gim',
-                 ),
-                 replacement: '$1<a href="mailto:$2">$2</a>',
-+                rawInputReplacement: '$1<a href="mailto:$2" data-raw-href="$2" data-link-variant="auto">$2</a>',
-             },
  
              {
-@@ -208,16 +233,16 @@ export default class ExpensiMark {
+@@ -170,16 +194,16 @@ export default class ExpensiMark {
                  // We also want to capture a blank line before or after the quote so that we do not add extra spaces.
                  // block quotes naturally appear on their own line. Blockquotes should not appear in code fences or
                  // inline code blocks. A single prepending space should be stripped if it exists
@@ -116,7 +108,7 @@ index a8fa687..11905bc 100644
                      // We want to enable 2 options of nested heading inside the blockquote: "># heading" and "> # heading".
                      // To do this we need to parse body of the quote without first space
                      let isStartingWithSpace = false;
-@@ -225,7 +250,7 @@ export default class ExpensiMark {
+@@ -187,7 +211,7 @@ export default class ExpensiMark {
                          isStartingWithSpace = !!g2;
                          return '';
                      });
@@ -125,7 +117,15 @@ index a8fa687..11905bc 100644
                      return `<blockquote>${isStartingWithSpace ? ' ' : ''}${replacedText}</blockquote>`;
                  },
              },
-@@ -423,7 +448,7 @@ export default class ExpensiMark {
+@@ -228,6 +252,7 @@ export default class ExpensiMark {
+                     'gim',
+                 ),
+                 replacement: '$1<a href="mailto:$2">$2</a>',
++                rawInputReplacement: '$1<a href="mailto:$2" data-raw-href="$2" data-link-variant="auto">$2</a>',
+             },
+ 
+             {
+@@ -424,7 +449,7 @@ export default class ExpensiMark {
           * @type {Object[]}
           */
          this.shouldKeepWhitespaceRules = this.rules.filter(rule => !this.whitespaceRulesToDisable.includes(rule.name)).map(rule => rule.name);
@@ -134,7 +134,7 @@ index a8fa687..11905bc 100644
  
      /**
       * Replaces markdown with html elements
-@@ -436,10 +461,10 @@ export default class ExpensiMark {
+@@ -437,10 +462,10 @@ export default class ExpensiMark {
       *
       * @returns {String}
       */
@@ -147,7 +147,7 @@ index a8fa687..11905bc 100644
          const rules = _.isEmpty(excludeRules) ? this.rules : _.filter(this.rules, rule => _.contains(excludeRules, rule.name));
  
          try {
-@@ -448,11 +473,11 @@ export default class ExpensiMark {
+@@ -449,11 +474,11 @@ export default class ExpensiMark {
                  if (rule.pre) {
                      replacedText = rule.pre(replacedText);
                  }
@@ -162,7 +162,7 @@ index a8fa687..11905bc 100644
                  }
  
                  // Post-process text after applying regex
-@@ -469,7 +494,7 @@ export default class ExpensiMark {
+@@ -470,7 +495,7 @@ export default class ExpensiMark {
          }
  
          return replacedText;
@@ -171,7 +171,7 @@ index a8fa687..11905bc 100644
  
      /**
       * Checks matched URLs for validity and replace valid links with html elements
-@@ -576,7 +601,7 @@ export default class ExpensiMark {
+@@ -577,7 +602,7 @@ export default class ExpensiMark {
          }
  
          return replacedText;
@@ -180,7 +180,7 @@ index a8fa687..11905bc 100644
  
      /**
       * Checks matched Emails for validity and replace valid links with html elements
-@@ -584,10 +609,11 @@ export default class ExpensiMark {
+@@ -585,10 +610,11 @@ export default class ExpensiMark {
       * @param {RegExp} regex
       * @param {String} textToCheck
       * @param {Function} replacement
@@ -193,7 +193,7 @@ index a8fa687..11905bc 100644
          let match = regex.exec(textToCheck);
          let replacedText = '';
          let startIndex = 0;
-@@ -601,7 +627,10 @@ export default class ExpensiMark {
+@@ -602,7 +628,10 @@ export default class ExpensiMark {
                  filterRules: ['bold', 'strikethrough', 'italic'],
                  shouldEscapeText: false,
              });
@@ -205,7 +205,7 @@ index a8fa687..11905bc 100644
              startIndex = match.index + (match[0].length);
  
              // Now we move to the next match that the js regex found in the text
-@@ -611,7 +640,7 @@ export default class ExpensiMark {
+@@ -612,7 +641,7 @@ export default class ExpensiMark {
              replacedText = replacedText.concat(textToCheck.substr(startIndex));
          }
          return replacedText;
@@ -214,7 +214,7 @@ index a8fa687..11905bc 100644
  
      /**
       * replace block element with '\n' if :
-@@ -651,7 +680,7 @@ export default class ExpensiMark {
+@@ -652,7 +681,7 @@ export default class ExpensiMark {
          });
  
          return joinedText;
@@ -223,7 +223,7 @@ index a8fa687..11905bc 100644
  
      /**
       * Replaces HTML with markdown
-@@ -678,7 +707,7 @@ export default class ExpensiMark {
+@@ -679,7 +708,7 @@ export default class ExpensiMark {
              generatedMarkdown = generatedMarkdown.replace(rule.regex, rule.replacement);
          });
          return Str.htmlDecode(this.replaceBlockElementWithNewLine(generatedMarkdown));
@@ -232,7 +232,7 @@ index a8fa687..11905bc 100644
  
      /**
       * Convert HTML to text
-@@ -697,7 +726,7 @@ export default class ExpensiMark {
+@@ -698,7 +727,7 @@ export default class ExpensiMark {
          // We use 'htmlDecode' instead of 'unescape' to replace entities like '&#32;'
          replacedText = Str.htmlDecode(replacedText);
          return replacedText;
@@ -241,7 +241,7 @@ index a8fa687..11905bc 100644
  
      /**
       * Modify text for Quotes replacing chevrons with html elements
-@@ -760,7 +789,7 @@ export default class ExpensiMark {
+@@ -761,7 +790,7 @@ export default class ExpensiMark {
              replacedText = textToCheck;
          }
          return replacedText;
@@ -250,7 +250,7 @@ index a8fa687..11905bc 100644
  
      /**
       * Format the content of blockquote if the text matches the regex or else just return the original text
-@@ -781,7 +810,7 @@ export default class ExpensiMark {
+@@ -782,7 +811,7 @@ export default class ExpensiMark {
              return replacement(textToFormat);
          }
          return textToCheck;
@@ -259,7 +259,7 @@ index a8fa687..11905bc 100644
  
      /**
       * Check if the input text includes only the open or the close tag of an element.
-@@ -820,7 +849,7 @@ export default class ExpensiMark {
+@@ -821,7 +850,7 @@ export default class ExpensiMark {
  
          // If there are any tags left in the stack, they're unclosed
          return tagStack.length !== 0;
@@ -268,7 +268,7 @@ index a8fa687..11905bc 100644
  
      /**
       * @param {String} comment
-@@ -842,7 +871,7 @@ export default class ExpensiMark {
+@@ -843,7 +872,7 @@ export default class ExpensiMark {
              console.warn('Error parsing url in ExpensiMark.extractLinksInMarkdownComment', {error: e});
              return undefined;
          }
@@ -277,7 +277,7 @@ index a8fa687..11905bc 100644
  
      /**
       * Compares two markdown comments and returns a list of the links removed in a new comment.
-@@ -857,3 +886,5 @@ export default class ExpensiMark {
+@@ -858,3 +887,5 @@ export default class ExpensiMark {
          return linksInOld === undefined || linksInNew === undefined ? [] : _.difference(linksInOld, linksInNew);
      }
  }
