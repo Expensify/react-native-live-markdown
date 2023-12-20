@@ -1,0 +1,11 @@
+**/node_modules/*
+*/node_modules/*
+**/lib/*
+**/__tests__/*
+**/out.js
+.eslintrc.js
+**/babel.config.js
+**/webpack.config.js
+**/jest.config.js
+**/metro.config.js
+**/react-native.config.js
