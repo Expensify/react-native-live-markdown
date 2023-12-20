@@ -1,14 +1,20 @@
 #import <react-native-markdown-text-input/RCTMarkdownUtils.h>
 #import <JavaScriptCore/JavaScriptCore.h>
 
-@implementation RCTMarkdownUtils
+@implementation RCTMarkdownUtils {
+  NSString *_prevInputString;
+  NSAttributedString *_prevAttributedString;
+}
 
-+ (NSAttributedString *)parseMarkdown:(NSAttributedString *)input {
+- (NSAttributedString *)parseMarkdown:(NSAttributedString *)input {
   if (input == nil) {
     return nil;
   }
 
-  // TODO: memoize outputs in LRU cache
+  NSString *inputString = [input string];
+  if ([inputString isEqualToString:_prevInputString]) {
+    return _prevAttributedString;
+  }
 
   static JSContext *ctx = nil;
   static JSValue *function = nil;
@@ -20,7 +26,6 @@
     function = ctx[@"parseMarkdownToTextAndRanges"];
   }
 
-  NSString *inputString = [input string];
   JSValue *result = [function callWithArguments:@[inputString]];
   NSString *outputString = [result[0] toString];
   NSArray *ranges = [result[1] toArray];
@@ -95,6 +100,9 @@
   }];
 
   [attributedString endEditing];
+
+  _prevInputString = inputString;
+  _prevAttributedString = attributedString;
 
   return attributedString;
 }
