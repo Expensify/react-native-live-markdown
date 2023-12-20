@@ -67,17 +67,17 @@
 #endif /* RCT_NEW_ARCH_ENABLED */
 
   RCTMarkdownUtils *markdownUtils = [[RCTMarkdownUtils alloc] init];
-  [_textInput setMarkdownEnabled:YES];
   [_textInput setMarkdownUtils:markdownUtils];
+  [_textInput setMarkdownEnabled:YES];
   if ([backedTextInputView isKindOfClass:[RCTUITextField class]]) {
     RCTUITextField *textField = (RCTUITextField *)backedTextInputView;
     _adapter = [textField valueForKey:@"textInputDelegateAdapter"];
-    [_adapter setMarkdownEnabled:YES];
     [_adapter setMarkdownUtils:markdownUtils];
+    [_adapter setMarkdownEnabled:YES];
   } else if ([backedTextInputView isKindOfClass:[RCTUITextView class]]) {
     _textView = (RCTUITextView *)backedTextInputView;
-    [_textView setMarkdownEnabled:YES];
     [_textView setMarkdownUtils:markdownUtils];
+    [_textView setMarkdownEnabled:YES];
   } else {
     react_native_assert(false && "Cannot enable Markdown for this type of TextInput.");
   }
