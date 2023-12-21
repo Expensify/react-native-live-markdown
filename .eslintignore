@@ -1,9 +1,8 @@
-**/__tests__/*
+# BUILD FILES
 **/out.js
 
-# NODE MODULES / LIBS
+# NODE MODULES
 **/node_modules/*
-**/lib/*
 
 # CONFIG FILES
 .eslintrc.js
@@ -12,4 +11,3 @@
 **/jest.config.js
 **/metro.config.js
 **/react-native.config.js
-
