@@ -21,7 +21,6 @@ function getPlatform() {
 }
 
 function getArchitecture() {
-  // @ts-ignore TODO - add global to type augumentation
   return 'nativeFabricUIManager' in global ? 'Fabric' : 'Paper';
 }
 

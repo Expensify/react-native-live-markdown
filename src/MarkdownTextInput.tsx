@@ -10,7 +10,6 @@ export interface MarkdownTextInputProps extends TextInputProps {
 
 const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
   (props, ref) => {
-    // @ts-ignore TODO - add global to type augumentation
     const IS_FABRIC = 'nativeFabricUIManager' in global;
     return (
       <>
