@@ -1,8 +1,11 @@
-**/node_modules/*
-*/node_modules/*
-**/lib/*
 **/__tests__/*
 **/out.js
+
+# NODE MODULES / LIBS
+**/node_modules/*
+**/lib/*
+
+# CONFIG FILES
 .eslintrc.js
 **/babel.config.js
 **/webpack.config.js

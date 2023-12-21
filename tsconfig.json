@@ -27,5 +27,5 @@
     "types": []
   },
   "include": ["src/**/*", "parser/**/*", "example/src/**/*", "WebExample/**/*"],
-  "exclude": ["node_modules","**/node_modules/**/*", "**/lib/**/*", "**/__tests__/**/*", "WebExample/**/*"],
+  "exclude": ["**/node_modules/**/*", "**/lib/**/*", "**/__tests__/**/*", "WebExample/**/*"],
 }
