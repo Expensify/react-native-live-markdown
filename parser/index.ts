@@ -180,5 +180,4 @@ function parseMarkdownToTextAndRanges(markdown: string): [string, Range[]] {
   return [text, sortedRanges];
 }
 
-// eslint-disable-next-line no-undef
 globalThis.parseMarkdownToTextAndRanges = parseMarkdownToTextAndRanges;
