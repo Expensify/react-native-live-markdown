@@ -9,7 +9,6 @@ import {
   View,
 } from 'react-native';
 
-// eslint-disable-next-line import/no-unresolved
 import { MarkdownTextInput } from 'react-native-markdown-text-input';
 
 function getPlatform() {

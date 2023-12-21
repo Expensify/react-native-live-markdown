@@ -8,7 +8,7 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
     'prettier',
     'plugin:import/typescript',
-    "plugin:prettier/recommended",
+    'plugin:prettier/recommended',
   ],
   plugins: [
     'react',
@@ -17,19 +17,24 @@ module.exports = {
     '@typescript-eslint',
     'eslint-plugin-tsdoc',
   ],
+  settings: {
+    'import/resolver': {
+      alias: [['react-native-markdown-text-input', './src/index.tsx']],
+    },
+  },
   root: true,
   rules: {
-    "prettier/prettier": [
-      "error",
+    'prettier/prettier': [
+      'error',
       {
-        "quoteProps": "consistent",
-        "singleQuote": true,
-        "tabWidth": 2,
-        "trailingComma": "es5",
-        "useTabs": false
-      }
+        quoteProps: 'consistent',
+        singleQuote: true,
+        tabWidth: 2,
+        trailingComma: 'es5',
+        useTabs: false,
+      },
     ],
-    curly: 'error',
+    'curly': 'error',
     'import/no-unresolved': 'error',
     'import/consistent-type-specifier-style': ['error', 'prefer-top-level'],
     'react/jsx-uses-vars': 'error',
@@ -45,7 +50,7 @@ module.exports = {
     ],
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     '@typescript-eslint/no-var-requires': 'warn',
-    eqeqeq: 'error',
+    'eqeqeq': 'error',
     'no-unreachable': 'error',
     '@typescript-eslint/consistent-type-imports': [
       'error',
