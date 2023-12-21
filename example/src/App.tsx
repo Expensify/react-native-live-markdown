@@ -32,7 +32,7 @@ export default function App() {
   return (
     <View style={styles.container}>
       <Text>{getPlatform()}</Text>
-      <Text>{getArchitecture()}</Text>
+      {Platform.OS !== 'web' && <Text>{getArchitecture()}</Text>}
       <Text>MarkdownTextInput singleline</Text>
       <MarkdownTextInput
         autoCapitalize="none"
