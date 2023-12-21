@@ -1,4 +1,5 @@
-import ExpensiMark from 'expensify-common/lib/ExpensiMark';
+// @ts-ignore - to review how it's implemented in ExpensiMark
+import { ExpensiMark } from 'expensify-common/lib/ExpensiMark';
 import _ from 'underscore';
 
 type Range = [string, number, number];
@@ -6,7 +7,7 @@ type Token = ['TEXT' | 'HTML', string];
 type StackItem = {tag: string, children: Array<StackItem | string>};
 
 function parseMarkdownToHTML(markdown: string): string {
-  const parser = new ExpensiMark;
+  const parser = ExpensiMark;
   const html = parser.replace(markdown, {
     // TODO remove ts-ignore after patch is added
     // @ts-ignore

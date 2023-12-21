@@ -6,8 +6,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "build": "esbuild index.js --bundle --minify --outfile=out.js",
-    "build-ts": "esbuild index.ts --bundle --minify --outfile=out.js",
+    "build": "esbuild index.ts --bundle --minify --outfile=out.js",
     "run": "node out.js",
     "postinstall": "patch-package"
   },
@@ -23,7 +22,6 @@
   "dependencies": {
     "expensify-common": "git+ssh://git@github.com/Expensify/expensify-common.git#bdbdf44825658500ba581d3e86237d7b8996cc2e",
     "patch-package": "^8.0.0",
-    "tslib": "^2.6.2",
     "underscore": "^1.13.6"
   }
 }
