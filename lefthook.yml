@@ -5,4 +5,4 @@ pre-commit:
       glob: "*.{js,ts,jsx,tsx}"
       run: npx eslint {staged_files}
     types:
-      run: npx tsc --project tsconfig.json --noEmit --skipLibCheck
+      run: npx tsc --project tsconfig.json --noEmit
