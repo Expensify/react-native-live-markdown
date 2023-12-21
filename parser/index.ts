@@ -4,7 +4,7 @@ import _ from 'underscore';
 
 type Range = [string, number, number];
 type Token = ['TEXT' | 'HTML', string];
-type StackItem = {tag: string, children: Array<StackItem | string>};
+type StackItem = { tag: string; children: Array<StackItem | string> };
 
 function parseMarkdownToHTML(markdown: string): string {
   const parser = ExpensiMark;
@@ -46,13 +46,13 @@ function parseTokensToTree(tokens: Token[]): StackItem {
     if (type === 'TEXT') {
       const text = _.unescape(payload);
       const top = stack[stack.length - 1];
-      if (top) top.children.push(text);
+      top!.children.push(text);
     } else if (type === 'HTML') {
       if (payload.startsWith('</')) {
         // closing tag
         const child = stack.pop();
         const top = stack[stack.length - 1];
-        if (top && child) top.children.push(child);
+        top!.children.push(child!);
       } else {
         // opening tag
         stack.push({ tag: payload, children: [] });
@@ -64,7 +64,7 @@ function parseTokensToTree(tokens: Token[]): StackItem {
   if (stack.length !== 1) {
     throw new Error('Invalid HTML: unclosed tags');
   }
-  return (stack[0] as StackItem);
+  return stack[0]!;
 }
 
 function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
@@ -120,11 +120,9 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
         appendSyntax('>');
         addChildrenWithStyle(node, 'blockquote');
         // compensate for "> " at the beginning
-        const curr = ranges?.[ranges.length -1];
-        if (curr) {
-          curr[1] -= 1;
-          curr[2] += 1;
-        }
+        const curr = ranges?.[ranges.length - 1];
+        curr![1] -= 1;
+        curr![2] += 1;
       } else if (node.tag === '<h1>') {
         appendSyntax('# ');
         addChildrenWithStyle(node, 'h1');
@@ -138,12 +136,13 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
         addChildrenWithStyle(content, 'pre');
         appendSyntax('```');
       } else if (node.tag.startsWith('<a href="')) {
-        const href = _.unescape(node.tag.match(/href="([^"]*)"/)?.[1] ?? ''); // always present
+        const rawHref = node.tag.match(/href="([^"]*)"/)![1]!; // always present
+        const href = _.unescape(rawHref);
         const isLabeledLink =
-          node.tag.match(/link-variant="([^"]*)"/)?.[1] === 'labeled';
+          node.tag.match(/link-variant="([^"]*)"/)![1] === 'labeled';
         const dataRawHref = node.tag.match(/data-raw-href="([^"]*)"/);
         const dataRawLabel = node.tag.match(/data-raw-label="([^"]*)"/);
-        const matchString = dataRawHref ? _.unescape(dataRawHref?.[1] ?? '') : href;
+        const matchString = dataRawHref ? _.unescape(dataRawHref[1]!) : href;
 
         if (
           !isLabeledLink &&
@@ -155,7 +154,7 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
           addChildrenWithStyle(node.children[0], 'link');
         } else {
           appendSyntax('[');
-          processChildren(dataRawLabel ? _.unescape(dataRawLabel?.[1] ?? '') : node);
+          processChildren(dataRawLabel ? _.unescape(dataRawLabel[1]!) : node);
           appendSyntax('](');
           addChildrenWithStyle(matchString, 'link');
           appendSyntax(')');
@@ -169,7 +168,7 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
   return [text, ranges];
 }
 
-function sortRanges(ranges: Range[]): Range[] {
+function sortRanges(ranges: Range[]) {
   return ranges.sort((a, b) => a[1] - b[1]); // sort by location to properly handle bold+italic
 }
 
