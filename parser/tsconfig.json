@@ -8,8 +8,7 @@
     "allowUnusedLabels": false,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "jsx": "react",
-    "lib": ["esnext"],
+    "lib": ["esnext", "dom"],
     "module": "esnext",
     "moduleResolution": "node",
     "noFallthroughCasesInSwitch": true,
@@ -23,10 +22,7 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "esnext",
-    "verbatimModuleSyntax": true,
-    "typeRoots": ["node_modules/@types"],
-    "types": []
+    "verbatimModuleSyntax": true
   },
-  "include": ["src/**/*", "parser/**/*", "example/src/**/*", "WebExample/**/*", "types/global.d.ts"],
-  "exclude": ["**/node_modules/**/*", "**/lib/**/*", "**/__tests__/**/*", "WebExample/**/*"],
+  "include": ["./**/*", "../types/global.d.ts"]
 }
