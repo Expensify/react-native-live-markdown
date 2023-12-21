@@ -23,6 +23,9 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "esnext",
-    "verbatimModuleSyntax": true
-  }
+    "verbatimModuleSyntax": true,
+    "types": []
+  },
+  "include": ["src/**/*", "parser/**/*", "example/src/**/*", "WebExample/**/*"],
+  "exclude": ["node_modules","**/node_modules/**/*", "**/lib/**/*", "**/__tests__/**/*", "WebExample/**/*"],
 }
