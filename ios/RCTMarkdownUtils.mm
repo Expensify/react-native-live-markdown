@@ -2,8 +2,17 @@
 #import <JavaScriptCore/JavaScriptCore.h>
 
 @implementation RCTMarkdownUtils {
+  __weak UIView<RCTBackedTextInputViewProtocol> *_backedTextInputView;
   NSString *_prevInputString;
   NSAttributedString *_prevAttributedString;
+}
+
+- (instancetype)initWithBackedTextInputView:(UIView<RCTBackedTextInputViewProtocol> *)backedTextInputView
+{
+  if (self = [super init]) {
+    _backedTextInputView = backedTextInputView;
+  }
+  return self;
 }
 
 - (NSAttributedString *)parseMarkdown:(NSAttributedString *)input {
@@ -34,7 +43,7 @@
     return input;
   }
 
-  NSMutableAttributedString *attributedString = [input mutableCopy];
+  NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:inputString attributes:_backedTextInputView.defaultTextAttributes];
   [attributedString beginEditing];
 
   NSMutableArray *quoteRanges = [NSMutableArray new];

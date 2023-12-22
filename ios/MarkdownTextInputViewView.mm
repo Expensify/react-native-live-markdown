@@ -66,7 +66,7 @@
   UIView<RCTBackedTextInputViewProtocol> *backedTextInputView = _textInput.backedTextInputView;
 #endif /* RCT_NEW_ARCH_ENABLED */
 
-  RCTMarkdownUtils *markdownUtils = [[RCTMarkdownUtils alloc] init];
+  RCTMarkdownUtils *markdownUtils = [[RCTMarkdownUtils alloc] initWithBackedTextInputView:backedTextInputView];
   [_textInput setMarkdownUtils:markdownUtils];
   [_textInput setMarkdownEnabled:YES];
   if ([backedTextInputView isKindOfClass:[RCTUITextField class]]) {
