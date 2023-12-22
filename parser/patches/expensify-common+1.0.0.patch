@@ -1,3 +1,16 @@
+diff --git a/node_modules/expensify-common/lib/CONST.jsx b/node_modules/expensify-common/lib/CONST.jsx
+index 4225717..0ae0962 100644
+--- a/node_modules/expensify-common/lib/CONST.jsx
++++ b/node_modules/expensify-common/lib/CONST.jsx
+@@ -351,7 +351,7 @@ export const CONST = {
+          *
+          * @type RegExp
+          */
+-        EMOJIS: /[\p{Extended_Pictographic}\u200d\u{1f1e6}-\u{1f1ff}\u{1f3fb}-\u{1f3ff}\u{e0020}-\u{e007f}\u20E3\uFE0F]|[#*0-9]\uFE0F?\u20E3/gu,
++        EMOJIS: /[\u200d\u{1f1e6}-\u{1f1ff}\u{1f3fb}-\u{1f3ff}\u{e0020}-\u{e007f}\u20E3\uFE0F]|[#*0-9]\uFE0F?\u20E3/gu,
+     },
+ 
+     REPORT: {
 diff --git a/node_modules/expensify-common/lib/ExpensiMark.js b/node_modules/expensify-common/lib/ExpensiMark.js
 index 6b198e2..90ec211 100644
 --- a/node_modules/expensify-common/lib/ExpensiMark.js
