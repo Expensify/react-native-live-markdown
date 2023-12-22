@@ -8,7 +8,6 @@ import android.text.Spanned;
 import android.text.style.AbsoluteSizeSpan;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.ForegroundColorSpan;
-import android.text.style.LeadingMarginSpan;
 import android.text.style.StrikethroughSpan;
 import android.text.style.StyleSpan;
 import android.text.style.TypefaceSpan;
@@ -61,6 +60,7 @@ public class MarkdownUtils {
   private static final int COLOR_MENTION_HERE = Color.argb(100, 252, 232, 142);
   private static final int COLOR_MENTION_USER = Color.argb(100, 176, 217, 255);
   private static final int COLOR_CODE_BACKGROUND = Color.argb(100, 211, 211, 211);
+  private static final int COLOR_QUOTE_LINE = Color.GRAY;
 
   // Spans
   private static Object makeBoldSpan() {
@@ -112,7 +112,7 @@ public class MarkdownUtils {
   }
 
   private static Object makeBlockquoteMarginSpan() {
-    return new LeadingMarginSpan.Standard(20);
+    return new QuoteSpan(COLOR_QUOTE_LINE, 15, 20);
   }
 
   public void applyMarkdownFormatting(SpannableStringBuilder ssb) {
