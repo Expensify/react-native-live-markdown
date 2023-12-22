@@ -1,14 +1,29 @@
 #import <react-native-markdown-text-input/RCTMarkdownUtils.h>
 #import <JavaScriptCore/JavaScriptCore.h>
 
-@implementation RCTMarkdownUtils
+@implementation RCTMarkdownUtils {
+  __weak UIView<RCTBackedTextInputViewProtocol> *_backedTextInputView;
+  NSString *_prevInputString;
+  NSAttributedString *_prevAttributedString;
+}
 
-+ (NSAttributedString *)parseMarkdown:(NSAttributedString *)input {
+- (instancetype)initWithBackedTextInputView:(UIView<RCTBackedTextInputViewProtocol> *)backedTextInputView
+{
+  if (self = [super init]) {
+    _backedTextInputView = backedTextInputView;
+  }
+  return self;
+}
+
+- (NSAttributedString *)parseMarkdown:(NSAttributedString *)input {
   if (input == nil) {
     return nil;
   }
 
-  // TODO: memoize outputs in LRU cache
+  NSString *inputString = [input string];
+  if ([inputString isEqualToString:_prevInputString]) {
+    return _prevAttributedString;
+  }
 
   static JSContext *ctx = nil;
   static JSValue *function = nil;
@@ -20,7 +35,6 @@
     function = ctx[@"parseMarkdownToTextAndRanges"];
   }
 
-  NSString *inputString = [input string];
   JSValue *result = [function callWithArguments:@[inputString]];
   NSString *outputString = [result[0] toString];
   NSArray *ranges = [result[1] toArray];
@@ -29,7 +43,7 @@
     return input;
   }
 
-  NSMutableAttributedString *attributedString = [input mutableCopy];
+  NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:inputString attributes:_backedTextInputView.defaultTextAttributes];
   [attributedString beginEditing];
 
   NSMutableArray *quoteRanges = [NSMutableArray new];
@@ -95,6 +109,9 @@
   }];
 
   [attributedString endEditing];
+
+  _prevInputString = inputString;
+  _prevAttributedString = attributedString;
 
   return attributedString;
 }

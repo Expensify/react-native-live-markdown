@@ -14,11 +14,19 @@
   return [markdownEnabledNumber boolValue];
 }
 
+- (void)setMarkdownUtils:(RCTMarkdownUtils *)markdownUtils {
+  objc_setAssociatedObject(self, @selector(getMarkdownUtils), markdownUtils, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (RCTMarkdownUtils *)getMarkdownUtils {
+  return objc_getAssociatedObject(self, @selector(getMarkdownUtils));
+}
+
 - (void)markdown_textDidChange
 {
   if ([self isMarkdownEnabled]) {
     UITextRange *range = self.selectedTextRange;
-    super.attributedText = [RCTMarkdownUtils parseMarkdown:self.attributedText];
+    super.attributedText = [[self getMarkdownUtils] parseMarkdown:self.attributedText];
     [super setSelectedTextRange:range]; // prevents cursor from jumping at the end when typing in the middle of the text
 
     if ([self.attributedText length] > 0) {

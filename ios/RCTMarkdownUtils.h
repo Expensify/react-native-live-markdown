@@ -1,5 +1,9 @@
+#import <React/RCTBackedTextInputViewProtocol.h>
+
 @interface RCTMarkdownUtils : NSObject
 
-+ (NSAttributedString *)parseMarkdown:(NSAttributedString *)input;
+- (instancetype)initWithBackedTextInputView:(UIView<RCTBackedTextInputViewProtocol> *)backedTextInputView;
+
+- (NSAttributedString *)parseMarkdown:(NSAttributedString *)input;
 
 @end
