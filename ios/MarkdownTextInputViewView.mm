@@ -70,8 +70,8 @@
 - (void)willMoveToWindow:(UIWindow *)newWindow
 {
   [_textInput setMarkdownUtils:nil];
-  [_textInput setMarkdownUtils:nil];
-  [_textInput setMarkdownUtils:nil];
+  [_adapter setMarkdownUtils:nil];
+  [_textView setMarkdownUtils:nil];
 }
 
 @end
