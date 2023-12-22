@@ -46,7 +46,7 @@
   NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:inputString attributes:_backedTextInputView.defaultTextAttributes];
   [attributedString beginEditing];
 
-  NSMutableArray *quoteRanges = [NSMutableArray new];
+  _quoteRanges = [NSMutableArray new];
 
   [ranges enumerateObjectsUsingBlock:^(id _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
     NSArray *item = obj;
@@ -88,7 +88,6 @@
     } else if ([type isEqualToString:@"mention"]) {
         [attributedString addAttribute:NSBackgroundColorAttributeName value:[[UIColor alloc] initWithRed:252/255.0 green:232/255.0 blue:142/255.0 alpha:1.0] range:range];
     } else if ([type isEqualToString:@"mention-user"]) {
-
         // TODO: change mention color when it mentions current user
         [attributedString addAttribute:NSBackgroundColorAttributeName value:[[UIColor alloc] initWithRed:176/255.0 green:217/255.0 blue:255/255.0 alpha:1.0] range:range];
     } else if ([type isEqualToString:@"link"]) {
@@ -99,7 +98,7 @@
       paragraphStyle.firstLineHeadIndent = 11;
       paragraphStyle.headIndent = 11;
       [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:range];
-      [quoteRanges addObject:[NSValue valueWithRange:range]];
+      [_quoteRanges addObject:[NSValue valueWithRange:range]];
     } else if ([type isEqualToString:@"pre"]) {
       NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
       paragraphStyle.firstLineHeadIndent = 5;
