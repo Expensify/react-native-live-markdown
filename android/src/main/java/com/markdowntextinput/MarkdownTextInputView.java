@@ -47,6 +47,7 @@ public class MarkdownTextInputView extends View {
     }
 
     if (previousSibling instanceof ReactEditText) {
+      MarkdownUtils.maybeInitializeRuntime(getContext().getAssets());
       mReactEditText = (ReactEditText) previousSibling;
       mTextWatcher = new MarkdownTextWatcher();
       mReactEditText.addTextChangedListener(mTextWatcher);

@@ -1,5 +1,6 @@
 package com.markdowntextinput;
 
+import android.content.res.AssetManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.text.SpannableStringBuilder;
@@ -18,6 +19,8 @@ import com.facebook.soloader.SoLoader;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -25,6 +28,27 @@ public class MarkdownUtils {
   static {
     SoLoader.loadLibrary("markdowntextinput");
   }
+
+  private static boolean IS_RUNTIME_INITIALIZED = false;
+
+  public static void maybeInitializeRuntime(AssetManager assetManager) {
+    if (IS_RUNTIME_INITIALIZED) {
+      return;
+    }
+    try {
+      InputStream inputStream = assetManager.open("out.js");
+      byte[] buffer = new byte[inputStream.available()];
+      inputStream.read(buffer);
+      inputStream.close();
+      String code = new String(buffer);
+      nativeInitializeRuntime(code);
+      IS_RUNTIME_INITIALIZED = true;
+    } catch (IOException e) {
+      throw new RuntimeException("Failed to initialize Markdown runtime");
+    }
+  }
+
+  private static native void nativeInitializeRuntime(String code);
 
   private static native String nativeParseMarkdown(String input);
 
@@ -99,8 +123,6 @@ public class MarkdownUtils {
     try {
       JSONArray array = new JSONArray(output);
       String text = array.getString(0);
-
-
 
       if (!ssb.toString().equals(text)) {
         return;
