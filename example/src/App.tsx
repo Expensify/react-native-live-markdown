@@ -11,16 +11,48 @@ import {
 
 import { MarkdownTextInput } from 'react-native-markdown-text-input';
 
+function isWeb() {
+  return Platform.OS === 'web';
+}
+
 function getPlatform() {
-  return Platform.select({
-    android: 'Android',
-    ios: 'iOS',
-    default: Platform.OS,
-  });
+  if (isWeb()) {
+    return 'web';
+  }
+  // @ts-ignore it works
+  return Platform.constants.systemName || Platform.constants.Brand;
+}
+
+function getPlatformVersion() {
+  return Platform.Version;
+}
+
+function getBundle() {
+  return __DEV__ ? 'dev' : 'production';
+}
+
+function getRuntime() {
+  if ('HermesInternal' in global) {
+    const version =
+      // @ts-ignore this is fine
+      global.HermesInternal?.getRuntimeProperties?.()['OSS Release Version'];
+    return `Hermes (${version})`;
+  }
+  if ('_v8runtime' in global) {
+    // @ts-ignore this is fine
+    const version = global._v8runtime().version;
+    return `V8 (${version})`;
+  }
+  return 'JSC';
 }
 
 function getArchitecture() {
   return 'nativeFabricUIManager' in global ? 'Fabric' : 'Paper';
+}
+
+function getReactNativeVersion() {
+  const { major, minor, patch } = Platform.constants.reactNativeVersion;
+  return `${major}.${minor}.${patch}`;
 }
 
 export default function App() {
@@ -31,8 +63,19 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <Text>{getPlatform()}</Text>
-      {Platform.OS !== 'web' && <Text>{getArchitecture()}</Text>}
+      <View style={styles.platform}>
+        <Text>
+          Platform: {getPlatform()} {getPlatformVersion()}
+        </Text>
+        <Text>Bundle: {getBundle()}</Text>
+        {!isWeb() && (
+          <>
+            <Text>Architecture: {getArchitecture()}</Text>
+            <Text>RN version: {getReactNativeVersion()}</Text>
+            <Text>RN runtime: {getRuntime()}</Text>
+          </>
+        )}
+      </View>
       <Text>MarkdownTextInput singleline</Text>
       <MarkdownTextInput
         autoCapitalize="none"
@@ -78,6 +121,10 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     marginTop: 60,
+  },
+  platform: {
+    alignItems: 'center',
+    marginBottom: 20,
   },
   input: {
     fontSize: 20,
