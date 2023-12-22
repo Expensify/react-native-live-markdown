@@ -21,19 +21,6 @@
   __weak RCTUITextView *_textView;
 }
 
-- (void)willMoveToWindow:(UIWindow *)newWindow
-{
-  if (_textInput != nil) {
-    [_textInput setMarkdownEnabled:NO];
-  }
-  if (_adapter != nil) {
-    [_adapter setMarkdownEnabled:NO];
-  }
-  if (_textView != nil) {
-    [_textView setMarkdownEnabled:NO];
-  }
-}
-
 - (void)didMoveToWindow {
 #ifdef RCT_NEW_ARCH_ENABLED
   if (self.superview.superview == nil) {
@@ -66,19 +53,25 @@
   UIView<RCTBackedTextInputViewProtocol> *backedTextInputView = _textInput.backedTextInputView;
 #endif /* RCT_NEW_ARCH_ENABLED */
 
-  [_textInput setMarkdownEnabled:YES];
+  RCTMarkdownUtils *markdownUtils = [[RCTMarkdownUtils alloc] initWithBackedTextInputView:backedTextInputView];
+  [_textInput setMarkdownUtils:markdownUtils];
   if ([backedTextInputView isKindOfClass:[RCTUITextField class]]) {
     RCTUITextField *textField = (RCTUITextField *)backedTextInputView;
     _adapter = [textField valueForKey:@"textInputDelegateAdapter"];
-    [_adapter setMarkdownEnabled:YES];
+    [_adapter setMarkdownUtils:markdownUtils];
   } else if ([backedTextInputView isKindOfClass:[RCTUITextView class]]) {
     _textView = (RCTUITextView *)backedTextInputView;
-    [_textView setMarkdownEnabled:YES];
+    [_textView setMarkdownUtils:markdownUtils];
   } else {
     react_native_assert(false && "Cannot enable Markdown for this type of TextInput.");
   }
 }
 
-// TODO: call setMarkdownEnabled:NO
+- (void)willMoveToWindow:(UIWindow *)newWindow
+{
+  [_textInput setMarkdownUtils:nil];
+  [_adapter setMarkdownUtils:nil];
+  [_textView setMarkdownUtils:nil];
+}
 
 @end

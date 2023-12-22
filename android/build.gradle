@@ -132,3 +132,12 @@ if (isNewArchitectureEnabled()) {
     codegenJavaPackageName = "com.markdowntextinput"
   }
 }
+
+task copyJS(type: Copy) {
+  from '../parser/out.js'
+  into 'src/main/assets'
+}
+
+tasks.preBuild {
+  dependsOn copyJS
+}

@@ -9,8 +9,7 @@ type StackItem = { tag: string; children: Array<StackItem | string> };
 function parseMarkdownToHTML(markdown: string): string {
   const parser = ExpensiMark;
   const html = parser.replace(markdown, {
-    // @ts-ignore TODO remove ts-ignore after patch is added
-    shouldKeepWhitespace: true,
+    shouldKeepRawInput: true,
   });
   return html;
 }
@@ -125,13 +124,12 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
       } else if (node.tag === '<h1>') {
         appendSyntax('# ');
         addChildrenWithStyle(node, 'h1');
-      } else if (node.tag === '<pre>') {
+      } else if (node.tag.startsWith('<pre')) {
+        const content = _.unescape(
+          node.tag.match(/data-code-raw="([^"]*)"/)![1]!
+        ); // always present
+
         appendSyntax('```');
-        text += '\n';
-        if (!node.children.every((child) => typeof child === 'string')) {
-          throw new Error('Invalid HTML: <pre> must contain only text');
-        }
-        const content = node.children.join('').replaceAll('&#32;', ' ');
         addChildrenWithStyle(content, 'pre');
         appendSyntax('```');
       } else if (node.tag.startsWith('<a href="')) {
@@ -140,9 +138,7 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
         const isLabeledLink =
           node.tag.match(/link-variant="([^"]*)"/)![1] === 'labeled';
         const dataRawHref = node.tag.match(/data-raw-href="([^"]*)"/);
-        const dataRawLabel = node.tag.match(/data-raw-label="([^"]*)"/);
         const matchString = dataRawHref ? _.unescape(dataRawHref[1]!) : href;
-
         if (
           !isLabeledLink &&
           node.children.length === 1 &&
@@ -153,7 +149,7 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
           addChildrenWithStyle(node.children[0], 'link');
         } else {
           appendSyntax('[');
-          processChildren(dataRawLabel ? _.unescape(dataRawLabel[1]!) : node);
+          processChildren(node);
           appendSyntax('](');
           addChildrenWithStyle(matchString, 'link');
           appendSyntax(')');

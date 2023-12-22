@@ -4,21 +4,20 @@
 
 @implementation RCTUITextView (Markdown)
 
-- (void)setMarkdownEnabled:(BOOL)markdownEnabled {
-  NSNumber *markdownEnabledNumber = [NSNumber numberWithBool:markdownEnabled];
-  objc_setAssociatedObject(self, @selector(isMarkdownEnabled), markdownEnabledNumber, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+- (void)setMarkdownUtils:(RCTMarkdownUtils *)markdownUtils {
+  objc_setAssociatedObject(self, @selector(getMarkdownUtils), markdownUtils, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
-- (BOOL)isMarkdownEnabled {
-  NSNumber *markdownEnabledNumber = objc_getAssociatedObject(self, @selector(isMarkdownEnabled));
-  return [markdownEnabledNumber boolValue];
+- (RCTMarkdownUtils *)getMarkdownUtils {
+  return objc_getAssociatedObject(self, @selector(getMarkdownUtils));
 }
 
 - (void)markdown_textDidChange
 {
-  if ([self isMarkdownEnabled]) {
+  RCTMarkdownUtils *markdownUtils = [self getMarkdownUtils];
+  if (markdownUtils != nil) {
     UITextRange *range = self.selectedTextRange;
-    super.attributedText = [RCTMarkdownUtils parseMarkdown:self.attributedText];
+    super.attributedText = [markdownUtils parseMarkdown:self.attributedText];
     [super setSelectedTextRange:range]; // prevents cursor from jumping at the end when typing in the middle of the text
 
     if ([self.attributedText length] > 0) {
