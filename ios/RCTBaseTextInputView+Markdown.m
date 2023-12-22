@@ -4,16 +4,6 @@
 
 @implementation RCTBaseTextInputView (Markdown)
 
-- (void)setMarkdownEnabled:(BOOL)markdownEnabled {
-  NSNumber *markdownEnabledNumber = [NSNumber numberWithBool:markdownEnabled];
-  objc_setAssociatedObject(self, @selector(isMarkdownEnabled), markdownEnabledNumber, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
-
-- (BOOL)isMarkdownEnabled {
-  NSNumber *markdownEnabledNumber = objc_getAssociatedObject(self, @selector(isMarkdownEnabled));
-  return [markdownEnabledNumber boolValue];
-}
-
 - (void)setMarkdownUtils:(RCTMarkdownUtils *)markdownUtils {
   objc_setAssociatedObject(self, @selector(getMarkdownUtils), markdownUtils, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
@@ -24,8 +14,9 @@
 
 - (void)markdown_setAttributedText:(NSAttributedString *)attributedText
 {
-  if ([self isMarkdownEnabled]) {
-    attributedText = [[self getMarkdownUtils] parseMarkdown:attributedText];
+  RCTMarkdownUtils *markdownUtils = [self getMarkdownUtils];
+  if (markdownUtils != nil) {
+    attributedText = [markdownUtils parseMarkdown:attributedText];
   }
 
   // Call the original method
@@ -34,8 +25,9 @@
 
 - (void)markdown_updateLocalData
 {
-  if ([self isMarkdownEnabled]) {
-    NSAttributedString *attributedText = [[self getMarkdownUtils] parseMarkdown:self.backedTextInputView.attributedText];
+  RCTMarkdownUtils *markdownUtils = [self getMarkdownUtils];
+  if (markdownUtils != nil) {
+    NSAttributedString *attributedText = [markdownUtils parseMarkdown:self.backedTextInputView.attributedText];
     [self.backedTextInputView setAttributedText:attributedText];
   }
 
