@@ -196,7 +196,7 @@ test('inline code', () => {
 test('codeblock', () => {
   expect('```\nHello world!\n```').toBeParsedAs(SAME, [
     ['syntax', 0, 3],
-    ['pre', 4, 13],
+    ['pre', 3, 14],
     ['syntax', 17, 3],
   ]);
 });
