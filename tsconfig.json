@@ -27,6 +27,6 @@
     "typeRoots": ["node_modules/@types"],
     "types": ["node"]
   },
-  "include": ["src/**/*", "parser/**/*", "example/src/**/*", "types/global.d.ts"],
-  "exclude": ["**/node_modules/**/*", "**/lib/**/*", "**/__tests__/**/*", "WebExample/**/*"],
+  "include": ["src/**/*", "example/src/**/*", "types/global.d.ts"],
+  "exclude": ["**/node_modules/**/*", "parser/**/*", "**/lib/**/*", "**/__tests__/**/*", "WebExample/**/*"],
 }
