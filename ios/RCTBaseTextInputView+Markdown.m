@@ -14,10 +14,18 @@
   return [markdownEnabledNumber boolValue];
 }
 
+- (void)setMarkdownUtils:(RCTMarkdownUtils *)markdownUtils {
+  objc_setAssociatedObject(self, @selector(getMarkdownUtils), markdownUtils, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (RCTMarkdownUtils *)getMarkdownUtils {
+  return objc_getAssociatedObject(self, @selector(getMarkdownUtils));
+}
+
 - (void)markdown_setAttributedText:(NSAttributedString *)attributedText
 {
   if ([self isMarkdownEnabled]) {
-    attributedText = [RCTMarkdownUtils parseMarkdown:attributedText];
+    attributedText = [[self getMarkdownUtils] parseMarkdown:attributedText];
   }
 
   // Call the original method
@@ -27,7 +35,7 @@
 - (void)markdown_updateLocalData
 {
   if ([self isMarkdownEnabled]) {
-    NSAttributedString *attributedText = [RCTMarkdownUtils parseMarkdown:self.backedTextInputView.attributedText];
+    NSAttributedString *attributedText = [[self getMarkdownUtils] parseMarkdown:self.backedTextInputView.attributedText];
     [self.backedTextInputView setAttributedText:attributedText];
   }
 
