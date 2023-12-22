@@ -8,24 +8,14 @@
 
 @implementation RCTTextInputComponentView (Markdown)
 
-- (void)setMarkdownEnabled:(BOOL)markdownEnabled {
-  NSNumber *markdownEnabledNumber = [NSNumber numberWithBool:markdownEnabled];
-  objc_setAssociatedObject(self, @selector(isMarkdownEnabled), markdownEnabledNumber, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-
-  if (markdownEnabled) {
-    // force Markdown formatting on first render because `_setAttributedText` is called before `setMarkdownEnabled`
-    RCTUITextField *backedTextInputView = [self valueForKey:@"_backedTextInputView"];
-    backedTextInputView.attributedText = [[self getMarkdownUtils] parseMarkdown:backedTextInputView.attributedText];
-  }
-}
-
-- (BOOL)isMarkdownEnabled {
-  NSNumber *markdownEnabledNumber = objc_getAssociatedObject(self, @selector(isMarkdownEnabled));
-  return [markdownEnabledNumber boolValue];
-}
-
 - (void)setMarkdownUtils:(RCTMarkdownUtils *)markdownUtils {
   objc_setAssociatedObject(self, @selector(getMarkdownUtils), markdownUtils, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+
+  if (markdownUtils != nil) {
+    // force Markdown formatting on first render because `_setAttributedText` is called before `setMarkdownUtils`
+    RCTUITextField *backedTextInputView = [self valueForKey:@"_backedTextInputView"];
+    backedTextInputView.attributedText = [markdownUtils parseMarkdown:backedTextInputView.attributedText];
+  }
 }
 
 - (RCTMarkdownUtils *)getMarkdownUtils {
@@ -34,8 +24,9 @@
 
 - (void)markdown__setAttributedString:(NSAttributedString *)attributedString
 {
-  if ([self isMarkdownEnabled]) {
-    attributedString = [[self getMarkdownUtils] parseMarkdown:attributedString];
+  RCTMarkdownUtils *markdownUtils = [self getMarkdownUtils];
+  if (markdownUtils != nil) {
+    attributedString = [markdownUtils parseMarkdown:attributedString];
   }
 
   // Call the original method

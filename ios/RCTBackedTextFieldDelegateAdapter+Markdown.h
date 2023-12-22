@@ -5,8 +5,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface RCTBackedTextFieldDelegateAdapter (Markdown)
 
-@property(nonatomic, getter=isMarkdownEnabled) BOOL markdownEnabled;
-
 @property(nonatomic, getter=getMarkdownUtils) RCTMarkdownUtils *markdownUtils;
 
 - (void)markdown_textFieldDidChange;
