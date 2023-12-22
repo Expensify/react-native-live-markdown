@@ -81,6 +81,11 @@ const styles = StyleSheet.create({
   },
   input: {
     fontSize: 20,
+    color: 'red',
+    backgroundColor: 'yellow',
+    textDecorationColor: 'green',
+    textDecorationStyle: 'dotted',
+    textDecorationLine: 'underline',
     width: 300,
     padding: 5,
     borderColor: 'gray',
