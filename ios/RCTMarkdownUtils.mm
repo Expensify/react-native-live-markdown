@@ -29,7 +29,9 @@
   static JSValue *function = nil;
   if (ctx == nil) {
     NSString *path = [[NSBundle mainBundle] pathForResource:@"out" ofType:@"js"];
+    assert(path != nil && "[react-native-markdown-text-input] Markdown parser bundle not found");
     NSString *content = [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:NULL];
+    assert(content != nil && "[react-native-markdown-text-input] Markdown parser bundle is empty");
     ctx = [[JSContext alloc] init];
     [ctx evaluateScript:content];
     function = ctx[@"parseMarkdownToTextAndRanges"];
