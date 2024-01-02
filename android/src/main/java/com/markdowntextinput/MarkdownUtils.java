@@ -55,8 +55,6 @@ public class MarkdownUtils {
 
   private final List<Object> mSpans = new LinkedList<>();
 
-  private String mPreviouslyFormattedString = "";
-
   // Colors
   private static final int COLOR_CODE = Color.rgb(6, 25, 109);
   private static final int COLOR_LINK = Color.BLUE;
@@ -127,12 +125,9 @@ public class MarkdownUtils {
   }
 
   public void applyMarkdownFormatting(SpannableStringBuilder ssb) {
-    String input = ssb.toString();
-    if (input.equals(mPreviouslyFormattedString)) {
-      return;
-    }
-
     removeSpans(ssb);
+
+    String input = ssb.toString();
     String output = nativeParseMarkdown(input);
     try {
       JSONArray array = new JSONArray(output);
@@ -153,8 +148,6 @@ public class MarkdownUtils {
     } catch (JSONException e) {
       // Do nothing
     }
-
-    mPreviouslyFormattedString = input;
   }
 
   private void applyRange(SpannableStringBuilder ssb, String type, int start, int end) {
