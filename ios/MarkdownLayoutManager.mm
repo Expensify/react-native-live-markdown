@@ -1,5 +1,7 @@
 #import <react-native-markdown-text-input/MarkdownLayoutManager.h>
 
+static UIColor *blockquoteLineColor = [UIColor lightGrayColor];
+
 @implementation MarkdownLayoutManager
 
 - (void)drawBackgroundForGlyphRange:(NSRange)glyphsToShow atPoint:(CGPoint)origin {
@@ -20,7 +22,7 @@
     }];
     if (isQuote) {
       CGRect lineRect = CGRectMake(5, rect.origin.y + 5, 5, rect.size.height);
-      [[UIColor lightGrayColor] setFill];
+      [blockquoteLineColor setFill];
       UIRectFill(lineRect);
     }
   }];
