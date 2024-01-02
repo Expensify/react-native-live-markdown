@@ -106,6 +106,10 @@
       paragraphStyle.firstLineHeadIndent = 5;
       paragraphStyle.headIndent = 5;
       [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:range];
+    } else if ([type isEqualToString:@"h1"]) {
+      NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
+      NSRange range2 = NSMakeRange(range.location - 2, range.length + 2);
+      [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:range2];
     }
   }];
 
