@@ -5,6 +5,7 @@
   __weak UIView<RCTBackedTextInputViewProtocol> *_backedTextInputView;
   NSString *_prevInputString;
   NSAttributedString *_prevAttributedString;
+  NSDictionary<NSAttributedStringKey, id> *_prevTextAttributes;
 }
 
 - (instancetype)initWithBackedTextInputView:(UIView<RCTBackedTextInputViewProtocol> *)backedTextInputView
@@ -21,7 +22,9 @@
   }
 
   NSString *inputString = [input string];
-  if ([inputString isEqualToString:_prevInputString]) {
+  BOOL defaultTextAttributesUnchanged = _prevTextAttributes != nil && [_backedTextInputView.defaultTextAttributes isEqualToDictionary:_prevTextAttributes];
+
+  if ([inputString isEqualToString:_prevInputString] && defaultTextAttributesUnchanged) {
     return _prevAttributedString;
   }
 
@@ -117,6 +120,7 @@
 
   _prevInputString = inputString;
   _prevAttributedString = attributedString;
+  _prevTextAttributes = _backedTextInputView.defaultTextAttributes;
 
   return attributedString;
 }
