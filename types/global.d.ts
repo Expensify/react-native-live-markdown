@@ -1,7 +1,7 @@
 export {};
 
-type Range = [string, number, number];
+type Range = [string, number, number]; // style, location, length
 
 declare global {
-  var parseMarkdownToTextAndRanges: (markdown: string) => [string, Range[]];
+  var parseMarkdownToTextAndRanges: (markdown: string) => Range[];
 }

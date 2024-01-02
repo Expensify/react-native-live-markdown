@@ -169,14 +169,17 @@ function sortRanges(ranges: Range[]) {
   return ranges.sort((a, b) => a[1] - b[1]); // sort by location to properly handle bold+italic
 }
 
-function parseMarkdownToTextAndRanges(markdown: string): [string, Range[]] {
+function parseMarkdownToTextAndRanges(markdown: string): Range[] {
   const html = parseMarkdownToHTML(markdown);
   const tokens = parseHTMLToTokens(html);
   const tree = parseTokensToTree(tokens);
   const [text, ranges] = parseTreeToTextAndRanges(tree);
+  if (text !== markdown) {
+    // text mismatch, don't return any ranges
+    return [];
+  }
   const sortedRanges = sortRanges(ranges);
-  return [text, sortedRanges];
+  return sortedRanges;
 }
 
-// eslint-disable-next-line no-undef
 globalThis.parseMarkdownToTextAndRanges = parseMarkdownToTextAndRanges;
