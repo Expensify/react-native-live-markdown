@@ -1,5 +1,7 @@
 package com.markdowntextinput;
 
+import static com.facebook.infer.annotation.ThreadConfined.UI;
+
 import android.content.res.AssetManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -14,6 +16,8 @@ import android.text.style.StyleSpan;
 import android.text.style.TypefaceSpan;
 import android.text.style.UnderlineSpan;
 
+import com.facebook.infer.annotation.ThreadConfined;
+import com.facebook.react.bridge.UiThreadUtil;
 import com.facebook.react.views.text.CustomLineHeightSpan;
 import com.facebook.soloader.SoLoader;
 
@@ -32,7 +36,9 @@ public class MarkdownUtils {
 
   private static boolean IS_RUNTIME_INITIALIZED = false;
 
+  @ThreadConfined(UI)
   public static void maybeInitializeRuntime(AssetManager assetManager) {
+    UiThreadUtil.assertOnUiThread();
     if (IS_RUNTIME_INITIALIZED) {
       return;
     }
@@ -50,6 +56,12 @@ public class MarkdownUtils {
   }
 
   private static native void nativeInitializeRuntime(String code);
+
+  @ThreadConfined(UI)
+  private static String parseMarkdown(String input) {
+    UiThreadUtil.assertOnUiThread();
+    return nativeParseMarkdown(input);
+  }
 
   private static native String nativeParseMarkdown(String input);
 
@@ -128,7 +140,7 @@ public class MarkdownUtils {
     removeSpans(ssb);
 
     String input = ssb.toString();
-    String output = nativeParseMarkdown(input);
+    String output = parseMarkdown(input);
     try {
       JSONArray array = new JSONArray(output);
       String text = array.getString(0);
