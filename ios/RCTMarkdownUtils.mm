@@ -10,7 +10,6 @@ static UIColor *mentionUserColor = [[UIColor alloc] initWithRed:176/255.0 green:
 static CGFloat headingFontSize = 25;
 
 @implementation RCTMarkdownUtils {
-  __weak UIView<RCTBackedTextInputViewProtocol> *_backedTextInputView;
   NSString *_prevInputString;
   NSAttributedString *_prevAttributedString;
 }
