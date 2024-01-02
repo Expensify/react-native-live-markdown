@@ -166,7 +166,8 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
 }
 
 function sortRanges(ranges: Range[]) {
-  return ranges.sort((a, b) => a[1] - b[1]); // sort by location to properly handle bold+italic
+  // sort by location ascending and length descending to properly handle bold+italic and blockquote
+  return ranges.sort((a, b) => a[1] - b[1] || b[2] - a[2]);
 }
 
 function parseMarkdownToTextAndRanges(markdown: string): [string, Range[]] {
