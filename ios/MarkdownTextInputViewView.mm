@@ -74,12 +74,18 @@
 
 - (void)willMoveToWindow:(UIWindow *)newWindow
 {
-  [_textInput setMarkdownUtils:nil];
-  [_adapter setMarkdownUtils:nil];
-  [_textView setMarkdownUtils:nil];
+  if (_textInput != nil) {
+    [_textInput setMarkdownUtils:nil];
+  }
+  if (_adapter != nil) {
+    [_adapter setMarkdownUtils:nil];
+  }
   if (_textView != nil) {
-    [_textView.layoutManager setValue:nil forKey:@"markdownUtils"];
-    object_setClass(_textView.layoutManager, [NSLayoutManager class]);
+    [_textView setMarkdownUtils:nil];
+    if (_textView.layoutManager != nil && [object_getClass(_textView.layoutManager) isEqual:[MarkdownLayoutManager class]]) {
+      [_textView.layoutManager setValue:nil forKey:@"markdownUtils"];
+      object_setClass(_textView.layoutManager, [NSLayoutManager class]);
+    }
   }
 }
 
