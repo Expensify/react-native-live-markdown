@@ -2,7 +2,6 @@
 #import <JavaScriptCore/JavaScriptCore.h>
 
 @implementation RCTMarkdownUtils {
-  __weak UIView<RCTBackedTextInputViewProtocol> *_backedTextInputView;
   NSString *_prevInputString;
   NSAttributedString *_prevAttributedString;
 }

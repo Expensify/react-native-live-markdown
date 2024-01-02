@@ -1,5 +1,8 @@
 #import <react-native-markdown-text-input/MarkdownLayoutManager.h>
 
+static CGFloat blockquoteLineOffset = 0;
+static CGFloat blockquoteLineWidth = 5;
+
 @implementation MarkdownLayoutManager
 
 - (void)drawBackgroundForGlyphRange:(NSRange)glyphsToShow atPoint:(CGPoint)origin {
@@ -19,7 +22,11 @@
       }
     }];
     if (isQuote) {
-      CGRect lineRect = CGRectMake(5, rect.origin.y + 5, 5, rect.size.height);
+      CGFloat x = markdownUtils.backedTextInputView.textContainerInset.left + blockquoteLineOffset;
+      CGFloat y = markdownUtils.backedTextInputView.textContainerInset.top + rect.origin.y;
+      CGFloat width = blockquoteLineWidth;
+      CGFloat height = rect.size.height;
+      CGRect lineRect = CGRectMake(x, y, width, height);
       [[UIColor lightGrayColor] setFill];
       UIRectFill(lineRect);
     }
