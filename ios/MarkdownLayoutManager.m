@@ -22,8 +22,10 @@ static CGFloat blockquoteLineWidth = 5;
       }
     }];
     if (isQuote) {
-      CGFloat x = markdownUtils.backedTextInputView.textContainerInset.left + blockquoteLineOffset;
-      CGFloat y = markdownUtils.backedTextInputView.textContainerInset.top + rect.origin.y;
+      CGFloat paddingLeft = markdownUtils.backedTextInputView.textContainerInset.left;
+      CGFloat paddingTop = markdownUtils.backedTextInputView.textContainerInset.top;
+      CGFloat x = paddingLeft + blockquoteLineOffset;
+      CGFloat y = paddingTop + rect.origin.y;
       CGFloat width = blockquoteLineWidth;
       CGFloat height = rect.size.height;
       CGRect lineRect = CGRectMake(x, y, width, height);
