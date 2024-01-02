@@ -1,6 +1,11 @@
 #import <react-native-markdown-text-input/RCTMarkdownUtils.h>
 #import <JavaScriptCore/JavaScriptCore.h>
 
+#include <jsi/jsi.h>
+#include <hermes/hermes.h>
+
+using namespace facebook;
+
 static UIColor *syntaxColor = [UIColor grayColor];
 static UIColor *linkColor = [UIColor blueColor];
 static UIColor *codeForegroundColor = [[UIColor alloc] initWithRed:6/255.0 green:25/255.0 blue:109/255.0 alpha:1.0];
@@ -32,21 +37,30 @@ static CGFloat headingFontSize = 25;
     return _prevAttributedString;
   }
 
-  static JSContext *ctx = nil;
-  static JSValue *function = nil;
-  if (ctx == nil) {
+  static std::shared_ptr<jsi::Runtime> runtime;
+  if (runtime == nullptr) {
     NSString *path = [[NSBundle mainBundle] pathForResource:@"out" ofType:@"js"];
     assert(path != nil && "[react-native-markdown-text-input] Markdown parser bundle not found");
     NSString *content = [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:NULL];
     assert(content != nil && "[react-native-markdown-text-input] Markdown parser bundle is empty");
-    ctx = [[JSContext alloc] init];
-    [ctx evaluateScript:content];
-    function = ctx[@"parseMarkdownToTextAndRanges"];
+    runtime = facebook::hermes::makeHermesRuntime();
+    auto codeBuffer = std::make_shared<const jsi::StringBuffer>([content UTF8String]);
+    runtime->evaluateJavaScript(codeBuffer, "nativeInitializeRuntime");
   }
 
-  JSValue *result = [function callWithArguments:@[inputString]];
-  NSString *outputString = [result[0] toString];
-  NSArray *ranges = [result[1] toArray];
+  jsi::Runtime &rt = *runtime;
+  auto func = rt.global().getPropertyAsFunction(rt, "parseMarkdownToTextAndRanges");
+  auto output = func.call(rt, [inputString UTF8String]);
+  auto json = rt.global().getPropertyAsObject(rt, "JSON").getPropertyAsFunction(rt, "stringify").call(rt, output).asString(rt).utf8(rt);
+
+  NSError *error = nil;
+  NSData *data = [NSData dataWithBytes:json.data() length:json.length()];
+  NSArray *result = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
+  if (error != nil) {
+    return input;
+  }
+  NSString *outputString = result[0];
+  NSArray *ranges = result[1];
 
   if (![outputString isEqualToString:inputString]) {
     return input;
