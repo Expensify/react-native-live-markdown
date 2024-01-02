@@ -5,14 +5,16 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
-import android.text.style.AbsoluteSizeSpan;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.ForegroundColorSpan;
+import android.text.style.LineHeightSpan;
+import android.text.style.RelativeSizeSpan;
 import android.text.style.StrikethroughSpan;
 import android.text.style.StyleSpan;
 import android.text.style.TypefaceSpan;
 import android.text.style.UnderlineSpan;
 
+import com.facebook.react.views.text.CustomLineHeightSpan;
 import com.facebook.soloader.SoLoader;
 
 import org.json.JSONArray;
@@ -108,7 +110,14 @@ public class MarkdownUtils {
   }
 
   private static Object makeHeadingSizeSpan() {
-    return new AbsoluteSizeSpan(25, true);
+    return new RelativeSizeSpan(1.4f);
+  }
+
+  private static Object makeHeadingLineHeightSpan(float lineHeight) {
+    return (LineHeightSpan) (text, start, end, spanstartv, lh, fm) -> {
+      fm.top -= lineHeight / 4;
+      fm.ascent -= lineHeight / 4;
+    };
   }
 
   private static Object makeBlockquoteMarginSpan() {
@@ -177,6 +186,12 @@ public class MarkdownUtils {
         break;
       case "h1":
         setSpan(ssb, makeBoldSpan(), start, end);
+        CustomLineHeightSpan[] spans = ssb.getSpans(0, ssb.length(), CustomLineHeightSpan.class);
+        if (spans.length >= 1) {
+          int lineHeight = spans[0].getLineHeight();
+          setSpan(ssb, makeHeadingLineHeightSpan(lineHeight * 1.5f), start, end);
+        }
+        // NOTE: size span must be set after line height span to avoid height jumps
         setSpan(ssb, makeHeadingSizeSpan(), start, end);
         break;
       case "blockquote":
@@ -189,7 +204,7 @@ public class MarkdownUtils {
 
   private void setSpan(SpannableStringBuilder ssb, Object span, int start, int end) {
     mSpans.add(span);
-    ssb.setSpan(span, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+    ssb.setSpan(span, start, end, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
   }
 
   private void removeSpans(SpannableStringBuilder ssb) {
