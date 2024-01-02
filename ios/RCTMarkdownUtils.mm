@@ -45,12 +45,7 @@ static CGFloat headingFontSize = 25;
   }
 
   JSValue *result = [function callWithArguments:@[inputString]];
-  NSString *outputString = [result[0] toString];
-  NSArray *ranges = [result[1] toArray];
-
-  if (![outputString isEqualToString:inputString]) {
-    return input;
-  }
+  NSArray *ranges = [result toArray];
 
   NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:inputString attributes:_backedTextInputView.defaultTextAttributes];
   [attributedString beginEditing];
