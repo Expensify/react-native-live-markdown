@@ -66,23 +66,16 @@ static CGFloat headingFontSize = 25;
 
     UIFont *font = [attributedString attribute:NSFontAttributeName atIndex:location effectiveRange:NULL];
     UIFontDescriptor *fontDescriptor = [font fontDescriptor];
-    UIFontDescriptorSymbolicTraits existingTraits = fontDescriptor.symbolicTraits;
-    UIFontDescriptorSymbolicTraits desiredTraits = UIFontDescriptorClassMask;
-
-    if ([type isEqualToString:@"bold"] || [type isEqualToString:@"mention"] || [type isEqualToString:@"h1"] || [type isEqualToString:@"mention-user"]) {
-      desiredTraits = existingTraits | UIFontDescriptorTraitBold;
+    UIFontDescriptorSymbolicTraits traits = fontDescriptor.symbolicTraits;
+    if ([type isEqualToString:@"bold"] || [type isEqualToString:@"mention"] || [type isEqualToString:@"h1"] || [type isEqualToString:@"mention-user"] || [type isEqualToString:@"syntax"]) {
+      traits |= UIFontDescriptorTraitBold;
     } else if ([type isEqualToString:@"italic"]) {
-      desiredTraits = existingTraits | UIFontDescriptorTraitItalic;
+      traits |= UIFontDescriptorTraitItalic;
     } else if ([type isEqualToString:@"code"] || [type isEqualToString:@"pre"]) {
-      desiredTraits = existingTraits | UIFontDescriptorTraitMonoSpace;
-    } else if ([type isEqualToString:@"syntax"]) {
-      desiredTraits = UIFontDescriptorTraitBold; // TODO: remove italic in nested bold+italic
-    } else {
-      // keep existing traits regardless of current item type
-      desiredTraits = existingTraits;
+      traits |= UIFontDescriptorTraitMonoSpace;
     }
 
-    UIFontDescriptor *newFontDescriptor = [fontDescriptor fontDescriptorWithSymbolicTraits:desiredTraits];
+    UIFontDescriptor *newFontDescriptor = [fontDescriptor fontDescriptorWithSymbolicTraits:traits];
     CGFloat size = 0; // Passing 0 to size keeps the existing size
     if ([type isEqualToString:@"h1"]) {
       size = headingFontSize;
