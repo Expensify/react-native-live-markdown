@@ -1,6 +1,14 @@
 #import <react-native-markdown-text-input/RCTMarkdownUtils.h>
 #import <JavaScriptCore/JavaScriptCore.h>
 
+static UIColor *syntaxColor = [UIColor grayColor];
+static UIColor *linkColor = [UIColor blueColor];
+static UIColor *codeForegroundColor = [[UIColor alloc] initWithRed:6/255.0 green:25/255.0 blue:109/255.0 alpha:1.0];
+static UIColor *codeBackgroundColor = [[UIColor alloc] initWithRed:0.95 green:0.95 blue:0.95 alpha:1.0];
+static UIColor *mentionHereColor = [[UIColor alloc] initWithRed:252/255.0 green:232/255.0 blue:142/255.0 alpha:1.0];
+static UIColor *mentionUserColor = [[UIColor alloc] initWithRed:176/255.0 green:217/255.0 blue:255/255.0 alpha:1.0];
+static CGFloat headingFontSize = 25;
+
 @implementation RCTMarkdownUtils {
   NSString *_prevInputString;
   NSAttributedString *_prevAttributedString;
@@ -74,26 +82,26 @@
     UIFontDescriptor *newFontDescriptor = [fontDescriptor fontDescriptorWithSymbolicTraits:desiredTraits];
     CGFloat size = 0; // Passing 0 to size keeps the existing size
     if ([type isEqualToString:@"h1"]) {
-      size = 25;
+      size = headingFontSize;
     }
     UIFont *newFont = [UIFont fontWithDescriptor:newFontDescriptor size:size];
     [attributedString addAttribute:NSFontAttributeName value:newFont range:range];
 
     if ([type isEqualToString:@"syntax"]) {
-      [attributedString addAttribute:NSForegroundColorAttributeName value:[UIColor grayColor] range:range];
+      [attributedString addAttribute:NSForegroundColorAttributeName value:syntaxColor range:range];
     } else if ([type isEqualToString:@"strikethrough"]) {
       [attributedString addAttribute:NSStrikethroughStyleAttributeName value:[NSNumber numberWithInteger:NSUnderlineStyleSingle] range:range];
     } else if ([type isEqualToString:@"code"]) {
-      [attributedString addAttribute:NSForegroundColorAttributeName value:[[UIColor alloc] initWithRed:6/255.0 green:25/255.0 blue:109/255.0 alpha:1.0] range:range];
-      [attributedString addAttribute:NSBackgroundColorAttributeName value:[[UIColor alloc] initWithRed:0.95 green:0.95 blue:0.95 alpha:1.0] range:range];
+      [attributedString addAttribute:NSForegroundColorAttributeName value:codeForegroundColor range:range];
+      [attributedString addAttribute:NSBackgroundColorAttributeName value:codeBackgroundColor range:range];
     } else if ([type isEqualToString:@"mention"]) {
-        [attributedString addAttribute:NSBackgroundColorAttributeName value:[[UIColor alloc] initWithRed:252/255.0 green:232/255.0 blue:142/255.0 alpha:1.0] range:range];
+        [attributedString addAttribute:NSBackgroundColorAttributeName value:mentionHereColor range:range];
     } else if ([type isEqualToString:@"mention-user"]) {
         // TODO: change mention color when it mentions current user
-        [attributedString addAttribute:NSBackgroundColorAttributeName value:[[UIColor alloc] initWithRed:176/255.0 green:217/255.0 blue:255/255.0 alpha:1.0] range:range];
+        [attributedString addAttribute:NSBackgroundColorAttributeName value:mentionUserColor range:range];
     } else if ([type isEqualToString:@"link"]) {
       [attributedString addAttribute:NSUnderlineStyleAttributeName value:[NSNumber numberWithInteger:NSUnderlineStyleSingle] range:range];
-      [attributedString addAttribute:NSForegroundColorAttributeName value:[UIColor blueColor] range:range];
+      [attributedString addAttribute:NSForegroundColorAttributeName value:linkColor range:range];
     } else if ([type isEqualToString:@"blockquote"]) {
       NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
       paragraphStyle.firstLineHeadIndent = 11;

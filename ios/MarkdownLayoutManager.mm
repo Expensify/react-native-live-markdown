@@ -3,6 +3,8 @@
 static CGFloat blockquoteLineOffset = 0;
 static CGFloat blockquoteLineWidth = 5;
 
+static UIColor *blockquoteLineColor = [UIColor lightGrayColor];
+
 @implementation MarkdownLayoutManager
 
 - (void)drawBackgroundForGlyphRange:(NSRange)glyphsToShow atPoint:(CGPoint)origin {
@@ -29,7 +31,7 @@ static CGFloat blockquoteLineWidth = 5;
       CGFloat width = blockquoteLineWidth;
       CGFloat height = rect.size.height;
       CGRect lineRect = CGRectMake(x, y, width, height);
-      [[UIColor lightGrayColor] setFill];
+      [blockquoteLineColor setFill];
       UIRectFill(lineRect);
     }
   }];
