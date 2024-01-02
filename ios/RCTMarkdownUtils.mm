@@ -71,8 +71,8 @@
     } else if ([type isEqualToString:@"syntax"]) {
       desiredTraits = UIFontDescriptorTraitBold; // TODO: remove italic in nested bold+italic
     } else {
-        // keep exisiting traits regardless of current item type
-        desiredTraits = existingTraits;
+      // keep exisiting traits regardless of current item type
+      desiredTraits = existingTraits;
     }
 
     UIFontDescriptor *newFontDescriptor = [fontDescriptor fontDescriptorWithSymbolicTraits:desiredTraits];
