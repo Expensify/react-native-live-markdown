@@ -13,6 +13,7 @@ static CGFloat headingFontSize = 25;
 @implementation RCTMarkdownUtils {
   NSString *_prevInputString;
   NSAttributedString *_prevAttributedString;
+  NSDictionary<NSAttributedStringKey, id> *_prevTextAttributes;
 }
 
 - (instancetype)initWithBackedTextInputView:(UIView<RCTBackedTextInputViewProtocol> *)backedTextInputView
@@ -32,7 +33,7 @@ static CGFloat headingFontSize = 25;
   }
 
   NSString *inputString = [input string];
-  if ([inputString isEqualToString:_prevInputString]) {
+  if ([inputString isEqualToString:_prevInputString] && [_backedTextInputView.defaultTextAttributes isEqualToDictionary:_prevTextAttributes]) {
     return _prevAttributedString;
   }
 
@@ -131,6 +132,7 @@ static CGFloat headingFontSize = 25;
 
   _prevInputString = inputString;
   _prevAttributedString = attributedString;
+  _prevTextAttributes = _backedTextInputView.defaultTextAttributes;
 
   return attributedString;
 }
