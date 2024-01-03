@@ -22,9 +22,7 @@
   }
 
   NSString *inputString = [input string];
-  BOOL defaultTextAttributesUnchanged = _prevTextAttributes != nil && [_backedTextInputView.defaultTextAttributes isEqualToDictionary:_prevTextAttributes];
-
-  if ([inputString isEqualToString:_prevInputString] && defaultTextAttributesUnchanged) {
+  if ([inputString isEqualToString:_prevInputString] && [_backedTextInputView.defaultTextAttributes isEqualToDictionary:_prevTextAttributes]) {
     return _prevAttributedString;
   }
 
