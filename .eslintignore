@@ -3,11 +3,3 @@
 
 # NODE MODULES
 **/node_modules/*
-
-# CONFIG FILES
-.eslintrc.js
-**/babel.config.js
-**/webpack.config.js
-**/jest.config.js
-**/metro.config.js
-**/react-native.config.js
