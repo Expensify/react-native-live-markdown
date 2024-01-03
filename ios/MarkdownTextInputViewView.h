@@ -2,4 +2,6 @@
 
 @interface MarkdownTextInputViewView : UIView
 
+- (void)setMarkdownStyle:(NSDictionary *)json;
+
 @end

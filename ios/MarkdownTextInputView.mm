@@ -6,6 +6,8 @@
 #import <react/renderer/components/RNMarkdownTextInputViewSpec/Props.h>
 #import <react/renderer/components/RNMarkdownTextInputViewSpec/RCTComponentViewHelpers.h>
 
+#import <React-Core/React/RCTFollyConvert.h>
+
 #import <react-native-markdown-text-input/MarkdownTextInputViewView.h>
 
 #import "RCTFabricComponentsPlugins.h"
@@ -43,6 +45,12 @@ using namespace facebook::react;
 {
     const auto &oldViewProps = *std::static_pointer_cast<MarkdownTextInputViewProps const>(_props);
     const auto &newViewProps = *std::static_pointer_cast<MarkdownTextInputViewProps const>(props);
+
+    if (oldViewProps.markdownStyle != newViewProps.markdownStyle) {
+      NSDictionary *json = convertFollyDynamicToId(newViewProps.markdownStyle);
+      MarkdownTextInputViewView *view = (MarkdownTextInputViewView *)_view;
+      [view setMarkdownStyle:json];
+    }
 
     [super updateProps:props oldProps:oldProps];
 }

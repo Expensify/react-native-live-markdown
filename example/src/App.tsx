@@ -3,6 +3,7 @@ import * as React from 'react';
 import {
   Button,
   Platform,
+  PlatformColor,
   StyleSheet,
   Text,
   TextInput,
@@ -10,6 +11,41 @@ import {
 } from 'react-native';
 
 import { MarkdownTextInput } from 'react-native-markdown-text-input';
+
+const MARKDOWN_STYLE = {
+  syntax: {
+    color: 'gray',
+  },
+  link: {
+    color: Platform.select({
+      android: PlatformColor('@android:color/holo_blue_bright'),
+      ios: PlatformColor('linkColor'),
+    }),
+  },
+  h1: {
+    fontSize: 25,
+  },
+  quote: {
+    borderColor: 'gray',
+    borderWidth: 10,
+    marginLeft: 10,
+    paddingLeft: 10,
+  },
+  code: {
+    color: 'rgb(6,25,109)',
+    backgroundColor: '#eee',
+  },
+  pre: {
+    color: 'rgb(6,25,109)',
+    backgroundColor: '#eee',
+  },
+  mentionHere: {
+    backgroundColor: 'rgb(252,232,142)',
+  },
+  mentionUser: {
+    backgroundColor: 'rgb(176,217,255)',
+  },
+};
 
 function isWeb() {
   return Platform.OS === 'web';
@@ -56,7 +92,9 @@ function getReactNativeVersion() {
 }
 
 export default function App() {
-  const [value, setValue] = React.useState('Hello, *world*!');
+  const [value, setValue] = React.useState(
+    'Hello, *world*!\nhttps://swmansion.com'
+  );
 
   // TODO: use MarkdownTextInput ref instead of TextInput ref
   const ref = React.useRef<TextInput>(null);
@@ -82,6 +120,7 @@ export default function App() {
         value={value}
         onChangeText={setValue}
         style={styles.input}
+        markdownStyle={MARKDOWN_STYLE}
         ref={ref}
       />
       <Text>MarkdownTextInput multiline</Text>
@@ -91,6 +130,7 @@ export default function App() {
         value={value}
         onChangeText={setValue}
         style={styles.input}
+        markdownStyle={MARKDOWN_STYLE}
       />
       <Text>TextInput singleline</Text>
       <TextInput

@@ -10,4 +10,9 @@ RCT_EXPORT_MODULE(MarkdownTextInputView)
   return [[MarkdownTextInputViewView alloc] init];
 }
 
+RCT_CUSTOM_VIEW_PROPERTY(markdownStyle, NSDictionary, MarkdownTextInputViewView)
+{
+  [view setMarkdownStyle:json];
+}
+
 @end

@@ -12,6 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)markdown__setAttributedString:(NSAttributedString *)attributedString;
 
+- (void)textInputDidChange;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -15,6 +15,7 @@
 #import <objc/runtime.h>
 
 @implementation MarkdownTextInputViewView {
+  RCTMarkdownStyle *_markdownStyle;
 #ifdef RCT_NEW_ARCH_ENABLED
   __weak RCTTextInputComponentView *_textInput;
 #else
@@ -22,6 +23,15 @@
 #endif /* RCT_NEW_ARCH_ENABLED */
   __weak RCTBackedTextFieldDelegateAdapter *_adapter;
   __weak RCTUITextView *_textView;
+}
+
+- (instancetype)init
+{
+  if (self = [super init]) {
+    _markdownStyle = [[RCTMarkdownStyle alloc] init];
+  }
+
+  return self;
 }
 
 - (void)didMoveToWindow {
@@ -56,7 +66,7 @@
   UIView<RCTBackedTextInputViewProtocol> *backedTextInputView = _textInput.backedTextInputView;
 #endif /* RCT_NEW_ARCH_ENABLED */
 
-  RCTMarkdownUtils *markdownUtils = [[RCTMarkdownUtils alloc] initWithBackedTextInputView:backedTextInputView];
+  RCTMarkdownUtils *markdownUtils = [[RCTMarkdownUtils alloc] initWithBackedTextInputView:backedTextInputView markdownStyle:_markdownStyle];
   [_textInput setMarkdownUtils:markdownUtils];
   if ([backedTextInputView isKindOfClass:[RCTUITextField class]]) {
     RCTUITextField *textField = (RCTUITextField *)backedTextInputView;
@@ -87,6 +97,12 @@
       object_setClass(_textView.layoutManager, [NSLayoutManager class]);
     }
   }
+}
+
+- (void)setMarkdownStyle:(NSDictionary *)json
+{
+  [_markdownStyle update:json];
+  [_textInput textInputDidChange]; // trigger update
 }
 
 @end

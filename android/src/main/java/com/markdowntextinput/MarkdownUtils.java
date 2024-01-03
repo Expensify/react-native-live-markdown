@@ -65,11 +65,16 @@ public class MarkdownUtils {
 
   private static native String nativeParseMarkdown(String input);
 
+  private MarkdownStyle mMarkdownStyle = new MarkdownStyle();
+
+  public void setMarkdownStyle(MarkdownStyle markdownStyle) {
+    mMarkdownStyle = markdownStyle;
+  }
+
   private final List<Object> mSpans = new LinkedList<>();
 
   // Colors
   private static final int COLOR_CODE = Color.rgb(6, 25, 109);
-  private static final int COLOR_LINK = Color.BLUE;
   private static final int COLOR_SYNTAX = Color.GRAY;
   private static final int COLOR_MENTION_HERE = Color.argb(100, 252, 232, 142);
   private static final int COLOR_MENTION_USER = Color.argb(100, 176, 217, 255);
@@ -101,8 +106,8 @@ public class MarkdownUtils {
     return new ForegroundColorSpan(COLOR_SYNTAX);
   }
 
-  private static Object makeLinkColorSpan() {
-    return new ForegroundColorSpan(COLOR_LINK);
+  private Object makeLinkColorSpan() {
+    return new ForegroundColorSpan(mMarkdownStyle.getLinkColor());
   }
 
   private static Object makeCodeColorSpan() {

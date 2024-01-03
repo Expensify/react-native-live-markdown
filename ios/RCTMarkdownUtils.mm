@@ -1,9 +1,9 @@
 #import <react-native-markdown-text-input/RCTMarkdownUtils.h>
+#import <react/debug/react_native_assert.h>
 #import <React/RCTAssert.h>
 #import <JavaScriptCore/JavaScriptCore.h>
 
 static UIColor *syntaxColor = [UIColor grayColor];
-static UIColor *linkColor = [UIColor blueColor];
 static UIColor *codeForegroundColor = [[UIColor alloc] initWithRed:6/255.0 green:25/255.0 blue:109/255.0 alpha:1.0];
 static UIColor *codeBackgroundColor = [[UIColor alloc] initWithRed:0.95 green:0.95 blue:0.95 alpha:1.0];
 static UIColor *mentionHereColor = [[UIColor alloc] initWithRed:252/255.0 green:232/255.0 blue:142/255.0 alpha:1.0];
@@ -13,12 +13,14 @@ static CGFloat headingFontSize = 25;
 @implementation RCTMarkdownUtils {
   NSString *_prevInputString;
   NSAttributedString *_prevAttributedString;
+  RCTMarkdownStyle *_markdownStyle;
 }
 
-- (instancetype)initWithBackedTextInputView:(UIView<RCTBackedTextInputViewProtocol> *)backedTextInputView
+- (instancetype)initWithBackedTextInputView:(UIView<RCTBackedTextInputViewProtocol> *)backedTextInputView markdownStyle:(nonnull RCTMarkdownStyle *)markdownStyle;
 {
   if (self = [super init]) {
     _backedTextInputView = backedTextInputView;
+    _markdownStyle = markdownStyle;
   }
   return self;
 }
@@ -32,9 +34,9 @@ static CGFloat headingFontSize = 25;
   }
 
   NSString *inputString = [input string];
-  if ([inputString isEqualToString:_prevInputString]) {
-    return _prevAttributedString;
-  }
+//  if ([inputString isEqualToString:_prevInputString]) {
+//    return _prevAttributedString;
+//  }
 
   static JSContext *ctx = nil;
   static JSValue *function = nil;
@@ -108,7 +110,7 @@ static CGFloat headingFontSize = 25;
         [attributedString addAttribute:NSBackgroundColorAttributeName value:mentionUserColor range:range];
     } else if ([type isEqualToString:@"link"]) {
       [attributedString addAttribute:NSUnderlineStyleAttributeName value:[NSNumber numberWithInteger:NSUnderlineStyleSingle] range:range];
-      [attributedString addAttribute:NSForegroundColorAttributeName value:linkColor range:range];
+      [attributedString addAttribute:NSForegroundColorAttributeName value:_markdownStyle.linkColor range:range];
     } else if ([type isEqualToString:@"blockquote"]) {
       NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
       paragraphStyle.firstLineHeadIndent = 11;

@@ -3,9 +3,11 @@ import { StyleSheet, TextInput } from 'react-native';
 import MarkdownTextInputViewNativeComponent from './MarkdownTextInputViewNativeComponent';
 import React from 'react';
 import type { TextInputProps } from 'react-native';
+import { processMarkdownStyle } from './MarkdownStyle';
+import type { MarkdownStyle } from './MarkdownStyle';
 
 export interface MarkdownTextInputProps extends TextInputProps {
-  // nothing here
+  markdownStyle?: MarkdownStyle;
 }
 
 const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
@@ -16,6 +18,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         <TextInput {...props} ref={ref} />
         <MarkdownTextInputViewNativeComponent
           style={IS_FABRIC ? styles.farAway : styles.displayNone}
+          markdownStyle={processMarkdownStyle(props.markdownStyle)}
         />
       </>
     );
