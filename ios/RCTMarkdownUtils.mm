@@ -13,6 +13,7 @@ static CGFloat headingFontSize = 25;
 @implementation RCTMarkdownUtils {
   NSString *_prevInputString;
   NSAttributedString *_prevAttributedString;
+  NSDictionary<NSAttributedStringKey, id> *_prevTextAttributes;
   RCTMarkdownStyle *_markdownStyle;
 }
 
@@ -34,9 +35,10 @@ static CGFloat headingFontSize = 25;
   }
 
   NSString *inputString = [input string];
-//  if ([inputString isEqualToString:_prevInputString]) {
-//    return _prevAttributedString;
-//  }
+  // TODO: fix memoization
+  // if ([inputString isEqualToString:_prevInputString] && [_backedTextInputView.defaultTextAttributes isEqualToDictionary:_prevTextAttributes]) {
+  //   return _prevAttributedString;
+  // }
 
   static JSContext *ctx = nil;
   static JSValue *function = nil;
@@ -133,6 +135,7 @@ static CGFloat headingFontSize = 25;
 
   _prevInputString = inputString;
   _prevAttributedString = attributedString;
+  _prevTextAttributes = _backedTextInputView.defaultTextAttributes;
 
   return attributedString;
 }
