@@ -1,13 +1,8 @@
 package com.markdowntextinput;
 
-import android.graphics.Typeface;
 import android.text.Editable;
 import android.text.SpannableStringBuilder;
-import android.text.Spanned;
 import android.text.TextWatcher;
-import android.text.style.StyleSpan;
-
-import com.facebook.react.views.textinput.ReactEditText;
 
 public class MarkdownTextWatcher implements TextWatcher {
   private final MarkdownUtils mMarkdownUtils = new MarkdownUtils();

@@ -1,6 +1,7 @@
 #import <React/RCTUITextField.h>
 #import <react/debug/react_native_assert.h>
 
+#import <react-native-markdown-text-input/MarkdownLayoutManager.h>
 #import <react-native-markdown-text-input/MarkdownTextInputViewView.h>
 #import <react-native-markdown-text-input/RCTBackedTextFieldDelegateAdapter+Markdown.h>
 #import <react-native-markdown-text-input/RCTUITextView+Markdown.h>
@@ -10,6 +11,8 @@
 #else
 #import <react-native-markdown-text-input/RCTBaseTextInputView+Markdown.h>
 #endif /* RCT_NEW_ARCH_ENABLED */
+
+#import <objc/runtime.h>
 
 @implementation MarkdownTextInputViewView {
 #ifdef RCT_NEW_ARCH_ENABLED
@@ -62,6 +65,8 @@
   } else if ([backedTextInputView isKindOfClass:[RCTUITextView class]]) {
     _textView = (RCTUITextView *)backedTextInputView;
     [_textView setMarkdownUtils:markdownUtils];
+    object_setClass(_textView.layoutManager, [MarkdownLayoutManager class]);
+    [_textView.layoutManager setValue:markdownUtils forKey:@"markdownUtils"];
   } else {
     react_native_assert(false && "Cannot enable Markdown for this type of TextInput.");
   }
@@ -72,6 +77,10 @@
   [_textInput setMarkdownUtils:nil];
   [_adapter setMarkdownUtils:nil];
   [_textView setMarkdownUtils:nil];
+  if (_textView != nil) {
+    [_textView.layoutManager setValue:nil forKey:@"markdownUtils"];
+    object_setClass(_textView.layoutManager, [NSLayoutManager class]);
+  }
 }
 
 @end
