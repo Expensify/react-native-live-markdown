@@ -1,5 +1,2 @@
-# BUILD FILES
-**/out.js
-
-# NODE MODULES
 **/node_modules/*
+**/out.js
