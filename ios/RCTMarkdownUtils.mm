@@ -1,4 +1,5 @@
 #import <react-native-markdown-text-input/RCTMarkdownUtils.h>
+#import <React/RCTAssert.h>
 #import <JavaScriptCore/JavaScriptCore.h>
 
 static UIColor *syntaxColor = [UIColor grayColor];
@@ -22,7 +23,10 @@ static CGFloat headingFontSize = 25;
   return self;
 }
 
-- (NSAttributedString *)parseMarkdown:(NSAttributedString *)input {
+- (NSAttributedString *)parseMarkdown:(NSAttributedString *)input
+{
+  RCTAssertMainQueue();
+
   if (input == nil) {
     return nil;
   }
