@@ -8,5 +8,7 @@ pre-commit:
       run: npx tsc --project tsconfig.json --noEmit
     types_parser:
       run: npx tsc --project ./parser/tsconfig.json --noEmit
+    types_example:
+      run: npx tsc --project ./example/tsconfig.json --noEmit
     types_WebExample:
       run: npx tsc --project ./WebExample/tsconfig.json --noEmit
