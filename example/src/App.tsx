@@ -27,9 +27,9 @@ const MARKDOWN_STYLE = {
   },
   quote: {
     borderColor: 'gray',
-    borderWidth: 10,
-    marginLeft: 10,
-    paddingLeft: 10,
+    borderWidth: 6,
+    marginLeft: 6,
+    paddingLeft: 6,
   },
   code: {
     color: 'rgb(6,25,109)',
