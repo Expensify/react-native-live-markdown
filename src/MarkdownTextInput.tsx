@@ -13,12 +13,18 @@ export interface MarkdownTextInputProps extends TextInputProps {
 const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
   (props, ref) => {
     const IS_FABRIC = 'nativeFabricUIManager' in global;
+
+    const markdownStyle = React.useMemo(
+      () => processMarkdownStyle(props.markdownStyle),
+      [props.markdownStyle]
+    );
+
     return (
       <>
         <TextInput {...props} ref={ref} />
         <MarkdownTextInputViewNativeComponent
           style={IS_FABRIC ? styles.farAway : styles.displayNone}
-          markdownStyle={processMarkdownStyle(props.markdownStyle)}
+          markdownStyle={markdownStyle}
         />
       </>
     );
