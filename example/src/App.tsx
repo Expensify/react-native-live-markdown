@@ -3,7 +3,6 @@ import * as React from 'react';
 import {
   Button,
   Platform,
-  PlatformColor,
   StyleSheet,
   Text,
   TextInput,
@@ -17,10 +16,7 @@ const MARKDOWN_STYLE = {
     color: 'gray',
   },
   link: {
-    color: Platform.select({
-      android: PlatformColor('@android:color/holo_blue_bright'),
-      ios: PlatformColor('linkColor'),
-    }),
+    color: 'blue',
   },
   h1: {
     fontSize: 25,
@@ -33,11 +29,11 @@ const MARKDOWN_STYLE = {
   },
   code: {
     color: 'rgb(6,25,109)',
-    backgroundColor: '#eee',
+    backgroundColor: 'lightgray',
   },
   pre: {
     color: 'rgb(6,25,109)',
-    backgroundColor: '#eee',
+    backgroundColor: 'lightgray',
   },
   mentionHere: {
     backgroundColor: 'rgb(252,232,142)',
@@ -46,6 +42,15 @@ const MARKDOWN_STYLE = {
     backgroundColor: 'rgb(176,217,255)',
   },
 };
+
+const DEFAULT_TEXT = [
+  'Hello, *world*!',
+  'https://expensify.com',
+  '# Lorem ipsum',
+  '> Hello world',
+  '@here',
+  '@someone@swmansion.com',
+].join('\n');
 
 function isWeb() {
   return Platform.OS === 'web';
@@ -92,9 +97,7 @@ function getReactNativeVersion() {
 }
 
 export default function App() {
-  const [value, setValue] = React.useState(
-    'Hello, *world*!\nhttps://swmansion.com'
-  );
+  const [value, setValue] = React.useState(DEFAULT_TEXT);
 
   // TODO: use MarkdownTextInput ref instead of TextInput ref
   const ref = React.useRef<TextInput>(null);
@@ -114,7 +117,7 @@ export default function App() {
           </>
         )}
       </View>
-      <Text>MarkdownTextInput singleline</Text>
+      {/* <Text>MarkdownTextInput singleline</Text>
       <MarkdownTextInput
         autoCapitalize="none"
         value={value}
@@ -122,7 +125,7 @@ export default function App() {
         style={styles.input}
         markdownStyle={MARKDOWN_STYLE}
         ref={ref}
-      />
+      /> */}
       <Text>MarkdownTextInput multiline</Text>
       <MarkdownTextInput
         multiline
@@ -132,21 +135,21 @@ export default function App() {
         style={styles.input}
         markdownStyle={MARKDOWN_STYLE}
       />
-      <Text>TextInput singleline</Text>
+      {/* <Text>TextInput singleline</Text>
       <TextInput
         autoCapitalize="none"
         value={value}
         onChangeText={setValue}
         style={styles.input}
-      />
-      <Text>TextInput multiline</Text>
+      /> */}
+      {/* <Text>TextInput multiline</Text>
       <TextInput
         multiline
         autoCapitalize="none"
         value={value}
         onChangeText={setValue}
         style={styles.input}
-      />
+      /> */}
       <Text style={styles.text}>{JSON.stringify(value)}</Text>
       <Button title="Focus" onPress={() => ref.current?.focus()} />
       <Button title="Blur" onPress={() => ref.current?.blur()} />
