@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
+import android.text.style.AbsoluteSizeSpan;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.LineHeightSpan;
@@ -73,14 +74,6 @@ public class MarkdownUtils {
 
   private final List<Object> mSpans = new LinkedList<>();
 
-  // Colors
-  private static final int COLOR_CODE = Color.rgb(6, 25, 109);
-  private static final int COLOR_SYNTAX = Color.GRAY;
-  private static final int COLOR_MENTION_HERE = Color.argb(100, 252, 232, 142);
-  private static final int COLOR_MENTION_USER = Color.argb(100, 176, 217, 255);
-  private static final int COLOR_CODE_BACKGROUND = Color.argb(100, 211, 211, 211);
-  private static final int COLOR_QUOTE_LINE = Color.GRAY;
-
   // Spans
   private static Object makeBoldSpan() {
     return new StyleSpan(Typeface.BOLD);
@@ -102,32 +95,40 @@ public class MarkdownUtils {
     return new TypefaceSpan("monospace");
   }
 
-  private static Object makeSyntaxColorSpan() {
-    return new ForegroundColorSpan(COLOR_SYNTAX);
+  private Object makeSyntaxColorSpan() {
+    return new ForegroundColorSpan(mMarkdownStyle.getSyntaxColor());
   }
 
   private Object makeLinkColorSpan() {
     return new ForegroundColorSpan(mMarkdownStyle.getLinkColor());
   }
 
-  private static Object makeCodeColorSpan() {
-    return new ForegroundColorSpan(COLOR_CODE);
+  private Object makeCodeColorSpan() {
+    return new ForegroundColorSpan(mMarkdownStyle.getCodeColor());
   }
 
-  private static Object makeMentionHereBackgroundSpan() {
-    return new BackgroundColorSpan(COLOR_MENTION_HERE);
+  private Object makePreColorSpan() {
+    return new ForegroundColorSpan(mMarkdownStyle.getPreColor());
   }
 
-  private static Object makeMentionUserBackgroundSpan() {
-    return new BackgroundColorSpan(COLOR_MENTION_USER);
+  private Object makeMentionHereBackgroundSpan() {
+    return new BackgroundColorSpan(mMarkdownStyle.getMentionHereBackgroundColor());
   }
 
-  private static Object makeCodeBackgroundSpan() {
-    return new BackgroundColorSpan(COLOR_CODE_BACKGROUND);
+  private Object makeMentionUserBackgroundSpan() {
+    return new BackgroundColorSpan(mMarkdownStyle.getMentionUserBackgroundColor());
   }
 
-  private static Object makeHeadingSizeSpan() {
-    return new RelativeSizeSpan(1.4f);
+  private Object makeCodeBackgroundSpan() {
+    return new BackgroundColorSpan(mMarkdownStyle.getCodeBackgroundColor());
+  }
+
+  private Object makePreBackgroundSpan() {
+    return new BackgroundColorSpan(mMarkdownStyle.getPreBackgroundColor());
+  }
+
+  private Object makeHeadingSizeSpan() {
+    return new AbsoluteSizeSpan((int) mMarkdownStyle.getHeadingFontSize(), true);
   }
 
   private static Object makeHeadingLineHeightSpan(float lineHeight) {
@@ -137,8 +138,12 @@ public class MarkdownUtils {
     };
   }
 
-  private static Object makeBlockquoteMarginSpan() {
-    return new QuoteSpan(COLOR_QUOTE_LINE, 15, 20);
+  private Object makeBlockquoteMarginSpan() {
+    return new QuoteSpan(
+      mMarkdownStyle.getQuoteBorderColor(),
+      mMarkdownStyle.getQuoteBorderWidth(),
+      mMarkdownStyle.getQuoteMarginLeft(),
+      mMarkdownStyle.getQuotePaddingLeft());
   }
 
   public void applyMarkdownFormatting(SpannableStringBuilder ssb) {
@@ -196,10 +201,14 @@ public class MarkdownUtils {
         setSpan(ssb, makeLinkColorSpan(), start, end);
         break;
       case "code":
-      case "pre":
         setSpan(ssb, makeMonospaceSpan(), start, end);
         setSpan(ssb, makeCodeColorSpan(), start, end);
         setSpan(ssb, makeCodeBackgroundSpan(), start, end);
+        break;
+      case "pre":
+        setSpan(ssb, makeMonospaceSpan(), start, end);
+        setSpan(ssb, makePreColorSpan(), start, end);
+        setSpan(ssb, makePreBackgroundSpan(), start, end);
         break;
       case "h1":
         setSpan(ssb, makeBoldSpan(), start, end);
