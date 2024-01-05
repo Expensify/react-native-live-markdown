@@ -73,7 +73,7 @@ function processMarkdownStyle(input: MarkdownStyle) {
     }
   }
 
-  return output;
+  return output as MarkdownStyle;
 }
 
 export interface MarkdownTextInputProps extends TextInputProps {
