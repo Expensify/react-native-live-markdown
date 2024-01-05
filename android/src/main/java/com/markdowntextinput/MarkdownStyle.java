@@ -14,7 +14,7 @@ import java.util.Objects;
 public class MarkdownStyle {
   private final int mSyntaxColor;
   private final int mLinkColor;
-  private final float mHeadingFontSize;
+  private final float mH1FontSize;
   private final int mQuoteBorderColor;
   private final float mQuoteBorderWidth;
   private final float mQuoteMarginLeft;
@@ -29,7 +29,7 @@ public class MarkdownStyle {
   public MarkdownStyle(@NonNull ReadableMap map, @NonNull Context context) {
     mSyntaxColor = parseColor(map, "syntax", "color", context);
     mLinkColor = parseColor(map, "link", "color", context);
-    mHeadingFontSize = parseFloat(map, "h1", "fontSize");
+    mH1FontSize = parseFloat(map, "h1", "fontSize");
     mQuoteBorderColor = parseColor(map, "quote", "borderColor", context);
     mQuoteBorderWidth = parseFloat(map, "quote", "borderWidth");
     mQuoteMarginLeft = parseFloat(map, "quote", "marginLeft");
@@ -71,8 +71,8 @@ public class MarkdownStyle {
     return mLinkColor;
   }
 
-  public float getHeadingFontSize() {
-    return mHeadingFontSize;
+  public float getH1FontSize() {
+    return mH1FontSize;
   }
 
   public int getQuoteBorderColor() {

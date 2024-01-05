@@ -17,7 +17,7 @@
 
     _linkColor = RCTUIColorFromSharedColor(style.link.color);
 
-    _headingFontSize = style.h1.fontSize;
+    _h1FontSize = style.h1.fontSize;
 
     _quoteBorderColor = RCTUIColorFromSharedColor(style.quote.borderColor);
     _quoteBorderWidth = style.quote.borderWidth;
@@ -47,7 +47,7 @@
 
     _linkColor = [RCTConvert UIColor:json[@"link"][@"color"]];
 
-    _headingFontSize = [json[@"h1"][@"fontSize"] floatValue];
+    _h1FontSize = [json[@"h1"][@"fontSize"] floatValue];
 
     _quoteBorderColor = [RCTConvert UIColor:json[@"quote"][@"borderColor"]];
     _quoteBorderWidth = [json[@"quote"][@"borderWidth"] floatValue];

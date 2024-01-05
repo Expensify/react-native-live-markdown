@@ -84,7 +84,7 @@
     UIFontDescriptor *newFontDescriptor = [fontDescriptor fontDescriptorWithSymbolicTraits:desiredTraits];
     CGFloat size = 0; // Passing 0 to size keeps the existing size
     if ([type isEqualToString:@"h1"]) {
-      size = _markdownStyle.headingFontSize;
+      size = _markdownStyle.h1FontSize;
     }
     UIFont *newFont = [UIFont fontWithDescriptor:newFontDescriptor size:size];
     [attributedString addAttribute:NSFontAttributeName value:newFont range:range];

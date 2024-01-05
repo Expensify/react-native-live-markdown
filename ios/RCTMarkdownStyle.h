@@ -6,7 +6,7 @@
 
 @property (nonatomic, nonnull) UIColor *syntaxColor;
 @property (nonatomic, nonnull) UIColor *linkColor;
-@property (nonatomic) CGFloat headingFontSize;
+@property (nonatomic) CGFloat h1FontSize;
 @property (nonatomic, nonnull) UIColor *quoteBorderColor;
 @property (nonatomic) CGFloat quoteBorderWidth;
 @property (nonatomic) CGFloat quoteMarginLeft;

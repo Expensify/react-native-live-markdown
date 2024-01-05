@@ -128,8 +128,8 @@ public class MarkdownUtils {
     return new BackgroundColorSpan(mMarkdownStyle.getPreBackgroundColor());
   }
 
-  private Object makeHeadingSizeSpan() {
-    return new AbsoluteSizeSpan((int) mMarkdownStyle.getHeadingFontSize(), true);
+  private Object makeH1FontSizeSpan() {
+    return new AbsoluteSizeSpan((int) mMarkdownStyle.getH1FontSize(), true);
   }
 
   private static Object makeHeadingLineHeightSpan(float lineHeight) {
@@ -221,7 +221,7 @@ public class MarkdownUtils {
           setSpan(ssb, makeHeadingLineHeightSpan(lineHeight * 1.5f), start, end);
         }
         // NOTE: size span must be set after line height span to avoid height jumps
-        setSpan(ssb, makeHeadingSizeSpan(), start, end);
+        setSpan(ssb, makeH1FontSizeSpan(), start, end);
         break;
       case "blockquote":
         setSpan(ssb, makeBlockquoteMarginSpan(), start, end);
