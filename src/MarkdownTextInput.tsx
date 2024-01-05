@@ -5,37 +5,39 @@ import MarkdownTextInputViewNativeComponent from './MarkdownTextInputViewNativeC
 import React from 'react';
 import type { TextInputProps } from 'react-native';
 
-const DEFAULT_MARKDOWN_STYLE = Object.freeze({
-  syntax: {
-    color: 'gray',
-  },
-  link: {
-    color: 'blue',
-  },
-  h1: {
-    fontSize: 25,
-  },
-  quote: {
-    borderColor: 'gray',
-    borderWidth: 6,
-    marginLeft: 6,
-    paddingLeft: 6,
-  },
-  code: {
-    color: 'black',
-    backgroundColor: 'lightgray',
-  },
-  pre: {
-    color: 'black',
-    backgroundColor: 'lightgray',
-  },
-  mentionHere: {
-    backgroundColor: 'yellow',
-  },
-  mentionUser: {
-    backgroundColor: 'cyan',
-  },
-});
+function makeDefaultMarkdownStyle(): MarkdownStyle {
+  return {
+    syntax: {
+      color: 'gray',
+    },
+    link: {
+      color: 'blue',
+    },
+    h1: {
+      fontSize: 25,
+    },
+    quote: {
+      borderColor: 'gray',
+      borderWidth: 6,
+      marginLeft: 6,
+      paddingLeft: 6,
+    },
+    code: {
+      color: 'black',
+      backgroundColor: 'lightgray',
+    },
+    pre: {
+      color: 'black',
+      backgroundColor: 'lightgray',
+    },
+    mentionHere: {
+      backgroundColor: 'yellow',
+    },
+    mentionUser: {
+      backgroundColor: 'cyan',
+    },
+  };
+}
 
 type PartialMarkdownStyle = Partial<{
   [K in keyof MarkdownStyle]: Partial<MarkdownStyle[K]>;
@@ -44,19 +46,15 @@ type PartialMarkdownStyle = Partial<{
 function mergeMarkdownStyleWithDefault(
   input: PartialMarkdownStyle | undefined
 ): MarkdownStyle {
-  if (input === undefined) {
-    return DEFAULT_MARKDOWN_STYLE;
-  }
+  const output = makeDefaultMarkdownStyle();
 
-  const output = JSON.parse(
-    JSON.stringify(DEFAULT_MARKDOWN_STYLE)
-  ) as MarkdownStyle;
-
-  for (const key in input) {
-    Object.assign(
-      output[key as keyof MarkdownStyle],
-      input[key as keyof MarkdownStyle]
-    );
+  if (input !== undefined) {
+    for (const key in input) {
+      Object.assign(
+        output[key as keyof MarkdownStyle],
+        input[key as keyof MarkdownStyle]
+      );
+    }
   }
 
   return output;
