@@ -5,6 +5,63 @@ import MarkdownTextInputViewNativeComponent from './MarkdownTextInputViewNativeC
 import React from 'react';
 import type { TextInputProps } from 'react-native';
 
+const DEFAULT_MARKDOWN_STYLE = Object.freeze({
+  syntax: {
+    color: 'gray',
+  },
+  link: {
+    color: 'blue',
+  },
+  h1: {
+    fontSize: 25,
+  },
+  quote: {
+    borderColor: 'gray',
+    borderWidth: 6,
+    marginLeft: 6,
+    paddingLeft: 6,
+  },
+  code: {
+    color: 'black',
+    backgroundColor: 'lightgray',
+  },
+  pre: {
+    color: 'black',
+    backgroundColor: 'lightgray',
+  },
+  mentionHere: {
+    backgroundColor: 'yellow',
+  },
+  mentionUser: {
+    backgroundColor: 'cyan',
+  },
+});
+
+type PartialMarkdownStyle = Partial<{
+  [K in keyof MarkdownStyle]: Partial<MarkdownStyle[K]>;
+}>;
+
+function mergeMarkdownStyleWithDefault(
+  input: PartialMarkdownStyle | undefined
+): MarkdownStyle {
+  if (input === undefined) {
+    return DEFAULT_MARKDOWN_STYLE;
+  }
+
+  const output = JSON.parse(
+    JSON.stringify(DEFAULT_MARKDOWN_STYLE)
+  ) as MarkdownStyle;
+
+  for (const key in input) {
+    Object.assign(
+      output[key as keyof MarkdownStyle],
+      input[key as keyof MarkdownStyle]
+    );
+  }
+
+  return output;
+}
+
 function processMarkdownStyle(input: MarkdownStyle) {
   const output = JSON.parse(JSON.stringify(input));
 
@@ -22,7 +79,7 @@ function processMarkdownStyle(input: MarkdownStyle) {
 }
 
 export interface MarkdownTextInputProps extends TextInputProps {
-  markdownStyle: MarkdownStyle; // TODO: support and merge with default Markdown style
+  markdownStyle?: PartialMarkdownStyle;
 }
 
 const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
@@ -30,7 +87,10 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     const IS_FABRIC = 'nativeFabricUIManager' in global;
 
     const markdownStyle = React.useMemo(
-      () => processMarkdownStyle(props.markdownStyle),
+      () =>
+        processMarkdownStyle(
+          mergeMarkdownStyleWithDefault(props.markdownStyle)
+        ),
       [props.markdownStyle]
     );
 

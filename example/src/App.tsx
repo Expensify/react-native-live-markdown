@@ -5,38 +5,6 @@ import { Button, Platform, StyleSheet, Text, View } from 'react-native';
 import { MarkdownTextInput } from 'react-native-markdown-text-input';
 import type { TextInput } from 'react-native';
 
-const MARKDOWN_STYLE = {
-  syntax: {
-    color: 'lightgray',
-  },
-  link: {
-    color: 'fuchsia',
-  },
-  h1: {
-    fontSize: 30,
-  },
-  quote: {
-    borderColor: 'dodgerblue',
-    borderWidth: 6,
-    marginLeft: 6,
-    paddingLeft: 6,
-  },
-  code: {
-    color: 'green',
-    backgroundColor: 'lime',
-  },
-  pre: {
-    color: 'goldenrod',
-    backgroundColor: 'yellow',
-  },
-  mentionHere: {
-    backgroundColor: 'orange',
-  },
-  mentionUser: {
-    backgroundColor: 'tomato',
-  },
-};
-
 const DEFAULT_TEXT = [
   'Hello, *world*!',
   'https://expensify.com',
@@ -119,7 +87,6 @@ export default function App() {
         value={value}
         onChangeText={setValue}
         style={styles.input}
-        markdownStyle={MARKDOWN_STYLE}
       />
       <Text style={styles.text}>{JSON.stringify(value)}</Text>
       <Button title="Focus" onPress={() => ref.current?.focus()} />
