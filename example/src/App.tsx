@@ -91,7 +91,7 @@ export default function App() {
       <Text style={styles.text}>{JSON.stringify(value)}</Text>
       <Button title="Focus" onPress={() => ref.current?.focus()} />
       <Button title="Blur" onPress={() => ref.current?.blur()} />
-      <Button title="Reset" onPress={() => setValue('Hello, *world*!')} />
+      <Button title="Reset" onPress={() => setValue(DEFAULT_TEXT)} />
       <Button title="Clear" onPress={() => setValue('')} />
     </View>
   );
