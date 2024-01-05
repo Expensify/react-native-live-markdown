@@ -15,7 +15,7 @@ static UIColor *blockquoteLineColor = [UIColor lightGrayColor];
     RCTMarkdownUtils *markdownUtils = [self valueForKey:@"markdownUtils"];
     [markdownUtils.quoteRanges enumerateObjectsUsingBlock:^(NSValue *item, NSUInteger idx, BOOL * _Nonnull stop) {
       NSRange range = [item rangeValue];
-      NSUInteger start = range.location - quoteLevel; // compensate for the `>` syntax which is not included in range
+      NSUInteger start = range.location - nestingLevel; // compensate for the `>` syntax which is not included in range
       NSUInteger end = start + range.length;
       NSUInteger location = glyphRange.location;
       if (location >= start && location < end) {
