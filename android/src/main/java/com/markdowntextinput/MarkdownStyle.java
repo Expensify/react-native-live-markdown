@@ -1,7 +1,6 @@
 package com.markdowntextinput;
 
 import android.content.Context;
-import android.graphics.Color;
 
 import androidx.annotation.NonNull;
 
@@ -9,6 +8,8 @@ import com.facebook.react.bridge.ColorPropConverter;
 import com.facebook.react.bridge.Dynamic;
 import com.facebook.react.bridge.JSApplicationCausedNativeException;
 import com.facebook.react.bridge.ReadableMap;
+
+import java.util.Objects;
 
 public class MarkdownStyle {
   private final int mSyntaxColor;
@@ -25,31 +26,27 @@ public class MarkdownStyle {
   private final int mMentionHereBackgroundColor;
   private final int mMentionUserBackgroundColor;
 
-  public MarkdownStyle(ReadableMap map, Context context) {
-    mSyntaxColor = parseColor(map, "syntax", "color", Color.GRAY, context);
-    mLinkColor = parseColor(map, "link", "color", Color.BLUE, context);
-    mHeadingFontSize = parseFloat(map, "h1", "fontSize", 25, context);
-    mQuoteBorderColor = parseColor(map, "quote", "borderColor", Color.GRAY, context);
-    mQuoteBorderWidth = parseFloat(map, "quote", "borderWidth", 6, context);
-    mQuoteMarginLeft = parseFloat(map, "quote", "marginLeft", 6, context);
-    mQuotePaddingLeft = parseFloat(map, "quote", "paddingLeft", 6, context);
-    mCodeColor = parseColor(map, "code", "color", Color.BLACK, context);
-    mCodeBackgroundColor = parseColor(map, "code", "backgroundColor", Color.LTGRAY, context);
-    mPreColor = parseColor(map, "pre", "color", Color.BLACK, context);
-    mPreBackgroundColor = parseColor(map, "pre", "backgroundColor", Color.LTGRAY, context);
-    mMentionHereBackgroundColor = parseColor(map, "mentionHere", "backgroundColor", Color.YELLOW, context);
-    mMentionUserBackgroundColor = parseColor(map, "mentionUser", "backgroundColor", Color.CYAN, context);
+  public MarkdownStyle(@NonNull ReadableMap map, @NonNull Context context) {
+    mSyntaxColor = parseColor(map, "syntax", "color", context);
+    mLinkColor = parseColor(map, "link", "color", context);
+    mHeadingFontSize = parseFloat(map, "h1", "fontSize");
+    mQuoteBorderColor = parseColor(map, "quote", "borderColor", context);
+    mQuoteBorderWidth = parseFloat(map, "quote", "borderWidth");
+    mQuoteMarginLeft = parseFloat(map, "quote", "marginLeft");
+    mQuotePaddingLeft = parseFloat(map, "quote", "paddingLeft");
+    mCodeColor = parseColor(map, "code", "color", context);
+    mCodeBackgroundColor = parseColor(map, "code", "backgroundColor", context);
+    mPreColor = parseColor(map, "pre", "color", context);
+    mPreBackgroundColor = parseColor(map, "pre", "backgroundColor", context);
+    mMentionHereBackgroundColor = parseColor(map, "mentionHere", "backgroundColor", context);
+    mMentionUserBackgroundColor = parseColor(map, "mentionUser", "backgroundColor", context);
   }
 
-  private static int parseColor(ReadableMap map, @NonNull String key, @NonNull String prop, int fallback, Context context) {
+  private static int parseColor(@NonNull ReadableMap map, @NonNull String key, @NonNull String prop, @NonNull Context context) {
     ReadableMap style = map.getMap(key);
-    if (style == null) {
-      return fallback;
-    }
+    Objects.requireNonNull(style);
     Dynamic value = style.getDynamic(prop);
     switch (value.getType()) {
-      case Null:
-        return fallback;
       case Number:
         return ColorPropConverter.getColor(value.asDouble(), context);
       case Map:
@@ -59,11 +56,9 @@ public class MarkdownStyle {
     }
   }
 
-  private static float parseFloat(ReadableMap map, @NonNull String key, @NonNull String prop, float fallback, Context context) {
+  private static float parseFloat(@NonNull ReadableMap map, @NonNull String key, @NonNull String prop) {
     ReadableMap style = map.getMap(key);
-    if (style == null) {
-      return fallback;
-    }
+    Objects.requireNonNull(style);
     double value = style.getDouble(prop);
     return (float) value;
   }
