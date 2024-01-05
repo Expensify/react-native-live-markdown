@@ -11,21 +11,19 @@ import com.facebook.react.bridge.JSApplicationCausedNativeException;
 import com.facebook.react.bridge.ReadableMap;
 
 public class MarkdownStyle {
-  private int mSyntaxColor;
-  private int mLinkColor;
-  private float mHeadingFontSize;
-  private int mQuoteBorderColor;
-  private float mQuoteBorderWidth;
-  private float mQuoteMarginLeft;
-  private float mQuotePaddingLeft;
-  private int mCodeColor;
-  private int mCodeBackgroundColor;
-  private int mPreColor;
-  private int mPreBackgroundColor;
-  private int mMentionHereBackgroundColor;
-  private int mMentionUserBackgroundColor;
-
-  public MarkdownStyle() {}
+  private final int mSyntaxColor;
+  private final int mLinkColor;
+  private final float mHeadingFontSize;
+  private final int mQuoteBorderColor;
+  private final float mQuoteBorderWidth;
+  private final float mQuoteMarginLeft;
+  private final float mQuotePaddingLeft;
+  private final int mCodeColor;
+  private final int mCodeBackgroundColor;
+  private final int mPreColor;
+  private final int mPreBackgroundColor;
+  private final int mMentionHereBackgroundColor;
+  private final int mMentionUserBackgroundColor;
 
   public MarkdownStyle(ReadableMap map, Context context) {
     mSyntaxColor = parseColor(map, "syntax", "color", Color.GRAY, context);

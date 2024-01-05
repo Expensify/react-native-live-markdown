@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 public class MarkdownUtils {
   static {
@@ -64,7 +65,7 @@ public class MarkdownUtils {
 
   private static native String nativeParseMarkdown(String input);
 
-  private MarkdownStyle mMarkdownStyle = new MarkdownStyle();
+  private MarkdownStyle mMarkdownStyle;
 
   public void setMarkdownStyle(MarkdownStyle markdownStyle) {
     mMarkdownStyle = markdownStyle;
@@ -145,6 +146,8 @@ public class MarkdownUtils {
   }
 
   public void applyMarkdownFormatting(SpannableStringBuilder ssb) {
+    Objects.requireNonNull(mMarkdownStyle, "mMarkdownStyle is null");
+
     removeSpans(ssb);
 
     String input = ssb.toString();
