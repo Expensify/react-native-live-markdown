@@ -112,10 +112,12 @@ static CGFloat headingFontSize = 25;
       [attributedString addAttribute:NSForegroundColorAttributeName value:linkColor range:range];
     } else if ([type isEqualToString:@"blockquote"]) {
       NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
-      paragraphStyle.firstLineHeadIndent = 11;
-      paragraphStyle.headIndent = 11;
-      [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:range];
       [_quoteRanges addObject:[NSValue valueWithRange:range]];
+      NSRange circumferencingRange = [self getCircumferencingBlockquoteRange:range];
+      int blockquoteNestLevel = [self getBlockquoteNestLevel:range];
+      paragraphStyle.firstLineHeadIndent = 11 * blockquoteNestLevel;
+      paragraphStyle.headIndent = 11 * blockquoteNestLevel;
+      [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:circumferencingRange];
     } else if ([type isEqualToString:@"pre"]) {
       NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
       paragraphStyle.firstLineHeadIndent = 5;
@@ -135,6 +137,29 @@ static CGFloat headingFontSize = 25;
   _prevTextAttributes = _backedTextInputView.defaultTextAttributes;
 
   return attributedString;
+}
+
+- (NSRange)getCircumferencingBlockquoteRange:(NSRange)range
+{
+  for (NSValue *quoteRange in _quoteRanges) {
+    NSRange quoteRangeValue = [quoteRange rangeValue];
+    if (quoteRangeValue.location < range.location && quoteRangeValue.location + quoteRangeValue.length >= range.location + range.length) {
+      return quoteRangeValue;
+    }
+  }
+  return range;
+}
+
+- (int)getBlockquoteNestLevel:(NSRange)range
+{
+  int nestLevel = 1;
+  for (NSValue *quoteRange in _quoteRanges) {
+    NSRange quoteRangeValue = [quoteRange rangeValue];
+    if (quoteRangeValue.location < range.location && quoteRangeValue.location + quoteRangeValue.length >= range.location + range.length) {
+      nestLevel++;
+    }
+  }
+  return nestLevel;
 }
 
 @end

@@ -9,4 +9,10 @@
 
 - (NSAttributedString *)parseMarkdown:(NSAttributedString *)input;
 
+// returns the most outer blockquote range that surrounds the given range; if there is no such range, it returns the passed range
+- (NSRange)getCircumferencingBlockquoteRange:(NSRange)range;
+
+// counts the number of ranges the given range is contained within
+- (int)getBlockquoteNestLevel:(NSRange)range;
+
 @end
