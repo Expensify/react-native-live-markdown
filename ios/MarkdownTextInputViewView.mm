@@ -94,11 +94,10 @@
   }
 }
 
-- (void)setMarkdownStyle:(NSDictionary *)json
+- (void)setMarkdownStyle:(nonnull RCTMarkdownStyle *)markdownStyle
 {
-  _markdownStyle = [[RCTMarkdownStyle alloc] initWithDictionary:json];
-  [_markdownUtils setMarkdownStyle:_markdownStyle];
-
+  _markdownStyle = markdownStyle;
+  [_markdownUtils setMarkdownStyle:markdownStyle];
   [_textInput textInputDidChange]; // trigger attributed text update
   [_textView.layoutManager invalidateDisplayForCharacterRange:NSMakeRange(0, _textView.attributedText.length)]; // trigger layout manager update
 }

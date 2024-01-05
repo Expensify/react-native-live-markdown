@@ -12,7 +12,12 @@ RCT_EXPORT_MODULE(MarkdownTextInputView)
 
 RCT_CUSTOM_VIEW_PROPERTY(markdownStyle, NSDictionary, MarkdownTextInputViewView)
 {
-  [view setMarkdownStyle:json];
+#ifdef RCT_NEW_ARCH_ENABLED
+  // implemented in MarkdownTextInputView updateProps:
+#else
+  RCTMarkdownStyle *markdownStyle = [[RCTMarkdownStyle alloc] initWithDictionary:json];
+  [view setMarkdownStyle:markdownStyle];
+#endif /* RCT_NEW_ARCH_ENABLED */
 }
 
 @end

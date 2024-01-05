@@ -1,42 +1,73 @@
 #import <react-native-markdown-text-input/RCTMarkdownStyle.h>
+
+#ifdef RCT_NEW_ARCH_ENABLED
+#import <React/RCTConversions.h>
+#else
 #import <React-Core/React/RCTConvert.h>
-
-static inline UIColor *parseColor(id value, UIColor *fallback) {
-  return value != nil ? [RCTConvert UIColor:value] : fallback;
-}
-
-static inline CGFloat parseFloat(id value, CGFloat fallback) {
-  return value != nil ? [value floatValue] : fallback;
-}
+#endif /* RCT_NEW_ARCH_ENABLED */
 
 @implementation RCTMarkdownStyle
 
-- (instancetype)initWithDictionary:(nonnull NSDictionary *)json
+#ifdef RCT_NEW_ARCH_ENABLED
+
+- (instancetype)initWithStruct:(const facebook::react::MarkdownTextInputViewMarkdownStyleStruct &)style
 {
   if (self = [super init]) {
-    _syntaxColor = parseColor(json[@"syntax"][@"color"], [UIColor grayColor]);
+    _syntaxColor = RCTUIColorFromSharedColor(style.syntax.color);
 
-    _linkColor = parseColor(json[@"link"][@"color"], [UIColor blueColor]);
+    _linkColor = RCTUIColorFromSharedColor(style.link.color);
 
-    _headingFontSize = parseFloat(json[@"h1"][@"fontSize"], 25);
+    _headingFontSize = style.h1.fontSize;
 
-    _quoteBorderColor = parseColor(json[@"quote"][@"borderColor"], [UIColor grayColor]);
-    _quoteBorderWidth = parseFloat(json[@"quote"][@"borderWidth"], 6);
-    _quoteMarginLeft = parseFloat(json[@"quote"][@"marginLeft"], 6);
-    _quotePaddingLeft = parseFloat(json[@"quote"][@"paddingLeft"], 6);
+    _quoteBorderColor = RCTUIColorFromSharedColor(style.quote.borderColor);
+    _quoteBorderWidth = style.quote.borderWidth;
+    _quoteMarginLeft = style.quote.marginLeft;
+    _quotePaddingLeft = style.quote.paddingLeft;
 
-    _codeColor = parseColor(json[@"code"][@"color"], [UIColor blackColor]);
-    _codeBackgroundColor = parseColor(json[@"code"][@"backgroundColor"], [UIColor lightGrayColor]);
+    _codeColor = RCTUIColorFromSharedColor(style.code.color);
+    _codeBackgroundColor = RCTUIColorFromSharedColor(style.code.backgroundColor);
 
-    _preColor = parseColor(json[@"pre"][@"color"], [UIColor blackColor]);
-    _preBackgroundColor = parseColor(json[@"pre"][@"backgroundColor"], [UIColor lightGrayColor]);
+    _preColor = RCTUIColorFromSharedColor(style.pre.color);
+    _preBackgroundColor = RCTUIColorFromSharedColor(style.pre.backgroundColor);
 
-    _mentionHereBackgroundColor = parseColor(json[@"mentionHere"][@"backgroundColor"], [UIColor yellowColor]);
+    _mentionHereBackgroundColor = RCTUIColorFromSharedColor(style.mentionHere.backgroundColor);
 
-    _mentionUserBackgroundColor = parseColor(json[@"mentionUser"][@"backgroundColor"], [UIColor cyanColor]);
+    _mentionUserBackgroundColor = RCTUIColorFromSharedColor(style.mentionUser.backgroundColor);
   }
 
   return self;
 }
+
+#else
+
+- (instancetype)initWithDictionary:(nonnull NSDictionary *)json
+{
+  if (self = [super init]) {
+    _syntaxColor = [RCTConvert UIColor:json[@"syntax"][@"color"]];
+
+    _linkColor = [RCTConvert UIColor:json[@"link"][@"color"]];
+
+    _headingFontSize = [json[@"h1"][@"fontSize"] floatValue];
+
+    _quoteBorderColor = [RCTConvert UIColor:json[@"quote"][@"borderColor"]];
+    _quoteBorderWidth = [json[@"quote"][@"borderWidth"] floatValue];
+    _quoteMarginLeft = [json[@"quote"][@"marginLeft"] floatValue];
+    _quotePaddingLeft = [json[@"quote"][@"paddingLeft"] floatValue];
+
+    _codeColor = [RCTConvert UIColor:json[@"code"][@"color"]];
+    _codeBackgroundColor = [RCTConvert UIColor:json[@"code"][@"backgroundColor"]];
+
+    _preColor = [RCTConvert UIColor:json[@"pre"][@"color"]];
+    _preBackgroundColor = [RCTConvert UIColor:json[@"pre"][@"backgroundColor"]];
+
+    _mentionHereBackgroundColor = [RCTConvert UIColor:json[@"mentionHere"][@"backgroundColor"]];
+
+    _mentionUserBackgroundColor = [RCTConvert UIColor:json[@"mentionUser"][@"backgroundColor"]];
+  }
+
+  return self;
+}
+
+#endif /* RCT_NEW_ARCH_ENABLED */
 
 @end
