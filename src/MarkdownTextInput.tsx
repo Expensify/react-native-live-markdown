@@ -39,7 +39,7 @@ function makeDefaultMarkdownStyle(): MarkdownStyle {
   };
 }
 
-type PartialMarkdownStyle = Partial<{
+export type PartialMarkdownStyle = Partial<{
   [K in keyof MarkdownStyle]: Partial<MarkdownStyle[K]>;
 }>;
 

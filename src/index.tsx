@@ -1,3 +1,5 @@
 export { default as MarkdownTextInput } from './MarkdownTextInput';
-export type { MarkdownTextInputProps } from './MarkdownTextInput';
-export type { MarkdownStyle } from './MarkdownTextInputViewNativeComponent';
+export type {
+  MarkdownTextInputProps,
+  PartialMarkdownStyle as MarkdownStyle,
+} from './MarkdownTextInput';
