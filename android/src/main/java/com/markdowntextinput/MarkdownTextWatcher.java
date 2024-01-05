@@ -21,6 +21,7 @@ public class MarkdownTextWatcher implements TextWatcher {
 
   @Override
   public void afterTextChanged(Editable editable) {
-
+    // ensures proper styling after wrapping for the next line
+    mMarkdownUtils.reinitializeSpans((SpannableStringBuilder) editable);
   }
 }

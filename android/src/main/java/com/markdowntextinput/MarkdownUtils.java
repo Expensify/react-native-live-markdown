@@ -207,11 +207,25 @@ public class MarkdownUtils {
         setSpan(ssb, makeHeadingSizeSpan(), start, end);
         break;
       case "blockquote":
-        setSpan(ssb, makeBlockquoteMarginSpan(), start, end);
+        Object containSpan = checkIfInsideSpanType(ssb, QuoteSpan.class, start, end);
+        if (containSpan != null) {
+          QuoteSpan blockquoteSpan = (QuoteSpan) containSpan;
+          blockquoteSpan.increaseNestingLevel();
+        } else {
+          setSpan(ssb, makeBlockquoteMarginSpan(), start, end);
+        }
         break;
       default:
         throw new IllegalStateException("Unsupported type: " + type);
     }
+  }
+
+  private Object checkIfInsideSpanType(SpannableStringBuilder ssb, Class<?> spanClass, int start, int end) {
+    Object[] spans = ssb.getSpans(start, end, spanClass);
+    if(spans.length == 0) {
+      return null;
+    }
+    return spans[0];
   }
 
   private void setSpan(SpannableStringBuilder ssb, Object span, int start, int end) {
@@ -225,5 +239,15 @@ public class MarkdownUtils {
       ssb.removeSpan(span);
     }
     mSpans.clear();
+  }
+
+  void reinitializeSpans(SpannableStringBuilder ssb) {
+    for (Object span : mSpans) {
+      int start = ssb.getSpanStart(span);
+      int end = ssb.getSpanEnd(span);
+      int flags = ssb.getSpanFlags(span);
+      ssb.removeSpan(span);
+      ssb.setSpan(span, start, end, flags);
+    }
   }
 }

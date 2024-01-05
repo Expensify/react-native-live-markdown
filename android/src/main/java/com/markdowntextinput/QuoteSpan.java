@@ -9,6 +9,7 @@ public class QuoteSpan implements LeadingMarginSpan {
   private final int color;
   private final int stripeWidth;
   private final int gapWidth;
+  private int nestingLevel = 0;
 
   public QuoteSpan(int color, int stripeWidth, int gapWidth) {
     this.color = color;
@@ -18,9 +19,10 @@ public class QuoteSpan implements LeadingMarginSpan {
 
   @Override
   public int getLeadingMargin(boolean first) {
-    return stripeWidth + gapWidth;
+    return (stripeWidth + gapWidth) * (nestingLevel + 1);
   }
 
+  public void increaseNestingLevel() { nestingLevel++; };
   @Override
   public void drawLeadingMargin(Canvas c, Paint p, int x, int dir, int top, int baseline, int bottom,
                                 CharSequence text, int start, int end, boolean first, Layout layout) {
@@ -30,7 +32,10 @@ public class QuoteSpan implements LeadingMarginSpan {
     p.setStyle(Paint.Style.FILL);
     p.setColor(color);
 
-    c.drawRect(x, top, x + dir * stripeWidth, bottom, p);
+    for(int stripe = 0; stripe <= nestingLevel; stripe++) {
+      int shift = (stripeWidth + gapWidth) * stripe;
+      c.drawRect(x + shift, top, x + dir * stripeWidth + shift, bottom, p);
+    }
 
     p.setStyle(originalStyle);
     p.setColor(originalColor);
