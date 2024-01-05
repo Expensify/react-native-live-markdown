@@ -7,6 +7,7 @@
   NSString *_prevInputString;
   NSAttributedString *_prevAttributedString;
   NSDictionary<NSAttributedStringKey, id> *_prevTextAttributes;
+  __weak RCTMarkdownStyle *_prevMarkdownStyle;
 }
 
 - (instancetype)initWithBackedTextInputView:(UIView<RCTBackedTextInputViewProtocol> *)backedTextInputView
@@ -26,8 +27,8 @@
   }
 
   NSString *inputString = [input string];
-  if ([inputString isEqualToString:_prevInputString] && [_backedTextInputView.defaultTextAttributes isEqualToDictionary:_prevTextAttributes]) {
-   return _prevAttributedString;
+  if ([inputString isEqualToString:_prevInputString] && [_backedTextInputView.defaultTextAttributes isEqualToDictionary:_prevTextAttributes] && [_markdownStyle isEqual:_prevMarkdownStyle]) {
+    return _prevAttributedString;
   }
 
   static JSContext *ctx = nil;
@@ -125,6 +126,7 @@
   _prevInputString = inputString;
   _prevAttributedString = attributedString;
   _prevTextAttributes = _backedTextInputView.defaultTextAttributes;
+  _prevMarkdownStyle = _markdownStyle;
 
   return attributedString;
 }
