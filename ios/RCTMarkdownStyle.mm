@@ -28,12 +28,12 @@ static inline CGFloat parseFloat(id value, CGFloat fallback) {
     _codeColor = parseColor(json[@"code"][@"color"], [UIColor blackColor]);
     _codeBackgroundColor = parseColor(json[@"code"][@"backgroundColor"], [UIColor lightGrayColor]);
 
-    _preColor = parseColor(json[@"code"][@"color"], [UIColor blackColor]);
-    _preBackgroundColor = parseColor(json[@"code"][@"backgroundColor"], [UIColor lightGrayColor]);
+    _preColor = parseColor(json[@"pre"][@"color"], [UIColor blackColor]);
+    _preBackgroundColor = parseColor(json[@"pre"][@"backgroundColor"], [UIColor lightGrayColor]);
 
-    _mentionHereBackgroundColor = parseColor(json[@"mentionHere"][@"backgroundColor"], [UIColor systemYellowColor]);
+    _mentionHereBackgroundColor = parseColor(json[@"mentionHere"][@"backgroundColor"], [UIColor yellowColor]);
 
-    _mentionUserBackgroundColor = parseColor(json[@"mentionUser"][@"backgroundColor"], [UIColor systemCyanColor]);
+    _mentionUserBackgroundColor = parseColor(json[@"mentionUser"][@"backgroundColor"], [UIColor cyanColor]);
   }
 
   return self;
