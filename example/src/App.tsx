@@ -13,33 +13,33 @@ import { MarkdownTextInput } from 'react-native-markdown-text-input';
 
 const MARKDOWN_STYLE = {
   syntax: {
-    color: 'gray',
+    color: 'lightgray',
   },
   link: {
-    color: 'blue',
+    color: 'fuchsia',
   },
   h1: {
-    fontSize: 25,
+    fontSize: 30,
   },
   quote: {
-    borderColor: 'gray',
+    borderColor: 'dodgerblue',
     borderWidth: 6,
     marginLeft: 6,
     paddingLeft: 6,
   },
   code: {
-    color: 'rgb(6,25,109)',
-    backgroundColor: 'lightgray',
+    color: 'green',
+    backgroundColor: 'lime',
   },
   pre: {
-    color: 'rgb(6,25,109)',
-    backgroundColor: 'lightgray',
+    color: 'goldenrod',
+    backgroundColor: 'yellow',
   },
   mentionHere: {
-    backgroundColor: 'rgb(252,232,142)',
+    backgroundColor: 'orange',
   },
   mentionUser: {
-    backgroundColor: 'rgb(176,217,255)',
+    backgroundColor: 'tomato',
   },
 };
 
@@ -48,6 +48,8 @@ const DEFAULT_TEXT = [
   'https://expensify.com',
   '# Lorem ipsum',
   '> Hello world',
+  '`foo`',
+  '```\nbar\n```',
   '@here',
   '@someone@swmansion.com',
 ].join('\n');
@@ -117,16 +119,6 @@ export default function App() {
           </>
         )}
       </View>
-      {/* <Text>MarkdownTextInput singleline</Text>
-      <MarkdownTextInput
-        autoCapitalize="none"
-        value={value}
-        onChangeText={setValue}
-        style={styles.input}
-        markdownStyle={MARKDOWN_STYLE}
-        ref={ref}
-      /> */}
-      <Text>MarkdownTextInput multiline</Text>
       <MarkdownTextInput
         multiline
         autoCapitalize="none"
@@ -135,21 +127,6 @@ export default function App() {
         style={styles.input}
         markdownStyle={MARKDOWN_STYLE}
       />
-      {/* <Text>TextInput singleline</Text>
-      <TextInput
-        autoCapitalize="none"
-        value={value}
-        onChangeText={setValue}
-        style={styles.input}
-      /> */}
-      {/* <Text>TextInput multiline</Text>
-      <TextInput
-        multiline
-        autoCapitalize="none"
-        value={value}
-        onChangeText={setValue}
-        style={styles.input}
-      /> */}
       <Text style={styles.text}>{JSON.stringify(value)}</Text>
       <Button title="Focus" onPress={() => ref.current?.focus()} />
       <Button title="Blur" onPress={() => ref.current?.blur()} />
