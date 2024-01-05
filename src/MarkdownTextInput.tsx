@@ -15,7 +15,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     const IS_FABRIC = 'nativeFabricUIManager' in global;
 
     const markdownStyle = React.useMemo(
-      () => processMarkdownStyle(props.markdownStyle),
+      () => processMarkdownStyle(props.markdownStyle ?? {}),
       [props.markdownStyle]
     );
 

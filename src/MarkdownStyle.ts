@@ -43,13 +43,7 @@ export interface MarkdownStyle extends GenericMarkdownStyle<ColorValue> {} // be
 export interface ProcessedMarkdownStyle
   extends GenericMarkdownStyle<ProcessedColorValue | null> {} // after calling processColor
 
-export function processMarkdownStyle(
-  input: MarkdownStyle | undefined
-): ProcessedMarkdownStyle | undefined {
-  if (input === undefined) {
-    return undefined;
-  }
-
+export function processMarkdownStyle(input: MarkdownStyle) {
   const output = JSON.parse(JSON.stringify(input));
 
   for (const key in output) {
