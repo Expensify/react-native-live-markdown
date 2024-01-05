@@ -15,6 +15,8 @@ import android.text.style.StyleSpan;
 import android.text.style.TypefaceSpan;
 import android.text.style.UnderlineSpan;
 
+import androidx.annotation.NonNull;
+
 import com.facebook.infer.annotation.ThreadConfined;
 import com.facebook.react.bridge.UiThreadUtil;
 import com.facebook.react.views.text.CustomLineHeightSpan;
@@ -67,7 +69,7 @@ public class MarkdownUtils {
 
   private MarkdownStyle mMarkdownStyle;
 
-  public void setMarkdownStyle(MarkdownStyle markdownStyle) {
+  public void setMarkdownStyle(@NonNull MarkdownStyle markdownStyle) {
     mMarkdownStyle = markdownStyle;
   }
 

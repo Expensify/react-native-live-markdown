@@ -4,10 +4,12 @@ import android.text.Editable;
 import android.text.SpannableStringBuilder;
 import android.text.TextWatcher;
 
+import androidx.annotation.NonNull;
+
 public class MarkdownTextWatcher implements TextWatcher {
   private final MarkdownUtils mMarkdownUtils;
 
-  public MarkdownTextWatcher(MarkdownUtils markdownUtils) {
+  public MarkdownTextWatcher(@NonNull MarkdownUtils markdownUtils) {
     mMarkdownUtils = markdownUtils;
   }
 

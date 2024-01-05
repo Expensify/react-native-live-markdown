@@ -1,5 +1,7 @@
 package com.markdowntextinput;
 
+import androidx.annotation.NonNull;
+
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.uimanager.ThemedReactContext;
@@ -22,7 +24,7 @@ public class MarkdownTextInputViewManager extends MarkdownTextInputViewManagerSp
 
   @Override
   @ReactProp(name = "markdownStyle")
-  public void setMarkdownStyle(MarkdownTextInputView view, ReadableMap value) {
+  public void setMarkdownStyle(@NonNull MarkdownTextInputView view, @NonNull ReadableMap value) {
     MarkdownStyle markdownStyle = new MarkdownStyle(value, view.getContext());
     view.setMarkdownStyle(markdownStyle);
   }
