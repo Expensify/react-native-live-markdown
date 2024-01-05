@@ -1,8 +1,5 @@
-import {
-  processColor,
-  type ColorValue,
-  type ProcessedColorValue,
-} from 'react-native';
+import { processColor } from 'react-native';
+import type { ColorValue, ProcessedColorValue } from 'react-native';
 
 interface GenericMarkdownStyle<
   ColorValueType extends ColorValue | ProcessedColorValue | null
