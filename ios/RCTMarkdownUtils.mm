@@ -1,9 +1,8 @@
 #import <react-native-markdown-text-input/RCTMarkdownUtils.h>
 #import <react/debug/react_native_assert.h>
 #import <React/RCTAssert.h>
-#import <JavaScriptCore/JavaScriptCore.h>
-#include <jsi/jsi.h>
 #include <hermes/hermes.h>
+#include <jsi/jsi.h>
 
 using namespace facebook;
 
@@ -50,7 +49,7 @@ using namespace facebook;
   auto func = rt.global().getPropertyAsFunction(rt, "parseExpensiMarkToRanges");
   auto output = func.call(rt, [inputString UTF8String]);
   auto json = rt.global().getPropertyAsObject(rt, "JSON").getPropertyAsFunction(rt, "stringify").call(rt, output).asString(rt).utf8(rt);
-    
+
   NSData *data = [NSData dataWithBytes:json.data() length:json.length()];
   NSError *error = nil;
   NSArray *ranges = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
