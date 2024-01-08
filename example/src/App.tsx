@@ -1,15 +1,21 @@
 import * as React from 'react';
 
-import {
-  Button,
-  Platform,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import { Button, Platform, StyleSheet, Text, View } from 'react-native';
 
 import { MarkdownTextInput } from 'react-native-markdown-text-input';
+import type { TextInput } from 'react-native';
+
+const DEFAULT_TEXT = [
+  'Hello, *world*!',
+  'https://expensify.com',
+  '# Lorem ipsum',
+  '> Hello world',
+  '>> Hello world',
+  '`foo`',
+  '```\nbar\n```',
+  '@here',
+  '@someone@swmansion.com',
+].join('\n');
 
 function isWeb() {
   return Platform.OS === 'web';
@@ -56,7 +62,7 @@ function getReactNativeVersion() {
 }
 
 export default function App() {
-  const [value, setValue] = React.useState('Hello, *world*!');
+  const [value, setValue] = React.useState(DEFAULT_TEXT);
 
   // TODO: use MarkdownTextInput ref instead of TextInput ref
   const ref = React.useRef<TextInput>(null);
@@ -76,14 +82,13 @@ export default function App() {
           </>
         )}
       </View>
-      <Text>MarkdownTextInput singleline</Text>
+      {/* <Text>MarkdownTextInput singleline</Text>
       <MarkdownTextInput
         autoCapitalize="none"
         value={value}
         onChangeText={setValue}
         style={styles.input}
-        ref={ref}
-      />
+      /> */}
       <Text>MarkdownTextInput multiline</Text>
       <MarkdownTextInput
         multiline
@@ -91,26 +96,27 @@ export default function App() {
         value={value}
         onChangeText={setValue}
         style={styles.input}
+        ref={ref}
       />
-      <Text>TextInput singleline</Text>
+      {/* <Text>TextInput singleline</Text>
       <TextInput
         autoCapitalize="none"
         value={value}
         onChangeText={setValue}
         style={styles.input}
-      />
-      <Text>TextInput multiline</Text>
+      /> */}
+      {/* <Text>TextInput multiline</Text>
       <TextInput
         multiline
         autoCapitalize="none"
         value={value}
         onChangeText={setValue}
         style={styles.input}
-      />
+      /> */}
       <Text style={styles.text}>{JSON.stringify(value)}</Text>
       <Button title="Focus" onPress={() => ref.current?.focus()} />
       <Button title="Blur" onPress={() => ref.current?.blur()} />
-      <Button title="Reset" onPress={() => setValue('Hello, *world*!')} />
+      <Button title="Reset" onPress={() => setValue(DEFAULT_TEXT)} />
       <Button title="Clear" onPress={() => setValue('')} />
     </View>
   );

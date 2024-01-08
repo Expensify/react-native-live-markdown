@@ -26,6 +26,10 @@ public class MarkdownTextInputView extends View {
     super(context, attrs, defStyleAttr);
   }
 
+  private MarkdownStyle mMarkdownStyle;
+
+  private MarkdownUtils mMarkdownUtils;
+
   private ReactEditText mReactEditText;
 
   private TextWatcher mTextWatcher;
@@ -48,8 +52,10 @@ public class MarkdownTextInputView extends View {
 
     if (previousSibling instanceof ReactEditText) {
       MarkdownUtils.maybeInitializeRuntime(getContext().getAssets());
+      mMarkdownUtils = new MarkdownUtils();
+      mMarkdownUtils.setMarkdownStyle(mMarkdownStyle);
       mReactEditText = (ReactEditText) previousSibling;
-      mTextWatcher = new MarkdownTextWatcher();
+      mTextWatcher = new MarkdownTextWatcher(mMarkdownUtils);
       mReactEditText.addTextChangedListener(mTextWatcher);
     }
   }
@@ -61,6 +67,18 @@ public class MarkdownTextInputView extends View {
       mReactEditText.removeTextChangedListener(mTextWatcher);
       mReactEditText = null;
       mTextWatcher = null;
+      mMarkdownUtils = null;
+      mMarkdownStyle = null;
+    }
+  }
+
+  protected void setMarkdownStyle(MarkdownStyle markdownStyle) {
+    mMarkdownStyle = markdownStyle;
+    if (mMarkdownUtils != null) {
+      mMarkdownUtils.setMarkdownStyle(mMarkdownStyle);
+    }
+    if (mReactEditText != null) {
+      mReactEditText.setText(mReactEditText.getText()); // trigger update
     }
   }
 }

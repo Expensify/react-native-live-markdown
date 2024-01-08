@@ -9,8 +9,6 @@ type StackItem = { tag: string; children: Array<StackItem | string> };
 function parseMarkdownToHTML(markdown: string): string {
   const parser = ExpensiMark;
   const html = parser.replace(markdown, {
-    // TODO remove ts-ignore after patch is added
-    // @ts-ignore
     shouldKeepRawInput: true,
   });
   return html;
@@ -140,7 +138,7 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
         const isLabeledLink =
           node.tag.match(/link-variant="([^"]*)"/)![1] === 'labeled';
         const dataRawHref = node.tag.match(/data-raw-href="([^"]*)"/);
-        const matchString = dataRawHref ? _.unescape(dataRawHref[1]) : href;
+        const matchString = dataRawHref ? _.unescape(dataRawHref[1]!) : href;
         if (
           !isLabeledLink &&
           node.children.length === 1 &&
@@ -178,5 +176,4 @@ function parseMarkdownToTextAndRanges(markdown: string): [string, Range[]] {
   return [text, sortedRanges];
 }
 
-// eslint-disable-next-line no-undef
 globalThis.parseMarkdownToTextAndRanges = parseMarkdownToTextAndRanges;
