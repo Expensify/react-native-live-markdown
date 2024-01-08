@@ -81,13 +81,37 @@ export default function App() {
           </>
         )}
       </View>
+      {/* <Text>MarkdownTextInput singleline</Text>
+      <MarkdownTextInput
+        autoCapitalize="none"
+        value={value}
+        onChangeText={setValue}
+        style={styles.input}
+      /> */}
+      <Text>MarkdownTextInput multiline</Text>
       <MarkdownTextInput
         multiline
         autoCapitalize="none"
         value={value}
         onChangeText={setValue}
         style={styles.input}
+        ref={ref}
       />
+      {/* <Text>TextInput singleline</Text>
+      <TextInput
+        autoCapitalize="none"
+        value={value}
+        onChangeText={setValue}
+        style={styles.input}
+      /> */}
+      {/* <Text>TextInput multiline</Text>
+      <TextInput
+        multiline
+        autoCapitalize="none"
+        value={value}
+        onChangeText={setValue}
+        style={styles.input}
+      /> */}
       <Text style={styles.text}>{JSON.stringify(value)}</Text>
       <Button title="Focus" onPress={() => ref.current?.focus()} />
       <Button title="Blur" onPress={() => ref.current?.blur()} />
