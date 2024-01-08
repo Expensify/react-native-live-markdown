@@ -50,10 +50,12 @@ function mergeMarkdownStyleWithDefault(
 
   if (input !== undefined) {
     for (const key in input) {
-      Object.assign(
-        output[key as keyof MarkdownStyle],
-        input[key as keyof MarkdownStyle]
-      );
+      if (key in output) {
+        Object.assign(
+          output[key as keyof MarkdownStyle],
+          input[key as keyof MarkdownStyle]
+        );
+      }
     }
   }
 
