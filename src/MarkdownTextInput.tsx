@@ -62,7 +62,7 @@ function mergeMarkdownStyleWithDefault(
   return output;
 }
 
-function processMarkdownStyle(input: MarkdownStyle) {
+function processColorsInMarkdownStyle(input: MarkdownStyle): MarkdownStyle {
   const output = JSON.parse(JSON.stringify(input));
 
   for (const key in output) {
@@ -75,7 +75,13 @@ function processMarkdownStyle(input: MarkdownStyle) {
     }
   }
 
-  return output as MarkdownStyle;
+  return output;
+}
+
+export function processMarkdownStyle(
+  input: PartialMarkdownStyle | undefined
+): MarkdownStyle {
+  return processColorsInMarkdownStyle(mergeMarkdownStyleWithDefault(input));
 }
 
 export interface MarkdownTextInputProps extends TextInputProps {
@@ -87,10 +93,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     const IS_FABRIC = 'nativeFabricUIManager' in global;
 
     const markdownStyle = React.useMemo(
-      () =>
-        processMarkdownStyle(
-          mergeMarkdownStyleWithDefault(props.markdownStyle)
-        ),
+      () => processMarkdownStyle(props.markdownStyle),
       [props.markdownStyle]
     );
 

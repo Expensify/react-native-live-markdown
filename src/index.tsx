@@ -1,4 +1,7 @@
-export { default as MarkdownTextInput } from './MarkdownTextInput';
+export {
+  default as MarkdownTextInput,
+  processMarkdownStyle,
+} from './MarkdownTextInput';
 export type {
   MarkdownTextInputProps,
   PartialMarkdownStyle as MarkdownStyle,
