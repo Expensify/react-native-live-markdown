@@ -376,6 +376,7 @@ PODS:
   - React-logger (0.72.7):
     - glog
   - react-native-markdown-text-input (0.1.0):
+    - hermes-engine
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
   - React-NativeModulesApple (0.72.7):
@@ -693,7 +694,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: c49502e5d02112247ee4526bc3ccfc891ae3eb9b
   React-jsinspector: 8baadae51f01d867c3921213a25ab78ab4fbcd91
   React-logger: 8edc785c47c8686c7962199a307015e2ce9a0e4f
-  react-native-markdown-text-input: 075defe331854ed02422c4c82125d212b92732f6
+  react-native-markdown-text-input: 04225511887a621e1e70bcb3516b2463bd4f3c52
   React-NativeModulesApple: b6868ee904013a7923128892ee4a032498a1024a
   React-perflogger: 31ea61077185eb1428baf60c0db6e2886f141a5a
   React-RCTActionSheet: 392090a3abc8992eb269ef0eaa561750588fc39d
