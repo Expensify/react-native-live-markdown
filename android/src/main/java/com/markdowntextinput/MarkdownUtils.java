@@ -67,13 +67,13 @@ public class MarkdownUtils {
 
   private static native String nativeParseMarkdown(String input);
 
+  private final List<Object> mSpans = new LinkedList<>();
+
   private MarkdownStyle mMarkdownStyle;
 
   public void setMarkdownStyle(@NonNull MarkdownStyle markdownStyle) {
     mMarkdownStyle = markdownStyle;
   }
-
-  private final List<Object> mSpans = new LinkedList<>();
 
   // Spans
   private static Object makeBoldSpan() {
