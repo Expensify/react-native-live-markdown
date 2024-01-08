@@ -58,24 +58,25 @@
     NSUInteger length = [item[2] unsignedIntegerValue];
     NSRange range = NSMakeRange(location, length);
 
-    UIFont *font = [attributedString attribute:NSFontAttributeName atIndex:location effectiveRange:NULL];
-    UIFontDescriptor *fontDescriptor = [font fontDescriptor];
-    UIFontDescriptorSymbolicTraits traits = fontDescriptor.symbolicTraits;
-    if ([type isEqualToString:@"bold"] || [type isEqualToString:@"mention"] || [type isEqualToString:@"h1"] || [type isEqualToString:@"mention-user"] || [type isEqualToString:@"syntax"]) {
-      traits |= UIFontDescriptorTraitBold;
-    } else if ([type isEqualToString:@"italic"]) {
-      traits |= UIFontDescriptorTraitItalic;
-    } else if ([type isEqualToString:@"code"] || [type isEqualToString:@"pre"]) {
-      traits |= UIFontDescriptorTraitMonoSpace;
+    if ([type isEqualToString:@"bold"] || [type isEqualToString:@"mention"] || [type isEqualToString:@"h1"] || [type isEqualToString:@"mention-user"] || [type isEqualToString:@"syntax"] || [type isEqualToString:@"italic"] || [type isEqualToString:@"code"] || [type isEqualToString:@"pre"] || [type isEqualToString:@"h1"]) {
+      UIFont *font = [attributedString attribute:NSFontAttributeName atIndex:location effectiveRange:NULL];
+      UIFontDescriptor *fontDescriptor = [font fontDescriptor];
+      UIFontDescriptorSymbolicTraits traits = fontDescriptor.symbolicTraits;
+      if ([type isEqualToString:@"bold"] || [type isEqualToString:@"mention"] || [type isEqualToString:@"h1"] || [type isEqualToString:@"mention-user"] || [type isEqualToString:@"syntax"]) {
+        traits |= UIFontDescriptorTraitBold;
+      } else if ([type isEqualToString:@"italic"]) {
+        traits |= UIFontDescriptorTraitItalic;
+      } else if ([type isEqualToString:@"code"] || [type isEqualToString:@"pre"]) {
+        traits |= UIFontDescriptorTraitMonoSpace;
+      }
+      UIFontDescriptor *newFontDescriptor = [fontDescriptor fontDescriptorWithSymbolicTraits:traits];
+      CGFloat size = 0; // Passing 0 to size keeps the existing size
+      if ([type isEqualToString:@"h1"]) {
+        size = _markdownStyle.h1FontSize;
+      }
+      UIFont *newFont = [UIFont fontWithDescriptor:newFontDescriptor size:size];
+      [attributedString addAttribute:NSFontAttributeName value:newFont range:range];
     }
-
-    UIFontDescriptor *newFontDescriptor = [fontDescriptor fontDescriptorWithSymbolicTraits:traits];
-    CGFloat size = 0; // Passing 0 to size keeps the existing size
-    if ([type isEqualToString:@"h1"]) {
-      size = _markdownStyle.h1FontSize;
-    }
-    UIFont *newFont = [UIFont fontWithDescriptor:newFontDescriptor size:size];
-    [attributedString addAttribute:NSFontAttributeName value:newFont range:range];
 
     if ([type isEqualToString:@"syntax"]) {
       [attributedString addAttribute:NSForegroundColorAttributeName value:_markdownStyle.syntaxColor range:range];
