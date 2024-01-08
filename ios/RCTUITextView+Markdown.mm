@@ -19,11 +19,7 @@
     UITextRange *range = self.selectedTextRange;
     super.attributedText = [markdownUtils parseMarkdown:self.attributedText];
     [super setSelectedTextRange:range]; // prevents cursor from jumping at the end when typing in the middle of the text
-
-    if ([self.attributedText length] > 0) {
-      UIFont *font = [self.attributedText attribute:NSFontAttributeName atIndex:0 effectiveRange:NULL];
-      self.typingAttributes = @{NSFontAttributeName:font}; // removes indent in new line when typing after quote
-    }
+    self.typingAttributes = self.defaultTextAttributes; // removes indent in new line when typing after blockquote
   }
 
   // Call the original method

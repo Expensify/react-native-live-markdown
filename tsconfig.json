@@ -24,7 +24,8 @@
     "strict": true,
     "target": "esnext",
     "verbatimModuleSyntax": true,
-    "typeRoots": ["node_modules/@types"]
+    "typeRoots": ["node_modules/@types"],
   },
-  "include": ["src/**/*", "types/global.d.ts"]
+  "include": ["src/**/*", "types/global.d.ts"],
+  "exclude": ["**/node_modules/**/*", "parser/**/*", "**/lib/**/*", "**/__tests__/**/*", "example/src/**/*", "WebExample/**/*"],
 }

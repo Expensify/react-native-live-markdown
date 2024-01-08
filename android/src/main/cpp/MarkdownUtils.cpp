@@ -21,7 +21,7 @@ namespace markdowntextinput {
       jni::alias_ref<jhybridobject> jThis,
       jni::alias_ref<jni::JString> input) {
     jsi::Runtime &rt = *runtime_;
-    auto func = rt.global().getPropertyAsFunction(rt, "parseMarkdownToTextAndRanges");
+    auto func = rt.global().getPropertyAsFunction(rt, "parseExpensiMarkToRanges");
     auto output = func.call(rt, input->toStdString());
     auto json = rt.global().getPropertyAsObject(rt, "JSON").getPropertyAsFunction(rt, "stringify").call(rt, output).asString(rt).utf8(rt);
     return jni::make_jstring(json);
