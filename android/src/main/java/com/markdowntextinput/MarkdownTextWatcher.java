@@ -4,8 +4,14 @@ import android.text.Editable;
 import android.text.SpannableStringBuilder;
 import android.text.TextWatcher;
 
+import androidx.annotation.NonNull;
+
 public class MarkdownTextWatcher implements TextWatcher {
-  private final MarkdownUtils mMarkdownUtils = new MarkdownUtils();
+  private final MarkdownUtils mMarkdownUtils;
+
+  public MarkdownTextWatcher(@NonNull MarkdownUtils markdownUtils) {
+    mMarkdownUtils = markdownUtils;
+  }
 
   @Override
   public void beforeTextChanged(CharSequence s, int start, int count, int after) {

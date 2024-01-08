@@ -4,22 +4,25 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.text.Layout;
 import android.text.style.LeadingMarginSpan;
+import com.facebook.react.uimanager.PixelUtil;
 
 public class QuoteSpan implements LeadingMarginSpan {
-  private final int color;
-  private final int stripeWidth;
-  private final int gapWidth;
+  private final int borderColor;
+  private final float borderWidth;
+  private final float marginLeft;
+  private final float paddingLeft;
   private int nestingLevel = 0;
 
-  public QuoteSpan(int color, int stripeWidth, int gapWidth) {
-    this.color = color;
-    this.stripeWidth = stripeWidth;
-    this.gapWidth = gapWidth;
+  public QuoteSpan(int borderColor, float borderWidth, float marginLeft, float paddingLeft) {
+    this.borderColor = borderColor;
+    this.borderWidth = PixelUtil.toPixelFromDIP(borderWidth);
+    this.marginLeft = PixelUtil.toPixelFromDIP(marginLeft);
+    this.paddingLeft = PixelUtil.toPixelFromDIP(paddingLeft);
   }
 
   @Override
   public int getLeadingMargin(boolean first) {
-    return (stripeWidth + gapWidth) * (nestingLevel + 1);
+    return (int) (marginLeft + borderWidth + paddingLeft) * (nestingLevel + 1);
   }
 
   public void increaseNestingLevel() { nestingLevel++; };
@@ -30,11 +33,14 @@ public class QuoteSpan implements LeadingMarginSpan {
     int originalColor = p.getColor();
 
     p.setStyle(Paint.Style.FILL);
-    p.setColor(color);
+    p.setColor(borderColor);
 
     for(int stripe = 0; stripe <= nestingLevel; stripe++) {
-      int shift = (stripeWidth + gapWidth) * stripe;
-      c.drawRect(x + shift, top, x + dir * stripeWidth + shift, bottom, p);
+
+      float shift = (borderWidth + marginLeft + paddingLeft) * stripe;
+      float left = x + dir * marginLeft + shift;
+      float right = x + dir * (marginLeft + borderWidth) + shift;
+      c.drawRect(left, top, right, bottom, p);
     }
 
     p.setStyle(originalStyle);
