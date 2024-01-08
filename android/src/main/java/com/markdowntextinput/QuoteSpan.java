@@ -5,20 +5,24 @@ import android.graphics.Paint;
 import android.text.Layout;
 import android.text.style.LeadingMarginSpan;
 
-public class QuoteSpan implements LeadingMarginSpan {
-  private final int color;
-  private final int stripeWidth;
-  private final int gapWidth;
+import com.facebook.react.uimanager.PixelUtil;
 
-  public QuoteSpan(int color, int stripeWidth, int gapWidth) {
-    this.color = color;
-    this.stripeWidth = stripeWidth;
-    this.gapWidth = gapWidth;
+public class QuoteSpan implements LeadingMarginSpan {
+  private final int borderColor;
+  private final float borderWidth;
+  private final float marginLeft;
+  private final float paddingLeft;
+
+  public QuoteSpan(int borderColor, float borderWidth, float marginLeft, float paddingLeft) {
+    this.borderColor = borderColor;
+    this.borderWidth = PixelUtil.toPixelFromDIP(borderWidth);
+    this.marginLeft = PixelUtil.toPixelFromDIP(marginLeft);
+    this.paddingLeft = PixelUtil.toPixelFromDIP(paddingLeft);
   }
 
   @Override
   public int getLeadingMargin(boolean first) {
-    return stripeWidth + gapWidth;
+    return (int) (marginLeft + borderWidth + paddingLeft);
   }
 
   @Override
@@ -28,9 +32,11 @@ public class QuoteSpan implements LeadingMarginSpan {
     int originalColor = p.getColor();
 
     p.setStyle(Paint.Style.FILL);
-    p.setColor(color);
+    p.setColor(borderColor);
 
-    c.drawRect(x, top, x + dir * stripeWidth, bottom, p);
+    float left = x + dir * marginLeft;
+    float right = x + dir * (marginLeft + borderWidth);
+    c.drawRect(left, top, right, bottom, p);
 
     p.setStyle(originalStyle);
     p.setColor(originalColor);
