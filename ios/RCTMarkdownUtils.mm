@@ -116,8 +116,8 @@
       // TODO: pass background color and ranges to layout manager
     } else if ([type isEqualToString:@"h1"]) {
       NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
-      NSRange range2 = NSMakeRange(range.location - 2, range.length + 2);
-      [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:range2];
+      NSRange rangeWithHashAndSpace = NSMakeRange(range.location - 2, range.length + 2); // we also need to include prepending "# "
+      [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:rangeWithHashAndSpace];
     }
   }];
 
