@@ -1,4 +1,4 @@
-package com.livemarkdown;
+package com.expensify.livemarkdown;
 
 import android.text.Editable;
 import android.text.SpannableStringBuilder;

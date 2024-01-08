@@ -1,4 +1,4 @@
-package com.livemarkdown;
+package com.expensify.livemarkdown;
 
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.NativeModule;

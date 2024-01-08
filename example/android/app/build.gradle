@@ -73,9 +73,9 @@ android {
 
     compileSdkVersion rootProject.ext.compileSdkVersion
 
-    namespace "com.livemarkdownexample"
+    namespace "com.expensify.livemarkdownexample"
     defaultConfig {
-        applicationId "com.livemarkdownexample"
+        applicationId "com.expensify.livemarkdownexample"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

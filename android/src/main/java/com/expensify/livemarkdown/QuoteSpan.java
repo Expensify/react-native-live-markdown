@@ -1,4 +1,4 @@
-package com.livemarkdown;
+package com.expensify.livemarkdown;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;

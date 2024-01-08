@@ -1,4 +1,4 @@
-package com.livemarkdown;
+package com.expensify.livemarkdown;
 
 import static com.facebook.infer.annotation.ThreadConfined.UI;
 

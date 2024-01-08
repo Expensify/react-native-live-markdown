@@ -1,4 +1,4 @@
-package com.livemarkdownexample;
+package com.expensify.livemarkdownexample;
 
 import android.app.Application;
 import com.facebook.react.PackageList;

@@ -1,4 +1,4 @@
-package com.livemarkdownexample;
+package com.expensify.livemarkdownexample;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;

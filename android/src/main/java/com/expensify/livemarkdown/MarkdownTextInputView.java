@@ -1,4 +1,4 @@
-package com.livemarkdown;
+package com.expensify.livemarkdown;
 
 import androidx.annotation.Nullable;
 

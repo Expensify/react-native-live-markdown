@@ -18,7 +18,7 @@ namespace livemarkdown {
                         public jsi::HostObject {
   public:
     static constexpr auto kJavaDescriptor =
-        "Lcom/livemarkdown/MarkdownUtils;";
+        "Lcom/expensify/livemarkdown/MarkdownUtils;";
 
     static void nativeInitializeRuntime(
         jni::alias_ref<jhybridobject> jThis,
