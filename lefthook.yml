@@ -2,15 +2,13 @@ pre-commit:
   parallel: true
   commands:
     lint:
-      files: git diff --name-only @{push}
       glob: "*.{js,ts,jsx,tsx}"
-      run: npx eslint {files}
-    types:
-      files: git diff --name-only @{push}
-      glob: "*.{js,ts, jsx, tsx}"
-      run: npx tsc --noEmit
-commit-msg:
-  parallel: true
-  commands:
-    commitlint:
-      run: npx commitlint --edit
+      run: npx eslint {staged_files}
+    types_root:
+      run: npx tsc --project tsconfig.json --noEmit
+    types_parser:
+      run: npx tsc --project ./parser/tsconfig.json --noEmit
+    types_example:
+      run: npx tsc --project ./example/tsconfig.json --noEmit
+    types_WebExample:
+      run: npx tsc --project ./WebExample/tsconfig.json --noEmit
