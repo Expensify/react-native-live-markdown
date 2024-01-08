@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "MarkdownTextInputExample.app"
-               BlueprintName = "MarkdownTextInputExample"
-               ReferencedContainer = "container:MarkdownTextInputExample.xcodeproj">
+               BuildableName = "LiveMarkdownExample.app"
+               BlueprintName = "LiveMarkdownExample"
+               ReferencedContainer = "container:LiveMarkdownExample.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "MarkdownTextInputExampleTests.xctest"
-               BlueprintName = "MarkdownTextInputExampleTests"
-               ReferencedContainer = "container:MarkdownTextInputExample.xcodeproj">
+               BuildableName = "LiveMarkdownExampleTests.xctest"
+               BlueprintName = "LiveMarkdownExampleTests"
+               ReferencedContainer = "container:LiveMarkdownExample.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "MarkdownTextInputExample.app"
-            BlueprintName = "MarkdownTextInputExample"
-            ReferencedContainer = "container:MarkdownTextInputExample.xcodeproj">
+            BuildableName = "LiveMarkdownExample.app"
+            BlueprintName = "LiveMarkdownExample"
+            ReferencedContainer = "container:LiveMarkdownExample.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "MarkdownTextInputExample.app"
-            BlueprintName = "MarkdownTextInputExample"
-            ReferencedContainer = "container:MarkdownTextInputExample.xcodeproj">
+            BuildableName = "LiveMarkdownExample.app"
+            BlueprintName = "LiveMarkdownExample"
+            ReferencedContainer = "container:LiveMarkdownExample.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

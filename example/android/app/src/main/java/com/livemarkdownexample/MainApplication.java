@@ -1,4 +1,4 @@
-package com.markdowntextinputexample;
+package com.livemarkdownexample;
 
 import android.app.Application;
 import com.facebook.react.PackageList;

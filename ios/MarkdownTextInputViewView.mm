@@ -1,15 +1,15 @@
 #import <React/RCTUITextField.h>
 #import <react/debug/react_native_assert.h>
 
-#import <react-native-markdown-text-input/MarkdownLayoutManager.h>
-#import <react-native-markdown-text-input/MarkdownTextInputViewView.h>
-#import <react-native-markdown-text-input/RCTBackedTextFieldDelegateAdapter+Markdown.h>
-#import <react-native-markdown-text-input/RCTUITextView+Markdown.h>
+#import <react-native-live-markdown/MarkdownLayoutManager.h>
+#import <react-native-live-markdown/MarkdownTextInputViewView.h>
+#import <react-native-live-markdown/RCTBackedTextFieldDelegateAdapter+Markdown.h>
+#import <react-native-live-markdown/RCTUITextView+Markdown.h>
 
 #ifdef RCT_NEW_ARCH_ENABLED
-#import <react-native-markdown-text-input/RCTTextInputComponentView+Markdown.h>
+#import <react-native-live-markdown/RCTTextInputComponentView+Markdown.h>
 #else
-#import <react-native-markdown-text-input/RCTBaseTextInputView+Markdown.h>
+#import <react-native-live-markdown/RCTBaseTextInputView+Markdown.h>
 #endif /* RCT_NEW_ARCH_ENABLED */
 
 #import <objc/runtime.h>

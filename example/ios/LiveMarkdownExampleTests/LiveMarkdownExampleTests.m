@@ -7,11 +7,11 @@
 #define TIMEOUT_SECONDS 600
 #define TEXT_TO_LOOK_FOR @"Welcome to React"
 
-@interface MarkdownTextInputExampleTests : XCTestCase
+@interface LiveMarkdownExampleTests : XCTestCase
 
 @end
 
-@implementation MarkdownTextInputExampleTests
+@implementation LiveMarkdownExampleTests
 
 - (BOOL)findSubviewInView:(UIView *)view matching:(BOOL (^)(UIView *view))test
 {

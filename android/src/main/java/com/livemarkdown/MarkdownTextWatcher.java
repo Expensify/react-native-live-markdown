@@ -1,4 +1,4 @@
-package com.markdowntextinput;
+package com.livemarkdown;
 
 import android.text.Editable;
 import android.text.SpannableStringBuilder;

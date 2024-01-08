@@ -1,4 +1,4 @@
-package com.markdowntextinput;
+package com.livemarkdown;
 
 import static com.facebook.infer.annotation.ThreadConfined.UI;
 
@@ -33,7 +33,7 @@ import java.util.Objects;
 
 public class MarkdownUtils {
   static {
-    SoLoader.loadLibrary("markdowntextinput");
+    SoLoader.loadLibrary("livemarkdown");
   }
 
   private static boolean IS_RUNTIME_INITIALIZED = false;

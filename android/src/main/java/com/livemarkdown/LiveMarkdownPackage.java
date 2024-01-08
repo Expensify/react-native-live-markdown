@@ -1,5 +1,4 @@
-
-package com.markdowntextinput;
+package com.livemarkdown;
 
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.NativeModule;
@@ -10,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class MarkdownTextInputViewPackage implements ReactPackage {
+public class LiveMarkdownPackage implements ReactPackage {
   @Override
   public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
     List<ViewManager> viewManagers = new ArrayList<>();

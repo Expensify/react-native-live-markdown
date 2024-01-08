@@ -19,7 +19,7 @@ module.exports = {
   ],
   settings: {
     'import/resolver': {
-      alias: [['react-native-markdown-text-input', './src/index.tsx']],
+      alias: [['@expensify/react-native-live-markdown', './src/index.tsx']],
     },
   },
   root: true,

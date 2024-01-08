@@ -1,21 +1,21 @@
-# react-native-markdown-text-input
+# @expensify/react-native-live-markdown
 
 Lorem ipsum sit dolor amet.
 
 ## Installation
 
 ```sh
-npm install react-native-markdown-text-input
+npm install @expensify/react-native-live-markdown
 ```
 
 ## Usage
 
 ```js
-import { MarkdownTextInputView } from "react-native-markdown-text-input";
+import { MarkdownTextInput } from '@expensify/react-native-live-markdown';
 
 // ...
 
-<MarkdownTextInputView color="tomato" />
+<MarkdownTextInput />;
 ```
 
 ## Contributing

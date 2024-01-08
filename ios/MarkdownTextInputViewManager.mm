@@ -1,5 +1,5 @@
-#import <react-native-markdown-text-input/MarkdownTextInputViewManager.h>
-#import <react-native-markdown-text-input/MarkdownTextInputViewView.h>
+#import <react-native-live-markdown/MarkdownTextInputViewManager.h>
+#import <react-native-live-markdown/MarkdownTextInputViewView.h>
 
 @implementation MarkdownTextInputViewManager
 

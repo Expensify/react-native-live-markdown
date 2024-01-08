@@ -1,8 +1,8 @@
 // This guard prevent this file to be compiled in the old architecture.
 #ifdef RCT_NEW_ARCH_ENABLED
 
-#import <react-native-markdown-text-input/RCTTextInputComponentView+Markdown.h>
-#import <react-native-markdown-text-input/RCTMarkdownUtils.h>
+#import <react-native-live-markdown/RCTTextInputComponentView+Markdown.h>
+#import <react-native-live-markdown/RCTMarkdownUtils.h>
 #import <React/RCTUITextField.h>
 #import <objc/message.h>
 

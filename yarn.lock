@@ -1738,6 +1738,61 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@expensify/react-native-live-markdown-example@workspace:example":
+  version: 0.0.0-use.local
+  resolution: "@expensify/react-native-live-markdown-example@workspace:example"
+  dependencies:
+    "@babel/core": ^7.20.0
+    "@babel/preset-env": ^7.20.0
+    "@babel/runtime": ^7.20.0
+    "@react-native/metro-config": ^0.72.11
+    babel-plugin-module-resolver: ^5.0.0
+    metro-react-native-babel-preset: 0.76.8
+    pod-install: ^0.1.0
+    react: 18.2.0
+    react-native: 0.72.7
+  languageName: unknown
+  linkType: soft
+
+"@expensify/react-native-live-markdown@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "@expensify/react-native-live-markdown@workspace:."
+  dependencies:
+    "@commitlint/config-conventional": ^17.0.2
+    "@evilmartians/lefthook": ^1.5.0
+    "@react-native/eslint-config": ^0.72.2
+    "@release-it/conventional-changelog": ^5.0.0
+    "@types/jest": ^28.1.2
+    "@types/react": ~17.0.21
+    "@types/react-native": 0.70.0
+    "@typescript-eslint/eslint-plugin": ^6.15.0
+    "@typescript-eslint/parser": ^6.15.0
+    del-cli: ^5.0.0
+    eslint: ^8.56.0
+    eslint-config-prettier: ^8.5.0
+    eslint-import-resolver-alias: ^1.1.2
+    eslint-plugin-deprecation: ^2.0.0
+    eslint-plugin-filenames: ^1.3.2
+    eslint-plugin-header: ^3.1.1
+    eslint-plugin-import: ^2.29.1
+    eslint-plugin-prettier: ^4.0.0
+    eslint-plugin-promise: ^6.1.1
+    eslint-plugin-tsdoc: ^0.2.17
+    jest: ^28.1.1
+    pod-install: ^0.1.0
+    prettier: ^2.0.5
+    react: 18.2.0
+    react-native: 0.72.7
+    react-native-builder-bob: ^0.20.0
+    release-it: ^15.0.0
+    turbo: ^1.10.7
+    typescript: ^5.3.3
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  languageName: unknown
+  linkType: soft
+
 "@hapi/hoek@npm:^9.0.0":
   version: 9.3.0
   resolution: "@hapi/hoek@npm:9.3.0"
@@ -10727,61 +10782,6 @@ __metadata:
   checksum: 258da6ecd03be52cc05a3e3a7c481890c7c0b7b62ae9f263c5f3d6fafeae95bd9445ad2f6c2513f7f4e4569eee935a18ae94c7491f58d6916af515c88de9e0a1
   languageName: node
   linkType: hard
-
-"react-native-markdown-text-input-example@workspace:example":
-  version: 0.0.0-use.local
-  resolution: "react-native-markdown-text-input-example@workspace:example"
-  dependencies:
-    "@babel/core": ^7.20.0
-    "@babel/preset-env": ^7.20.0
-    "@babel/runtime": ^7.20.0
-    "@react-native/metro-config": ^0.72.11
-    babel-plugin-module-resolver: ^5.0.0
-    metro-react-native-babel-preset: 0.76.8
-    pod-install: ^0.1.0
-    react: 18.2.0
-    react-native: 0.72.7
-  languageName: unknown
-  linkType: soft
-
-"react-native-markdown-text-input@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "react-native-markdown-text-input@workspace:."
-  dependencies:
-    "@commitlint/config-conventional": ^17.0.2
-    "@evilmartians/lefthook": ^1.5.0
-    "@react-native/eslint-config": ^0.72.2
-    "@release-it/conventional-changelog": ^5.0.0
-    "@types/jest": ^28.1.2
-    "@types/react": ~17.0.21
-    "@types/react-native": 0.70.0
-    "@typescript-eslint/eslint-plugin": ^6.15.0
-    "@typescript-eslint/parser": ^6.15.0
-    del-cli: ^5.0.0
-    eslint: ^8.56.0
-    eslint-config-prettier: ^8.5.0
-    eslint-import-resolver-alias: ^1.1.2
-    eslint-plugin-deprecation: ^2.0.0
-    eslint-plugin-filenames: ^1.3.2
-    eslint-plugin-header: ^3.1.1
-    eslint-plugin-import: ^2.29.1
-    eslint-plugin-prettier: ^4.0.0
-    eslint-plugin-promise: ^6.1.1
-    eslint-plugin-tsdoc: ^0.2.17
-    jest: ^28.1.1
-    pod-install: ^0.1.0
-    prettier: ^2.0.5
-    react: 18.2.0
-    react-native: 0.72.7
-    react-native-builder-bob: ^0.20.0
-    release-it: ^15.0.0
-    turbo: ^1.10.7
-    typescript: ^5.3.3
-  peerDependencies:
-    react: "*"
-    react-native: "*"
-  languageName: unknown
-  linkType: soft
 
 "react-native@npm:0.72.7":
   version: 0.72.7

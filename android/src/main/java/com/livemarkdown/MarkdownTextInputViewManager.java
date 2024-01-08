@@ -1,4 +1,4 @@
-package com.markdowntextinput;
+package com.livemarkdown;
 
 import androidx.annotation.NonNull;
 
