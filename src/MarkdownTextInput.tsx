@@ -78,7 +78,7 @@ function processColorsInMarkdownStyle(input: MarkdownStyle): MarkdownStyle {
   return output;
 }
 
-export function processMarkdownStyle(
+function processMarkdownStyle(
   input: PartialMarkdownStyle | undefined
 ): MarkdownStyle {
   return processColorsInMarkdownStyle(mergeMarkdownStyleWithDefault(input));
