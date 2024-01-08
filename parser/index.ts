@@ -9,8 +9,6 @@ type StackItem = { tag: string; children: Array<StackItem | string> };
 function parseMarkdownToHTML(markdown: string): string {
   const parser = ExpensiMark;
   const html = parser.replace(markdown, {
-    // TODO remove ts-ignore after patch is added
-    // @ts-ignore
     shouldKeepRawInput: true,
   });
   return html;
@@ -140,7 +138,7 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
         const isLabeledLink =
           node.tag.match(/link-variant="([^"]*)"/)![1] === 'labeled';
         const dataRawHref = node.tag.match(/data-raw-href="([^"]*)"/);
-        const matchString = dataRawHref ? _.unescape(dataRawHref[1]) : href;
+        const matchString = dataRawHref ? _.unescape(dataRawHref[1]!) : href;
         if (
           !isLabeledLink &&
           node.children.length === 1 &&
@@ -169,14 +167,17 @@ function sortRanges(ranges: Range[]) {
   return ranges.sort((a, b) => a[1] - b[1]); // sort by location to properly handle bold+italic
 }
 
-function parseMarkdownToTextAndRanges(markdown: string): [string, Range[]] {
+function parseExpensiMarkToRanges(markdown: string): Range[] {
   const html = parseMarkdownToHTML(markdown);
   const tokens = parseHTMLToTokens(html);
   const tree = parseTokensToTree(tokens);
   const [text, ranges] = parseTreeToTextAndRanges(tree);
+  if (text !== markdown) {
+    // text mismatch, don't return any ranges
+    return [];
+  }
   const sortedRanges = sortRanges(ranges);
-  return [text, sortedRanges];
+  return sortedRanges;
 }
 
-// eslint-disable-next-line no-undef
-globalThis.parseMarkdownToTextAndRanges = parseMarkdownToTextAndRanges;
+globalThis.parseExpensiMarkToRanges = parseExpensiMarkToRanges;

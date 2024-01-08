@@ -1,19 +1,24 @@
 package com.markdowntextinput;
 
+import static com.facebook.infer.annotation.ThreadConfined.UI;
+
 import android.content.res.AssetManager;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
+import android.text.style.AbsoluteSizeSpan;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.LineHeightSpan;
-import android.text.style.RelativeSizeSpan;
 import android.text.style.StrikethroughSpan;
 import android.text.style.StyleSpan;
 import android.text.style.TypefaceSpan;
 import android.text.style.UnderlineSpan;
 
+import androidx.annotation.NonNull;
+
+import com.facebook.infer.annotation.ThreadConfined;
+import com.facebook.react.bridge.UiThreadUtil;
 import com.facebook.react.views.text.CustomLineHeightSpan;
 import com.facebook.soloader.SoLoader;
 
@@ -24,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 public class MarkdownUtils {
   static {
@@ -32,7 +38,9 @@ public class MarkdownUtils {
 
   private static boolean IS_RUNTIME_INITIALIZED = false;
 
+  @ThreadConfined(UI)
   public static void maybeInitializeRuntime(AssetManager assetManager) {
+    UiThreadUtil.assertOnUiThread();
     if (IS_RUNTIME_INITIALIZED) {
       return;
     }
@@ -51,18 +59,21 @@ public class MarkdownUtils {
 
   private static native void nativeInitializeRuntime(String code);
 
+  @ThreadConfined(UI)
+  private static String parseMarkdown(String input) {
+    UiThreadUtil.assertOnUiThread();
+    return nativeParseMarkdown(input);
+  }
+
   private static native String nativeParseMarkdown(String input);
 
   private final List<Object> mSpans = new LinkedList<>();
 
-  // Colors
-  private static final int COLOR_CODE = Color.rgb(6, 25, 109);
-  private static final int COLOR_LINK = Color.BLUE;
-  private static final int COLOR_SYNTAX = Color.GRAY;
-  private static final int COLOR_MENTION_HERE = Color.argb(100, 252, 232, 142);
-  private static final int COLOR_MENTION_USER = Color.argb(100, 176, 217, 255);
-  private static final int COLOR_CODE_BACKGROUND = Color.argb(100, 211, 211, 211);
-  private static final int COLOR_QUOTE_LINE = Color.GRAY;
+  private MarkdownStyle mMarkdownStyle;
+
+  public void setMarkdownStyle(@NonNull MarkdownStyle markdownStyle) {
+    mMarkdownStyle = markdownStyle;
+  }
 
   // Spans
   private static Object makeBoldSpan() {
@@ -85,32 +96,40 @@ public class MarkdownUtils {
     return new TypefaceSpan("monospace");
   }
 
-  private static Object makeSyntaxColorSpan() {
-    return new ForegroundColorSpan(COLOR_SYNTAX);
+  private Object makeSyntaxColorSpan() {
+    return new ForegroundColorSpan(mMarkdownStyle.getSyntaxColor());
   }
 
-  private static Object makeLinkColorSpan() {
-    return new ForegroundColorSpan(COLOR_LINK);
+  private Object makeLinkColorSpan() {
+    return new ForegroundColorSpan(mMarkdownStyle.getLinkColor());
   }
 
-  private static Object makeCodeColorSpan() {
-    return new ForegroundColorSpan(COLOR_CODE);
+  private Object makeCodeColorSpan() {
+    return new ForegroundColorSpan(mMarkdownStyle.getCodeColor());
   }
 
-  private static Object makeMentionHereBackgroundSpan() {
-    return new BackgroundColorSpan(COLOR_MENTION_HERE);
+  private Object makePreColorSpan() {
+    return new ForegroundColorSpan(mMarkdownStyle.getPreColor());
   }
 
-  private static Object makeMentionUserBackgroundSpan() {
-    return new BackgroundColorSpan(COLOR_MENTION_USER);
+  private Object makeMentionHereBackgroundSpan() {
+    return new BackgroundColorSpan(mMarkdownStyle.getMentionHereBackgroundColor());
   }
 
-  private static Object makeCodeBackgroundSpan() {
-    return new BackgroundColorSpan(COLOR_CODE_BACKGROUND);
+  private Object makeMentionUserBackgroundSpan() {
+    return new BackgroundColorSpan(mMarkdownStyle.getMentionUserBackgroundColor());
   }
 
-  private static Object makeHeadingSizeSpan() {
-    return new RelativeSizeSpan(1.4f);
+  private Object makeCodeBackgroundSpan() {
+    return new BackgroundColorSpan(mMarkdownStyle.getCodeBackgroundColor());
+  }
+
+  private Object makePreBackgroundSpan() {
+    return new BackgroundColorSpan(mMarkdownStyle.getPreBackgroundColor());
+  }
+
+  private Object makeH1FontSizeSpan() {
+    return new AbsoluteSizeSpan((int) mMarkdownStyle.getH1FontSize(), true);
   }
 
   private static Object makeHeadingLineHeightSpan(float lineHeight) {
@@ -120,24 +139,23 @@ public class MarkdownUtils {
     };
   }
 
-  private static Object makeBlockquoteMarginSpan() {
-    return new QuoteSpan(COLOR_QUOTE_LINE, 15, 20);
+  private Object makeBlockquoteMarginSpan() {
+    return new QuoteSpan(
+      mMarkdownStyle.getQuoteBorderColor(),
+      mMarkdownStyle.getQuoteBorderWidth(),
+      mMarkdownStyle.getQuoteMarginLeft(),
+      mMarkdownStyle.getQuotePaddingLeft());
   }
 
   public void applyMarkdownFormatting(SpannableStringBuilder ssb) {
+    Objects.requireNonNull(mMarkdownStyle, "mMarkdownStyle is null");
+
     removeSpans(ssb);
 
     String input = ssb.toString();
-    String output = nativeParseMarkdown(input);
+    String output = parseMarkdown(input);
     try {
-      JSONArray array = new JSONArray(output);
-      String text = array.getString(0);
-
-      if (!ssb.toString().equals(text)) {
-        return;
-      }
-
-      JSONArray ranges = array.getJSONArray(1);
+      JSONArray ranges = new JSONArray(output);
       for (int i = 0; i < ranges.length(); i++) {
         JSONArray range = ranges.getJSONArray(i);
         String type = range.getString(0);
@@ -179,10 +197,14 @@ public class MarkdownUtils {
         setSpan(ssb, makeLinkColorSpan(), start, end);
         break;
       case "code":
-      case "pre":
         setSpan(ssb, makeMonospaceSpan(), start, end);
         setSpan(ssb, makeCodeColorSpan(), start, end);
         setSpan(ssb, makeCodeBackgroundSpan(), start, end);
+        break;
+      case "pre":
+        setSpan(ssb, makeMonospaceSpan(), start, end);
+        setSpan(ssb, makePreColorSpan(), start, end);
+        setSpan(ssb, makePreBackgroundSpan(), start, end);
         break;
       case "h1":
         setSpan(ssb, makeBoldSpan(), start, end);
@@ -192,7 +214,7 @@ public class MarkdownUtils {
           setSpan(ssb, makeHeadingLineHeightSpan(lineHeight * 1.5f), start, end);
         }
         // NOTE: size span must be set after line height span to avoid height jumps
-        setSpan(ssb, makeHeadingSizeSpan(), start, end);
+        setSpan(ssb, makeH1FontSizeSpan(), start, end);
         break;
       case "blockquote":
         setSpan(ssb, makeBlockquoteMarginSpan(), start, end);

@@ -15,6 +15,8 @@
 #import <objc/runtime.h>
 
 @implementation MarkdownTextInputViewView {
+  RCTMarkdownUtils *_markdownUtils;
+  RCTMarkdownStyle *_markdownStyle;
 #ifdef RCT_NEW_ARCH_ENABLED
   __weak RCTTextInputComponentView *_textInput;
 #else
@@ -56,17 +58,20 @@
   UIView<RCTBackedTextInputViewProtocol> *backedTextInputView = _textInput.backedTextInputView;
 #endif /* RCT_NEW_ARCH_ENABLED */
 
-  RCTMarkdownUtils *markdownUtils = [[RCTMarkdownUtils alloc] initWithBackedTextInputView:backedTextInputView];
-  [_textInput setMarkdownUtils:markdownUtils];
+  _markdownUtils = [[RCTMarkdownUtils alloc] initWithBackedTextInputView:backedTextInputView];
+  react_native_assert(_markdownStyle != nil);
+  [_markdownUtils setMarkdownStyle:_markdownStyle];
+
+  [_textInput setMarkdownUtils:_markdownUtils];
   if ([backedTextInputView isKindOfClass:[RCTUITextField class]]) {
     RCTUITextField *textField = (RCTUITextField *)backedTextInputView;
     _adapter = [textField valueForKey:@"textInputDelegateAdapter"];
-    [_adapter setMarkdownUtils:markdownUtils];
+    [_adapter setMarkdownUtils:_markdownUtils];
   } else if ([backedTextInputView isKindOfClass:[RCTUITextView class]]) {
     _textView = (RCTUITextView *)backedTextInputView;
-    [_textView setMarkdownUtils:markdownUtils];
+    [_textView setMarkdownUtils:_markdownUtils];
     object_setClass(_textView.layoutManager, [MarkdownLayoutManager class]);
-    [_textView.layoutManager setValue:markdownUtils forKey:@"markdownUtils"];
+    [_textView.layoutManager setValue:_markdownUtils forKey:@"markdownUtils"];
   } else {
     react_native_assert(false && "Cannot enable Markdown for this type of TextInput.");
   }
@@ -74,13 +79,26 @@
 
 - (void)willMoveToWindow:(UIWindow *)newWindow
 {
-  [_textInput setMarkdownUtils:nil];
-  [_adapter setMarkdownUtils:nil];
-  [_textView setMarkdownUtils:nil];
-  if (_textView != nil) {
-    [_textView.layoutManager setValue:nil forKey:@"markdownUtils"];
-    object_setClass(_textView.layoutManager, [NSLayoutManager class]);
+  if (_textInput != nil) {
+    [_textInput setMarkdownUtils:nil];
   }
+  if (_adapter != nil) {
+    [_adapter setMarkdownUtils:nil];
+  }
+  if (_textView != nil) {
+    [_textView setMarkdownUtils:nil];
+    if (_textView.layoutManager != nil && [object_getClass(_textView.layoutManager) isEqual:[MarkdownLayoutManager class]]) {
+      [_textView.layoutManager setValue:nil forKey:@"markdownUtils"];
+      object_setClass(_textView.layoutManager, [NSLayoutManager class]);
+    }
+  }
+}
+
+- (void)setMarkdownStyle:(nonnull RCTMarkdownStyle *)markdownStyle
+{
+  _markdownStyle = markdownStyle;
+  [_markdownUtils setMarkdownStyle:markdownStyle];
+  [_textInput textInputDidChange]; // trigger attributed text update
 }
 
 @end

@@ -8,9 +8,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface RCTTextInputComponentView (Markdown)
 
-@property(nonatomic, getter=getMarkdownUtils) RCTMarkdownUtils *markdownUtils;
+@property(nonatomic, nullable, getter=getMarkdownUtils) RCTMarkdownUtils *markdownUtils;
 
 - (void)markdown__setAttributedString:(NSAttributedString *)attributedString;
+
+- (void)textInputDidChange;
 
 @end
 
