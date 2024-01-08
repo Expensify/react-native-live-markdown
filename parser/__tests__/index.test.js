@@ -2,7 +2,7 @@ require('../out.js');
 
 expect.extend({
   toBeParsedAs(received, expectedRanges) {
-    const actualRanges = global.parseMarkdownToTextAndRanges(received);
+    const actualRanges = global.parseExpensiMarkToRanges(received);
     if (JSON.stringify(actualRanges) !== JSON.stringify(expectedRanges)) {
       return {
         pass: false,

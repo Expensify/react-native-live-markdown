@@ -40,7 +40,7 @@
     assert(content != nil && "[react-native-markdown-text-input] Markdown parser bundle is empty");
     ctx = [[JSContext alloc] init];
     [ctx evaluateScript:content];
-    function = ctx[@"parseMarkdownToTextAndRanges"];
+    function = ctx[@"parseExpensiMarkToRanges"];
   }
 
   JSValue *result = [function callWithArguments:@[inputString]];

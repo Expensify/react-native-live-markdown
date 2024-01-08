@@ -167,7 +167,7 @@ function sortRanges(ranges: Range[]) {
   return ranges.sort((a, b) => a[1] - b[1]); // sort by location to properly handle bold+italic
 }
 
-function parseMarkdownToTextAndRanges(markdown: string): Range[] {
+function parseExpensiMarkToRanges(markdown: string): Range[] {
   const html = parseMarkdownToHTML(markdown);
   const tokens = parseHTMLToTokens(html);
   const tree = parseTokensToTree(tokens);
@@ -180,4 +180,4 @@ function parseMarkdownToTextAndRanges(markdown: string): Range[] {
   return sortedRanges;
 }
 
-globalThis.parseMarkdownToTextAndRanges = parseMarkdownToTextAndRanges;
+globalThis.parseExpensiMarkToRanges = parseExpensiMarkToRanges;
