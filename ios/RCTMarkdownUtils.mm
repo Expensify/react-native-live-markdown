@@ -40,16 +40,11 @@
     assert(content != nil && "[react-native-markdown-text-input] Markdown parser bundle is empty");
     ctx = [[JSContext alloc] init];
     [ctx evaluateScript:content];
-    function = ctx[@"parseMarkdownToTextAndRanges"];
+    function = ctx[@"parseExpensiMarkToRanges"];
   }
 
   JSValue *result = [function callWithArguments:@[inputString]];
-  NSString *outputString = [result[0] toString];
-  NSArray *ranges = [result[1] toArray];
-
-  if (![outputString isEqualToString:inputString]) {
-    return input;
-  }
+  NSArray *ranges = [result toArray];
 
   NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:inputString attributes:_backedTextInputView.defaultTextAttributes];
   [attributedString beginEditing];

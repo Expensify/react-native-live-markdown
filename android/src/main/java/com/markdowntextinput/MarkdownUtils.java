@@ -155,14 +155,7 @@ public class MarkdownUtils {
     String input = ssb.toString();
     String output = parseMarkdown(input);
     try {
-      JSONArray array = new JSONArray(output);
-      String text = array.getString(0);
-
-      if (!ssb.toString().equals(text)) {
-        return;
-      }
-
-      JSONArray ranges = array.getJSONArray(1);
+      JSONArray ranges = new JSONArray(output);
       for (int i = 0; i < ranges.length(); i++) {
         JSONArray range = ranges.getJSONArray(i);
         String type = range.getString(0);
