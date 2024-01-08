@@ -5,6 +5,7 @@
 
 using namespace facebook;
 
+namespace expensify {
 namespace livemarkdown {
   std::shared_ptr<jsi::Runtime> MarkdownUtils::runtime_;
 
@@ -40,3 +41,4 @@ namespace livemarkdown {
   }
 
 } // namespace livemarkdown
+} // namespace expensify

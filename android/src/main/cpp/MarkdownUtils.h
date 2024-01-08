@@ -12,6 +12,7 @@
 
 using namespace facebook;
 
+namespace expensify {
 namespace livemarkdown {
 
   class MarkdownUtils : public jni::HybridClass<MarkdownUtils>,
@@ -37,3 +38,4 @@ namespace livemarkdown {
   };
 
 } // namespace livemarkdown
+} // namespace expensify
