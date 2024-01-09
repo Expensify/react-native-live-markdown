@@ -2,7 +2,7 @@
 #import <react/debug/react_native_assert.h>
 
 #import <react-native-live-markdown/MarkdownLayoutManager.h>
-#import <react-native-live-markdown/MarkdownTextInputViewView.h>
+#import <react-native-live-markdown/MarkdownTextInputDecoratorViewView.h>
 #import <react-native-live-markdown/RCTBackedTextFieldDelegateAdapter+Markdown.h>
 #import <react-native-live-markdown/RCTUITextView+Markdown.h>
 
@@ -14,7 +14,7 @@
 
 #import <objc/runtime.h>
 
-@implementation MarkdownTextInputViewView {
+@implementation MarkdownTextInputDecoratorViewView {
   RCTMarkdownUtils *_markdownUtils;
   RCTMarkdownStyle *_markdownStyle;
 #ifdef RCT_NEW_ARCH_ENABLED

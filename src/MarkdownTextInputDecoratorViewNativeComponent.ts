@@ -39,4 +39,6 @@ interface NativeProps extends ViewProps {
   markdownStyle: MarkdownStyle;
 }
 
-export default codegenNativeComponent<NativeProps>('MarkdownTextInputView');
+export default codegenNativeComponent<NativeProps>(
+  'MarkdownTextInputDecoratorView'
+);

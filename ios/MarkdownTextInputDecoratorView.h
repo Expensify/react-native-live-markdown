@@ -3,15 +3,15 @@
 #import <React/RCTViewComponentView.h>
 #import <UIKit/UIKit.h>
 
-#ifndef MarkdownTextInputViewNativeComponent_h
-#define MarkdownTextInputViewNativeComponent_h
+#ifndef MarkdownTextInputDecoratorViewNativeComponent_h
+#define MarkdownTextInputDecoratorViewNativeComponent_h
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MarkdownTextInputView : RCTViewComponentView
+@interface MarkdownTextInputDecoratorView : RCTViewComponentView
 @end
 
 NS_ASSUME_NONNULL_END
 
-#endif /* MarkdownTextInputViewNativeComponent_h */
+#endif /* MarkdownTextInputDecoratorViewNativeComponent_h */
 #endif /* RCT_NEW_ARCH_ENABLED */

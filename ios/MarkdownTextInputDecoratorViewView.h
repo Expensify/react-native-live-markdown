@@ -1,7 +1,7 @@
 #import <UIKit/UIKit.h>
 #import <react-native-live-markdown/RCTMarkdownStyle.h>
 
-@interface MarkdownTextInputViewView : UIView
+@interface MarkdownTextInputDecoratorViewView : UIView
 
 - (void)setMarkdownStyle:(nonnull RCTMarkdownStyle *)markdownStyle;
 
