@@ -134,7 +134,7 @@ if (isNewArchitectureEnabled()) {
 }
 
 task copyJS(type: Copy) {
-  from '../parser/out.js'
+  from '../parser/react-native-live-markdown-parser.js'
   into 'src/main/assets'
 }
 
