@@ -10,7 +10,7 @@
   "files": [
     "src",
     "lib",
-    "parser/out.js",
+    "parser/react-native-live-markdown-parser.js",
     "android",
     "ios",
     "cpp",

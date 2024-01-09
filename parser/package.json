@@ -6,8 +6,8 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "build": "esbuild index.ts --bundle --minify --outfile=out.js",
-    "run": "node out.js",
+    "build": "esbuild index.ts --bundle --minify --outfile=react-native-live-markdown-parser.js",
+    "run": "node react-native-live-markdown-parser.js",
     "postinstall": "patch-package"
   },
   "author": "",

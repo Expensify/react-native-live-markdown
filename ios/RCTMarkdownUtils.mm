@@ -34,7 +34,7 @@
   static JSContext *ctx = nil;
   static JSValue *function = nil;
   if (ctx == nil) {
-    NSString *path = [[NSBundle mainBundle] pathForResource:@"out" ofType:@"js"];
+    NSString *path = [[NSBundle mainBundle] pathForResource:@"react-native-live-markdown-parser" ofType:@"js"];
     assert(path != nil && "[react-native-live-markdown] Markdown parser bundle not found");
     NSString *content = [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:NULL];
     assert(content != nil && "[react-native-live-markdown] Markdown parser bundle is empty");
