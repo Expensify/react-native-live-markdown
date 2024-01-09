@@ -1,5 +1,5 @@
-#import <react-native-markdown-text-input/RCTUITextView+Markdown.h>
-#import <react-native-markdown-text-input/RCTMarkdownUtils.h>
+#import <react-native-live-markdown/RCTUITextView+Markdown.h>
+#import <react-native-live-markdown/RCTMarkdownUtils.h>
 #import <objc/message.h>
 
 @implementation RCTUITextView (Markdown)

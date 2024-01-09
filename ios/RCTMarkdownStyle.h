@@ -1,5 +1,5 @@
 #ifdef RCT_NEW_ARCH_ENABLED
-#import <react/renderer/components/RNMarkdownTextInputViewSpec/Props.h>
+#import <react/renderer/components/RNLiveMarkdownSpec/Props.h>
 #endif /* RCT_NEW_ARCH_ENABLED */
 
 @interface RCTMarkdownStyle : NSObject

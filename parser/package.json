@@ -1,5 +1,5 @@
 {
-  "name": "parser",
+  "name": "@expensify/react-native-live-markdown-parser",
   "version": "0.0.0",
   "private": true,
   "description": "",

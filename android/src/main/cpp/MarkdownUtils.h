@@ -12,13 +12,14 @@
 
 using namespace facebook;
 
-namespace markdowntextinput {
+namespace expensify {
+namespace livemarkdown {
 
   class MarkdownUtils : public jni::HybridClass<MarkdownUtils>,
                         public jsi::HostObject {
   public:
     static constexpr auto kJavaDescriptor =
-        "Lcom/markdowntextinput/MarkdownUtils;";
+        "Lcom/expensify/livemarkdown/MarkdownUtils;";
 
     static void nativeInitializeRuntime(
         jni::alias_ref<jhybridobject> jThis,
@@ -36,4 +37,5 @@ namespace markdowntextinput {
     friend HybridBase;
   };
 
-} // namespace markdowntextinput
+} // namespace livemarkdown
+} // namespace expensify

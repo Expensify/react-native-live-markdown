@@ -1,13 +1,13 @@
 #ifdef RCT_NEW_ARCH_ENABLED
 #import "MarkdownTextInputView.h"
 
-#import <react/renderer/components/RNMarkdownTextInputViewSpec/ComponentDescriptors.h>
-#import <react/renderer/components/RNMarkdownTextInputViewSpec/EventEmitters.h>
-#import <react/renderer/components/RNMarkdownTextInputViewSpec/Props.h>
-#import <react/renderer/components/RNMarkdownTextInputViewSpec/RCTComponentViewHelpers.h>
+#import <react/renderer/components/RNLiveMarkdownSpec/ComponentDescriptors.h>
+#import <react/renderer/components/RNLiveMarkdownSpec/EventEmitters.h>
+#import <react/renderer/components/RNLiveMarkdownSpec/Props.h>
+#import <react/renderer/components/RNLiveMarkdownSpec/RCTComponentViewHelpers.h>
 
-#import <react-native-markdown-text-input/MarkdownTextInputViewView.h>
-#import <react-native-markdown-text-input/RCTMarkdownStyle.h>
+#import <react-native-live-markdown/MarkdownTextInputViewView.h>
+#import <react-native-live-markdown/RCTMarkdownStyle.h>
 
 #import "RCTFabricComponentsPlugins.h"
 
@@ -23,7 +23,7 @@ using namespace facebook::react;
 
 + (ComponentDescriptorProvider)componentDescriptorProvider
 {
-    return concreteComponentDescriptorProvider<MarkdownTextInputViewComponentDescriptor>();
+  return concreteComponentDescriptorProvider<MarkdownTextInputViewComponentDescriptor>();
 }
 
 - (instancetype)initWithFrame:(CGRect)frame

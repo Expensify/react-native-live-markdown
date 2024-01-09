@@ -1,5 +1,5 @@
 {
-  "name": "react-native-markdown-text-input-example",
+  "name": "@expensify/react-native-live-markdown-example",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -7,7 +7,7 @@
     "ios": "react-native run-ios",
     "start": "react-native start",
     "build:android": "cd android && ./gradlew assembleDebug --no-daemon --console=plain -PreactNativeArchitectures=arm64-v8a",
-    "build:ios": "cd ios && xcodebuild -workspace MarkdownTextInputExample.xcworkspace -scheme MarkdownTextInputExample -configuration Debug -sdk iphonesimulator CC=clang CPLUSPLUS=clang++ LD=clang LDPLUSPLUS=clang++ GCC_OPTIMIZATION_LEVEL=0 GCC_PRECOMPILE_PREFIX_HEADER=YES ASSETCATALOG_COMPILER_OPTIMIZATION=time DEBUG_INFORMATION_FORMAT=dwarf COMPILER_INDEX_STORE_ENABLE=NO"
+    "build:ios": "cd ios && xcodebuild -workspace LiveMarkdownExample.xcworkspace -scheme LiveMarkdownExample -configuration Debug -sdk iphonesimulator CC=clang CPLUSPLUS=clang++ LD=clang LDPLUSPLUS=clang++ GCC_OPTIMIZATION_LEVEL=0 GCC_PRECOMPILE_PREFIX_HEADER=YES ASSETCATALOG_COMPILER_OPTIMIZATION=time DEBUG_INFORMATION_FORMAT=dwarf COMPILER_INDEX_STORE_ENABLE=NO"
   },
   "dependencies": {
     "react": "18.2.0",

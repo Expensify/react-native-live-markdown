@@ -1,5 +1,5 @@
 #import <UIKit/UIKit.h>
-#import <react-native-markdown-text-input/RCTMarkdownStyle.h>
+#import <react-native-live-markdown/RCTMarkdownStyle.h>
 
 @interface MarkdownTextInputViewView : UIView
 
