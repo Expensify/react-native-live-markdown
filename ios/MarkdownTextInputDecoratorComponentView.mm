@@ -4,7 +4,7 @@
 #import <react/renderer/components/RNLiveMarkdownSpec/Props.h>
 
 #import <react-native-live-markdown/MarkdownTextInputDecoratorComponentView.h>
-#import <react-native-live-markdown/MarkdownTextInputDecoratorViewView.h>
+#import <react-native-live-markdown/MarkdownTextInputDecoratorView.h>
 #import <react-native-live-markdown/RCTMarkdownStyle.h>
 
 #import "RCTFabricComponentsPlugins.h"
@@ -12,7 +12,7 @@
 using namespace facebook::react;
 
 @implementation MarkdownTextInputDecoratorComponentView {
-  MarkdownTextInputDecoratorViewView *_view;
+  MarkdownTextInputDecoratorView *_view;
 }
 
 + (ComponentDescriptorProvider)componentDescriptorProvider
@@ -26,7 +26,7 @@ using namespace facebook::react;
     static const auto defaultProps = std::make_shared<const MarkdownTextInputDecoratorViewProps>();
     _props = defaultProps;
 
-    _view = [[MarkdownTextInputDecoratorViewView alloc] init];
+    _view = [[MarkdownTextInputDecoratorView alloc] init];
 
     self.contentView = _view;
   }
