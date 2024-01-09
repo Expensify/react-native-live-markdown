@@ -1,11 +1,9 @@
+// This guard prevent this file to be compiled in the old architecture.
 #ifdef RCT_NEW_ARCH_ENABLED
-#import "MarkdownTextInputDecoratorView.h"
-
 #import <react/renderer/components/RNLiveMarkdownSpec/ComponentDescriptors.h>
-#import <react/renderer/components/RNLiveMarkdownSpec/EventEmitters.h>
 #import <react/renderer/components/RNLiveMarkdownSpec/Props.h>
-#import <react/renderer/components/RNLiveMarkdownSpec/RCTComponentViewHelpers.h>
 
+#import <react-native-live-markdown/MarkdownTextInputDecoratorComponentView.h>
 #import <react-native-live-markdown/MarkdownTextInputDecoratorViewView.h>
 #import <react-native-live-markdown/RCTMarkdownStyle.h>
 
@@ -13,11 +11,7 @@
 
 using namespace facebook::react;
 
-@interface MarkdownTextInputDecoratorView () <RCTMarkdownTextInputDecoratorViewViewProtocol>
-
-@end
-
-@implementation MarkdownTextInputDecoratorView {
+@implementation MarkdownTextInputDecoratorComponentView {
   MarkdownTextInputDecoratorViewView *_view;
 }
 
@@ -54,7 +48,7 @@ using namespace facebook::react;
 
 Class<RCTComponentViewProtocol> MarkdownTextInputDecoratorViewCls(void)
 {
-    return MarkdownTextInputDecoratorView.class;
+  return MarkdownTextInputDecoratorComponentView.class;
 }
 
 @end
