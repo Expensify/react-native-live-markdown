@@ -12,17 +12,17 @@ import android.view.ViewParent;
 
 import com.facebook.react.views.textinput.ReactEditText;
 
-public class MarkdownTextInputView extends View {
+public class MarkdownTextInputDecoratorView extends View {
 
-  public MarkdownTextInputView(Context context) {
+  public MarkdownTextInputDecoratorView(Context context) {
     super(context);
   }
 
-  public MarkdownTextInputView(Context context, @Nullable AttributeSet attrs) {
+  public MarkdownTextInputDecoratorView(Context context, @Nullable AttributeSet attrs) {
     super(context, attrs);
   }
 
-  public MarkdownTextInputView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+  public MarkdownTextInputDecoratorView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
     super(context, attrs, defStyleAttr);
   }
 

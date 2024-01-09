@@ -19,7 +19,7 @@
 @property (nonatomic, nonnull) UIColor *mentionUserBackgroundColor;
 
 #ifdef RCT_NEW_ARCH_ENABLED
-- (instancetype)initWithStruct:(const facebook::react::MarkdownTextInputViewMarkdownStyleStruct &)style;
+- (instancetype)initWithStruct:(const facebook::react::MarkdownTextInputDecoratorViewMarkdownStyleStruct &)style;
 #else
 - (instancetype)initWithDictionary:(NSDictionary *)json;
 #endif /* RCT_NEW_ARCH_ENABLED */
