@@ -1,5 +1,5 @@
 {
-  "name": "react-native-markdown-text-input",
+  "name": "@expensify/react-native-live-markdown",
   "version": "0.1.0",
   "description": "Lorem ipsum sit dolor amet.",
   "main": "lib/commonjs/index",
@@ -10,7 +10,7 @@
   "files": [
     "src",
     "lib",
-    "parser/out.js",
+    "parser/react-native-live-markdown-parser.js",
     "android",
     "ios",
     "cpp",
@@ -27,7 +27,7 @@
     "!**/.*"
   ],
   "scripts": {
-    "example": "yarn workspace react-native-markdown-text-input-example",
+    "example": "yarn workspace @expensify/react-native-live-markdown-example",
     "test": "jest",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --ext .js,.ts,.tsx",
@@ -40,13 +40,16 @@
     "ios",
     "android"
   ],
-  "repository": "https://github.com/tomekzaw/react-native-markdown-text-input",
-  "author": "Tomasz Zawadzki <tomasz.zawadzki@swmansion.com> (https://github.com/tomekzaw)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/expensify/react-native-live-markdown.git"
+  },
+  "author": "Expensify, Inc.",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/tomekzaw/react-native-markdown-text-input/issues"
+    "url": "https://github.com/expensify/react-native-live-markdown/issues"
   },
-  "homepage": "https://github.com/tomekzaw/react-native-markdown-text-input#readme",
+  "homepage": "https://github.com/expensify/react-native-live-markdown#readme",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
@@ -146,7 +149,7 @@
     ]
   },
   "codegenConfig": {
-    "name": "RNMarkdownTextInputViewSpec",
+    "name": "RNLiveMarkdownSpec",
     "type": "components",
     "jsSrcsDir": "src"
   }

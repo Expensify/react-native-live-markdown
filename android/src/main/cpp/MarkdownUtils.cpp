@@ -5,7 +5,8 @@
 
 using namespace facebook;
 
-namespace markdowntextinput {
+namespace expensify {
+namespace livemarkdown {
   std::shared_ptr<jsi::Runtime> MarkdownUtils::runtime_;
 
   void MarkdownUtils::nativeInitializeRuntime(
@@ -21,9 +22,15 @@ namespace markdowntextinput {
       jni::alias_ref<jhybridobject> jThis,
       jni::alias_ref<jni::JString> input) {
     jsi::Runtime &rt = *runtime_;
-    auto func = rt.global().getPropertyAsFunction(rt, "parseMarkdownToTextAndRanges");
-    auto output = func.call(rt, input->toStdString());
-    auto json = rt.global().getPropertyAsObject(rt, "JSON").getPropertyAsFunction(rt, "stringify").call(rt, output).asString(rt).utf8(rt);
+    auto func = rt.global().getPropertyAsFunction(rt, "parseExpensiMarkToRanges");
+    auto arg = input->toStdString();
+    jsi::Value result;
+    try {
+      result = func.call(rt, arg);
+    } catch (jsi::JSError e) {
+      result = jsi::Array(rt, 0);
+    }
+    auto json = rt.global().getPropertyAsObject(rt, "JSON").getPropertyAsFunction(rt, "stringify").call(rt, result).asString(rt).utf8(rt);
     return jni::make_jstring(json);
   }
 
@@ -33,4 +40,5 @@ namespace markdowntextinput {
         makeNativeMethod("nativeParseMarkdown", MarkdownUtils::nativeParseMarkdown)});
   }
 
-} // namespace markdowntextinput
+} // namespace livemarkdown
+} // namespace expensify

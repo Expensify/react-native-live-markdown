@@ -1,4 +1,4 @@
-#import <react-native-markdown-text-input/RCTMarkdownStyle.h>
+#import <react-native-live-markdown/RCTMarkdownStyle.h>
 
 #ifdef RCT_NEW_ARCH_ENABLED
 #import <React/RCTConversions.h>
@@ -10,7 +10,7 @@
 
 #ifdef RCT_NEW_ARCH_ENABLED
 
-- (instancetype)initWithStruct:(const facebook::react::MarkdownTextInputViewMarkdownStyleStruct &)style
+- (instancetype)initWithStruct:(const facebook::react::MarkdownTextInputDecoratorViewMarkdownStyleStruct &)style
 {
   if (self = [super init]) {
     _syntaxColor = RCTUIColorFromSharedColor(style.syntax.color);

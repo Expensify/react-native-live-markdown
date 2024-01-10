@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { Button, Platform, StyleSheet, Text, View } from 'react-native';
 
-import { MarkdownTextInput } from 'react-native-markdown-text-input';
+import { MarkdownTextInput } from '@expensify/react-native-live-markdown';
 import type { TextInput } from 'react-native';
 
 const DEFAULT_TEXT = [

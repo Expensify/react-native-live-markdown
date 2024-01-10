@@ -1,8 +1,8 @@
 export {};
 
-type Range = [string, number, number];
+type Range = [string, number, number]; // style, location, length
 
 declare global {
   // eslint-disable-next-line no-var
-  var parseMarkdownToTextAndRanges: (markdown: string) => [string, Range[]];
+  var parseExpensiMarkToRanges: (markdown: string) => Range[];
 }

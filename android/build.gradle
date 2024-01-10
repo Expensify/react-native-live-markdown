@@ -20,11 +20,11 @@ if (isNewArchitectureEnabled()) {
 }
 
 def getExtOrDefault(name) {
-  return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties["MarkdownTextInput_" + name]
+  return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties["LiveMarkdown_" + name]
 }
 
 def getExtOrIntegerDefault(name) {
-  return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties["MarkdownTextInput_" + name]).toInteger()
+  return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties["LiveMarkdown_" + name]).toInteger()
 }
 
 def supportsNamespace() {
@@ -38,7 +38,7 @@ def supportsNamespace() {
 
 android {
   if (supportsNamespace()) {
-    namespace "com.markdowntextinput"
+    namespace "com.expensify.livemarkdown"
 
     sourceSets {
       main {
@@ -128,13 +128,13 @@ dependencies {
 if (isNewArchitectureEnabled()) {
   react {
     jsRootDir = file("../src/")
-    libraryName = "MarkdownTextInputView"
-    codegenJavaPackageName = "com.markdowntextinput"
+    libraryName = "LiveMarkdown"
+    codegenJavaPackageName = "com.expensify.livemarkdown"
   }
 }
 
 task copyJS(type: Copy) {
-  from '../parser/out.js'
+  from '../parser/react-native-live-markdown-parser.js'
   into 'src/main/assets'
 }
 

@@ -1,19 +1,8 @@
-require('../out.js');
+require('../react-native-live-markdown-parser.js');
 
 expect.extend({
   toBeParsedAs(received, expectedRanges) {
-    const expectedText = received;
-    const [actualText, actualRanges] =
-      global.parseMarkdownToTextAndRanges(received);
-    if (actualText !== expectedText) {
-      return {
-        pass: false,
-        message: () =>
-          `Expected ${JSON.stringify(expectedText)}, got ${JSON.stringify(
-            actualText
-          )}`,
-      };
-    }
+    const actualRanges = global.parseExpensiMarkToRanges(received);
     if (JSON.stringify(actualRanges) !== JSON.stringify(expectedRanges)) {
       return {
         pass: false,
