@@ -49,6 +49,11 @@
   NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:inputString attributes:_backedTextInputView.defaultTextAttributes];
   [attributedString beginEditing];
 
+    // ensure that no underline is applied to the entire string beforehand
+    // context: 
+    // https://github.com/tomekzaw/react-native-live-markdown/issues/92#issuecomment-1881763177
+    [attributedString addAttribute:NSUnderlineStyleAttributeName value:[NSNumber numberWithInteger:NSUnderlineStyleNone] range:NSMakeRange(0, attributedString.length)];
+
   _quoteRanges = [NSMutableArray new];
 
   [ranges enumerateObjectsUsingBlock:^(id _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
