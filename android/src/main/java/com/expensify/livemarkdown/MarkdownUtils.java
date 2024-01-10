@@ -67,6 +67,10 @@ public class MarkdownUtils {
 
   private static native String nativeParseMarkdown(String input);
 
+  private String mPrevInput;
+
+  private String mPrevOutput;
+
   private final List<Object> mSpans = new LinkedList<>();
 
   private MarkdownStyle mMarkdownStyle;
@@ -153,7 +157,15 @@ public class MarkdownUtils {
     removeSpans(ssb);
 
     String input = ssb.toString();
-    String output = parseMarkdown(input);
+    String output;
+    if (input.equals(mPrevInput)) {
+      output = mPrevOutput;
+    } else {
+      output = parseMarkdown(input);
+      mPrevInput = input;
+      mPrevOutput = output;
+    }
+
     try {
       JSONArray ranges = new JSONArray(output);
       for (int i = 0; i < ranges.length(); i++) {
