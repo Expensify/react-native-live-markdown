@@ -45,7 +45,7 @@ public class MarkdownUtils {
       return;
     }
     try {
-      InputStream inputStream = assetManager.open("out.js");
+      InputStream inputStream = assetManager.open("react-native-live-markdown-parser.js");
       byte[] buffer = new byte[inputStream.available()];
       inputStream.read(buffer);
       inputStream.close();
