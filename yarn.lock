@@ -1750,7 +1750,7 @@ __metadata:
     metro-react-native-babel-preset: 0.76.8
     pod-install: ^0.1.0
     react: 18.2.0
-    react-native: 0.72.7
+    react-native: 0.72.9
   languageName: unknown
   linkType: soft
 
@@ -1782,7 +1782,7 @@ __metadata:
     pod-install: ^0.1.0
     prettier: ^2.0.5
     react: 18.2.0
-    react-native: 0.72.7
+    react-native: 0.72.9
     react-native-builder-bob: ^0.20.0
     release-it: ^15.0.0
     turbo: ^1.10.7
@@ -2702,7 +2702,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-native/codegen@npm:^0.72.7":
+"@react-native/codegen@npm:^0.72.8":
   version: 0.72.8
   resolution: "@react-native/codegen@npm:0.72.8"
   dependencies:
@@ -10783,22 +10783,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native@npm:0.72.7":
-  version: 0.72.7
-  resolution: "react-native@npm:0.72.7"
+"react-native@npm:0.72.9":
+  version: 0.72.9
+  resolution: "react-native@npm:0.72.9"
   dependencies:
     "@jest/create-cache-key-function": ^29.2.1
     "@react-native-community/cli": 11.3.10
     "@react-native-community/cli-platform-android": 11.3.10
     "@react-native-community/cli-platform-ios": 11.3.10
     "@react-native/assets-registry": ^0.72.0
-    "@react-native/codegen": ^0.72.7
+    "@react-native/codegen": ^0.72.8
     "@react-native/gradle-plugin": ^0.72.11
     "@react-native/js-polyfills": ^0.72.1
     "@react-native/normalize-colors": ^0.72.0
     "@react-native/virtualized-lists": ^0.72.8
     abort-controller: ^3.0.0
     anser: ^1.4.9
+    ansi-regex: ^5.0.0
     base64-js: ^1.1.2
     deprecated-react-native-prop-types: ^4.2.3
     event-target-shim: ^5.0.1
@@ -10827,7 +10828,7 @@ __metadata:
     react: 18.2.0
   bin:
     react-native: cli.js
-  checksum: 587490c63bba709347e99edbe29f2a10d5a358e296d214960e066bd803d5a71a49b5e199208cf85cd6f6d3ce5fdbe5134e9480eb268b41b29807c833f7d45a34
+  checksum: 4f2d2f28708150a86736daca3de66334ab42d5775029324e0acd3d5a26543a1efb93c203945cae857815f4717d6f1c19c582590c642aed26ef14cbf66000eb8b
   languageName: node
   linkType: hard
 
