@@ -12,7 +12,7 @@ index 4225717..0ae0962 100644
  
      REPORT: {
 diff --git a/node_modules/expensify-common/lib/ExpensiMark.js b/node_modules/expensify-common/lib/ExpensiMark.js
-index 6b198e2..90ec211 100644
+index 4e149ca..c94b383 100644
 --- a/node_modules/expensify-common/lib/ExpensiMark.js
 +++ b/node_modules/expensify-common/lib/ExpensiMark.js
 @@ -7,8 +7,8 @@ const MARKDOWN_LINK_REGEX = new RegExp(`\\[([^\\][]*(?:\\[[^\\][]*][^\\][]*)*)]\
@@ -26,119 +26,7 @@ index 6b198e2..90ec211 100644
          /**
           * The list of regex replacements to do on a comment. Check the link regex is first so links are processed
           * before other delimiters
-@@ -36,6 +36,11 @@ export default class ExpensiMark {
-                     const group = textWithinFences.replace(/(?:(?![\n\r])\s)/g, '&#32;');
-                     return `<pre>${group}</pre>`;
-                 },
-+                rawInputReplacement: (match, __, textWithinFences) => {
-+                    const withinFences = match.replace(/(?:&#x60;&#x60;&#x60;)([\s\S]*?)(?:&#x60;&#x60;&#x60;)/g, '$1');
-+                    const group = textWithinFences.replace(/(?:(?![\n\r])\s)/g, '&#32;');
-+                    return `<pre data-code-raw="${_.escape(withinFences)}">${group}</pre>`;
-+                }
-             },
- 
-             /**
-@@ -59,11 +64,11 @@ export default class ExpensiMark {
-              */
-             {
-                 name: 'email',
--                process: (textToProcess, replacement) => {
-+                process: (textToProcess, replacement, shouldKeepRawInput) => {
-                     const regex = new RegExp(
-                         `(?!\\[\\s*\\])\\[([^[\\]]*)]\\((mailto:)?${CONST.REG_EXP.MARKDOWN_EMAIL}\\)`, 'gim'
-                     );
--                    return this.modifyTextForEmailLinks(regex, textToProcess, replacement);
-+                    return this.modifyTextForEmailLinks(regex, textToProcess, replacement, shouldKeepRawInput);
-                 },
-                 replacement: (match, g1, g2) => {
-                     if (g1.match(CONST.REG_EXP.EMOJIS) || !g1.trim()) {
-@@ -74,12 +79,21 @@ export default class ExpensiMark {
-                     const formattedLabel = label === href ? g2 : label;
-                     return `<a href="${href}">${formattedLabel}</a>`;
-                 },
-+                rawInputReplacement: (match, g1, g2, g3) => {
-+                    if (g1.match(CONST.REG_EXP.EMOJIS) || !g1.trim()) {
-+                        return match;
-+                    }
-+
-+                    const dataRawHref = g2 ? g2 + g3 : g3;
-+                    const href = `mailto:${g3}`;
-+                    return `<a href="${href}" data-raw-href="${dataRawHref}" data-link-variant="labeled">${g1}</a>`;
-+                }
-             },
- 
-             {
-                 name: 'heading1',
--                process: (textToProcess, replacement, shouldKeepWhitespace = false) => {
--                    const regexp = shouldKeepWhitespace ? /^# ( *(?! )(?:(?!<pre>|\n|\r\n).)+)/gm : /^# +(?! )((?:(?!<pre>|\n|\r\n).)+)/gm;
-+                process: (textToProcess, replacement, shouldKeepRawInput = false) => {
-+                    const regexp = shouldKeepRawInput ? /^# ( *(?! )(?:(?!<pre>|\n|\r\n).)+)/gm : /^# +(?! )((?:(?!<pre>|\n|\r\n).)+)/gm;
-                     return textToProcess.replace(regexp, replacement);
-                 },
-                 replacement: '<h1>$1</h1>',
-@@ -100,6 +114,12 @@ export default class ExpensiMark {
-                     }
-                     return `<a href="${Str.sanitizeURL(g2)}" target="_blank" rel="noreferrer noopener">${g1.trim()}</a>`;
-                 },
-+                rawInputReplacement: (match, g1, g2) => {
-+                    if (g1.match(CONST.REG_EXP.EMOJIS) || !g1.trim()) {
-+                        return match;
-+                    }
-+                    return `<a href="${Str.sanitizeURL(g2)}" data-raw-href="${g2}" data-link-variant="labeled" target="_blank" rel="noreferrer noopener">${g1.trim()}</a>`;
-+                }
-             },
- 
-             /**
-@@ -162,6 +182,10 @@ export default class ExpensiMark {
-                     const href = Str.sanitizeURL(g2);
-                     return `${g1}<a href="${href}" target="_blank" rel="noreferrer noopener">${g2}</a>${g1}`;
-                 },
-+                rawInputReplacement: (_match, g1, g2) => {
-+                    const href = Str.sanitizeURL(g2);
-+                    return `${g1}<a href="${href}" data-raw-href="${g2}" data-link-variant="auto" target="_blank" rel="noreferrer noopener">${g2}</a>${g1}`;
-+                }
-             },
- 
-             {
-@@ -170,16 +194,16 @@ export default class ExpensiMark {
-                 // We also want to capture a blank line before or after the quote so that we do not add extra spaces.
-                 // block quotes naturally appear on their own line. Blockquotes should not appear in code fences or
-                 // inline code blocks. A single prepending space should be stripped if it exists
--                process: (textToProcess, replacement, shouldKeepWhitespace = false) => {
-+                process: (textToProcess, replacement, shouldKeepRawInput = false) => {
-                     const regex = new RegExp(
-                         /^&gt; *(?! )(?![^<]*(?:<\/pre>|<\/code>))([^\v\n\r]+)/gm,
-                     );
--                    if (shouldKeepWhitespace) {
--                        return textToProcess.replace(regex, g1 => replacement(g1, shouldKeepWhitespace));
-+                    if (shouldKeepRawInput) {
-+                        return textToProcess.replace(regex, g1 => replacement(g1, shouldKeepRawInput));
-                     }
-                     return this.modifyTextForQuote(regex, textToProcess, replacement);
-                 },
--                replacement: (g1, shouldKeepWhitespace = false) => {
-+                replacement: (g1, shouldKeepRawInput = false) => {
-                     // We want to enable 2 options of nested heading inside the blockquote: "># heading" and "> # heading".
-                     // To do this we need to parse body of the quote without first space
-                     let isStartingWithSpace = false;
-@@ -187,7 +211,7 @@ export default class ExpensiMark {
-                         isStartingWithSpace = !!g2;
-                         return '';
-                     });
--                    const replacedText = this.replace(textToReplace, {filterRules: ['heading1'], shouldEscapeText: false, shouldKeepWhitespace});
-+                    const replacedText = this.replace(textToReplace, {filterRules: ['heading1'], shouldEscapeText: false, shouldKeepRawInput});
-                     return `<blockquote>${isStartingWithSpace ? ' ' : ''}${replacedText}</blockquote>`;
-                 },
-             },
-@@ -228,6 +252,7 @@ export default class ExpensiMark {
-                     'gim',
-                 ),
-                 replacement: '$1<a href="mailto:$2">$2</a>',
-+                rawInputReplacement: '$1<a href="mailto:$2" data-raw-href="$2" data-link-variant="auto">$2</a>',
-             },
- 
-             {
-@@ -424,7 +449,7 @@ export default class ExpensiMark {
+@@ -457,7 +457,7 @@ export default class ExpensiMark {
           * @type {Object[]}
           */
          this.shouldKeepWhitespaceRules = this.rules.filter(rule => !this.whitespaceRulesToDisable.includes(rule.name)).map(rule => rule.name);
@@ -147,35 +35,7 @@ index 6b198e2..90ec211 100644
  
      /**
       * Replaces markdown with html elements
-@@ -437,10 +462,10 @@ export default class ExpensiMark {
-      *
-      * @returns {String}
-      */
--    replace(text, {filterRules = [], shouldEscapeText = true, shouldKeepWhitespace = false} = {}) {
-+    replace(text, {filterRules = [], shouldEscapeText = true, shouldKeepRawInput = false} = {}) {
-         // This ensures that any html the user puts into the comment field shows as raw html
-         let replacedText = shouldEscapeText ? _.escape(text) : text;
--        const excludeRules = shouldKeepWhitespace ? _.union(this.shouldKeepWhitespaceRules, filterRules) : filterRules;
-+        const excludeRules = shouldKeepRawInput ? _.union(this.shouldKeepWhitespaceRules, filterRules) : filterRules;
-         const rules = _.isEmpty(excludeRules) ? this.rules : _.filter(this.rules, rule => _.contains(excludeRules, rule.name));
- 
-         try {
-@@ -449,11 +474,11 @@ export default class ExpensiMark {
-                 if (rule.pre) {
-                     replacedText = rule.pre(replacedText);
-                 }
--
-+                const replacementFunction = shouldKeepRawInput && rule.rawInputReplacement ? rule.rawInputReplacement : rule.replacement;
-                 if (rule.process) {
--                    replacedText = rule.process(replacedText, rule.replacement, shouldKeepWhitespace);
-+                    replacedText = rule.process(replacedText, replacementFunction, shouldKeepRawInput);
-                 } else {
--                    replacedText = replacedText.replace(rule.regex, rule.replacement);
-+                    replacedText = replacedText.replace(rule.regex, replacementFunction);
-                 }
- 
-                 // Post-process text after applying regex
-@@ -470,7 +495,7 @@ export default class ExpensiMark {
+@@ -503,7 +503,7 @@ export default class ExpensiMark {
          }
  
          return replacedText;
@@ -184,7 +44,7 @@ index 6b198e2..90ec211 100644
  
      /**
       * Checks matched URLs for validity and replace valid links with html elements
-@@ -577,7 +602,7 @@ export default class ExpensiMark {
+@@ -610,7 +610,7 @@ export default class ExpensiMark {
          }
  
          return replacedText;
@@ -193,32 +53,7 @@ index 6b198e2..90ec211 100644
  
      /**
       * Checks matched Emails for validity and replace valid links with html elements
-@@ -585,10 +610,11 @@ export default class ExpensiMark {
-      * @param {RegExp} regex
-      * @param {String} textToCheck
-      * @param {Function} replacement
-+     * @param {Boolean} shouldKeepRawInput
-      *
-      * @returns {String}
-      */
--    modifyTextForEmailLinks(regex, textToCheck, replacement) {
-+    modifyTextForEmailLinks(regex, textToCheck, replacement, shouldKeepRawInput) {
-         let match = regex.exec(textToCheck);
-         let replacedText = '';
-         let startIndex = 0;
-@@ -602,7 +628,10 @@ export default class ExpensiMark {
-                 filterRules: ['bold', 'strikethrough', 'italic'],
-                 shouldEscapeText: false,
-             });
--            replacedText = replacedText.concat(replacement(match[0], linkText, match[3]));
-+
-+            // rawInputReplacment needs to be called with additional parameters from match
-+            const replacedMatch = shouldKeepRawInput ? replacement(match[0], linkText, match[2], match[3]) : replacement(match[0], linkText, match[3]);
-+            replacedText = replacedText.concat(replacedMatch);
-             startIndex = match.index + (match[0].length);
- 
-             // Now we move to the next match that the js regex found in the text
-@@ -612,7 +641,7 @@ export default class ExpensiMark {
+@@ -649,7 +649,7 @@ export default class ExpensiMark {
              replacedText = replacedText.concat(textToCheck.substr(startIndex));
          }
          return replacedText;
@@ -227,7 +62,7 @@ index 6b198e2..90ec211 100644
  
      /**
       * replace block element with '\n' if :
-@@ -652,7 +681,7 @@ export default class ExpensiMark {
+@@ -689,7 +689,7 @@ export default class ExpensiMark {
          });
  
          return joinedText;
@@ -236,7 +71,7 @@ index 6b198e2..90ec211 100644
  
      /**
       * Replaces HTML with markdown
-@@ -679,7 +708,7 @@ export default class ExpensiMark {
+@@ -716,7 +716,7 @@ export default class ExpensiMark {
              generatedMarkdown = generatedMarkdown.replace(rule.regex, rule.replacement);
          });
          return Str.htmlDecode(this.replaceBlockElementWithNewLine(generatedMarkdown));
@@ -245,7 +80,7 @@ index 6b198e2..90ec211 100644
  
      /**
       * Convert HTML to text
-@@ -698,7 +727,7 @@ export default class ExpensiMark {
+@@ -735,7 +735,7 @@ export default class ExpensiMark {
          // We use 'htmlDecode' instead of 'unescape' to replace entities like '&#32;'
          replacedText = Str.htmlDecode(replacedText);
          return replacedText;
@@ -254,7 +89,7 @@ index 6b198e2..90ec211 100644
  
      /**
       * Modify text for Quotes replacing chevrons with html elements
-@@ -761,7 +790,7 @@ export default class ExpensiMark {
+@@ -798,7 +798,7 @@ export default class ExpensiMark {
              replacedText = textToCheck;
          }
          return replacedText;
@@ -263,7 +98,7 @@ index 6b198e2..90ec211 100644
  
      /**
       * Format the content of blockquote if the text matches the regex or else just return the original text
-@@ -782,7 +811,7 @@ export default class ExpensiMark {
+@@ -819,7 +819,7 @@ export default class ExpensiMark {
              return replacement(textToFormat);
          }
          return textToCheck;
@@ -272,7 +107,7 @@ index 6b198e2..90ec211 100644
  
      /**
       * Check if the input text includes only the open or the close tag of an element.
-@@ -821,7 +850,7 @@ export default class ExpensiMark {
+@@ -858,7 +858,7 @@ export default class ExpensiMark {
  
          // If there are any tags left in the stack, they're unclosed
          return tagStack.length !== 0;
@@ -281,7 +116,7 @@ index 6b198e2..90ec211 100644
  
      /**
       * @param {String} comment
-@@ -843,7 +872,7 @@ export default class ExpensiMark {
+@@ -880,7 +880,7 @@ export default class ExpensiMark {
              console.warn('Error parsing url in ExpensiMark.extractLinksInMarkdownComment', {error: e});
              return undefined;
          }
@@ -290,7 +125,7 @@ index 6b198e2..90ec211 100644
  
      /**
       * Compares two markdown comments and returns a list of the links removed in a new comment.
-@@ -858,3 +887,5 @@ export default class ExpensiMark {
+@@ -895,3 +895,5 @@ export default class ExpensiMark {
          return linksInOld === undefined || linksInNew === undefined ? [] : _.difference(linksInOld, linksInNew);
      }
  }

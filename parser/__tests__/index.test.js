@@ -1,4 +1,4 @@
-require('../out.js');
+require('../react-native-live-markdown-parser.js');
 
 expect.extend({
   toBeParsedAs(received, expectedRanges) {
