@@ -49,6 +49,11 @@
   NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:inputString attributes:_backedTextInputView.defaultTextAttributes];
   [attributedString beginEditing];
 
+  // If the attributed string ends with underlined text, blurring the single-line input imprints the underline style across the whole string.
+  // It looks like a bug in iOS, as there is no underline style to be found in the attributed string, especially after formatting.
+  // This is a workaround that applies the NSUnderlineStyleNone to the string before iterating over ranges which resolves this problem.
+  [attributedString addAttribute:NSUnderlineStyleAttributeName value:[NSNumber numberWithInteger:NSUnderlineStyleNone] range:NSMakeRange(0, attributedString.length)];
+
   _quoteRanges = [NSMutableArray new];
 
   [ranges enumerateObjectsUsingBlock:^(id _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
