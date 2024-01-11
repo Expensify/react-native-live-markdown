@@ -8,11 +8,15 @@
     "test": "jest",
     "build": "esbuild index.ts --bundle --minify --outfile=react-native-live-markdown-parser.js",
     "run": "node react-native-live-markdown-parser.js",
-    "postinstall": "patch-package"
+    "postinstall": "patch-package && babel ./node_modules/expensify-common/lib/ExpensiMark.js --out-file ./node_modules/expensify-common/lib/ExpensiMark.js"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@babel/cli": "^7.23.4",
+    "@babel/core": "^7.23.7",
+    "@babel/plugin-transform-classes": "^7.23.5",
+    "@babel/preset-env": "^7.23.7",
     "@types/underscore": "^1.11.15",
     "esbuild": "0.19.4",
     "esbuild-plugin-tsc": "^0.4.0",

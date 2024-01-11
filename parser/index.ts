@@ -1,5 +1,5 @@
 // @ts-ignore - to review how it's implemented in ExpensiMark
-import { ExpensiMark } from 'expensify-common/lib/ExpensiMark';
+import ExpensiMark from 'expensify-common/lib/ExpensiMark';
 import _ from 'underscore';
 
 type Range = [string, number, number];
@@ -7,7 +7,7 @@ type Token = ['TEXT' | 'HTML', string];
 type StackItem = { tag: string; children: Array<StackItem | string> };
 
 function parseMarkdownToHTML(markdown: string): string {
-  const parser = ExpensiMark;
+  const parser = new ExpensiMark();
   const html = parser.replace(markdown, {
     shouldKeepRawInput: true,
   });
