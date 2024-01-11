@@ -3,8 +3,8 @@
 ## Features
 
 - ⚛️ Drop-in replacement for `<TextInput>` component
+- ⌨️ Live synchronous formatting on every keystroke
 - ⚡ Fully native experience (selection, spellcheck, autocomplete)
-- ⌨️ Live synchronous formatting while typing
 - 🎨 Customizable styles
 - 🌐 Universal support (Android, iOS, web)
 - 🏗️ Supports New Architecture
@@ -26,6 +26,9 @@ cd ios && pod install
 ```
 
 The library includes native code so you will need to re-build the native app.
+
+> [!NOTE]
+> The library does not support Expo Go, you will need to setup Expo Dev Client (see [here](https://docs.expo.dev/workflow/prebuild/)).
 
 ## Usage
 
@@ -93,7 +96,8 @@ The style object can be passed to multiple `MarkdownTextInput` components using 
 />
 ```
 
-It is advisable to store the style object outside of a component (if the styles don't change) or memoize the style object with `React.useMemo`.
+> [!TIP]
+> We recommend to store the style object outside of a component body or memoize the style object with `React.useMemo`.
 
 ## Markdown flavors support
 
@@ -103,9 +107,9 @@ Currently, `react-native-live-markdown` supports only [ExpensiMark](https://gith
 
 `MarkdownTextInput` inherits all props of React Native's `TextInput` component.
 
-| Prop            | Type            | Default     | Note                                                                                                                                                     |
-| --------------- | --------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `markdownStyle` | `MarkdownStyle` | `undefined` | Adds custom styling to the map component. See [README](https://github.com/tomekzaw/react-native-live-markdown/blob/main/README.md) for more information. |
+| Prop            | Type            | Default     | Note                                                                                                                                                      |
+| --------------- | --------------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `markdownStyle` | `MarkdownStyle` | `undefined` | Adds custom styling to the map component. See [README](https://github.com/expensify/react-native-live-markdown/blob/main/README.md) for more information. |
 
 ## Compatibility
 
