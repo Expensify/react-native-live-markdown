@@ -107,8 +107,7 @@
       [_quoteRanges addObject:[NSValue valueWithRange:range]];
     } else if ([type isEqualToString:@"pre"]) {
       [attributedString addAttribute:NSForegroundColorAttributeName value:_markdownStyle.preColor range:range];
-      NSString *firstChar = [inputString substringWithRange:NSMakeRange(range.location, 1)];
-      NSRange rangeForBackground = [firstChar isEqualToString:@"\n"] ? NSMakeRange(range.location + 1, range.length - 1) : range;
+      NSRange rangeForBackground = [inputString characterAtIndex:range.location] == '\n' ? NSMakeRange(range.location + 1, range.length - 1) : range;
       [attributedString addAttribute:NSBackgroundColorAttributeName value:_markdownStyle.preBackgroundColor range:rangeForBackground];
       // TODO: pass background color and ranges to layout manager
     } else if ([type isEqualToString:@"h1"]) {
