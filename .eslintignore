@@ -1,5 +1,6 @@
 **/node_modules/*
 **/react-native-live-markdown-parser.js
+lib/**/*
 *.test.*
 example/**/*
 *.config.js

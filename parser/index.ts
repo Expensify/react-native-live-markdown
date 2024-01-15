@@ -1,4 +1,5 @@
 // @ts-ignore - to review how it's implemented in ExpensiMark
+// eslint-disable-next-line import/no-unresolved
 import {ExpensiMark} from 'expensify-common/lib/ExpensiMark';
 import _ from 'underscore';
 
