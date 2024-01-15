@@ -23,6 +23,8 @@ jobs:
                   node-version: "16.x"
 
             - run: npm ci
+            - run: npm ci
+              working-directory: ./WebExample
 
             - run: npm run lint
               env:
