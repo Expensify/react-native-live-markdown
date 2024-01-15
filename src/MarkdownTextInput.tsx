@@ -5,7 +5,7 @@ import MarkdownTextInputDecoratorViewNativeComponent from './MarkdownTextInputDe
 import React from 'react';
 import type { TextInputProps } from 'react-native';
 
-const MONOSPACE_FONT = Platform.select({
+const FONT_FAMILY_MONOSPACE = Platform.select({
   ios: 'Courier',
   default: 'monospace',
 });
@@ -28,12 +28,12 @@ function makeDefaultMarkdownStyle(): MarkdownStyle {
       paddingLeft: 6,
     },
     code: {
-      fontFamily: MONOSPACE_FONT,
+      fontFamily: FONT_FAMILY_MONOSPACE,
       color: 'black',
       backgroundColor: 'lightgray',
     },
     pre: {
-      fontFamily: MONOSPACE_FONT,
+      fontFamily: FONT_FAMILY_MONOSPACE,
       color: 'black',
       backgroundColor: 'lightgray',
     },
