@@ -22,9 +22,11 @@ jobs:
               with:
                   node-version: "16.x"
 
-            - run: npm ci
-            - run: npm ci
+            - name: Setup web example
+              run: npm ci
               working-directory: ./WebExample
+
+            - run: npm ci
 
             - run: npm run lint
               env:
