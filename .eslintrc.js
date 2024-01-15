@@ -5,6 +5,7 @@ module.exports = {
     tsconfigRootDir: __dirname,
   },
   extends: [
+    'expensify',
     'plugin:@typescript-eslint/recommended',
     'prettier',
     'plugin:import/typescript',
@@ -24,17 +25,20 @@ module.exports = {
   },
   root: true,
   rules: {
-    'prettier/prettier': [
-      'error',
+    'rulesdir/prefer-underscore-method': 'off',
+    'react/jsx-props-no-spreading': 'off',
+    'react/require-default-props': 'off',
+    'react/jsx-filename-extension': ['error', { extensions: ['.tsx', '.jsx'] }],
+    "import/extensions": [
+      "error",
+      "ignorePackages",
       {
-        quoteProps: 'consistent',
-        singleQuote: true,
-        tabWidth: 2,
-        trailingComma: 'es5',
-        useTabs: false,
-      },
-    ],
-    'curly': 'error',
+        "js": "never",
+        "jsx": "never",
+        "ts": "never",
+        "tsx": "never"
+      }
+   ],
     'import/no-unresolved': 'error',
     'import/consistent-type-specifier-style': ['error', 'prefer-top-level'],
     'react/jsx-uses-vars': 'error',

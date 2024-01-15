@@ -1,2 +1,7 @@
 **/node_modules/*
-parser/react-native-live-markdown-parser.js
+**/react-native-live-markdown-parser.js
+*.test.*
+example/**/*
+*.config.js
+.eslintrc.js
+.prettierrc.js

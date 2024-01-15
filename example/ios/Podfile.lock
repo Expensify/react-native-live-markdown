@@ -673,11 +673,11 @@ SPEC CHECKSUMS:
   Flipper-PeerTalk: 116d8f857dc6ef55c7a5a75ea3ceaafe878aadc9
   FlipperKit: 2efad7007d6745a3f95e4034d547be637f89d3f6
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
-  glog: 04b94705f318337d7ead9e6d17c019bd9b1f6b1b
-  hermes-engine: 9b9bb14184a11b8ceb4131b09abf634880f0f46d
+  glog: 791fe035093b84822da7f0870421a25839ca7870
+  hermes-engine: c0fcd29517813123a2153e9f7943bc30675f5229
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
   OpenSSL-Universal: ebc357f1e6bc71fa463ccb2fe676756aff50e88c
-  RCT-Folly: 424b8c9a7a0b9ab2886ffe9c3b041ef628fd4fb1
+  RCT-Folly: 85766c3226c7ec638f05ad7cb3cf6a268d6c4241
   RCTRequired: f30c3213569b1dc43659ecc549a6536e1e11139e
   RCTTypeSafety: e1ed3137728804fa98bce30b70e3da0b8e23054e
   React: 54070abee263d5773486987f1cf3a3616710ed52

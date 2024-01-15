@@ -17,6 +17,7 @@ function parseMarkdownToHTML(markdown: string): string {
 function parseHTMLToTokens(html: string): Token[] {
   const tokens: Token[] = [];
   let left = 0;
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const open = html.indexOf('<', left);
     if (open === -1) {
@@ -92,6 +93,7 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
     if (typeof node === 'string') {
       text += node;
     } else {
+      // eslint-disable-next-line no-lonely-if
       if (node.tag === '<>') {
         processChildren(node);
       } else if (node.tag === '<strong>') {
@@ -118,9 +120,11 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
         appendSyntax('>');
         addChildrenWithStyle(node, 'blockquote');
         // compensate for "> " at the beginning
-        const curr = ranges?.[ranges.length - 1];
-        curr![1] -= 1;
-        curr![2] += 1;
+        if (ranges.length > 0) {
+          const curr = ranges[ranges.length - 1];
+          curr![1] -= 1;
+          curr![2] += 1;
+        }
       } else if (node.tag === '<h1>') {
         appendSyntax('# ');
         addChildrenWithStyle(node, 'h1');
@@ -155,7 +159,7 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
           appendSyntax(')');
         }
       } else {
-        throw new Error('Unknown tag: ' + node.tag);
+        throw new Error(`Unknown tag: {node.tag}`);
       }
     }
   }
