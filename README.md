@@ -69,10 +69,12 @@ const markdownStyle: MarkdownStyle = {
     paddingLeft: 6,
   },
   code: {
+    fontFamily: 'monospace',
     color: 'black',
     backgroundColor: 'lightgray',
   },
   pre: {
+    fontFamily: 'monospace',
     color: 'black',
     backgroundColor: 'lightgray',
   },
