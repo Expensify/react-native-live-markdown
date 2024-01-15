@@ -1,9 +1,14 @@
-import { StyleSheet, TextInput, processColor } from 'react-native';
+import { Platform, StyleSheet, TextInput, processColor } from 'react-native';
 
 import type { MarkdownStyle } from './MarkdownTextInputDecoratorViewNativeComponent';
 import MarkdownTextInputDecoratorViewNativeComponent from './MarkdownTextInputDecoratorViewNativeComponent';
 import React from 'react';
 import type { TextInputProps } from 'react-native';
+
+const MONOSPACE_FONT = Platform.select({
+  ios: 'Courier',
+  default: 'monospace',
+});
 
 function makeDefaultMarkdownStyle(): MarkdownStyle {
   return {
@@ -23,12 +28,12 @@ function makeDefaultMarkdownStyle(): MarkdownStyle {
       paddingLeft: 6,
     },
     code: {
-      fontFamily: 'Courier',
+      fontFamily: MONOSPACE_FONT,
       color: 'black',
       backgroundColor: 'lightgray',
     },
     pre: {
-      fontFamily: 'Courier',
+      fontFamily: MONOSPACE_FONT,
       color: 'black',
       backgroundColor: 'lightgray',
     },
