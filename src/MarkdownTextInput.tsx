@@ -23,10 +23,12 @@ function makeDefaultMarkdownStyle(): MarkdownStyle {
       paddingLeft: 6,
     },
     code: {
+      fontFamily: 'Courier',
       color: 'black',
       backgroundColor: 'lightgray',
     },
     pre: {
+      fontFamily: 'Courier',
       color: 'black',
       backgroundColor: 'lightgray',
     },

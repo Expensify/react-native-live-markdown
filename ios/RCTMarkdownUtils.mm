@@ -1,6 +1,7 @@
 #import <react-native-live-markdown/RCTMarkdownUtils.h>
 #import <react/debug/react_native_assert.h>
 #import <React/RCTAssert.h>
+#import <React/RCTFont.h>
 #import <JavaScriptCore/JavaScriptCore.h>
 
 @implementation RCTMarkdownUtils {
@@ -63,24 +64,25 @@
     NSUInteger length = [item[2] unsignedIntegerValue];
     NSRange range = NSMakeRange(location, length);
 
-    if ([type isEqualToString:@"bold"] || [type isEqualToString:@"mention"] || [type isEqualToString:@"h1"] || [type isEqualToString:@"mention-user"] || [type isEqualToString:@"syntax"] || [type isEqualToString:@"italic"] || [type isEqualToString:@"code"] || [type isEqualToString:@"pre"] || [type isEqualToString:@"h1"]) {
+    if ([type isEqualToString:@"bold"] || [type isEqualToString:@"mention"] || [type isEqualToString:@"mention-user"] || [type isEqualToString:@"syntax"] || [type isEqualToString:@"italic"] || [type isEqualToString:@"code"] || [type isEqualToString:@"pre"] || [type isEqualToString:@"h1"]) {
       UIFont *font = [attributedString attribute:NSFontAttributeName atIndex:location effectiveRange:NULL];
-      UIFontDescriptor *fontDescriptor = [font fontDescriptor];
-      UIFontDescriptorSymbolicTraits traits = fontDescriptor.symbolicTraits;
-      if ([type isEqualToString:@"bold"] || [type isEqualToString:@"mention"] || [type isEqualToString:@"h1"] || [type isEqualToString:@"mention-user"] || [type isEqualToString:@"syntax"]) {
-        traits |= UIFontDescriptorTraitBold;
+      if ([type isEqualToString:@"bold"] || [type isEqualToString:@"mention"] || [type isEqualToString:@"mention-user"] || [type isEqualToString:@"syntax"]) {
+        font = [RCTFont updateFont:font withWeight:@"bold"];
       } else if ([type isEqualToString:@"italic"]) {
-        traits |= UIFontDescriptorTraitItalic;
-      } else if ([type isEqualToString:@"code"] || [type isEqualToString:@"pre"]) {
-        traits |= UIFontDescriptorTraitMonoSpace;
+        font = [RCTFont updateFont:font withStyle:@"italic"];
+      } else if ([type isEqualToString:@"code"]) {
+        font = [RCTFont updateFont:font withFamily:_markdownStyle.codeFontFamily];
+      } else if ([type isEqualToString:@"pre"]) {
+        font = [RCTFont updateFont:font withFamily:_markdownStyle.preFontFamily];
+      } else if ([type isEqualToString:@"h1"]) {
+        font = [RCTFont updateFont:font withFamily:nil
+                                              size:[NSNumber numberWithFloat:_markdownStyle.h1FontSize]
+                                            weight:@"bold"
+                                             style:nil
+                                           variant:nil
+                                   scaleMultiplier:0];
       }
-      UIFontDescriptor *newFontDescriptor = [fontDescriptor fontDescriptorWithSymbolicTraits:traits];
-      CGFloat size = 0; // Passing 0 to size keeps the existing size
-      if ([type isEqualToString:@"h1"]) {
-        size = _markdownStyle.h1FontSize;
-      }
-      UIFont *newFont = [UIFont fontWithDescriptor:newFontDescriptor size:size];
-      [attributedString addAttribute:NSFontAttributeName value:newFont range:range];
+      [attributedString addAttribute:NSFontAttributeName value:font range:range];
     }
 
     if ([type isEqualToString:@"syntax"]) {
