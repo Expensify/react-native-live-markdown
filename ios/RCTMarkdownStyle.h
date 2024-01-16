@@ -11,8 +11,10 @@
 @property (nonatomic) CGFloat quoteBorderWidth;
 @property (nonatomic) CGFloat quoteMarginLeft;
 @property (nonatomic) CGFloat quotePaddingLeft;
+@property (nonatomic, nonnull) NSString *codeFontFamily;
 @property (nonatomic, nonnull) UIColor *codeColor;
 @property (nonatomic, nonnull) UIColor *codeBackgroundColor;
+@property (nonatomic, nonnull) NSString *preFontFamily;
 @property (nonatomic, nonnull) UIColor *preColor;
 @property (nonatomic, nonnull) UIColor *preBackgroundColor;
 @property (nonatomic, nonnull) UIColor *mentionHereBackgroundColor;

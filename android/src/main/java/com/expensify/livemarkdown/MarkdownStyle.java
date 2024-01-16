@@ -19,8 +19,10 @@ public class MarkdownStyle {
   private final float mQuoteBorderWidth;
   private final float mQuoteMarginLeft;
   private final float mQuotePaddingLeft;
+  private final String mCodeFontFamily;
   private final int mCodeColor;
   private final int mCodeBackgroundColor;
+  private final String mPreFontFamily;
   private final int mPreColor;
   private final int mPreBackgroundColor;
   private final int mMentionHereBackgroundColor;
@@ -34,8 +36,10 @@ public class MarkdownStyle {
     mQuoteBorderWidth = parseFloat(map, "quote", "borderWidth");
     mQuoteMarginLeft = parseFloat(map, "quote", "marginLeft");
     mQuotePaddingLeft = parseFloat(map, "quote", "paddingLeft");
+    mCodeFontFamily = parseString(map, "code", "fontFamily");
     mCodeColor = parseColor(map, "code", "color", context);
     mCodeBackgroundColor = parseColor(map, "code", "backgroundColor", context);
+    mPreFontFamily = parseString(map, "pre", "fontFamily");
     mPreColor = parseColor(map, "pre", "color", context);
     mPreBackgroundColor = parseColor(map, "pre", "backgroundColor", context);
     mMentionHereBackgroundColor = parseColor(map, "mentionHere", "backgroundColor", context);
@@ -61,6 +65,12 @@ public class MarkdownStyle {
     Objects.requireNonNull(style);
     double value = style.getDouble(prop);
     return (float) value;
+  }
+
+  private static String parseString(@NonNull ReadableMap map, @NonNull String key, @NonNull String prop) {
+    ReadableMap style = map.getMap(key);
+    Objects.requireNonNull(style);
+    return style.getString(prop);
   }
 
   public int getSyntaxColor() {
@@ -91,12 +101,20 @@ public class MarkdownStyle {
     return mQuotePaddingLeft;
   }
 
+  public String getCodeFontFamily() {
+    return mCodeFontFamily;
+  }
+
   public int getCodeColor() {
     return mCodeColor;
   }
 
   public int getCodeBackgroundColor() {
     return mCodeBackgroundColor;
+  }
+
+  public String getPreFontFamily() {
+    return mPreFontFamily;
   }
 
   public int getPreColor() {
