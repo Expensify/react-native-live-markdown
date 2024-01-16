@@ -199,7 +199,7 @@ public class MarkdownUtils {
       case "strikethrough":
         setSpan(ssb, makeStrikethroughSpan(), start, end);
         break;
-      case "mention":
+      case "mention-here":
         setSpan(ssb, makeBoldSpan(), start, end);
         setSpan(ssb, makeMentionHereBackgroundSpan(), start, end);
         break;

@@ -48,9 +48,9 @@ test('strikethrough', () => {
   ]);
 });
 
-describe('mention', () => {
+describe('mention-here', () => {
   test('normal', () => {
-    expect('@here Hello!').toBeParsedAs([['mention', 0, 5]]);
+    expect('@here Hello!').toBeParsedAs([['mention-here', 0, 5]]);
   });
 
   test('with additional letters', () => {
@@ -58,7 +58,7 @@ describe('mention', () => {
   });
 
   test('with punctation marks', () => {
-    expect('@here!').toBeParsedAs([['mention', 0, 5]]);
+    expect('@here!').toBeParsedAs([['mention-here', 0, 5]]);
   });
 });
 
