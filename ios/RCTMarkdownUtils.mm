@@ -107,6 +107,8 @@
       [_quoteRanges addObject:[NSValue valueWithRange:range]];
     } else if ([type isEqualToString:@"pre"]) {
       [attributedString addAttribute:NSForegroundColorAttributeName value:_markdownStyle.preColor range:range];
+      NSRange rangeForBackground = [inputString characterAtIndex:range.location] == '\n' ? NSMakeRange(range.location + 1, range.length - 1) : range;
+      [attributedString addAttribute:NSBackgroundColorAttributeName value:_markdownStyle.preBackgroundColor range:rangeForBackground];
       // TODO: pass background color and ranges to layout manager
     } else if ([type isEqualToString:@"h1"]) {
       NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
