@@ -144,7 +144,7 @@ public class MarkdownUtils {
     return new AbsoluteSizeSpan((int) mMarkdownStyle.getH1FontSize(), true);
   }
 
-  private static Object makeHeadingLineHeightSpan(float lineHeight) {
+  private static Object makeH1LineHeightSpan(float lineHeight) {
     return (LineHeightSpan) (text, start, end, spanstartv, lh, fm) -> {
       fm.top -= lineHeight / 4;
       fm.ascent -= lineHeight / 4;
@@ -152,11 +152,11 @@ public class MarkdownUtils {
   }
 
   private Object makeBlockquoteMarginSpan() {
-    return new QuoteSpan(
-      mMarkdownStyle.getQuoteBorderColor(),
-      mMarkdownStyle.getQuoteBorderWidth(),
-      mMarkdownStyle.getQuoteMarginLeft(),
-      mMarkdownStyle.getQuotePaddingLeft());
+    return new BlockquoteSpan(
+      mMarkdownStyle.getBlockquoteBorderColor(),
+      mMarkdownStyle.getBlockquoteBorderWidth(),
+      mMarkdownStyle.getBlockquoteMarginLeft(),
+      mMarkdownStyle.getBlockquotePaddingLeft());
   }
 
   public void applyMarkdownFormatting(SpannableStringBuilder ssb) {
@@ -199,7 +199,7 @@ public class MarkdownUtils {
       case "strikethrough":
         setSpan(ssb, makeStrikethroughSpan(), start, end);
         break;
-      case "mention":
+      case "mention-here":
         setSpan(ssb, makeBoldSpan(), start, end);
         setSpan(ssb, makeMentionHereBackgroundSpan(), start, end);
         break;
@@ -231,7 +231,7 @@ public class MarkdownUtils {
         CustomLineHeightSpan[] spans = ssb.getSpans(0, ssb.length(), CustomLineHeightSpan.class);
         if (spans.length >= 1) {
           int lineHeight = spans[0].getLineHeight();
-          setSpan(ssb, makeHeadingLineHeightSpan(lineHeight * 1.5f), start, end);
+          setSpan(ssb, makeH1LineHeightSpan(lineHeight * 1.5f), start, end);
         }
         // NOTE: size span must be set after line height span to avoid height jumps
         setSpan(ssb, makeH1FontSizeSpan(), start, end);

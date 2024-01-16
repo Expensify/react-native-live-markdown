@@ -45,9 +45,9 @@ test('strikethrough', () => {
   ]);
 });
 
-describe('mention', () => {
+describe('mention-here', () => {
   test('normal', () => {
-    expect('@here Hello!').toBeParsedAs([['mention', 0, 5]]);
+    expect('@here Hello!').toBeParsedAs([['mention-here', 0, 5]]);
   });
 
   test('with additional letters', () => {
@@ -55,7 +55,7 @@ describe('mention', () => {
   });
 
   test('with punctation marks', () => {
-    expect('@here!').toBeParsedAs([['mention', 0, 5]]);
+    expect('@here!').toBeParsedAs([['mention-here', 0, 5]]);
   });
 });
 
@@ -170,7 +170,7 @@ test('codeblock', () => {
   ]);
 });
 
-describe('quote', () => {
+describe('blockquote', () => {
   test('with single space', () => {
     expect('> Hello world!').toBeParsedAs([
       ['syntax', 0, 1],
@@ -213,7 +213,7 @@ test('separate blockquotes', () => {
   ]);
 });
 
-test('heading', () => {
+test('h1', () => {
   expect('# Hello world').toBeParsedAs([
     ['syntax', 0, 2],
     ['h1', 2, 11],
@@ -237,7 +237,7 @@ test('nested bold and italic', () => {
   ]);
 });
 
-describe('nested heading in blockquote', () => {
+describe('nested h1 in blockquote', () => {
   test('without spaces', () => {
     expect('># Hello world').toBeParsedAs([
       ['syntax', 0, 1],
@@ -290,7 +290,7 @@ describe('trailing whitespace', () => {
     });
   });
 
-  describe('after heading', () => {
+  describe('after h1', () => {
     test('nothing', () => {
       expect('# Hello world').toBeParsedAs([
         ['syntax', 0, 2],
@@ -319,7 +319,7 @@ describe('trailing whitespace', () => {
       ]);
     });
 
-    test('multiple quotes', () => {
+    test('multiple blockquotes', () => {
       expect('> # Hello\n> # world').toBeParsedAs([
         ['syntax', 0, 1],
         ['blockquote', 0, 9],

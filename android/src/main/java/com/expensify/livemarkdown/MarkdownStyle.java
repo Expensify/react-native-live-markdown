@@ -15,10 +15,10 @@ public class MarkdownStyle {
   private final int mSyntaxColor;
   private final int mLinkColor;
   private final float mH1FontSize;
-  private final int mQuoteBorderColor;
-  private final float mQuoteBorderWidth;
-  private final float mQuoteMarginLeft;
-  private final float mQuotePaddingLeft;
+  private final int mBlockquoteBorderColor;
+  private final float mBlockquoteBorderWidth;
+  private final float mBlockquoteMarginLeft;
+  private final float mBlockquotePaddingLeft;
   private final String mCodeFontFamily;
   private final int mCodeColor;
   private final int mCodeBackgroundColor;
@@ -32,10 +32,10 @@ public class MarkdownStyle {
     mSyntaxColor = parseColor(map, "syntax", "color", context);
     mLinkColor = parseColor(map, "link", "color", context);
     mH1FontSize = parseFloat(map, "h1", "fontSize");
-    mQuoteBorderColor = parseColor(map, "quote", "borderColor", context);
-    mQuoteBorderWidth = parseFloat(map, "quote", "borderWidth");
-    mQuoteMarginLeft = parseFloat(map, "quote", "marginLeft");
-    mQuotePaddingLeft = parseFloat(map, "quote", "paddingLeft");
+    mBlockquoteBorderColor = parseColor(map, "blockquote", "borderColor", context);
+    mBlockquoteBorderWidth = parseFloat(map, "blockquote", "borderWidth");
+    mBlockquoteMarginLeft = parseFloat(map, "blockquote", "marginLeft");
+    mBlockquotePaddingLeft = parseFloat(map, "blockquote", "paddingLeft");
     mCodeFontFamily = parseString(map, "code", "fontFamily");
     mCodeColor = parseColor(map, "code", "color", context);
     mCodeBackgroundColor = parseColor(map, "code", "backgroundColor", context);
@@ -85,20 +85,20 @@ public class MarkdownStyle {
     return mH1FontSize;
   }
 
-  public int getQuoteBorderColor() {
-    return mQuoteBorderColor;
+  public int getBlockquoteBorderColor() {
+    return mBlockquoteBorderColor;
   }
 
-  public float getQuoteBorderWidth() {
-    return mQuoteBorderWidth;
+  public float getBlockquoteBorderWidth() {
+    return mBlockquoteBorderWidth;
   }
 
-  public float getQuoteMarginLeft() {
-    return mQuoteMarginLeft;
+  public float getBlockquoteMarginLeft() {
+    return mBlockquoteMarginLeft;
   }
 
-  public float getQuotePaddingLeft() {
-    return mQuotePaddingLeft;
+  public float getBlockquotePaddingLeft() {
+    return mBlockquotePaddingLeft;
   }
 
   public String getCodeFontFamily() {

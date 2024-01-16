@@ -114,7 +114,7 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
         addChildrenWithStyle(node, 'code');
         appendSyntax('`');
       } else if (node.tag === '<mention-here>') {
-        addChildrenWithStyle(node, 'mention');
+        addChildrenWithStyle(node, 'mention-here');
       } else if (node.tag === '<mention-user>') {
         addChildrenWithStyle(node, 'mention-user');
       } else if (node.tag === '<blockquote>') {
