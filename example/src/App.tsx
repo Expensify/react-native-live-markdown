@@ -24,7 +24,8 @@ function getPlatform() {
   if (isWeb()) {
     return 'web';
   }
-  // @ts-ignore it works
+  // @ts-expect-error it works
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return Platform.constants.systemName || Platform.constants.Brand;
 }
 
@@ -39,12 +40,12 @@ function getBundle() {
 function getRuntime() {
   if ('HermesInternal' in global) {
     const version =
-      // @ts-ignore this is fine
+      // @ts-expect-error this is fine
       global.HermesInternal?.getRuntimeProperties?.()['OSS Release Version'];
     return `Hermes (${version})`;
   }
   if ('_v8runtime' in global) {
-    // @ts-ignore this is fine
+    // @ts-expect-error this is fine
     const version = global._v8runtime().version;
     return `V8 (${version})`;
   }

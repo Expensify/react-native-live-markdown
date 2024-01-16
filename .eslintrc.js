@@ -6,10 +6,10 @@ module.exports = {
   },
   extends: [
     'expensify',
-    'plugin:@typescript-eslint/recommended',
-    'prettier',
+    'plugin:@typescript-eslint/recommended-type-checked',
+    'plugin:@typescript-eslint/stylistic-type-checked',
     'plugin:import/typescript',
-    'plugin:prettier/recommended',
+    'prettier',
   ],
   plugins: [
     'react',
@@ -39,23 +39,12 @@ module.exports = {
         "tsx": "never"
       }
    ],
-    'import/no-unresolved': 'error',
+    'import/no-unresolved': 'error', // no in app
     'import/consistent-type-specifier-style': ['error', 'prefer-top-level'],
-    'react/jsx-uses-vars': 'error',
-    'react/jsx-uses-react': 'error',
     'no-use-before-define': 'off',
     '@typescript-eslint/no-use-before-define': 'off', // TODO consider enabling this (currently it reports styles defined at the bottom of the file)
-    '@typescript-eslint/ban-ts-comment': [
-      'error',
-      {
-        'ts-ignore': 'allow-with-description',
-        'ts-expect-error': 'allow-with-description',
-      },
-    ],
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
-    '@typescript-eslint/no-var-requires': 'warn',
-    'eqeqeq': 'error',
-    'no-unreachable': 'error',
+
     '@typescript-eslint/consistent-type-imports': [
       'error',
       { prefer: 'type-imports' },
@@ -66,5 +55,14 @@ module.exports = {
     ],
     'tsdoc/syntax': 'error',
     '@typescript-eslint/no-non-null-assertion': 'off',
+    '@typescript-eslint/array-type': ['error', {default: 'array-simple'}],
+    '@typescript-eslint/consistent-type-definitions': 'off',
+    '@typescript-eslint/no-unsafe-argument': 'off',
+    '@typescript-eslint/no-unsafe-call': 'off',
+    '@typescript-eslint/no-unsafe-member-access': 'off',
+    '@typescript-eslint/no-unsafe-assignment': 'off',
+    'no-underscore-dangle': 'off',
+    'es/no-nullish-coalescing-operators': 'off',
+    'es/no-optional-chaining': 'off',
   },
 };

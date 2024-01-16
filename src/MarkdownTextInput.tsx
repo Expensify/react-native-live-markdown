@@ -74,7 +74,7 @@ function processColorsInMarkdownStyle(input: MarkdownStyle): MarkdownStyle {
         });
     });
 
-    return output;
+    return output as MarkdownStyle;
 }
 
 function processMarkdownStyle(input: PartialMarkdownStyle | undefined): MarkdownStyle {

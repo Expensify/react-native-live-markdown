@@ -1,4 +1,4 @@
-// @ts-ignore - to review how it's implemented in ExpensiMark
+// @ts-expect-error - to review how it's implemented in ExpensiMark
 // eslint-disable-next-line import/no-unresolved
 import {ExpensiMark} from 'expensify-common/lib/ExpensiMark';
 import _ from 'underscore';
@@ -12,7 +12,7 @@ function parseMarkdownToHTML(markdown: string): string {
     const html = parser.replace(markdown, {
         shouldKeepRawInput: true,
     });
-    return html;
+    return html as string;
 }
 
 function parseHTMLToTokens(html: string): Token[] {
@@ -58,7 +58,7 @@ function parseTokensToTree(tokens: Token[]): StackItem {
                 stack.push({tag: payload, children: []});
             }
         } else {
-            throw new Error(`Unknown token type: ${type}`);
+            throw new Error(`Unknown token type: ${type as string}`);
         }
     });
     if (stack.length !== 1) {

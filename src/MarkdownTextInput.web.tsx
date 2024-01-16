@@ -1,3 +1,5 @@
+/* eslint-disable arrow-body-style */
+/* eslint-disable @typescript-eslint/no-empty-interface */
 import {TextInput} from 'react-native';
 
 import React from 'react';
