@@ -144,7 +144,7 @@ public class MarkdownUtils {
     return new AbsoluteSizeSpan((int) mMarkdownStyle.getH1FontSize(), true);
   }
 
-  private static Object makeHeadingLineHeightSpan(float lineHeight) {
+  private static Object makeH1LineHeightSpan(float lineHeight) {
     return (LineHeightSpan) (text, start, end, spanstartv, lh, fm) -> {
       fm.top -= lineHeight / 4;
       fm.ascent -= lineHeight / 4;
@@ -231,7 +231,7 @@ public class MarkdownUtils {
         CustomLineHeightSpan[] spans = ssb.getSpans(0, ssb.length(), CustomLineHeightSpan.class);
         if (spans.length >= 1) {
           int lineHeight = spans[0].getLineHeight();
-          setSpan(ssb, makeHeadingLineHeightSpan(lineHeight * 1.5f), start, end);
+          setSpan(ssb, makeH1LineHeightSpan(lineHeight * 1.5f), start, end);
         }
         // NOTE: size span must be set after line height span to avoid height jumps
         setSpan(ssb, makeH1FontSizeSpan(), start, end);

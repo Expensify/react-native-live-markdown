@@ -220,7 +220,7 @@ test('separate blockquotes', () => {
   ]);
 });
 
-test('heading', () => {
+test('h1', () => {
   expect('# Hello world').toBeParsedAs([
     ['syntax', 0, 2],
     ['h1', 2, 11],
@@ -244,7 +244,7 @@ test('nested bold and italic', () => {
   ]);
 });
 
-describe('nested heading in blockquote', () => {
+describe('nested h1 in blockquote', () => {
   test('without spaces', () => {
     expect('># Hello world').toBeParsedAs([
       ['syntax', 0, 1],
@@ -297,7 +297,7 @@ describe('trailing whitespace', () => {
     });
   });
 
-  describe('after heading', () => {
+  describe('after h1', () => {
     test('nothing', () => {
       expect('# Hello world').toBeParsedAs([
         ['syntax', 0, 2],
