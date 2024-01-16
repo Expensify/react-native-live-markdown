@@ -9,10 +9,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) UIColor *syntaxColor;
 @property (nonatomic) UIColor *linkColor;
 @property (nonatomic) CGFloat h1FontSize;
-@property (nonatomic) UIColor *quoteBorderColor;
-@property (nonatomic) CGFloat quoteBorderWidth;
-@property (nonatomic) CGFloat quoteMarginLeft;
-@property (nonatomic) CGFloat quotePaddingLeft;
+@property (nonatomic) UIColor *blockquoteBorderColor;
+@property (nonatomic) CGFloat blockquoteBorderWidth;
+@property (nonatomic) CGFloat blockquoteMarginLeft;
+@property (nonatomic) CGFloat blockquotePaddingLeft;
 @property (nonatomic) NSString *codeFontFamily;
 @property (nonatomic) UIColor *codeColor;
 @property (nonatomic) UIColor *codeBackgroundColor;

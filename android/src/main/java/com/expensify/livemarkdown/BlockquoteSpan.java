@@ -7,13 +7,13 @@ import android.text.style.LeadingMarginSpan;
 
 import com.facebook.react.uimanager.PixelUtil;
 
-public class QuoteSpan implements LeadingMarginSpan {
+public class BlockquoteSpan implements LeadingMarginSpan {
   private final int borderColor;
   private final float borderWidth;
   private final float marginLeft;
   private final float paddingLeft;
 
-  public QuoteSpan(int borderColor, float borderWidth, float marginLeft, float paddingLeft) {
+  public BlockquoteSpan(int borderColor, float borderWidth, float marginLeft, float paddingLeft) {
     this.borderColor = borderColor;
     this.borderWidth = PixelUtil.toPixelFromDIP(borderWidth);
     this.marginLeft = PixelUtil.toPixelFromDIP(marginLeft);

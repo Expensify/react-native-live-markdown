@@ -13,7 +13,7 @@ export interface MarkdownStyle {
   h1: {
     fontSize: Float;
   };
-  quote: {
+  blockquote: {
     borderColor: ColorValue;
     borderWidth: Float;
     marginLeft: Float;

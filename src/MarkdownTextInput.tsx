@@ -21,7 +21,7 @@ function makeDefaultMarkdownStyle(): MarkdownStyle {
     h1: {
       fontSize: 25,
     },
-    quote: {
+    blockquote: {
       borderColor: 'gray',
       borderWidth: 6,
       marginLeft: 6,
