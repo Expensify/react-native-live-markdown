@@ -18,6 +18,14 @@
   return self;
 }
 
+- (instancetype)initWithTextView:(RCTTextView *)textView
+{
+  if (self = [super init]) {
+    _textView = textView;
+  }
+  return self;
+}
+
 - (NSAttributedString *)parseMarkdown:(nullable NSAttributedString *)input
 {
   RCTAssertMainQueue();
@@ -46,7 +54,13 @@
   JSValue *result = [function callWithArguments:@[inputString]];
   NSArray *ranges = [result toArray];
 
-  NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:inputString attributes:_backedTextInputView.defaultTextAttributes];
+//  NSDictionary<NSAttributedStringKey, id> *defaultTextAttributes = _backedTextInputView.defaultTextAttributes;
+//  if (defaultTextAttributes == nil) {
+//    defaultTextAttributes = @{};
+//  }
+//  assert(defaultTextAttributes != nil);
+//  NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:inputString attributes:defaultTextAttributes];
+  NSMutableAttributedString *attributedString = [input mutableCopy];
   [attributedString beginEditing];
 
   // If the attributed string ends with underlined text, blurring the single-line input imprints the underline style across the whole string.
@@ -80,7 +94,9 @@
         size = _markdownStyle.h1FontSize;
       }
       UIFont *newFont = [UIFont fontWithDescriptor:newFontDescriptor size:size];
-      [attributedString addAttribute:NSFontAttributeName value:newFont range:range];
+      if (newFont != nil) {
+        [attributedString addAttribute:NSFontAttributeName value:newFont range:range];
+      }
     }
 
     if ([type isEqualToString:@"syntax"]) {

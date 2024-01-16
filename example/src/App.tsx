@@ -1,8 +1,11 @@
 import * as React from 'react';
 
 import { Button, Platform, StyleSheet, Text, View } from 'react-native';
+import {
+  MarkdownText,
+  MarkdownTextInput,
+} from '@expensify/react-native-live-markdown';
 
-import { MarkdownTextInput } from '@expensify/react-native-live-markdown';
 import type { TextInput } from 'react-native';
 
 const DEFAULT_TEXT = [
@@ -112,7 +115,7 @@ export default function App() {
         onChangeText={setValue}
         style={styles.input}
       /> */}
-      <Text style={styles.text}>{JSON.stringify(value)}</Text>
+      <MarkdownText style={styles.text}>{value}</MarkdownText>
       <Button title="Focus" onPress={() => ref.current?.focus()} />
       <Button title="Blur" onPress={() => ref.current?.blur()} />
       <Button title="Reset" onPress={() => setValue(DEFAULT_TEXT)} />
@@ -140,8 +143,7 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
   text: {
-    fontFamily: 'Courier New',
     marginTop: 10,
-    height: 100,
+    width: 300,
   },
 });
