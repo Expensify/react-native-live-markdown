@@ -8,111 +8,111 @@ import MarkdownTextInputDecoratorViewNativeComponent from './MarkdownTextInputDe
 type MarkdownStyle = MarkdownTextInputDecoractorView.MarkdownStyle;
 
 function makeDefaultMarkdownStyle(): MarkdownStyle {
-    return {
-        syntax: {
-            color: 'gray',
-        },
-        link: {
-            color: 'blue',
-        },
-        h1: {
-            fontSize: 25,
-        },
-        quote: {
-            borderColor: 'gray',
-            borderWidth: 6,
-            marginLeft: 6,
-            paddingLeft: 6,
-        },
-        code: {
-            color: 'black',
-            backgroundColor: 'lightgray',
-        },
-        pre: {
-            color: 'black',
-            backgroundColor: 'lightgray',
-        },
-        mentionHere: {
-            backgroundColor: 'yellow',
-        },
-        mentionUser: {
-            backgroundColor: 'cyan',
-        },
-    };
+  return {
+    syntax: {
+      color: 'gray',
+    },
+    link: {
+      color: 'blue',
+    },
+    h1: {
+      fontSize: 25,
+    },
+    quote: {
+      borderColor: 'gray',
+      borderWidth: 6,
+      marginLeft: 6,
+      paddingLeft: 6,
+    },
+    code: {
+      color: 'black',
+      backgroundColor: 'lightgray',
+    },
+    pre: {
+      color: 'black',
+      backgroundColor: 'lightgray',
+    },
+    mentionHere: {
+      backgroundColor: 'yellow',
+    },
+    mentionUser: {
+      backgroundColor: 'cyan',
+    },
+  };
 }
 
 type PartialMarkdownStyle = Partial<{
-    [K in keyof MarkdownStyle]: Partial<MarkdownStyle[K]>;
+  [K in keyof MarkdownStyle]: Partial<MarkdownStyle[K]>;
 }>;
 
 function mergeMarkdownStyleWithDefault(input: PartialMarkdownStyle | undefined): MarkdownStyle {
-    const output = makeDefaultMarkdownStyle();
+  const output = makeDefaultMarkdownStyle();
 
-    if (input !== undefined) {
-        Object.keys(input).forEach((key) => {
-            if (!(key in output)) {
-                return;
-            }
-            Object.assign(output[key as keyof MarkdownStyle], input[key as keyof MarkdownStyle]);
-        });
-    }
+  if (input !== undefined) {
+    Object.keys(input).forEach((key) => {
+      if (!(key in output)) {
+        return;
+      }
+      Object.assign(output[key as keyof MarkdownStyle], input[key as keyof MarkdownStyle]);
+    });
+  }
 
-    return output;
+  return output;
 }
 
 function processColorsInMarkdownStyle(input: MarkdownStyle): MarkdownStyle {
-    const output = JSON.parse(JSON.stringify(input));
+  const output = JSON.parse(JSON.stringify(input));
 
-    Object.keys(output).forEach((key) => {
-        const obj = output[key];
-        Object.keys(obj).forEach((prop) => {
-            // TODO: use ReactNativeStyleAttributes from 'react-native/Libraries/Components/View/ReactNativeStyleAttributes'
-            if (!(prop === 'color' || prop.endsWith('Color'))) {
-                return;
-            }
-            obj[prop] = processColor(obj[prop]);
-        });
+  Object.keys(output).forEach((key) => {
+    const obj = output[key];
+    Object.keys(obj).forEach((prop) => {
+      // TODO: use ReactNativeStyleAttributes from 'react-native/Libraries/Components/View/ReactNativeStyleAttributes'
+      if (!(prop === 'color' || prop.endsWith('Color'))) {
+        return;
+      }
+      obj[prop] = processColor(obj[prop]);
     });
+  });
 
-    return output as MarkdownStyle;
+  return output as MarkdownStyle;
 }
 
 function processMarkdownStyle(input: PartialMarkdownStyle | undefined): MarkdownStyle {
-    return processColorsInMarkdownStyle(mergeMarkdownStyleWithDefault(input));
+  return processColorsInMarkdownStyle(mergeMarkdownStyleWithDefault(input));
 }
 
 interface MarkdownTextInputProps extends TextInputProps {
-    markdownStyle?: PartialMarkdownStyle;
+  markdownStyle?: PartialMarkdownStyle;
 }
 
 const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>((props, ref) => {
-    const IS_FABRIC = 'nativeFabricUIManager' in global;
+  const IS_FABRIC = 'nativeFabricUIManager' in global;
 
-    const markdownStyle = React.useMemo(() => processMarkdownStyle(props.markdownStyle), [props.markdownStyle]);
+  const markdownStyle = React.useMemo(() => processMarkdownStyle(props.markdownStyle), [props.markdownStyle]);
 
-    return (
-        <>
-            <TextInput
-                {...props}
-                ref={ref}
-            />
-            <MarkdownTextInputDecoratorViewNativeComponent
-                style={IS_FABRIC ? styles.farAway : styles.displayNone}
-                markdownStyle={markdownStyle}
-            />
-        </>
-    );
+  return (
+    <>
+      <TextInput
+        {...props}
+        ref={ref}
+      />
+      <MarkdownTextInputDecoratorViewNativeComponent
+        style={IS_FABRIC ? styles.farAway : styles.displayNone}
+        markdownStyle={markdownStyle}
+      />
+    </>
+  );
 });
 
 const styles = StyleSheet.create({
-    displayNone: {
-        display: 'none',
-    },
-    farAway: {
-        position: 'absolute',
-        top: 1e8,
-        left: 1e8,
-    },
+  displayNone: {
+    display: 'none',
+  },
+  farAway: {
+    position: 'absolute',
+    top: 1e8,
+    left: 1e8,
+  },
 });
 
 export type {PartialMarkdownStyle as MarkdownStyle, MarkdownTextInputProps};

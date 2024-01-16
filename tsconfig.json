@@ -1,31 +1,31 @@
 {
-    "compilerOptions": {
-        "rootDir": ".",
-        "paths": {
-            "@expensify/react-native-live-markdown": ["./src/index"]
-        },
-        "allowUnreachableCode": false,
-        "allowUnusedLabels": false,
-        "esModuleInterop": true,
-        "forceConsistentCasingInFileNames": true,
-        "jsx": "react",
-        "lib": ["esnext"],
-        "module": "esnext",
-        "moduleResolution": "node",
-        "noFallthroughCasesInSwitch": true,
-        "noImplicitReturns": true,
-        "noImplicitUseStrict": false,
-        "noStrictGenericChecks": false,
-        "noUncheckedIndexedAccess": true,
-        "noUnusedLocals": true,
-        "noUnusedParameters": true,
-        "resolveJsonModule": true,
-        "skipLibCheck": true,
-        "strict": true,
-        "target": "esnext",
-        "verbatimModuleSyntax": true,
-        "typeRoots": ["node_modules/@types"]
+  "compilerOptions": {
+    "rootDir": ".",
+    "paths": {
+      "@expensify/react-native-live-markdown": ["./src/index"]
     },
-    "include": ["src/**/*", "types/global.d.ts"],
-    "exclude": ["**/node_modules/**/*", "parser/**/*", "**/lib/**/*", "**/__tests__/**/*", "example/src/**/*", "WebExample/**/*"]
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "jsx": "react",
+    "lib": ["esnext"],
+    "module": "esnext",
+    "moduleResolution": "node",
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "noImplicitUseStrict": false,
+    "noStrictGenericChecks": false,
+    "noUncheckedIndexedAccess": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "target": "esnext",
+    "verbatimModuleSyntax": true,
+    "typeRoots": ["node_modules/@types"]
+  },
+  "include": ["src/**/*", "types/global.d.ts"],
+  "exclude": ["**/node_modules/**/*", "parser/**/*", "**/lib/**/*", "**/__tests__/**/*", "example/src/**/*", "WebExample/**/*"]
 }
