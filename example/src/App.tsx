@@ -26,7 +26,7 @@ function getPlatform() {
   }
   // @ts-expect-error it works
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-  return Platform.constants.systemName || Platform.constants.Brand;
+  return Platform.constants.systemName ?? Platform.constants.Brand;
 }
 
 function getPlatformVersion() {

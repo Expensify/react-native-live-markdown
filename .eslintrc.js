@@ -4,6 +4,9 @@ module.exports = {
     project: true,
     tsconfigRootDir: __dirname,
   },
+  env: {
+    jest: true,
+  },
   extends: [
     'expensify',
     'plugin:@typescript-eslint/recommended-type-checked',
@@ -46,7 +49,6 @@ module.exports = {
       "error",
       "ignorePackages",
       {
-        "js": "never",
         "jsx": "never",
         "ts": "never",
         "tsx": "never"
