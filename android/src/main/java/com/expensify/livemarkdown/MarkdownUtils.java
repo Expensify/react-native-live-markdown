@@ -62,8 +62,6 @@ public class MarkdownUtils {
 
   private String mPrevOutput;
 
-  private final List<MarkdownSpan> mSpans = new LinkedList<>();
-
   private MarkdownStyle mMarkdownStyle;
 
   public void setMarkdownStyle(@NonNull MarkdownStyle markdownStyle) {
@@ -161,15 +159,14 @@ public class MarkdownUtils {
   }
 
   private void setSpan(SpannableStringBuilder ssb, MarkdownSpan span, int start, int end) {
-    mSpans.add(span);
-    ssb.setSpan(span, start, end, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+    ssb.setSpan(span, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
   }
 
   private void removeSpans(SpannableStringBuilder ssb) {
     // We shouldn't use `removeSpans()` because it also removes SpellcheckSpan, SuggestionSpan etc.
-    for (MarkdownSpan span : mSpans) {
+    MarkdownSpan[] spans = ssb.getSpans(0, ssb.length(), MarkdownSpan.class);
+    for (MarkdownSpan span : spans) {
       ssb.removeSpan(span);
     }
-    mSpans.clear();
   }
 }
