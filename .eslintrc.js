@@ -10,6 +10,7 @@ module.exports = {
     'plugin:@typescript-eslint/stylistic-type-checked',
     'plugin:import/typescript',
     'prettier',
+    'plugin:prettier/recommended',
   ],
   plugins: [
     'react',
@@ -25,6 +26,18 @@ module.exports = {
   },
   root: true,
   rules: {
+    'prettier/prettier': [
+      'error',
+      {
+        tabWidth: 2,
+        singleQuote: true,
+        trailingComma: 'all',
+        bracketSpacing: false,
+        arrowParens: 'always',
+        printWidth: 190,
+        singleAttributePerLine: true,
+      },
+    ],
     'rulesdir/prefer-underscore-method': 'off',
     'react/jsx-props-no-spreading': 'off',
     'react/require-default-props': 'off',
@@ -39,7 +52,7 @@ module.exports = {
         "tsx": "never"
       }
    ],
-    'import/no-unresolved': 'error', // no in app
+    'import/no-unresolved': 'error',
     'import/consistent-type-specifier-style': ['error', 'prefer-top-level'],
     'no-use-before-define': 'off',
     '@typescript-eslint/no-use-before-define': 'off', // TODO consider enabling this (currently it reports styles defined at the bottom of the file)

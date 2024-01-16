@@ -1,8 +1,18 @@
 **/node_modules/*
-**/react-native-live-markdown-parser.js
-lib/**/*
-*.test.*
+
+# any js file inside android and ios folders
+android/**/*.js
+ios/**/*.js
+
+# Ignore all files inside subproject folders 
 example/**/*
-*.config.js
+WebExample/**/*
+parser/**/*
+
+# Output of the build process & scripts
+lib/**/*
+scripts/**/*
+
+babel.config.js
 .eslintrc.js
 .prettierrc.js
