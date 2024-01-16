@@ -49,12 +49,12 @@
 
     _linkColor = [RCTConvert UIColor:json[@"link"][@"color"]];
 
-    _h1FontSize = [json[@"h1"][@"fontSize"] floatValue];
+    _h1FontSize = [RCTConvert CGFloat:json[@"h1"][@"fontSize"]];
 
     _quoteBorderColor = [RCTConvert UIColor:json[@"quote"][@"borderColor"]];
-    _quoteBorderWidth = [json[@"quote"][@"borderWidth"] floatValue];
-    _quoteMarginLeft = [json[@"quote"][@"marginLeft"] floatValue];
-    _quotePaddingLeft = [json[@"quote"][@"paddingLeft"] floatValue];
+    _quoteBorderWidth = [RCTConvert CGFloat:json[@"quote"][@"borderWidth"]];
+    _quoteMarginLeft = [RCTConvert CGFloat:json[@"quote"][@"marginLeft"]];
+    _quotePaddingLeft = [RCTConvert CGFloat:json[@"quote"][@"paddingLeft"]];
 
     _codeFontFamily = [RCTConvert NSString:json[@"code"][@"fontFamily"]];
     _codeColor = [RCTConvert UIColor:json[@"code"][@"color"]];
