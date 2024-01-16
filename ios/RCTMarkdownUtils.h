@@ -4,7 +4,7 @@
 @interface RCTMarkdownUtils : NSObject
 
 @property (nonatomic) RCTMarkdownStyle *markdownStyle;
-@property (nonatomic) NSMutableArray<NSValue *> *quoteRanges;
+@property (nonatomic) NSMutableArray<NSValue *> *blockquoteRanges;
 @property (weak, nonatomic) UIView<RCTBackedTextInputViewProtocol> *backedTextInputView;
 
 - (instancetype)initWithBackedTextInputView:(UIView<RCTBackedTextInputViewProtocol> *)backedTextInputView;

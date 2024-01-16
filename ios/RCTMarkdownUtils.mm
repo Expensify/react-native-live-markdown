@@ -55,7 +55,7 @@
   // This is a workaround that applies the NSUnderlineStyleNone to the string before iterating over ranges which resolves this problem.
   [attributedString addAttribute:NSUnderlineStyleAttributeName value:[NSNumber numberWithInteger:NSUnderlineStyleNone] range:NSMakeRange(0, attributedString.length)];
 
-  _quoteRanges = [NSMutableArray new];
+  _blockquoteRanges = [NSMutableArray new];
 
   [ranges enumerateObjectsUsingBlock:^(id _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
     NSArray *item = obj;
@@ -101,12 +101,12 @@
       [attributedString addAttribute:NSUnderlineStyleAttributeName value:[NSNumber numberWithInteger:NSUnderlineStyleSingle] range:range];
       [attributedString addAttribute:NSForegroundColorAttributeName value:_markdownStyle.linkColor range:range];
     } else if ([type isEqualToString:@"blockquote"]) {
-      CGFloat indent = _markdownStyle.quoteMarginLeft + _markdownStyle.quoteBorderWidth + _markdownStyle.quotePaddingLeft;
+      CGFloat indent = _markdownStyle.blockquoteMarginLeft + _markdownStyle.blockquoteBorderWidth + _markdownStyle.blockquotePaddingLeft;
       NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
       paragraphStyle.firstLineHeadIndent = indent;
       paragraphStyle.headIndent = indent;
       [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:range];
-      [_quoteRanges addObject:[NSValue valueWithRange:range]];
+      [_blockquoteRanges addObject:[NSValue valueWithRange:range]];
     } else if ([type isEqualToString:@"pre"]) {
       [attributedString addAttribute:NSForegroundColorAttributeName value:_markdownStyle.preColor range:range];
       NSRange rangeForBackground = [inputString characterAtIndex:range.location] == '\n' ? NSMakeRange(range.location + 1, range.length - 1) : range;

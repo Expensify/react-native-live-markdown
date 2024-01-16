@@ -152,11 +152,11 @@ public class MarkdownUtils {
   }
 
   private Object makeBlockquoteMarginSpan() {
-    return new QuoteSpan(
-      mMarkdownStyle.getQuoteBorderColor(),
-      mMarkdownStyle.getQuoteBorderWidth(),
-      mMarkdownStyle.getQuoteMarginLeft(),
-      mMarkdownStyle.getQuotePaddingLeft());
+    return new BlockquoteSpan(
+      mMarkdownStyle.getBlockquouoteBorderColor(),
+      mMarkdownStyle.getBlockquoteBorderWidth(),
+      mMarkdownStyle.getBlockquoteMarginLeft(),
+      mMarkdownStyle.getBlockquotePaddingLeft());
   }
 
   public void applyMarkdownFormatting(SpannableStringBuilder ssb) {

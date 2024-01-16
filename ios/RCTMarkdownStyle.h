@@ -7,10 +7,10 @@
 @property (nonatomic, nonnull) UIColor *syntaxColor;
 @property (nonatomic, nonnull) UIColor *linkColor;
 @property (nonatomic) CGFloat h1FontSize;
-@property (nonatomic, nonnull) UIColor *quoteBorderColor;
-@property (nonatomic) CGFloat quoteBorderWidth;
-@property (nonatomic) CGFloat quoteMarginLeft;
-@property (nonatomic) CGFloat quotePaddingLeft;
+@property (nonatomic, nonnull) UIColor *blockquoteBorderColor;
+@property (nonatomic) CGFloat blockquoteBorderWidth;
+@property (nonatomic) CGFloat blockquoteMarginLeft;
+@property (nonatomic) CGFloat blockquotePaddingLeft;
 @property (nonatomic, nonnull) NSString *codeFontFamily;
 @property (nonatomic, nonnull) UIColor *codeColor;
 @property (nonatomic, nonnull) UIColor *codeBackgroundColor;

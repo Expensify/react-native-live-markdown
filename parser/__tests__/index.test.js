@@ -177,7 +177,7 @@ test('codeblock', () => {
   ]);
 });
 
-describe('quote', () => {
+describe('blockquote', () => {
   test('with single space', () => {
     expect('> Hello world!').toBeParsedAs([
       ['syntax', 0, 1],
@@ -326,7 +326,7 @@ describe('trailing whitespace', () => {
       ]);
     });
 
-    test('multiple quotes', () => {
+    test('multiple blockquotes', () => {
       expect('> # Hello\n> # world').toBeParsedAs([
         ['syntax', 0, 1],
         ['blockquote', 0, 9],

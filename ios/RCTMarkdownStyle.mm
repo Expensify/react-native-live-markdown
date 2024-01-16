@@ -19,10 +19,10 @@
 
     _h1FontSize = style.h1.fontSize;
 
-    _quoteBorderColor = RCTUIColorFromSharedColor(style.quote.borderColor);
-    _quoteBorderWidth = style.quote.borderWidth;
-    _quoteMarginLeft = style.quote.marginLeft;
-    _quotePaddingLeft = style.quote.paddingLeft;
+    _blockquoteBorderColor = RCTUIColorFromSharedColor(style.blockquote.borderColor);
+    _blockquoteBorderWidth = style.blockquote.borderWidth;
+    _blockquoteMarginLeft = style.blockquote.marginLeft;
+    _blockquotePaddingLeft = style.blockquote.paddingLeft;
 
     _codeFontFamily = RCTNSStringFromString(style.code.fontFamily);
     _codeColor = RCTUIColorFromSharedColor(style.code.color);
@@ -51,10 +51,10 @@
 
     _h1FontSize = [json[@"h1"][@"fontSize"] floatValue];
 
-    _quoteBorderColor = [RCTConvert UIColor:json[@"quote"][@"borderColor"]];
-    _quoteBorderWidth = [json[@"quote"][@"borderWidth"] floatValue];
-    _quoteMarginLeft = [json[@"quote"][@"marginLeft"] floatValue];
-    _quotePaddingLeft = [json[@"quote"][@"paddingLeft"] floatValue];
+    _blockquoteBorderColor = [RCTConvert UIColor:json[@"blockquote"][@"borderColor"]];
+    _blockquoteBorderWidth = [json[@"blockquote"][@"borderWidth"] floatValue];
+    _blockquoteMarginLeft = [json[@"blockquote"][@"marginLeft"] floatValue];
+    _blockquotePaddingLeft = [json[@"blockquote"][@"paddingLeft"] floatValue];
 
     _codeFontFamily = [RCTConvert NSString:json[@"code"][@"fontFamily"]];
     _codeColor = [RCTConvert UIColor:json[@"code"][@"color"]];
