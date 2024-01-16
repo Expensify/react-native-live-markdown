@@ -153,7 +153,7 @@ public class MarkdownUtils {
 
   private Object makeBlockquoteMarginSpan() {
     return new BlockquoteSpan(
-      mMarkdownStyle.getBlockquouoteBorderColor(),
+      mMarkdownStyle.getBlockquoteBorderColor(),
       mMarkdownStyle.getBlockquoteBorderWidth(),
       mMarkdownStyle.getBlockquoteMarginLeft(),
       mMarkdownStyle.getBlockquotePaddingLeft());
