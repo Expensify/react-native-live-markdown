@@ -42,7 +42,7 @@
 
 #else
 
-- (instancetype)initWithDictionary:(nonnull NSDictionary *)json
+- (instancetype)initWithDictionary:(NSDictionary *)json
 {
   if (self = [super init]) {
     _syntaxColor = [RCTConvert UIColor:json[@"syntax"][@"color"]];
