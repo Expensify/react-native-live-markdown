@@ -108,8 +108,16 @@ public class MarkdownUtils {
     return new ForegroundColorSpan(mMarkdownStyle.getLinkColor());
   }
 
+  private Object makeCodeFontFamilySpan() {
+    return new TypefaceSpan(mMarkdownStyle.getCodeFontFamily());
+  }
+
   private Object makeCodeColorSpan() {
     return new ForegroundColorSpan(mMarkdownStyle.getCodeColor());
+  }
+
+  private Object makePreFontFamilySpan() {
+    return new TypefaceSpan(mMarkdownStyle.getPreFontFamily());
   }
 
   private Object makePreColorSpan() {
@@ -209,12 +217,12 @@ public class MarkdownUtils {
         setSpan(ssb, makeLinkColorSpan(), start, end);
         break;
       case "code":
-        setSpan(ssb, makeMonospaceSpan(), start, end);
+        setSpan(ssb, makeCodeFontFamilySpan(), start, end);
         setSpan(ssb, makeCodeColorSpan(), start, end);
         setSpan(ssb, makeCodeBackgroundSpan(), start, end);
         break;
       case "pre":
-        setSpan(ssb, makeMonospaceSpan(), start, end);
+        setSpan(ssb, makePreFontFamilySpan(), start, end);
         setSpan(ssb, makePreColorSpan(), start, end);
         setSpan(ssb, makePreBackgroundSpan(), start, end);
         break;

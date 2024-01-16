@@ -24,9 +24,11 @@
     _quoteMarginLeft = style.quote.marginLeft;
     _quotePaddingLeft = style.quote.paddingLeft;
 
+    _codeFontFamily = RCTNSStringFromString(style.code.fontFamily);
     _codeColor = RCTUIColorFromSharedColor(style.code.color);
     _codeBackgroundColor = RCTUIColorFromSharedColor(style.code.backgroundColor);
 
+    _preFontFamily = RCTNSStringFromString(style.pre.fontFamily);
     _preColor = RCTUIColorFromSharedColor(style.pre.color);
     _preBackgroundColor = RCTUIColorFromSharedColor(style.pre.backgroundColor);
 
@@ -54,9 +56,11 @@
     _quoteMarginLeft = [json[@"quote"][@"marginLeft"] floatValue];
     _quotePaddingLeft = [json[@"quote"][@"paddingLeft"] floatValue];
 
+    _codeFontFamily = [RCTConvert NSString:json[@"code"][@"fontFamily"]];
     _codeColor = [RCTConvert UIColor:json[@"code"][@"color"]];
     _codeBackgroundColor = [RCTConvert UIColor:json[@"code"][@"backgroundColor"]];
 
+    _preFontFamily = [RCTConvert NSString:json[@"pre"][@"fontFamily"]];
     _preColor = [RCTConvert UIColor:json[@"pre"][@"color"]];
     _preBackgroundColor = [RCTConvert UIColor:json[@"pre"][@"backgroundColor"]];
 

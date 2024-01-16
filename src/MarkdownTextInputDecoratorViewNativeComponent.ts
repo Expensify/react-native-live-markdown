@@ -20,10 +20,12 @@ export interface MarkdownStyle {
     paddingLeft: Float;
   };
   code: {
+    fontFamily: string;
     color: ColorValue;
     backgroundColor: ColorValue;
   };
   pre: {
+    fontFamily: string;
     color: ColorValue;
     backgroundColor: ColorValue;
   };
