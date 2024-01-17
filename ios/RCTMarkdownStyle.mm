@@ -51,10 +51,10 @@
 
     _h1FontSize = [RCTConvert CGFloat:json[@"h1"][@"fontSize"]];
 
-    _quoteBorderColor = [RCTConvert UIColor:json[@"blockquote"][@"borderColor"]];
-    _quoteBorderWidth = [RCTConvert CGFloat:json[@"blockquote"][@"borderWidth"]];
-    _quoteMarginLeft = [RCTConvert CGFloat:json[@"blockquote"][@"marginLeft"]];
-    _quotePaddingLeft = [RCTConvert CGFloat:json[@"blockquote"][@"paddingLeft"]];
+    _blockquoteBorderColor = [RCTConvert UIColor:json[@"blockquote"][@"borderColor"]];
+    _blockquoteBorderWidth = [RCTConvert CGFloat:json[@"blockquote"][@"borderWidth"]];
+    _blockquoteMarginLeft = [RCTConvert CGFloat:json[@"blockquote"][@"marginLeft"]];
+    _blockquotePaddingLeft = [RCTConvert CGFloat:json[@"blockquote"][@"paddingLeft"]];
 
     _codeFontFamily = [RCTConvert NSString:json[@"code"][@"fontFamily"]];
     _codeColor = [RCTConvert UIColor:json[@"code"][@"color"]];
