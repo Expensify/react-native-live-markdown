@@ -109,9 +109,9 @@ Currently, `react-native-live-markdown` supports only [ExpensiMark](https://gith
 
 `MarkdownTextInput` inherits all props of React Native's `TextInput` component.
 
-| Prop            | Type            | Default     | Note                                                                                                                                                 |
-| --------------- | --------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `markdownStyle` | `MarkdownStyle` | `undefined` | Adds custom styling to the contents. See [README](https://github.com/expensify/react-native-live-markdown/blob/main/README.md) for more information. |
+| Prop            | Type            | Default     | Note                                                                                                                                                                                                             |
+| --------------- | --------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `markdownStyle` | `MarkdownStyle` | `undefined` | Adds custom styling to the contents. The provided value is merged with the default style object. See [README](https://github.com/expensify/react-native-live-markdown/blob/main/README.md) for more information. |
 
 ## Compatibility
 
