@@ -10,7 +10,8 @@ import androidx.annotation.ColorInt;
 import com.facebook.react.uimanager.PixelUtil;
 
 public class MarkdownBlockquoteSpan implements MarkdownSpan, LeadingMarginSpan {
-  private final @ColorInt int borderColor;
+  @ColorInt
+  private final int borderColor;
   private final float borderWidth;
   private final float marginLeft;
   private final float paddingLeft;
