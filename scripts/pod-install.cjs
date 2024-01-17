@@ -10,17 +10,25 @@ module.exports = {
             return;
           }
 
-          if (options && (options.mode === 'update-lockfile' || options.mode === 'skip-build')) {
+          if (
+            options &&
+            (options.mode === 'update-lockfile' ||
+              options.mode === 'skip-build')
+          ) {
             return;
           }
 
-          const result = child_process.spawnSync('yarn', ['pod-install', 'example/ios'], {
-            cwd: project.cwd,
-            env: process.env,
-            stdio: 'inherit',
-            encoding: 'utf-8',
-            shell: true,
-          });
+          const result = child_process.spawnSync(
+            'yarn',
+            ['pod-install', 'example/ios'],
+            {
+              cwd: project.cwd,
+              env: process.env,
+              stdio: 'inherit',
+              encoding: 'utf-8',
+              shell: true,
+            }
+          );
 
           if (result.status !== 0) {
             throw new Error('Failed to run pod-install');
