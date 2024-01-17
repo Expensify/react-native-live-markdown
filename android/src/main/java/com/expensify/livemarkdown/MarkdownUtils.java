@@ -3,17 +3,8 @@ package com.expensify.livemarkdown;
 import static com.facebook.infer.annotation.ThreadConfined.UI;
 
 import android.content.res.AssetManager;
-import android.graphics.Typeface;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
-import android.text.style.AbsoluteSizeSpan;
-import android.text.style.BackgroundColorSpan;
-import android.text.style.ForegroundColorSpan;
-import android.text.style.LineHeightSpan;
-import android.text.style.StrikethroughSpan;
-import android.text.style.StyleSpan;
-import android.text.style.TypefaceSpan;
-import android.text.style.UnderlineSpan;
 
 import androidx.annotation.NonNull;
 
@@ -27,8 +18,6 @@ import org.json.JSONException;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Objects;
 
 public class MarkdownUtils {
@@ -71,92 +60,10 @@ public class MarkdownUtils {
 
   private String mPrevOutput;
 
-  private final List<Object> mSpans = new LinkedList<>();
-
   private MarkdownStyle mMarkdownStyle;
 
   public void setMarkdownStyle(@NonNull MarkdownStyle markdownStyle) {
     mMarkdownStyle = markdownStyle;
-  }
-
-  // Spans
-  private static Object makeBoldSpan() {
-    return new StyleSpan(Typeface.BOLD);
-  }
-
-  private static Object makeItalicSpan() {
-    return new StyleSpan(Typeface.ITALIC);
-  }
-
-  private static Object makeUnderlineSpan() {
-    return new UnderlineSpan();
-  }
-
-  private static Object makeStrikethroughSpan() {
-    return new StrikethroughSpan();
-  }
-
-  private static Object makeMonospaceSpan() {
-    return new TypefaceSpan("monospace");
-  }
-
-  private Object makeSyntaxColorSpan() {
-    return new ForegroundColorSpan(mMarkdownStyle.getSyntaxColor());
-  }
-
-  private Object makeLinkColorSpan() {
-    return new ForegroundColorSpan(mMarkdownStyle.getLinkColor());
-  }
-
-  private Object makeCodeFontFamilySpan() {
-    return new TypefaceSpan(mMarkdownStyle.getCodeFontFamily());
-  }
-
-  private Object makeCodeColorSpan() {
-    return new ForegroundColorSpan(mMarkdownStyle.getCodeColor());
-  }
-
-  private Object makePreFontFamilySpan() {
-    return new TypefaceSpan(mMarkdownStyle.getPreFontFamily());
-  }
-
-  private Object makePreColorSpan() {
-    return new ForegroundColorSpan(mMarkdownStyle.getPreColor());
-  }
-
-  private Object makeMentionHereBackgroundSpan() {
-    return new BackgroundColorSpan(mMarkdownStyle.getMentionHereBackgroundColor());
-  }
-
-  private Object makeMentionUserBackgroundSpan() {
-    return new BackgroundColorSpan(mMarkdownStyle.getMentionUserBackgroundColor());
-  }
-
-  private Object makeCodeBackgroundSpan() {
-    return new BackgroundColorSpan(mMarkdownStyle.getCodeBackgroundColor());
-  }
-
-  private Object makePreBackgroundSpan() {
-    return new BackgroundColorSpan(mMarkdownStyle.getPreBackgroundColor());
-  }
-
-  private Object makeH1FontSizeSpan() {
-    return new AbsoluteSizeSpan((int) mMarkdownStyle.getH1FontSize(), true);
-  }
-
-  private static Object makeH1LineHeightSpan(float lineHeight) {
-    return (LineHeightSpan) (text, start, end, spanstartv, lh, fm) -> {
-      fm.top -= lineHeight / 4;
-      fm.ascent -= lineHeight / 4;
-    };
-  }
-
-  private Object makeBlockquoteMarginSpan() {
-    return new BlockquoteSpan(
-      mMarkdownStyle.getBlockquoteBorderColor(),
-      mMarkdownStyle.getBlockquoteBorderWidth(),
-      mMarkdownStyle.getBlockquoteMarginLeft(),
-      mMarkdownStyle.getBlockquotePaddingLeft());
   }
 
   public void applyMarkdownFormatting(SpannableStringBuilder ssb) {
@@ -191,69 +98,73 @@ public class MarkdownUtils {
   private void applyRange(SpannableStringBuilder ssb, String type, int start, int end) {
     switch (type) {
       case "bold":
-        setSpan(ssb, makeBoldSpan(), start, end);
+        setSpan(ssb, new MarkdownBoldSpan(), start, end);
         break;
       case "italic":
-        setSpan(ssb, makeItalicSpan(), start, end);
+        setSpan(ssb, new MarkdownItalicSpan(), start, end);
         break;
       case "strikethrough":
-        setSpan(ssb, makeStrikethroughSpan(), start, end);
+        setSpan(ssb, new MarkdownStrikethroughSpan(), start, end);
         break;
       case "mention-here":
-        setSpan(ssb, makeBoldSpan(), start, end);
-        setSpan(ssb, makeMentionHereBackgroundSpan(), start, end);
+        setSpan(ssb, new MarkdownBoldSpan(), start, end);
+        setSpan(ssb, new MarkdownBackgroundColorSpan(mMarkdownStyle.getMentionHereBackgroundColor()), start, end);
         break;
       case "mention-user":
-        setSpan(ssb, makeBoldSpan(), start, end);
+        setSpan(ssb, new MarkdownBoldSpan(), start, end);
         // TODO: change mention color when it mentions current user
-        setSpan(ssb, makeMentionUserBackgroundSpan(), start, end);
+        setSpan(ssb, new MarkdownBackgroundColorSpan(mMarkdownStyle.getMentionUserBackgroundColor()), start, end);
         break;
       case "syntax":
-        setSpan(ssb, makeBoldSpan(), start, end);
-        setSpan(ssb, makeSyntaxColorSpan(), start, end);
+        setSpan(ssb, new MarkdownBoldSpan(), start, end);
+        setSpan(ssb, new MarkdownForegroundColorSpan(mMarkdownStyle.getSyntaxColor()), start, end);
         break;
       case "link":
-        setSpan(ssb, makeUnderlineSpan(), start, end);
-        setSpan(ssb, makeLinkColorSpan(), start, end);
+        setSpan(ssb, new MarkdownUnderlineSpan(), start, end);
+        setSpan(ssb, new MarkdownForegroundColorSpan(mMarkdownStyle.getLinkColor()), start, end);
         break;
       case "code":
-        setSpan(ssb, makeCodeFontFamilySpan(), start, end);
-        setSpan(ssb, makeCodeColorSpan(), start, end);
-        setSpan(ssb, makeCodeBackgroundSpan(), start, end);
+        setSpan(ssb, new MarkdownFontFamilySpan(mMarkdownStyle.getCodeFontFamily()), start, end);
+        setSpan(ssb, new MarkdownForegroundColorSpan(mMarkdownStyle.getCodeColor()), start, end);
+        setSpan(ssb, new MarkdownBackgroundColorSpan(mMarkdownStyle.getCodeBackgroundColor()), start, end);
         break;
       case "pre":
-        setSpan(ssb, makePreFontFamilySpan(), start, end);
-        setSpan(ssb, makePreColorSpan(), start, end);
-        setSpan(ssb, makePreBackgroundSpan(), start, end);
+        setSpan(ssb, new MarkdownFontFamilySpan(mMarkdownStyle.getPreFontFamily()), start, end);
+        setSpan(ssb, new MarkdownForegroundColorSpan(mMarkdownStyle.getPreColor()), start, end);
+        setSpan(ssb, new MarkdownBackgroundColorSpan(mMarkdownStyle.getPreBackgroundColor()), start, end);
         break;
       case "h1":
-        setSpan(ssb, makeBoldSpan(), start, end);
+        setSpan(ssb, new MarkdownBoldSpan(), start, end);
         CustomLineHeightSpan[] spans = ssb.getSpans(0, ssb.length(), CustomLineHeightSpan.class);
         if (spans.length >= 1) {
           int lineHeight = spans[0].getLineHeight();
-          setSpan(ssb, makeH1LineHeightSpan(lineHeight * 1.5f), start, end);
+          setSpan(ssb, new MarkdownLineHeightSpan(lineHeight * 1.5f), start, end);
         }
         // NOTE: size span must be set after line height span to avoid height jumps
-        setSpan(ssb, makeH1FontSizeSpan(), start, end);
+        setSpan(ssb, new MarkdownFontSizeSpan(mMarkdownStyle.getH1FontSize()), start, end);
         break;
       case "blockquote":
-        setSpan(ssb, makeBlockquoteMarginSpan(), start, end);
+        MarkdownBlockquoteSpan span = new MarkdownBlockquoteSpan(
+          mMarkdownStyle.getBlockquoteBorderColor(),
+          mMarkdownStyle.getBlockquoteBorderWidth(),
+          mMarkdownStyle.getBlockquoteMarginLeft(),
+          mMarkdownStyle.getBlockquotePaddingLeft());
+        setSpan(ssb, span, start, end);
         break;
       default:
         throw new IllegalStateException("Unsupported type: " + type);
     }
   }
 
-  private void setSpan(SpannableStringBuilder ssb, Object span, int start, int end) {
-    mSpans.add(span);
-    ssb.setSpan(span, start, end, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+  private void setSpan(SpannableStringBuilder ssb, MarkdownSpan span, int start, int end) {
+    ssb.setSpan(span, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
   }
 
   private void removeSpans(SpannableStringBuilder ssb) {
     // We shouldn't use `removeSpans()` because it also removes SpellcheckSpan, SuggestionSpan etc.
-    for (Object span : mSpans) {
+    MarkdownSpan[] spans = ssb.getSpans(0, ssb.length(), MarkdownSpan.class);
+    for (MarkdownSpan span : spans) {
       ssb.removeSpan(span);
     }
-    mSpans.clear();
   }
 }
