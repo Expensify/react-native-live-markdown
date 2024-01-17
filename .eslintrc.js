@@ -59,7 +59,6 @@ module.exports = {
     'no-use-before-define': 'off',
     '@typescript-eslint/no-use-before-define': 'off', // TODO consider enabling this (currently it reports styles defined at the bottom of the file)
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
-
     '@typescript-eslint/consistent-type-imports': [
       'error',
       { prefer: 'type-imports' },
