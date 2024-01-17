@@ -25,8 +25,7 @@ function getPlatform() {
     return 'web';
   }
   // @ts-expect-error it works
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-  return Platform.constants.systemName ?? Platform.constants.Brand;
+  return Platform.constants.systemName || Platform.constants.Brand;
 }
 
 function getPlatformVersion() {
@@ -41,11 +40,13 @@ function getRuntime() {
   if ('HermesInternal' in global) {
     const version =
       // @ts-expect-error this is fine
+      // eslint-disable-next-line es/no-optional-chaining
       global.HermesInternal?.getRuntimeProperties?.()['OSS Release Version'];
     return `Hermes (${version})`;
   }
   if ('_v8runtime' in global) {
     // @ts-expect-error this is fine
+    // eslint-disable-next-line no-underscore-dangle
     const version = global._v8runtime().version;
     return `V8 (${version})`;
   }
@@ -114,8 +115,20 @@ export default function App() {
         style={styles.input}
       /> */}
       <Text style={styles.text}>{JSON.stringify(value)}</Text>
-      <Button title="Focus" onPress={() => ref.current?.focus()} />
-      <Button title="Blur" onPress={() => ref.current?.blur()} />
+      <Button title="Focus" onPress={() => {
+          if (!ref.current) {
+            return;
+          }
+          ref.current.focus();
+        }}
+      />
+      <Button title="Blur" onPress={() => {
+          if (!ref.current) {
+            return;
+          }
+          ref.current.blur();
+        }}
+      />
       <Button title="Reset" onPress={() => setValue(DEFAULT_TEXT)} />
       <Button title="Clear" onPress={() => setValue('')} />
     </View>

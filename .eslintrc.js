@@ -9,8 +9,8 @@ module.exports = {
   },
   extends: [
     'expensify',
-    'plugin:@typescript-eslint/recommended-type-checked',
-    'plugin:@typescript-eslint/stylistic-type-checked',
+    'plugin:@typescript-eslint/recommended',
+    'plugin:@typescript-eslint/stylistic',
     'plugin:import/typescript',
     'prettier',
     'plugin:prettier/recommended',
@@ -71,12 +71,5 @@ module.exports = {
     '@typescript-eslint/no-non-null-assertion': 'off',
     '@typescript-eslint/array-type': ['error', {default: 'array-simple'}],
     '@typescript-eslint/consistent-type-definitions': 'off',
-    '@typescript-eslint/no-unsafe-argument': 'off',
-    '@typescript-eslint/no-unsafe-call': 'off',
-    '@typescript-eslint/no-unsafe-member-access': 'off',
-    '@typescript-eslint/no-unsafe-assignment': 'off',
-    'no-underscore-dangle': 'off',
-    'es/no-nullish-coalescing-operators': 'off',
-    'es/no-optional-chaining': 'off',
   },
 };
