@@ -5,15 +5,17 @@ import android.graphics.Paint;
 import android.text.Layout;
 import android.text.style.LeadingMarginSpan;
 
+import androidx.annotation.ColorInt;
+
 import com.facebook.react.uimanager.PixelUtil;
 
 public class MarkdownBlockquoteSpan implements MarkdownSpan, LeadingMarginSpan {
-  private final int borderColor;
+  private final @ColorInt int borderColor;
   private final float borderWidth;
   private final float marginLeft;
   private final float paddingLeft;
 
-  public MarkdownBlockquoteSpan(int borderColor, float borderWidth, float marginLeft, float paddingLeft) {
+  public MarkdownBlockquoteSpan(@ColorInt int borderColor, float borderWidth, float marginLeft, float paddingLeft) {
     this.borderColor = borderColor;
     this.borderWidth = PixelUtil.toPixelFromDIP(borderWidth);
     this.marginLeft = PixelUtil.toPixelFromDIP(marginLeft);

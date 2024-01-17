@@ -2,6 +2,7 @@ package com.expensify.livemarkdown;
 
 import android.content.Context;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 
 import com.facebook.react.bridge.ColorPropConverter;
@@ -12,20 +13,43 @@ import com.facebook.react.bridge.ReadableMap;
 import java.util.Objects;
 
 public class MarkdownStyle {
+  @ColorInt
   private final int mSyntaxColor;
+
+  @ColorInt
   private final int mLinkColor;
+
   private final float mH1FontSize;
+
+  @ColorInt
   private final int mBlockquoteBorderColor;
+
   private final float mBlockquoteBorderWidth;
+
   private final float mBlockquoteMarginLeft;
+
   private final float mBlockquotePaddingLeft;
+
   private final String mCodeFontFamily;
+
+  @ColorInt
   private final int mCodeColor;
+
+  @ColorInt
   private final int mCodeBackgroundColor;
+
   private final String mPreFontFamily;
+
+  @ColorInt
   private final int mPreColor;
+
+  @ColorInt
   private final int mPreBackgroundColor;
+
+  @ColorInt
   private final int mMentionHereBackgroundColor;
+
+  @ColorInt
   private final int mMentionUserBackgroundColor;
 
   public MarkdownStyle(@NonNull ReadableMap map, @NonNull Context context) {
@@ -73,10 +97,12 @@ public class MarkdownStyle {
     return style.getString(prop);
   }
 
+  @ColorInt
   public int getSyntaxColor() {
     return mSyntaxColor;
   }
 
+  @ColorInt
   public int getLinkColor() {
     return mLinkColor;
   }
@@ -85,6 +111,7 @@ public class MarkdownStyle {
     return mH1FontSize;
   }
 
+  @ColorInt
   public int getBlockquoteBorderColor() {
     return mBlockquoteBorderColor;
   }
@@ -105,10 +132,12 @@ public class MarkdownStyle {
     return mCodeFontFamily;
   }
 
+  @ColorInt
   public int getCodeColor() {
     return mCodeColor;
   }
 
+  @ColorInt
   public int getCodeBackgroundColor() {
     return mCodeBackgroundColor;
   }
@@ -117,18 +146,22 @@ public class MarkdownStyle {
     return mPreFontFamily;
   }
 
+  @ColorInt
   public int getPreColor() {
     return mPreColor;
   }
 
+  @ColorInt
   public int getPreBackgroundColor() {
     return mPreBackgroundColor;
   }
 
+  @ColorInt
   public int getMentionHereBackgroundColor() {
     return mMentionHereBackgroundColor;
   }
 
+  @ColorInt
   public int getMentionUserBackgroundColor() {
     return mMentionUserBackgroundColor;
   }
