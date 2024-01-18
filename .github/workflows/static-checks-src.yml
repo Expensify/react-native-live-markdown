@@ -1,0 +1,27 @@
+name: TypeScript & EsLint & Tests - src
+on:
+  pull_request:
+  merge_group:
+    branches:
+      - main
+  push:
+    # commented out for test purposes
+    # branches:
+    #   - main
+jobs:
+  static-analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Install root node dependencies
+        run: yarn
+      - name: Check types
+        run: npx tsc --project tsconfig.json --noEmit
+      - name: Lint
+        run: yarn lint:root
+      - name: run tests
+        run: yarn test
