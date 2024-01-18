@@ -3,6 +3,7 @@ package com.expensify.livemarkdown;
 import androidx.annotation.Nullable;
 
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 
@@ -51,8 +52,9 @@ public class MarkdownTextInputDecoratorView extends View {
     }
 
     if (previousSibling instanceof ReactEditText) {
-      MarkdownUtils.maybeInitializeRuntime(getContext().getAssets());
-      mMarkdownUtils = new MarkdownUtils();
+      AssetManager assetManager = getContext().getAssets();
+      MarkdownUtils.maybeInitializeRuntime(assetManager);
+      mMarkdownUtils = new MarkdownUtils(assetManager);
       mMarkdownUtils.setMarkdownStyle(mMarkdownStyle);
       mReactEditText = (ReactEditText) previousSibling;
       mTextWatcher = new MarkdownTextWatcher(mMarkdownUtils);
