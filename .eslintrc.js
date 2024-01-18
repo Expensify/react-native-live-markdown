@@ -29,18 +29,6 @@ module.exports = {
   },
   root: true,
   rules: {
-    'prettier/prettier': [
-      'error',
-      {
-        tabWidth: 2,
-        singleQuote: true,
-        trailingComma: 'all',
-        bracketSpacing: false,
-        arrowParens: 'always',
-        printWidth: 190,
-        singleAttributePerLine: true,
-      },
-    ],
     'rulesdir/prefer-underscore-method': 'off',
     'react/jsx-props-no-spreading': 'off',
     'react/require-default-props': 'off',

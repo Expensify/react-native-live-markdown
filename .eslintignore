@@ -15,4 +15,3 @@ react-native.config.js
 jest.config.js
 webpack.config.js
 .eslintrc.js
-.prettierrc.js
