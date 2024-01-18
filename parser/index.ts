@@ -1,22 +1,24 @@
-// @ts-ignore - to review how it's implemented in ExpensiMark
-import { ExpensiMark } from 'expensify-common/lib/ExpensiMark';
+// @ts-expect-error - to review how it's implemented in ExpensiMark
+// eslint-disable-next-line import/no-unresolved
+import {ExpensiMark} from 'expensify-common/lib/ExpensiMark';
 import _ from 'underscore';
 
 type Range = [string, number, number];
 type Token = ['TEXT' | 'HTML', string];
-type StackItem = { tag: string; children: Array<StackItem | string> };
+type StackItem = {tag: string; children: Array<StackItem | string>};
 
 function parseMarkdownToHTML(markdown: string): string {
   const parser = ExpensiMark;
   const html = parser.replace(markdown, {
     shouldKeepRawInput: true,
   });
-  return html;
+  return html as string;
 }
 
 function parseHTMLToTokens(html: string): Token[] {
   const tokens: Token[] = [];
   let left = 0;
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const open = html.indexOf('<', left);
     if (open === -1) {
@@ -39,7 +41,7 @@ function parseHTMLToTokens(html: string): Token[] {
 }
 
 function parseTokensToTree(tokens: Token[]): StackItem {
-  const stack: StackItem[] = [{ tag: '<>', children: [] }];
+  const stack: StackItem[] = [{tag: '<>', children: []}];
   tokens.forEach(([type, payload]) => {
     if (type === 'TEXT') {
       const text = _.unescape(payload);
@@ -53,10 +55,10 @@ function parseTokensToTree(tokens: Token[]): StackItem {
         top!.children.push(child!);
       } else {
         // opening tag
-        stack.push({ tag: payload, children: [] });
+        stack.push({tag: payload, children: []});
       }
     } else {
-      throw new Error(`Unknown token type: ${type}`);
+      throw new Error(`Unknown token type: ${type as string}`);
     }
   });
   if (stack.length !== 1) {
@@ -92,6 +94,7 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
     if (typeof node === 'string') {
       text += node;
     } else {
+      // eslint-disable-next-line no-lonely-if
       if (node.tag === '<>') {
         processChildren(node);
       } else if (node.tag === '<strong>') {
@@ -118,16 +121,16 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
         appendSyntax('>');
         addChildrenWithStyle(node, 'blockquote');
         // compensate for "> " at the beginning
-        const curr = ranges?.[ranges.length - 1];
-        curr![1] -= 1;
-        curr![2] += 1;
+        if (ranges.length > 0) {
+          const curr = ranges[ranges.length - 1];
+          curr![1] -= 1;
+          curr![2] += 1;
+        }
       } else if (node.tag === '<h1>') {
         appendSyntax('# ');
         addChildrenWithStyle(node, 'h1');
       } else if (node.tag.startsWith('<pre')) {
-        const content = _.unescape(
-          node.tag.match(/data-code-raw="([^"]*)"/)![1]!
-        ); // always present
+        const content = _.unescape(node.tag.match(/data-code-raw="([^"]*)"/)![1]!); // always present
 
         appendSyntax('```');
         addChildrenWithStyle(content, 'pre');
@@ -135,17 +138,10 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
       } else if (node.tag.startsWith('<a href="')) {
         const rawHref = node.tag.match(/href="([^"]*)"/)![1]!; // always present
         const href = _.unescape(rawHref);
-        const isLabeledLink =
-          node.tag.match(/link-variant="([^"]*)"/)![1] === 'labeled';
+        const isLabeledLink = node.tag.match(/link-variant="([^"]*)"/)![1] === 'labeled';
         const dataRawHref = node.tag.match(/data-raw-href="([^"]*)"/);
         const matchString = dataRawHref ? _.unescape(dataRawHref[1]!) : href;
-        if (
-          !isLabeledLink &&
-          node.children.length === 1 &&
-          typeof node.children[0] === 'string' &&
-          (node.children[0] === matchString ||
-            `mailto:${node.children[0]}` === href)
-        ) {
+        if (!isLabeledLink && node.children.length === 1 && typeof node.children[0] === 'string' && (node.children[0] === matchString || `mailto:${node.children[0]}` === href)) {
           addChildrenWithStyle(node.children[0], 'link');
         } else {
           appendSyntax('[');
@@ -155,7 +151,7 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
           appendSyntax(')');
         }
       } else {
-        throw new Error('Unknown tag: ' + node.tag);
+        throw new Error(`Unknown tag: {node.tag}`);
       }
     }
   }

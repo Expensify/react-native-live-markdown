@@ -1,2 +1,17 @@
 **/node_modules/*
 parser/react-native-live-markdown-parser.js
+
+# any js file inside android and ios folders
+**/android/**/*.js
+**/ios/**/*.js
+
+# Output of the build process & scripts
+lib/**/*
+scripts/**/*
+
+babel.config.js
+metro.config.js
+react-native.config.js
+jest.config.js
+webpack.config.js
+.eslintrc.js

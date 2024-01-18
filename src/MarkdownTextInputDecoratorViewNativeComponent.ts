@@ -1,9 +1,9 @@
-import type { ColorValue, ViewProps } from 'react-native';
+import type {ColorValue, ViewProps} from 'react-native';
 
-import type { Float } from 'react-native/Libraries/Types/CodegenTypes';
+import type {Float} from 'react-native/Libraries/Types/CodegenTypes';
 import codegenNativeComponent from 'react-native/Libraries/Utilities/codegenNativeComponent';
 
-export interface MarkdownStyle {
+interface MarkdownStyle {
   syntax: {
     color: ColorValue;
   };
@@ -41,6 +41,6 @@ interface NativeProps extends ViewProps {
   markdownStyle: MarkdownStyle;
 }
 
-export default codegenNativeComponent<NativeProps>(
-  'MarkdownTextInputDecoratorView'
-);
+export default codegenNativeComponent<NativeProps>('MarkdownTextInputDecoratorView');
+
+export type {MarkdownStyle};

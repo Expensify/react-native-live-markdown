@@ -8,7 +8,7 @@ module.exports = async function (env, argv) {
         dangerouslyAddModulePathsToTranspile: ['react-native-live-markdown'],
       },
     },
-    argv
+    argv,
   );
   return config;
 };

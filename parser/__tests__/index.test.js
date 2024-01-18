@@ -6,13 +6,10 @@ expect.extend({
     if (JSON.stringify(actualRanges) !== JSON.stringify(expectedRanges)) {
       return {
         pass: false,
-        message: () =>
-          `Expected ${JSON.stringify(expectedRanges)}, got ${JSON.stringify(
-            actualRanges
-          )}`,
+        message: () => `Expected ${JSON.stringify(expectedRanges)}, got ${JSON.stringify(actualRanges)}`,
       };
     }
-    return { pass: true };
+    return {pass: true};
   },
 });
 
@@ -103,9 +100,7 @@ test('no nesting links while typing', () => {
 });
 
 test('link with query string', () => {
-  expect('https://example.com?name=John&age=25&city=NewYork').toBeParsedAs([
-    ['link', 0, 49],
-  ]);
+  expect('https://example.com?name=John&age=25&city=NewYork').toBeParsedAs([['link', 0, 49]]);
 });
 
 test('plain email', () => {
@@ -150,9 +145,7 @@ describe('email with same label as address', () => {
   });
 
   test('label and address with "mailto:"', () => {
-    expect(
-      '[mailto:someone@example.com](mailto:someone@example.com)'
-    ).toBeParsedAs([
+    expect('[mailto:someone@example.com](mailto:someone@example.com)').toBeParsedAs([
       ['syntax', 0, 1],
       ['syntax', 27, 2],
       ['link', 29, 26],
