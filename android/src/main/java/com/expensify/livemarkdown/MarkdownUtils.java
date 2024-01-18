@@ -8,6 +8,7 @@ import android.text.Spanned;
 
 import androidx.annotation.NonNull;
 
+import com.facebook.infer.annotation.Assertions;
 import com.facebook.infer.annotation.ThreadConfined;
 import com.facebook.react.bridge.UiThreadUtil;
 import com.facebook.react.views.text.CustomLineHeightSpan;
@@ -55,6 +56,12 @@ public class MarkdownUtils {
   }
 
   private static native String nativeParseMarkdown(String input);
+
+  public MarkdownUtils(@NonNull AssetManager assetManager) {
+    mAssetManager = assetManager;
+  }
+
+  private final AssetManager mAssetManager;
 
   private String mPrevInput;
 
@@ -124,12 +131,12 @@ public class MarkdownUtils {
         setSpan(ssb, new MarkdownForegroundColorSpan(mMarkdownStyle.getLinkColor()), start, end);
         break;
       case "code":
-        setSpan(ssb, new MarkdownFontFamilySpan(mMarkdownStyle.getCodeFontFamily()), start, end);
+        setSpan(ssb, new MarkdownFontFamilySpan(mMarkdownStyle.getCodeFontFamily(), mAssetManager), start, end);
         setSpan(ssb, new MarkdownForegroundColorSpan(mMarkdownStyle.getCodeColor()), start, end);
         setSpan(ssb, new MarkdownBackgroundColorSpan(mMarkdownStyle.getCodeBackgroundColor()), start, end);
         break;
       case "pre":
-        setSpan(ssb, new MarkdownFontFamilySpan(mMarkdownStyle.getPreFontFamily()), start, end);
+        setSpan(ssb, new MarkdownFontFamilySpan(mMarkdownStyle.getPreFontFamily(), mAssetManager), start, end);
         setSpan(ssb, new MarkdownForegroundColorSpan(mMarkdownStyle.getPreColor()), start, end);
         setSpan(ssb, new MarkdownBackgroundColorSpan(mMarkdownStyle.getPreBackgroundColor()), start, end);
         break;
