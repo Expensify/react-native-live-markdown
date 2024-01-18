@@ -33,13 +33,18 @@ The library includes native code so you will need to re-build the native app.
 ## Usage
 
 ```tsx
-import { MarkdownTextInput } from '@expensify/react-native-live-markdown';
+import {MarkdownTextInput} from '@expensify/react-native-live-markdown';
 import React from 'react';
 
 export default function App() {
   const [text, setText] = React.useState('Hello, *world*!');
 
-  return <MarkdownTextInput value={text} onChangeText={setText} />;
+  return (
+    <MarkdownTextInput
+      value={text}
+      onChangeText={setText}
+    />
+  );
 }
 ```
 
@@ -50,7 +55,7 @@ export default function App() {
 It is also possible to customize the styling of the formatted contents of `MarkdownTextInput` component. The style object supports all color representations from React Native including `PlatformColor` and `DynamicColorIOS` according to the [color reference](https://reactnative.dev/docs/colors). Currently, a limited set of styles is customizable but this is subject to change in the future.
 
 ```tsx
-import type { MarkdownStyle } from '@expensify/react-native-live-markdown';
+import type {MarkdownStyle} from '@expensify/react-native-live-markdown';
 
 const markdownStyle: MarkdownStyle = {
   syntax: {
