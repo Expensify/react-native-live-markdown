@@ -61,7 +61,7 @@ public class MarkdownUtils {
     mAssetManager = assetManager;
   }
 
-  private final AssetManager mAssetManager;
+  private final @NonNull AssetManager mAssetManager;
 
   private String mPrevInput;
 
