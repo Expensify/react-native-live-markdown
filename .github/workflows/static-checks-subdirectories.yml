@@ -34,4 +34,4 @@ jobs:
         # no tests inside example and WebExample   
         if: ${{ matrix.dir != 'example' && matrix.dir != 'WebExample' }}
         working-directory: ${{ matrix.dir }}
-        run: npm run tests  
+        run: npm run test  
