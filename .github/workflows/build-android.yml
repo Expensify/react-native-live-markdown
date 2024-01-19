@@ -1,0 +1,43 @@
+name: Test Android build
+on:
+  pull_request:
+    paths:
+      - .github/workflows/android-build.yml
+      - android/**
+      - example/package.json
+      - example/android/**
+  merge_group:
+    branches:
+      - main
+  push:
+    # commented out for test purposes
+    # branches:
+    #   - main
+    # paths:
+    #   - .github/workflows/android-build.yml
+    #   - android/**
+    #   - example/package.json
+    #   - example/android/**
+
+jobs:
+  build_android:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: {dir: ['example']}
+      fail-fast: false
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v4
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: 17
+
+      - name: Install root & example node dependencies
+        run: yarn install --immutable
+
+      - name: Build app
+        working-directory: ${{ matrix.dir }}/android
+        run: ./gradlew assembleDebug --build-cache -PreactNativeArchitectures=arm64-v8a
