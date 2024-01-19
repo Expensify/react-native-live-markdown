@@ -1,0 +1,54 @@
+name: Test iOS build
+on:
+  pull_request:
+    paths:
+      - .github/workflows/ios-build.yml
+      - Example/package.json
+      - Example/ios/**
+  merge_group:
+    branches:
+      - main
+  push:
+    # commented due to test purposes
+    # branches:
+    #   - main
+    # paths:
+    #   - .github/workflows/ios-build.yml
+    #   - Example/package.json
+    #   - Example/ios/**
+
+jobs:
+  build_ios:
+    runs-on: macos-12
+    strategy:
+      matrix: {dir: [Example]}
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+
+      - name: Install app node_modules
+        working-directory: ${{ matrix.dir }}
+        run: yarn install --frozen-lockfile
+
+      - name: Restore Pods from cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ matrix.dir }}/ios/Pods
+            ~/Library/Caches/CocoaPods
+            ~/.cocoapods
+          key: ${{ runner.os }}-pods-${{ matrix.dir }}-${{ hashFiles(format('{0}/ios/Podfile.lock', matrix.dir)) }}
+
+      - name: Install Pods
+        working-directory: ${{ matrix.dir }}/ios
+        run: pod install
+
+      - name: Restore build artifacts from cache
+        uses: actions/cache@v3
+        with:
+          path: ~/Library/Developer/Xcode/DerivedData
+          key: ${{ runner.os }}-ios-derived-data-${{ matrix.dir }}-${{ hashFiles(format('{0}/ios/Podfile.lock', matrix.dir)) }}
+
+      - name: Build app
+        working-directory: ${{ matrix.dir }}
+        run: npx react-native run-ios
