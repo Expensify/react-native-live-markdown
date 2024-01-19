@@ -10,14 +10,13 @@ on:
     branches:
       - main
   push:
-    # commented out for test purposes
-    # branches:
-    #   - main
-    # paths:
-    #   - .github/workflows/android-build.yml
-    #   - android/**
-    #   - example/package.json
-    #   - example/android/**
+    branches:
+      - main
+    paths:
+      - .github/workflows/android-build.yml
+      - android/**
+      - example/package.json
+      - example/android/**
 
 jobs:
   build_android:

@@ -9,13 +9,12 @@ on:
     branches:
       - main
   push:
-    # commented due to test purposes
-    # branches:
-    #   - main
-    # paths:
-    #   - .github/workflows/ios-build.yml
-    #   - Example/package.json
-    #   - Example/ios/**
+    branches:
+      - main
+    paths:
+      - .github/workflows/ios-build.yml
+      - Example/package.json
+      - Example/ios/**
 
 jobs:
   build_ios:
