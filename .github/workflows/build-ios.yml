@@ -20,7 +20,7 @@ jobs:
   build_ios:
     runs-on: macos-12
     strategy:
-      matrix: {dir: [Example]}
+      matrix: {dir: ['example']}
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v3
