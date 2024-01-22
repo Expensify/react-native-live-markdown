@@ -94,7 +94,7 @@
   }
 }
 
-- (void)setMarkdownStyle:(nonnull RCTMarkdownStyle *)markdownStyle
+- (void)setMarkdownStyle:(RCTMarkdownStyle *)markdownStyle
 {
   _markdownStyle = markdownStyle;
   [_markdownUtils setMarkdownStyle:markdownStyle];

@@ -31,6 +31,10 @@
     "test": "jest",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --ext .js,.ts,.tsx",
+    "lint:root": "eslint . --ext .js,.ts,.tsx --ignore-pattern '/example/**/*' --ignore-pattern '/WebExample/**/*' --ignore-pattern '/parser/**/*'",
+    "lint:example": "eslint example --ext .js,.ts,.tsx",
+    "lint:parser": "eslint parser --ext .js,.ts,.tsx",
+    "lint:web": "eslint WebExample --ext .js,.ts,.tsx",
     "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
     "prepare": "bob build",
     "release": "release-it"
@@ -54,8 +58,11 @@
     "registry": "https://registry.npmjs.org/"
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.20.2",
+    "@babel/preset-react": "^7.18.6",
     "@commitlint/config-conventional": "^17.0.2",
     "@evilmartians/lefthook": "^1.5.0",
+    "@lwc/eslint-plugin-lwc": "^1.7.2",
     "@react-native/eslint-config": "^0.72.2",
     "@release-it/conventional-changelog": "^5.0.0",
     "@types/jest": "^28.1.2",
@@ -65,12 +72,15 @@
     "@typescript-eslint/parser": "^6.15.0",
     "del-cli": "^5.0.0",
     "eslint": "^8.56.0",
+    "eslint-config-expensify": "^2.0.24",
     "eslint-config-prettier": "^8.5.0",
     "eslint-import-resolver-alias": "^1.1.2",
     "eslint-plugin-deprecation": "^2.0.0",
+    "eslint-plugin-es": "^4.1.0",
     "eslint-plugin-filenames": "^1.3.2",
     "eslint-plugin-header": "^3.1.1",
     "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-jsx-a11y": "^6.8.0",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-promise": "^6.1.1",
     "eslint-plugin-tsdoc": "^0.2.17",
@@ -78,7 +88,7 @@
     "pod-install": "^0.1.0",
     "prettier": "^2.0.5",
     "react": "18.2.0",
-    "react-native": "0.72.7",
+    "react-native": "0.72.9",
     "react-native-builder-bob": "^0.20.0",
     "release-it": "^15.0.0",
     "turbo": "^1.10.7",
@@ -126,13 +136,6 @@
         "preset": "angular"
       }
     }
-  },
-  "prettier": {
-    "quoteProps": "consistent",
-    "singleQuote": true,
-    "tabWidth": 2,
-    "trailingComma": "es5",
-    "useTabs": false
   },
   "react-native-builder-bob": {
     "source": "src",

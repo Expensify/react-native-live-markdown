@@ -1,21 +1,11 @@
 import * as React from 'react';
 
-import { Button, Platform, StyleSheet, Text, View } from 'react-native';
+import {Button, Platform, StyleSheet, Text, View} from 'react-native';
 
-import { MarkdownTextInput } from '@expensify/react-native-live-markdown';
-import type { TextInput } from 'react-native';
+import {MarkdownTextInput} from '@expensify/react-native-live-markdown';
+import type {TextInput} from 'react-native';
 
-const DEFAULT_TEXT = [
-  'Hello, *world*!',
-  'https://expensify.com',
-  '# Lorem ipsum',
-  '> Hello world',
-  '>> Hello world',
-  '`foo`',
-  '```\nbar\n```',
-  '@here',
-  '@someone@swmansion.com',
-].join('\n');
+const DEFAULT_TEXT = ['Hello, *world*!', 'https://expensify.com', '# Lorem ipsum', '> Hello world', '`foo`', '```\nbar\n```', '@here', '@someone@swmansion.com'].join('\n');
 
 function isWeb() {
   return Platform.OS === 'web';
@@ -25,7 +15,7 @@ function getPlatform() {
   if (isWeb()) {
     return 'web';
   }
-  // @ts-ignore it works
+  // @ts-expect-error it works
   return Platform.constants.systemName || Platform.constants.Brand;
 }
 
@@ -40,12 +30,14 @@ function getBundle() {
 function getRuntime() {
   if ('HermesInternal' in global) {
     const version =
-      // @ts-ignore this is fine
+      // @ts-expect-error this is fine
+      // eslint-disable-next-line es/no-optional-chaining
       global.HermesInternal?.getRuntimeProperties?.()['OSS Release Version'];
     return `Hermes (${version})`;
   }
   if ('_v8runtime' in global) {
-    // @ts-ignore this is fine
+    // @ts-expect-error this is fine
+    // eslint-disable-next-line no-underscore-dangle
     const version = global._v8runtime().version;
     return `V8 (${version})`;
   }
@@ -57,7 +49,7 @@ function getArchitecture() {
 }
 
 function getReactNativeVersion() {
-  const { major, minor, patch } = Platform.constants.reactNativeVersion;
+  const {major, minor, patch} = Platform.constants.reactNativeVersion;
   return `${major}.${minor}.${patch}`;
 }
 
@@ -114,10 +106,32 @@ export default function App() {
         style={styles.input}
       /> */}
       <Text style={styles.text}>{JSON.stringify(value)}</Text>
-      <Button title="Focus" onPress={() => ref.current?.focus()} />
-      <Button title="Blur" onPress={() => ref.current?.blur()} />
-      <Button title="Reset" onPress={() => setValue(DEFAULT_TEXT)} />
-      <Button title="Clear" onPress={() => setValue('')} />
+      <Button
+        title="Focus"
+        onPress={() => {
+          if (!ref.current) {
+            return;
+          }
+          ref.current.focus();
+        }}
+      />
+      <Button
+        title="Blur"
+        onPress={() => {
+          if (!ref.current) {
+            return;
+          }
+          ref.current.blur();
+        }}
+      />
+      <Button
+        title="Reset"
+        onPress={() => setValue(DEFAULT_TEXT)}
+      />
+      <Button
+        title="Clear"
+        onPress={() => setValue('')}
+      />
     </View>
   );
 }

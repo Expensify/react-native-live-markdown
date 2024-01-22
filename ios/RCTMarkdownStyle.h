@@ -2,21 +2,25 @@
 #import <react/renderer/components/RNLiveMarkdownSpec/Props.h>
 #endif /* RCT_NEW_ARCH_ENABLED */
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface RCTMarkdownStyle : NSObject
 
-@property (nonatomic, nonnull) UIColor *syntaxColor;
-@property (nonatomic, nonnull) UIColor *linkColor;
+@property (nonatomic) UIColor *syntaxColor;
+@property (nonatomic) UIColor *linkColor;
 @property (nonatomic) CGFloat h1FontSize;
-@property (nonatomic, nonnull) UIColor *quoteBorderColor;
-@property (nonatomic) CGFloat quoteBorderWidth;
-@property (nonatomic) CGFloat quoteMarginLeft;
-@property (nonatomic) CGFloat quotePaddingLeft;
-@property (nonatomic, nonnull) UIColor *codeColor;
-@property (nonatomic, nonnull) UIColor *codeBackgroundColor;
-@property (nonatomic, nonnull) UIColor *preColor;
-@property (nonatomic, nonnull) UIColor *preBackgroundColor;
-@property (nonatomic, nonnull) UIColor *mentionHereBackgroundColor;
-@property (nonatomic, nonnull) UIColor *mentionUserBackgroundColor;
+@property (nonatomic) UIColor *blockquoteBorderColor;
+@property (nonatomic) CGFloat blockquoteBorderWidth;
+@property (nonatomic) CGFloat blockquoteMarginLeft;
+@property (nonatomic) CGFloat blockquotePaddingLeft;
+@property (nonatomic) NSString *codeFontFamily;
+@property (nonatomic) UIColor *codeColor;
+@property (nonatomic) UIColor *codeBackgroundColor;
+@property (nonatomic) NSString *preFontFamily;
+@property (nonatomic) UIColor *preColor;
+@property (nonatomic) UIColor *preBackgroundColor;
+@property (nonatomic) UIColor *mentionHereBackgroundColor;
+@property (nonatomic) UIColor *mentionUserBackgroundColor;
 
 #ifdef RCT_NEW_ARCH_ENABLED
 - (instancetype)initWithStruct:(const facebook::react::MarkdownTextInputDecoratorViewMarkdownStyleStruct &)style;
@@ -25,3 +29,5 @@
 #endif /* RCT_NEW_ARCH_ENABLED */
 
 @end
+
+NS_ASSUME_NONNULL_END
