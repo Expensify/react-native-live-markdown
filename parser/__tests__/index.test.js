@@ -1,29 +1,15 @@
-require('../out.js');
+require('../react-native-live-markdown-parser.js');
 
 expect.extend({
   toBeParsedAs(received, expectedRanges) {
-    const expectedText = received;
-    const [actualText, actualRanges] =
-      global.parseMarkdownToTextAndRanges(received);
-    if (actualText !== expectedText) {
-      return {
-        pass: false,
-        message: () =>
-          `Expected ${JSON.stringify(expectedText)}, got ${JSON.stringify(
-            actualText
-          )}`,
-      };
-    }
+    const actualRanges = global.parseExpensiMarkToRanges(received);
     if (JSON.stringify(actualRanges) !== JSON.stringify(expectedRanges)) {
       return {
         pass: false,
-        message: () =>
-          `Expected ${JSON.stringify(expectedRanges)}, got ${JSON.stringify(
-            actualRanges
-          )}`,
+        message: () => `Expected ${JSON.stringify(expectedRanges)}, got ${JSON.stringify(actualRanges)}`,
       };
     }
-    return { pass: true };
+    return {pass: true};
   },
 });
 
@@ -59,9 +45,9 @@ test('strikethrough', () => {
   ]);
 });
 
-describe('mention', () => {
+describe('mention-here', () => {
   test('normal', () => {
-    expect('@here Hello!').toBeParsedAs([['mention', 0, 5]]);
+    expect('@here Hello!').toBeParsedAs([['mention-here', 0, 5]]);
   });
 
   test('with additional letters', () => {
@@ -69,7 +55,7 @@ describe('mention', () => {
   });
 
   test('with punctation marks', () => {
-    expect('@here!').toBeParsedAs([['mention', 0, 5]]);
+    expect('@here!').toBeParsedAs([['mention-here', 0, 5]]);
   });
 });
 
@@ -114,9 +100,7 @@ test('no nesting links while typing', () => {
 });
 
 test('link with query string', () => {
-  expect('https://example.com?name=John&age=25&city=NewYork').toBeParsedAs([
-    ['link', 0, 49],
-  ]);
+  expect('https://example.com?name=John&age=25&city=NewYork').toBeParsedAs([['link', 0, 49]]);
 });
 
 test('plain email', () => {
@@ -161,9 +145,7 @@ describe('email with same label as address', () => {
   });
 
   test('label and address with "mailto:"', () => {
-    expect(
-      '[mailto:someone@example.com](mailto:someone@example.com)'
-    ).toBeParsedAs([
+    expect('[mailto:someone@example.com](mailto:someone@example.com)').toBeParsedAs([
       ['syntax', 0, 1],
       ['syntax', 27, 2],
       ['link', 29, 26],
@@ -188,7 +170,7 @@ test('codeblock', () => {
   ]);
 });
 
-describe('quote', () => {
+describe('blockquote', () => {
   test('with single space', () => {
     expect('> Hello world!').toBeParsedAs([
       ['syntax', 0, 1],
@@ -231,7 +213,7 @@ test('separate blockquotes', () => {
   ]);
 });
 
-test('heading', () => {
+test('h1', () => {
   expect('# Hello world').toBeParsedAs([
     ['syntax', 0, 2],
     ['h1', 2, 11],
@@ -255,7 +237,7 @@ test('nested bold and italic', () => {
   ]);
 });
 
-describe('nested heading in blockquote', () => {
+describe('nested h1 in blockquote', () => {
   test('without spaces', () => {
     expect('># Hello world').toBeParsedAs([
       ['syntax', 0, 1],
@@ -308,7 +290,7 @@ describe('trailing whitespace', () => {
     });
   });
 
-  describe('after heading', () => {
+  describe('after h1', () => {
     test('nothing', () => {
       expect('# Hello world').toBeParsedAs([
         ['syntax', 0, 2],
@@ -337,7 +319,7 @@ describe('trailing whitespace', () => {
       ]);
     });
 
-    test('multiple quotes', () => {
+    test('multiple blockquotes', () => {
       expect('> # Hello\n> # world').toBeParsedAs([
         ['syntax', 0, 1],
         ['blockquote', 0, 9],

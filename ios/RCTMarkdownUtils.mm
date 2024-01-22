@@ -1,6 +1,7 @@
-#import <react-native-markdown-text-input/RCTMarkdownUtils.h>
+#import <react-native-live-markdown/RCTMarkdownUtils.h>
 #import <react/debug/react_native_assert.h>
 #import <React/RCTAssert.h>
+#import <React/RCTFont.h>
 #import <JavaScriptCore/JavaScriptCore.h>
 
 @implementation RCTMarkdownUtils {
@@ -34,27 +35,27 @@
   static JSContext *ctx = nil;
   static JSValue *function = nil;
   if (ctx == nil) {
-    NSString *path = [[NSBundle mainBundle] pathForResource:@"out" ofType:@"js"];
-    assert(path != nil && "[react-native-markdown-text-input] Markdown parser bundle not found");
+    NSString *path = [[NSBundle mainBundle] pathForResource:@"react-native-live-markdown-parser" ofType:@"js"];
+    assert(path != nil && "[react-native-live-markdown] Markdown parser bundle not found");
     NSString *content = [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:NULL];
-    assert(content != nil && "[react-native-markdown-text-input] Markdown parser bundle is empty");
+    assert(content != nil && "[react-native-live-markdown] Markdown parser bundle is empty");
     ctx = [[JSContext alloc] init];
     [ctx evaluateScript:content];
-    function = ctx[@"parseMarkdownToTextAndRanges"];
+    function = ctx[@"parseExpensiMarkToRanges"];
   }
 
   JSValue *result = [function callWithArguments:@[inputString]];
-  NSString *outputString = [result[0] toString];
-  NSArray *ranges = [result[1] toArray];
-
-  if (![outputString isEqualToString:inputString]) {
-    return input;
-  }
+  NSArray *ranges = [result toArray];
 
   NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:inputString attributes:_backedTextInputView.defaultTextAttributes];
   [attributedString beginEditing];
 
-  _quoteRanges = [NSMutableArray new];
+  // If the attributed string ends with underlined text, blurring the single-line input imprints the underline style across the whole string.
+  // It looks like a bug in iOS, as there is no underline style to be found in the attributed string, especially after formatting.
+  // This is a workaround that applies the NSUnderlineStyleNone to the string before iterating over ranges which resolves this problem.
+  [attributedString addAttribute:NSUnderlineStyleAttributeName value:[NSNumber numberWithInteger:NSUnderlineStyleNone] range:NSMakeRange(0, attributedString.length)];
+
+  _blockquoteRanges = [NSMutableArray new];
 
   [ranges enumerateObjectsUsingBlock:^(id _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
     NSArray *item = obj;
@@ -63,31 +64,26 @@
     NSUInteger length = [item[2] unsignedIntegerValue];
     NSRange range = NSMakeRange(location, length);
 
-    UIFont *font = [attributedString attribute:NSFontAttributeName atIndex:location effectiveRange:NULL];
-    UIFontDescriptor *fontDescriptor = [font fontDescriptor];
-    UIFontDescriptorSymbolicTraits existingTraits = fontDescriptor.symbolicTraits;
-    UIFontDescriptorSymbolicTraits desiredTraits = UIFontDescriptorClassMask;
-
-    if ([type isEqualToString:@"bold"] || [type isEqualToString:@"mention"] || [type isEqualToString:@"h1"] || [type isEqualToString:@"mention-user"]) {
-      desiredTraits = existingTraits | UIFontDescriptorTraitBold;
-    } else if ([type isEqualToString:@"italic"]) {
-      desiredTraits = existingTraits | UIFontDescriptorTraitItalic;
-    } else if ([type isEqualToString:@"code"] || [type isEqualToString:@"pre"]) {
-      desiredTraits = existingTraits | UIFontDescriptorTraitMonoSpace;
-    } else if ([type isEqualToString:@"syntax"]) {
-      desiredTraits = UIFontDescriptorTraitBold; // TODO: remove italic in nested bold+italic
-    } else {
-      // keep existing traits regardless of current item type
-      desiredTraits = existingTraits;
+    if ([type isEqualToString:@"bold"] || [type isEqualToString:@"mention-here"] || [type isEqualToString:@"mention-user"] || [type isEqualToString:@"syntax"] || [type isEqualToString:@"italic"] || [type isEqualToString:@"code"] || [type isEqualToString:@"pre"] || [type isEqualToString:@"h1"]) {
+      UIFont *font = [attributedString attribute:NSFontAttributeName atIndex:location effectiveRange:NULL];
+      if ([type isEqualToString:@"bold"] || [type isEqualToString:@"mention-here"] || [type isEqualToString:@"mention-user"] || [type isEqualToString:@"syntax"]) {
+        font = [RCTFont updateFont:font withWeight:@"bold"];
+      } else if ([type isEqualToString:@"italic"]) {
+        font = [RCTFont updateFont:font withStyle:@"italic"];
+      } else if ([type isEqualToString:@"code"]) {
+        font = [RCTFont updateFont:font withFamily:_markdownStyle.codeFontFamily];
+      } else if ([type isEqualToString:@"pre"]) {
+        font = [RCTFont updateFont:font withFamily:_markdownStyle.preFontFamily];
+      } else if ([type isEqualToString:@"h1"]) {
+        font = [RCTFont updateFont:font withFamily:nil
+                                              size:[NSNumber numberWithFloat:_markdownStyle.h1FontSize]
+                                            weight:@"bold"
+                                             style:nil
+                                           variant:nil
+                                   scaleMultiplier:0];
+      }
+      [attributedString addAttribute:NSFontAttributeName value:font range:range];
     }
-
-    UIFontDescriptor *newFontDescriptor = [fontDescriptor fontDescriptorWithSymbolicTraits:desiredTraits];
-    CGFloat size = 0; // Passing 0 to size keeps the existing size
-    if ([type isEqualToString:@"h1"]) {
-      size = _markdownStyle.h1FontSize;
-    }
-    UIFont *newFont = [UIFont fontWithDescriptor:newFontDescriptor size:size];
-    [attributedString addAttribute:NSFontAttributeName value:newFont range:range];
 
     if ([type isEqualToString:@"syntax"]) {
       [attributedString addAttribute:NSForegroundColorAttributeName value:_markdownStyle.syntaxColor range:range];
@@ -96,7 +92,7 @@
     } else if ([type isEqualToString:@"code"]) {
       [attributedString addAttribute:NSForegroundColorAttributeName value:_markdownStyle.codeColor range:range];
       [attributedString addAttribute:NSBackgroundColorAttributeName value:_markdownStyle.codeBackgroundColor range:range];
-    } else if ([type isEqualToString:@"mention"]) {
+    } else if ([type isEqualToString:@"mention-here"]) {
         [attributedString addAttribute:NSBackgroundColorAttributeName value:_markdownStyle.mentionHereBackgroundColor range:range];
     } else if ([type isEqualToString:@"mention-user"]) {
         // TODO: change mention color when it mentions current user
@@ -105,14 +101,16 @@
       [attributedString addAttribute:NSUnderlineStyleAttributeName value:[NSNumber numberWithInteger:NSUnderlineStyleSingle] range:range];
       [attributedString addAttribute:NSForegroundColorAttributeName value:_markdownStyle.linkColor range:range];
     } else if ([type isEqualToString:@"blockquote"]) {
-      CGFloat indent = _markdownStyle.quoteMarginLeft + _markdownStyle.quoteBorderWidth + _markdownStyle.quotePaddingLeft;
+      CGFloat indent = _markdownStyle.blockquoteMarginLeft + _markdownStyle.blockquoteBorderWidth + _markdownStyle.blockquotePaddingLeft;
       NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
       paragraphStyle.firstLineHeadIndent = indent;
       paragraphStyle.headIndent = indent;
       [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:range];
-      [_quoteRanges addObject:[NSValue valueWithRange:range]];
+      [_blockquoteRanges addObject:[NSValue valueWithRange:range]];
     } else if ([type isEqualToString:@"pre"]) {
       [attributedString addAttribute:NSForegroundColorAttributeName value:_markdownStyle.preColor range:range];
+      NSRange rangeForBackground = [inputString characterAtIndex:range.location] == '\n' ? NSMakeRange(range.location + 1, range.length - 1) : range;
+      [attributedString addAttribute:NSBackgroundColorAttributeName value:_markdownStyle.preBackgroundColor range:rangeForBackground];
       // TODO: pass background color and ranges to layout manager
     } else if ([type isEqualToString:@"h1"]) {
       NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];

@@ -1,6 +1,6 @@
 //
 //  File.swift
-//  MarkdownTextInputExample
+//  LiveMarkdownExample
 //
 
 import Foundation

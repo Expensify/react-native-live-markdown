@@ -1,13 +1,13 @@
 {
-  "name": "parser",
+  "name": "@expensify/react-native-live-markdown-parser",
   "version": "0.0.0",
   "private": true,
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "build": "esbuild index.ts --bundle --minify --outfile=out.js",
-    "run": "node out.js",
+    "build": "esbuild index.ts --bundle --minify --outfile=react-native-live-markdown-parser.js",
+    "run": "node react-native-live-markdown-parser.js",
     "postinstall": "patch-package"
   },
   "author": "",
@@ -20,7 +20,7 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "expensify-common": "git+ssh://git@github.com/Expensify/expensify-common.git#c6bb3cfa56d12af9fa02e2bfc729646f5b64ef44",
+    "expensify-common": "git+ssh://git@github.com/Expensify/expensify-common.git#039f4c584655cb4b5e933c9058b84ead7c8c6aee",
     "patch-package": "^8.0.0",
     "underscore": "^1.13.6"
   }
