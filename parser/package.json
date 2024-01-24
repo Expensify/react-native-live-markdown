@@ -20,7 +20,7 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "expensify-common": "git+ssh://git@github.com/Expensify/expensify-common.git#039f4c584655cb4b5e933c9058b84ead7c8c6aee",
+    "expensify-common": "git+ssh://git@github.com/Expensify/expensify-common.git#4a61536649cbfe49236a35bc7542b5dfd0767e4a",
     "patch-package": "^8.0.0",
     "underscore": "^1.13.6"
   }
