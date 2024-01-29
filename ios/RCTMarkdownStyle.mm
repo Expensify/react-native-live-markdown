@@ -32,8 +32,10 @@
     _preColor = RCTUIColorFromSharedColor(style.pre.color);
     _preBackgroundColor = RCTUIColorFromSharedColor(style.pre.backgroundColor);
 
+    _mentionHereColor = RCTUIColorFromSharedColor(style.mentionHere.color);
     _mentionHereBackgroundColor = RCTUIColorFromSharedColor(style.mentionHere.backgroundColor);
 
+    _mentionUserColor = RCTUIColorFromSharedColor(style.mentionUser.color);
     _mentionUserBackgroundColor = RCTUIColorFromSharedColor(style.mentionUser.backgroundColor);
   }
 
@@ -64,8 +66,10 @@
     _preColor = [RCTConvert UIColor:json[@"pre"][@"color"]];
     _preBackgroundColor = [RCTConvert UIColor:json[@"pre"][@"backgroundColor"]];
 
+    _mentionHereColor = [RCTConvert UIColor:json[@"mentionHere"][@"color"]];
     _mentionHereBackgroundColor = [RCTConvert UIColor:json[@"mentionHere"][@"backgroundColor"]];
 
+    _mentionUserColor = [RCTConvert UIColor:json[@"mentionUser"][@"color"]];
     _mentionUserBackgroundColor = [RCTConvert UIColor:json[@"mentionUser"][@"backgroundColor"]];
   }
 
