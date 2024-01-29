@@ -31,9 +31,11 @@ interface MarkdownStyle {
   };
   mentionHere: {
     backgroundColor: ColorValue;
+    color: ColorValue;
   };
   mentionUser: {
     backgroundColor: ColorValue;
+    color: ColorValue;
   };
 }
 

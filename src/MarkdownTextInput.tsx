@@ -40,10 +40,12 @@ function makeDefaultMarkdownStyle(): MarkdownStyle {
       backgroundColor: 'lightgray',
     },
     mentionHere: {
-      backgroundColor: 'yellow',
+      backgroundColor: 'lime',
+      color: 'green',
     },
     mentionUser: {
       backgroundColor: 'cyan',
+      color: 'blue',
     },
   };
 }
