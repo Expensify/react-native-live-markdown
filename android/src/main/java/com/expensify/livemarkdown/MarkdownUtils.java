@@ -123,7 +123,6 @@ public class MarkdownUtils {
         setSpan(ssb, new MarkdownBackgroundColorSpan(mMarkdownStyle.getMentionUserBackgroundColor()), start, end);
         break;
       case "syntax":
-        setSpan(ssb, new MarkdownBoldSpan(), start, end);
         setSpan(ssb, new MarkdownForegroundColorSpan(mMarkdownStyle.getSyntaxColor()), start, end);
         break;
       case "link":

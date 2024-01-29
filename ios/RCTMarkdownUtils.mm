@@ -64,9 +64,9 @@
     NSUInteger length = [item[2] unsignedIntegerValue];
     NSRange range = NSMakeRange(location, length);
 
-    if ([type isEqualToString:@"bold"] || [type isEqualToString:@"syntax"] || [type isEqualToString:@"italic"] || [type isEqualToString:@"code"] || [type isEqualToString:@"pre"] || [type isEqualToString:@"h1"]) {
+    if ([type isEqualToString:@"bold"] || [type isEqualToString:@"italic"] || [type isEqualToString:@"code"] || [type isEqualToString:@"pre"] || [type isEqualToString:@"h1"]) {
       UIFont *font = [attributedString attribute:NSFontAttributeName atIndex:location effectiveRange:NULL];
-      if ([type isEqualToString:@"bold"] || [type isEqualToString:@"syntax"]) {
+      if ([type isEqualToString:@"bold"]) {
         font = [RCTFont updateFont:font withWeight:@"bold"];
       } else if ([type isEqualToString:@"italic"]) {
         font = [RCTFont updateFont:font withStyle:@"italic"];
