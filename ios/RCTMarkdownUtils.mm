@@ -64,9 +64,9 @@
     NSUInteger length = [item[2] unsignedIntegerValue];
     NSRange range = NSMakeRange(location, length);
 
-    if ([type isEqualToString:@"bold"] || [type isEqualToString:@"mention-here"] || [type isEqualToString:@"mention-user"] || [type isEqualToString:@"syntax"] || [type isEqualToString:@"italic"] || [type isEqualToString:@"code"] || [type isEqualToString:@"pre"] || [type isEqualToString:@"h1"]) {
+    if ([type isEqualToString:@"bold"] || [type isEqualToString:@"syntax"] || [type isEqualToString:@"italic"] || [type isEqualToString:@"code"] || [type isEqualToString:@"pre"] || [type isEqualToString:@"h1"]) {
       UIFont *font = [attributedString attribute:NSFontAttributeName atIndex:location effectiveRange:NULL];
-      if ([type isEqualToString:@"bold"] || [type isEqualToString:@"mention-here"] || [type isEqualToString:@"mention-user"] || [type isEqualToString:@"syntax"]) {
+      if ([type isEqualToString:@"bold"] || [type isEqualToString:@"syntax"]) {
         font = [RCTFont updateFont:font withWeight:@"bold"];
       } else if ([type isEqualToString:@"italic"]) {
         font = [RCTFont updateFont:font withStyle:@"italic"];
@@ -93,10 +93,12 @@
       [attributedString addAttribute:NSForegroundColorAttributeName value:_markdownStyle.codeColor range:range];
       [attributedString addAttribute:NSBackgroundColorAttributeName value:_markdownStyle.codeBackgroundColor range:range];
     } else if ([type isEqualToString:@"mention-here"]) {
-        [attributedString addAttribute:NSBackgroundColorAttributeName value:_markdownStyle.mentionHereBackgroundColor range:range];
+      [attributedString addAttribute:NSForegroundColorAttributeName value:_markdownStyle.mentionHereColor range:range];
+      [attributedString addAttribute:NSBackgroundColorAttributeName value:_markdownStyle.mentionHereBackgroundColor range:range];
     } else if ([type isEqualToString:@"mention-user"]) {
-        // TODO: change mention color when it mentions current user
-        [attributedString addAttribute:NSBackgroundColorAttributeName value:_markdownStyle.mentionUserBackgroundColor range:range];
+      // TODO: change mention color when it mentions current user
+      [attributedString addAttribute:NSForegroundColorAttributeName value:_markdownStyle.mentionUserColor range:range];
+      [attributedString addAttribute:NSBackgroundColorAttributeName value:_markdownStyle.mentionUserBackgroundColor range:range];
     } else if ([type isEqualToString:@"link"]) {
       [attributedString addAttribute:NSUnderlineStyleAttributeName value:[NSNumber numberWithInteger:NSUnderlineStyleSingle] range:range];
       [attributedString addAttribute:NSForegroundColorAttributeName value:_markdownStyle.linkColor range:range];
