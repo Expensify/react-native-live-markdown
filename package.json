@@ -36,7 +36,7 @@
     "lint:parser": "eslint parser --ext .js,.ts,.tsx",
     "lint:web": "eslint WebExample --ext .js,.ts,.tsx",
     "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
-    "prepare": "bob build",
+    "prepare": "bob build && mkdir lib/parser && cp parser/react-native-live-markdown-parser.js lib/parser/react-native-live-markdown-parser.js",
     "release": "release-it"
   },
   "keywords": [
