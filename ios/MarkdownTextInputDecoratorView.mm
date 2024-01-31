@@ -70,8 +70,10 @@
   } else if ([backedTextInputView isKindOfClass:[RCTUITextView class]]) {
     _textView = (RCTUITextView *)backedTextInputView;
     [_textView setMarkdownUtils:_markdownUtils];
-    object_setClass(_textView.layoutManager, [MarkdownLayoutManager class]);
-    [_textView.layoutManager setValue:_markdownUtils forKey:@"markdownUtils"];
+    NSLayoutManager *layoutManager = _textView.layoutManager; // switching to TextKit 1 compatibility mode
+    layoutManager.allowsNonContiguousLayout = NO; // workaround for onScroll issue
+    object_setClass(layoutManager, [MarkdownLayoutManager class]);
+    [layoutManager setValue:_markdownUtils forKey:@"markdownUtils"];
   } else {
     react_native_assert(false && "Cannot enable Markdown for this type of TextInput.");
   }
@@ -87,10 +89,10 @@
   }
   if (_textView != nil) {
     [_textView setMarkdownUtils:nil];
-    if (_textView.layoutManager != nil && [object_getClass(_textView.layoutManager) isEqual:[MarkdownLayoutManager class]]) {
-      [_textView.layoutManager setValue:nil forKey:@"markdownUtils"];
-      object_setClass(_textView.layoutManager, [NSLayoutManager class]);
-    }
+//    if (_textView.layoutManager != nil && [object_getClass(_textView.layoutManager) isEqual:[MarkdownLayoutManager class]]) {
+//      [_textView.layoutManager setValue:nil forKey:@"markdownUtils"];
+//      object_setClass(_textView.layoutManager, [NSLayoutManager class]);
+//    }
   }
 }
 
