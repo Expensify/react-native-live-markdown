@@ -89,10 +89,10 @@
   }
   if (_textView != nil) {
     [_textView setMarkdownUtils:nil];
-//    if (_textView.layoutManager != nil && [object_getClass(_textView.layoutManager) isEqual:[MarkdownLayoutManager class]]) {
-//      [_textView.layoutManager setValue:nil forKey:@"markdownUtils"];
-//      object_setClass(_textView.layoutManager, [NSLayoutManager class]);
-//    }
+   if (_textView.layoutManager != nil && [object_getClass(_textView.layoutManager) isEqual:[MarkdownLayoutManager class]]) {
+     [_textView.layoutManager setValue:nil forKey:@"markdownUtils"];
+     object_setClass(_textView.layoutManager, [NSLayoutManager class]);
+   }
   }
 }
 
