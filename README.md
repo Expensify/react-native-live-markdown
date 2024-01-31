@@ -128,8 +128,12 @@ Currently, `react-native-live-markdown` supports only [ExpensiMark](https://gith
 
 MIT
 
-<picture>
-  <source media="(prefers-color-scheme: light)" srcset="./assets/signature-light.png" />
-  <source media="(prefers-color-scheme: dark)" srcset="./assets/signature-dark.png" />
-  <img alt="Brought to you by Software Mansion + Expensify" src="./assets/signature-light.png" />
-</picture>
+---
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: light)" srcset="./assets/signature-light.png" />
+    <source media="(prefers-color-scheme: dark)" srcset="./assets/signature-dark.png" />
+    <img alt="Brought to you by Software Mansion + Expensify" src="./assets/signature-light.png" width="600" />
+  </picture>
+</p>
