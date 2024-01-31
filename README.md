@@ -1,4 +1,4 @@
-# @expensify/react-native-live-markdown
+<img src="./assets/hero-animation.gif" alt="@expensify/react-native-live-markdown" />
 
 ## Features
 
@@ -127,3 +127,9 @@ Currently, `react-native-live-markdown` supports only [ExpensiMark](https://gith
 ## License
 
 MIT
+
+<picture>
+  <source media="(prefers-color-scheme: light)" srcset="./assets/signature-light.png" />
+  <source media="(prefers-color-scheme: dark)" srcset="./assets/signature-dark.png" />
+  <img alt="Brought to you by Software Mansion + Expensify" src="./assets/signature-light.png" />
+</picture>
