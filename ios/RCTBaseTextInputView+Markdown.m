@@ -53,7 +53,7 @@
     }
 
     {
-      // swizzle setAttributedText
+      // swizzle updateLocalData
       SEL originalSelector = @selector(updateLocalData);
       SEL swizzledSelector = @selector(markdown_updateLocalData);
       Method originalMethod = class_getInstanceMethod(cls, originalSelector);
