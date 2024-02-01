@@ -114,7 +114,7 @@ Currently, `react-native-live-markdown` supports only [ExpensiMark](https://gith
 
 ## API reference
 
-`MarkdownTextInput` inherits all props of React Native's `TextInput` component.
+`MarkdownTextInput` inherits all props of React Native's `TextInput` component as well as introduces the following properties:
 
 | Prop            | Type            | Default     | Note                                                                                                                                                                                                                   |
 | --------------- | --------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
