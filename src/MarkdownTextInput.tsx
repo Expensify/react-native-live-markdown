@@ -9,6 +9,7 @@ type MarkdownStyle = MarkdownTextInputDecoractorView.MarkdownStyle;
 
 const FONT_FAMILY_MONOSPACE = Platform.select({
   ios: 'Courier',
+  macos: 'Courier',
   default: 'monospace',
 });
 

@@ -11,7 +11,7 @@
   __weak RCTMarkdownStyle *_prevMarkdownStyle;
 }
 
-- (instancetype)initWithBackedTextInputView:(UIView<RCTBackedTextInputViewProtocol> *)backedTextInputView
+- (instancetype)initWithBackedTextInputView:(RCTUIView<RCTBackedTextInputViewProtocol> *)backedTextInputView
 {
   if (self = [super init]) {
     _backedTextInputView = backedTextInputView;

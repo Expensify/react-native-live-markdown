@@ -27,7 +27,7 @@
 {
   RCTMarkdownUtils *markdownUtils = [self getMarkdownUtils];
   if (markdownUtils != nil) {
-    UITextRange *range = self.backedTextInputView.selectedTextRange;
+    NSRange range = self.backedTextInputView.selectedRange;
     NSAttributedString *attributedText = [markdownUtils parseMarkdown:self.backedTextInputView.attributedText];
     [self.backedTextInputView setAttributedText:attributedText];
     [self.backedTextInputView setSelectedTextRange:range notifyDelegate:YES];
