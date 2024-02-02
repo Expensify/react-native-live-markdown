@@ -6,7 +6,7 @@
 - ⌨️ Live synchronous formatting on every keystroke
 - ⚡ Fully native experience (selection, spellcheck, autocomplete)
 - 🎨 Customizable styles
-- 🌐 Universal support (Android, iOS, web)
+- 🌐 Universal support (Android, iOS, macOS, web)
 - 🏗️ Supports New Architecture
 
 ## Installation
