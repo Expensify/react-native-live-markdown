@@ -173,43 +173,43 @@ test('codeblock', () => {
 describe('blockquote', () => {
   test('with single space', () => {
     expect('> Hello world!').toBeParsedAs([
-      ['syntax', 0, 1],
       ['blockquote', 0, 14],
+      ['syntax', 0, 1],
     ]);
   });
 
   test('with multiple spaces', () => {
     expect('>      Hello world!').toBeParsedAs([
-      ['syntax', 0, 1],
       ['blockquote', 0, 19],
+      ['syntax', 0, 1],
     ]);
   });
 
   test('without space', () => {
     expect('>Hello world!').toBeParsedAs([
-      ['syntax', 0, 1],
       ['blockquote', 0, 13],
+      ['syntax', 0, 1],
     ]);
   });
 });
 
 test('multiple blockquotes', () => {
   expect('> Hello\n> beautiful\n> world').toBeParsedAs([
-    ['syntax', 0, 1],
     ['blockquote', 0, 7],
-    ['syntax', 8, 1],
+    ['syntax', 0, 1],
     ['blockquote', 8, 11],
-    ['syntax', 20, 1],
+    ['syntax', 8, 1],
     ['blockquote', 20, 7],
+    ['syntax', 20, 1],
   ]);
 });
 
 test('separate blockquotes', () => {
   expect('> Lorem ipsum\ndolor\n> sit amet').toBeParsedAs([
-    ['syntax', 0, 1],
     ['blockquote', 0, 13],
-    ['syntax', 20, 1],
+    ['syntax', 0, 1],
     ['blockquote', 20, 10],
+    ['syntax', 20, 1],
   ]);
 });
 
@@ -223,14 +223,14 @@ test('h1', () => {
 test('nested bold and italic', () => {
   expect('*_Hello_*, _*world*_!').toBeParsedAs([
     ['syntax', 0, 1],
-    ['syntax', 1, 1],
     ['bold', 1, 7],
+    ['syntax', 1, 1],
     ['italic', 2, 5],
     ['syntax', 7, 1],
     ['syntax', 8, 1],
     ['syntax', 11, 1],
-    ['syntax', 12, 1],
     ['italic', 12, 7],
+    ['syntax', 12, 1],
     ['bold', 13, 5],
     ['syntax', 18, 1],
     ['syntax', 19, 1],
@@ -240,8 +240,8 @@ test('nested bold and italic', () => {
 describe('nested h1 in blockquote', () => {
   test('without spaces', () => {
     expect('># Hello world').toBeParsedAs([
-      ['syntax', 0, 1],
       ['blockquote', 0, 14],
+      ['syntax', 0, 1],
       ['syntax', 1, 2],
       ['h1', 3, 11],
     ]);
@@ -249,8 +249,8 @@ describe('nested h1 in blockquote', () => {
 
   test('with single space', () => {
     expect('> # Hello world').toBeParsedAs([
-      ['syntax', 0, 1],
       ['blockquote', 0, 15],
+      ['syntax', 0, 1],
       ['syntax', 2, 2],
       ['h1', 4, 11],
     ]);
@@ -258,8 +258,8 @@ describe('nested h1 in blockquote', () => {
 
   test('with multiple spaces after #', () => {
     expect('>#    Hello world').toBeParsedAs([
-      ['syntax', 0, 1],
       ['blockquote', 0, 17],
+      ['syntax', 0, 1],
       ['syntax', 1, 2],
       ['h1', 3, 14],
     ]);
@@ -270,22 +270,22 @@ describe('trailing whitespace', () => {
   describe('after blockquote', () => {
     test('nothing', () => {
       expect('> Hello world').toBeParsedAs([
-        ['syntax', 0, 1],
         ['blockquote', 0, 13],
+        ['syntax', 0, 1],
       ]);
     });
 
     test('single space', () => {
       expect('> Hello world ').toBeParsedAs([
-        ['syntax', 0, 1],
         ['blockquote', 0, 14],
+        ['syntax', 0, 1],
       ]);
     });
 
     test('newline', () => {
       expect('> Hello world\n').toBeParsedAs([
-        ['syntax', 0, 1],
         ['blockquote', 0, 13],
+        ['syntax', 0, 1],
       ]);
     });
   });
@@ -321,12 +321,12 @@ describe('trailing whitespace', () => {
 
     test('multiple blockquotes', () => {
       expect('> # Hello\n> # world').toBeParsedAs([
-        ['syntax', 0, 1],
         ['blockquote', 0, 9],
+        ['syntax', 0, 1],
         ['syntax', 2, 2],
         ['h1', 4, 5],
-        ['syntax', 10, 1],
         ['blockquote', 10, 9],
+        ['syntax', 10, 1],
         ['syntax', 12, 2],
         ['h1', 14, 5],
       ]);

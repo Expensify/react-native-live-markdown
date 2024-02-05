@@ -1,0 +1,24 @@
+.react-native-live-markdown-input-singleline[contenteditable='true'] {
+  white-space: nowrap;
+  overflow: auto;
+}
+
+.react-native-live-markdown-input-singleline[contenteditable='true']::-webkit-scrollbar {
+  display: none;
+}
+
+.react-native-live-markdown-input-singleline[contenteditable='true'] br {
+  display: none;
+}
+
+.react-native-live-markdown-input-singleline[contenteditable='true'] * {
+  display: inline;
+  white-space: nowrap;
+}
+
+.react-native-live-markdown-input-singleline[contenteditable='true']:empty::before,
+.react-native-live-markdown-input-multiline[contenteditable='true']:empty::before {
+  pointer-events: none;
+  display: block; /* For Firefox */
+  content: attr(placeholder);
+}
