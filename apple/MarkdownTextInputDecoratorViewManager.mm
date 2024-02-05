@@ -5,7 +5,7 @@
 
 RCT_EXPORT_MODULE(MarkdownTextInputDecoratorView)
 
-- (UIView *)view
+- (RCTUIView *)view
 {
   return [[MarkdownTextInputDecoratorView alloc] init];
 }

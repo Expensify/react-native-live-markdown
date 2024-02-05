@@ -1,3 +1,4 @@
+#import <objc/runtime.h>
 #import <react-native-live-markdown/MarkdownLayoutManager.h>
 
 @implementation MarkdownLayoutManager
@@ -7,7 +8,7 @@
 
   [self enumerateLineFragmentsForGlyphRange:glyphsToShow usingBlock:^(CGRect rect, CGRect usedRect, NSTextContainer * _Nonnull textContainer, NSRange glyphRange, BOOL * _Nonnull stop) {
     __block BOOL isBlockquote = NO;
-    RCTMarkdownUtils *markdownUtils = [self valueForKey:@"markdownUtils"];
+    RCTMarkdownUtils *markdownUtils = objc_getAssociatedObject(self, @selector(markdownUtils));
     [markdownUtils.blockquoteRanges enumerateObjectsUsingBlock:^(NSValue *item, NSUInteger idx, BOOL * _Nonnull stop) {
       NSRange range = [item rangeValue];
       NSUInteger start = range.location;
@@ -27,7 +28,7 @@
       CGFloat height = rect.size.height;
       CGRect lineRect = CGRectMake(x, y, width, height);
       [markdownUtils.markdownStyle.blockquoteBorderColor setFill];
-      UIRectFill(lineRect);
+      NSRectFill(lineRect);
     }
   }];
 }

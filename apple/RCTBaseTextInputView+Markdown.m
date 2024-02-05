@@ -27,7 +27,7 @@
 {
   RCTMarkdownUtils *markdownUtils = [self getMarkdownUtils];
   if (markdownUtils != nil) {
-    UITextRange *range = self.backedTextInputView.selectedTextRange;
+    NSRange range = self.backedTextInputView.selectedRange;
     NSAttributedString *attributedText = [markdownUtils parseMarkdown:self.backedTextInputView.attributedText];
     [self.backedTextInputView setAttributedText:attributedText];
     [self.backedTextInputView setSelectedTextRange:range notifyDelegate:YES];
@@ -58,7 +58,7 @@
       SEL swizzledSelector = @selector(markdown_updateLocalData);
       Method originalMethod = class_getInstanceMethod(cls, originalSelector);
       Method swizzledMethod = class_getInstanceMethod(cls, swizzledSelector);
-      method_exchangeImplementations(originalMethod, swizzledMethod);
+      // method_exchangeImplementations(originalMethod, swizzledMethod);
     }
   });
 }
