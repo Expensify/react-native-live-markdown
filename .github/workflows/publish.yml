@@ -79,7 +79,7 @@ jobs:
                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
            - name: Build package
-             run: yarn prepare
+             run: yarn pack
 
            - name: Publish to npm
              run: yarn publish
