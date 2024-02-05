@@ -210,7 +210,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     // Placeholder text color logic
     const updateTextColor = useCallback((node: HTMLDivElement, text: string) => {
       // eslint-disable-next-line no-param-reassign -- we need to change the style of the node, so we need to modify it
-      node.style.color = String(placeholder && (text === '' || text === '\n') ? placeholderTextColor : (style as TextStyle).color || 'black');
+      node.style.color = String(placeholder && (text === '' || text === '\n') ? placeholderTextColor : flattenedStyle.color || 'black');
     }, []);
 
     const handleOnChangeText = useCallback(
