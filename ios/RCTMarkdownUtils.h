@@ -1,5 +1,5 @@
 #import <React/RCTBackedTextInputViewProtocol.h>
-#import <react-native-live-markdown/RCTMarkdownStyle.h>
+#import <react_native_live_markdown/RCTMarkdownStyle.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

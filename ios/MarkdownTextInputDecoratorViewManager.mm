@@ -1,5 +1,5 @@
-#import <react-native-live-markdown/MarkdownTextInputDecoratorViewManager.h>
-#import <react-native-live-markdown/MarkdownTextInputDecoratorView.h>
+#import <react_native_live_markdown/MarkdownTextInputDecoratorViewManager.h>
+#import <react_native_live_markdown/MarkdownTextInputDecoratorView.h>
 
 @implementation MarkdownTextInputDecoratorViewManager
 

@@ -1,9 +1,9 @@
-#import <react-native-live-markdown/RCTMarkdownStyle.h>
+#import <react_native_live_markdown/RCTMarkdownStyle.h>
 
 #ifdef RCT_NEW_ARCH_ENABLED
 #import <React/RCTConversions.h>
 #else
-#import <React-Core/React/RCTConvert.h>
+#import <React/RCTConvert.h>
 #endif /* RCT_NEW_ARCH_ENABLED */
 
 @implementation RCTMarkdownStyle
