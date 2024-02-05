@@ -315,9 +315,6 @@ PODS:
   - React-jsinspector (0.72.9)
   - React-logger (0.72.9):
     - glog
-  - react-native-live-markdown (0.1.0):
-    - RCT-Folly (= 2021.07.22.00)
-    - React-Core
   - React-NativeModulesApple (0.72.9):
     - hermes-engine
     - React-callinvoker
@@ -428,6 +425,9 @@ PODS:
     - React-jsi (= 0.72.9)
     - React-logger (= 0.72.9)
     - React-perflogger (= 0.72.9)
+  - RNLiveMarkdown (0.1.0):
+    - RCT-Folly (= 2021.07.22.00)
+    - React-Core
   - SocketRocket (0.6.1)
   - Yoga (1.14.0)
 
@@ -455,7 +455,6 @@ DEPENDENCIES:
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
-  - react-native-live-markdown (from `../..`)
   - React-NativeModulesApple (from `../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
@@ -473,6 +472,7 @@ DEPENDENCIES:
   - React-runtimescheduler (from `../node_modules/react-native/ReactCommon/react/renderer/runtimescheduler`)
   - React-utils (from `../node_modules/react-native/ReactCommon/react/utils`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
+  - RNLiveMarkdown (from `../..`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -524,8 +524,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/jsinspector"
   React-logger:
     :path: "../node_modules/react-native/ReactCommon/logger"
-  react-native-live-markdown:
-    :path: "../.."
   React-NativeModulesApple:
     :path: "../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios"
   React-perflogger:
@@ -560,11 +558,13 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/react/utils"
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
+  RNLiveMarkdown:
+    :path: "../.."
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
-  boost: 57d2868c099736d80fcd648bf211b4431e51a558
+  boost: 7dcd2de282d72e344012f7d6564d024930a6a440
   DoubleConversion: 5189b271737e1565bdce30deb4a08d647e3f5f54
   FBLazyVector: dc178b8748748c036ef9493a5d59d6d1f91a36ce
   FBReactNativeSpec: d0aaae78e93c89dc2d691d8052a4d2aeb1b461ee
@@ -587,7 +587,6 @@ SPEC CHECKSUMS:
   React-jsiexecutor: 5a169b1dd1abad06bed40ab7e1aca883c657d865
   React-jsinspector: 54205b269da20c51417e0fc02c4cde9f29a4bf1a
   React-logger: f42d2f2bc4cbb5d19d7c0ce84b8741b1e54e88c8
-  react-native-live-markdown: d187e67bbac163914bf1f940aed08e7b7fe413cc
   React-NativeModulesApple: 3d1fab3decbf21afb13a7a3a297053652765190d
   React-perflogger: cb433f318c6667060fc1f62e26eb58d6eb30a627
   React-RCTActionSheet: 0af3f8ac067e8a1dde902810b7ad169d0a0ec31e
@@ -605,6 +604,7 @@ SPEC CHECKSUMS:
   React-runtimescheduler: e8591257b9c3ba3f675f9435fd667b7ea9da9ffb
   React-utils: ca41af4592cb4ed7eb660d33b7d63818561ee118
   ReactCommon: 7f1c2a847773d16c6ba5fb8224552f4d510a51ba
+  RNLiveMarkdown: 1bd05ce65f18f415f12eba1b0164ba0c2b2cd3d9
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
   Yoga: eddf2bbe4a896454c248a8f23b4355891eb720a6
 

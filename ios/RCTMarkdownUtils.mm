@@ -1,4 +1,4 @@
-#import <react_native_live_markdown/RCTMarkdownUtils.h>
+#import <RNLiveMarkdown/RCTMarkdownUtils.h>
 #import <react/debug/react_native_assert.h>
 #import <React/RCTAssert.h>
 #import <React/RCTFont.h>

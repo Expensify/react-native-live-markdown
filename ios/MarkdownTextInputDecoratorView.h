@@ -1,5 +1,5 @@
 #import <UIKit/UIKit.h>
-#import <react_native_live_markdown/RCTMarkdownStyle.h>
+#import <RNLiveMarkdown/RCTMarkdownStyle.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

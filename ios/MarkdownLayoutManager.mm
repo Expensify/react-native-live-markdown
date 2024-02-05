@@ -1,4 +1,4 @@
-#import <react_native_live_markdown/MarkdownLayoutManager.h>
+#import <RNLiveMarkdown/MarkdownLayoutManager.h>
 
 @implementation MarkdownLayoutManager
 

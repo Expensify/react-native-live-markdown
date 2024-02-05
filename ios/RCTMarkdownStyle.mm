@@ -1,4 +1,4 @@
-#import <react_native_live_markdown/RCTMarkdownStyle.h>
+#import <RNLiveMarkdown/RCTMarkdownStyle.h>
 
 #ifdef RCT_NEW_ARCH_ENABLED
 #import <React/RCTConversions.h>
