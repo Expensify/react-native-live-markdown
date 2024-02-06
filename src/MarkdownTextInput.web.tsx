@@ -156,6 +156,14 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         if (history.current && shouldAddToHistory) {
           history.current.debouncedAdd(parsedText.text, parsedText.cursorPosition);
         }
+
+        if (parsedText.cursorPosition !== null) {
+          contentSelection.current = {
+            start: parsedText.cursorPosition,
+            end: parsedText.cursorPosition,
+          };
+        }
+
         return parsedText;
       },
       [multiline],
@@ -418,13 +426,13 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       }
 
       const text = processedValue !== undefined ? processedValue : '';
-      parseText(divRef.current, text, processedMarkdownStyle);
       if ((divRef.current as unknown as TextInput).isFocused()) {
         contentSelection.current = {
           start: text.length,
           end: text.length,
         };
       }
+      parseText(divRef.current, text, processedMarkdownStyle);
       updateTextColor(divRef.current, value);
     }, [multiline, processedMarkdownStyle, processedValue]);
 
