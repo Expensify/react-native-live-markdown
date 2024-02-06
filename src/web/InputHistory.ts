@@ -23,6 +23,24 @@ export default class InputHistory {
     this.debounceTime = debounceTime;
   }
 
+  getCurrentItem(): HistoryItem | null {
+    return this.history[this.historyIndex] || null;
+  }
+
+  setHistory(newHistory: HistoryItem[]): void {
+    this.history = newHistory.slice(newHistory.length - this.depth);
+    this.historyIndex = newHistory.length - 1;
+  }
+
+  setHistoryIndex(index: number): void {
+    this.historyIndex = index;
+  }
+
+  clear(): void {
+    this.history = [];
+    this.historyIndex = 0;
+  }
+
   debouncedAdd(text: string, cursorPosition: number): void {
     this.currentText = text;
 
@@ -65,7 +83,7 @@ export default class InputHistory {
       return this.history[this.history.length - 1] || null;
     }
 
-    if (this.history.length === 0) {
+    if (this.history.length === 0 || this.historyIndex - 1 < 0) {
       return null;
     }
 
@@ -76,7 +94,12 @@ export default class InputHistory {
   }
 
   redo(): HistoryItem | null {
-    if (this.history.length === 0 || (this.currentText !== null && this.timeout)) {
+    if (this.currentText !== null && this.timeout) {
+      clearTimeout(this.timeout);
+      return this.history[this.history.length - 1] || null;
+    }
+
+    if (this.history.length === 0 || this.historyIndex + 1 > this.history.length) {
       return null;
     }
 
@@ -85,6 +108,7 @@ export default class InputHistory {
     } else {
       return null;
     }
+
     return this.history[this.historyIndex] || null;
   }
 }
