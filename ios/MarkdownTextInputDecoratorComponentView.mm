@@ -3,9 +3,9 @@
 #import <react/renderer/components/RNLiveMarkdownSpec/ComponentDescriptors.h>
 #import <react/renderer/components/RNLiveMarkdownSpec/Props.h>
 
-#import <react-native-live-markdown/MarkdownTextInputDecoratorComponentView.h>
-#import <react-native-live-markdown/MarkdownTextInputDecoratorView.h>
-#import <react-native-live-markdown/RCTMarkdownStyle.h>
+#import <RNLiveMarkdown/MarkdownTextInputDecoratorComponentView.h>
+#import <RNLiveMarkdown/MarkdownTextInputDecoratorView.h>
+#import <RNLiveMarkdown/RCTMarkdownStyle.h>
 
 #import "RCTFabricComponentsPlugins.h"
 
