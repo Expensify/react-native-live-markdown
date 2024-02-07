@@ -80,7 +80,7 @@ jobs:
                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
            - name: Auto-merge pull request
-             run: gh pr merge --merge --delete-branch ${{ env.BRANCH_NAME }}
+             run: gh pr merge --squash --delete-branch ${{ env.BRANCH_NAME }}
              env:
                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -88,6 +88,6 @@ jobs:
              run: yarn pack
 
            - name: Publish to npm
-             run: yarn publish
+             run: yarn npm publish
              env:
                NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
