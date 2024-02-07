@@ -105,21 +105,20 @@ function processMarkdownStyle(input: MarkdownStyle | undefined): MarkdownStyle {
   return processUnitsInMarkdownStyle(StyleUtils.mergeMarkdownStyleWithDefault(input));
 }
 
-function getElementHeight(node: Element, styles: TextStyle, numberOfLines: number | undefined = undefined): string {
-  if (!numberOfLines) {
-    return `${styles.height}px` || 'auto';
+function getElementHeight(node: HTMLDivElement, styles: CSSProperties, numberOfLines: number | undefined) {
+  if (numberOfLines) {
+    const tempElement = document.createElement('div');
+    tempElement.setAttribute('contenteditable', 'true');
+    Object.assign(tempElement.style, styles);
+    tempElement.innerText = Array(numberOfLines).fill('A').join('\n');
+    if (node.parentElement) {
+      node.parentElement.appendChild(tempElement);
+      const height = tempElement.clientHeight;
+      node.parentElement.removeChild(tempElement);
+      return `${height}px`;
+    }
   }
-
-  const computedStyle = window.getComputedStyle(node);
-  const lineHeight = computedStyle.getPropertyValue('line-height');
-  let lineHeightInPixels;
-  if (lineHeight.includes('px')) {
-    lineHeightInPixels = parseFloat(lineHeight);
-  } else {
-    lineHeightInPixels = parseFloat(computedStyle.fontSize) * 1.2;
-  }
-
-  return `${lineHeightInPixels * numberOfLines + parseFloat(computedStyle.paddingBottom) + parseFloat(computedStyle.paddingTop)}px`;
+  return `${styles.height}px` || 'auto';
 }
 
 const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
@@ -437,11 +436,6 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           // update to placeholder color when value is empty
           updateTextColor(r, r.innerText);
         }
-
-        if (multiline && !flattenedStyle.height) {
-          // set height for multiline input based on number of lines
-          r.style.height = getElementHeight(r, flattenedStyle, numberOfLines);
-        }
       }
 
       if (ref) {
@@ -469,6 +463,15 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       parseText(divRef.current, text, processedMarkdownStyle, text.length);
       updateTextColor(divRef.current, value);
     }, [multiline, processedMarkdownStyle, processedValue]);
+
+    useEffect(() => {
+      if (!divRef.current || !multiline) {
+        return;
+      }
+      const elementHeight = getElementHeight(divRef.current, inputStyles, numberOfLines);
+      divRef.current.style.height = elementHeight;
+      divRef.current.style.maxHeight = elementHeight;
+    }, [numberOfLines]);
 
     return (
       // eslint-disable-next-line jsx-a11y/no-static-element-interactions
