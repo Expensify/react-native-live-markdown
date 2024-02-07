@@ -46,6 +46,9 @@
 #endif /* RCT_NEW_ARCH_ENABLED */
 
   react_native_assert(currentIndex != 0 && currentIndex != NSNotFound && "Error while finding current component.");
+  if (currentIndex == 0) {
+    return;
+  }
   UIView *view = [viewsArray objectAtIndex:currentIndex - 1];
 
 #ifdef RCT_NEW_ARCH_ENABLED
@@ -55,6 +58,9 @@
 #else
   react_native_assert([view isKindOfClass:[RCTBaseTextInputView class]] && "Previous sibling component is not an instance of RCTBaseTextInputView.");
   _textInput = (RCTBaseTextInputView *)view;
+  if (![view isKindOfClass:[RCTBaseTextInputView class]]) {
+    return;
+  }
   UIView<RCTBackedTextInputViewProtocol> *backedTextInputView = _textInput.backedTextInputView;
 #endif /* RCT_NEW_ARCH_ENABLED */
 
@@ -77,6 +83,8 @@
   } else {
     react_native_assert(false && "Cannot enable Markdown for this type of TextInput.");
   }
+
+  _textInput.attributedText = [_textInput.attributedText copy];
 }
 
 - (void)willMoveToWindow:(UIWindow *)newWindow

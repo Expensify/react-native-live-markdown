@@ -1,162 +1,221 @@
 import * as React from 'react';
 
-import {Button, Platform, StyleSheet, Text, View} from 'react-native';
+import {KeyboardAvoidingView, Pressable, StyleSheet, View} from 'react-native';
 
+import Animated from 'react-native-reanimated';
 import {MarkdownTextInput} from '@expensify/react-native-live-markdown';
-import type {TextInput} from 'react-native';
+import {MasonryFlashList} from '@shopify/flash-list';
+import type {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
-const DEFAULT_TEXT = ['Hello, *world*!', 'https://expensify.com', '# Lorem ipsum', '> Hello world', '`foo`', '```\nbar\n```', '@here', '@someone@swmansion.com'].join('\n');
-
-function isWeb() {
-  return Platform.OS === 'web';
+interface BigNoteProps {
+  tag: string;
+  backgroundColor: string;
+  text: string;
 }
 
-function getPlatform() {
-  if (isWeb()) {
-    return 'web';
-  }
-  // @ts-expect-error it works
-  return Platform.constants.systemName || Platform.constants.Brand;
+interface SmallNoteProps extends BigNoteProps {
+  onPress: () => void;
 }
 
-function getPlatformVersion() {
-  return Platform.Version;
-}
+type ParamList = {
+  Screen1?: object;
+  Screen2: BigNoteProps;
+};
 
-function getBundle() {
-  return __DEV__ ? 'dev' : 'production';
-}
+const MARKDOWN_STYLE = {
+  h1: {
+    fontSize: 21,
+  },
+  pre: {
+    backgroundColor: 'transparent',
+  },
+  code: {
+    backgroundColor: 'transparent',
+  },
+  blockquote: {
+    borderColor: 'rgba(0,0,0,0.15)',
+    borderWidth: 6,
+    marginLeft: 0,
+    paddingLeft: 8,
+  },
+  mentionHere: {
+    color: 'brown',
+    backgroundColor: 'yellow',
+  },
+  mentionUser: {
+    color: 'dodgerblue',
+    backgroundColor: 'lightblue',
+  },
+};
 
-function getRuntime() {
-  if ('HermesInternal' in global) {
-    const version =
-      // @ts-expect-error this is fine
-      // eslint-disable-next-line es/no-optional-chaining
-      global.HermesInternal?.getRuntimeProperties?.()['OSS Release Version'];
-    return `Hermes (${version})`;
-  }
-  if ('_v8runtime' in global) {
-    // @ts-expect-error this is fine
-    // eslint-disable-next-line no-underscore-dangle
-    const version = global._v8runtime().version;
-    return `V8 (${version})`;
-  }
-  return 'JSC';
-}
+const AnimatedMarkdownTextInput = Animated.createAnimatedComponent(MarkdownTextInput);
 
-function getArchitecture() {
-  return 'nativeFabricUIManager' in global ? 'Fabric' : 'Paper';
-}
-
-function getReactNativeVersion() {
-  const {major, minor, patch} = Platform.constants.reactNativeVersion;
-  return `${major}.${minor}.${patch}`;
-}
-
-export default function App() {
-  const [value, setValue] = React.useState(DEFAULT_TEXT);
-
-  // TODO: use MarkdownTextInput ref instead of TextInput ref
-  const ref = React.useRef<TextInput>(null);
+function SmallNote({tag, backgroundColor, text, onPress}: SmallNoteProps) {
+  const [value, setValue] = React.useState(text);
 
   return (
-    <View style={styles.container}>
-      <View style={styles.platform}>
-        <Text>
-          Platform: {getPlatform()} {getPlatformVersion()}
-        </Text>
-        <Text>Bundle: {getBundle()}</Text>
-        {!isWeb() && (
-          <>
-            <Text>Architecture: {getArchitecture()}</Text>
-            <Text>RN version: {getReactNativeVersion()}</Text>
-            <Text>RN runtime: {getRuntime()}</Text>
-          </>
-        )}
+    <Pressable onPress={onPress}>
+      <AnimatedMarkdownTextInput
+        sharedTransitionTag={tag}
+        multiline
+        value={value}
+        onChangeText={setValue}
+        editable={false}
+        style={[styles.smallNote, {backgroundColor}]}
+        pointerEvents="none"
+        markdownStyle={MARKDOWN_STYLE}
+        autoCapitalize="none"
+      />
+    </Pressable>
+  );
+}
+
+const DATA = [
+  {
+    tag: 'note1',
+    backgroundColor: 'lightgreen',
+    value: '# React Native Live Markdown\nhttps://github.com/Expensify/react-native-live-markdown\nDrop-in replacement for `<TextInput>` component',
+  },
+  {tag: 'note2', backgroundColor: '#ffd3fd', value: 'Made with 💖 at *Software Mansion* for *Expensify*'},
+  {tag: 'note6', backgroundColor: 'white', value: '# Heading\n*Bold* _italic_ ~strikethrough~\n*_~nested~_*\n`inline code`\n> Blockquote'},
+  {tag: 'note4', backgroundColor: 'lightskyblue', value: '```\nyarn add @expensify/react-native-live-markdown\n```'},
+  {tag: 'note5', backgroundColor: '#ffac9d', value: 'this is just a `<TextInput>` with some magic'},
+  {
+    tag: 'note3',
+    backgroundColor: 'lemonchiffon',
+    value:
+      '> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque iaculis est a cursus pellentesque. Phasellus id massa sit amet lacus pellentesque maximus molestie in diam. Morbi commodo pellentesque dignissim. Morbi augue nunc, finibus quis dapibus tincidunt, vulputate vel ligula. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Sed laoreet feugiat enim, sed condimentum lorem varius non. Mauris quis neque venenatis, mattis massa vel, feugiat felis. Phasellus id augue cursus ex vehicula porttitor. ',
+  },
+  {tag: 'note7', backgroundColor: 'paleturquoise', value: '🌐 Supports Android, iOS & web'},
+  {tag: 'note8', backgroundColor: 'lightgray', value: '⌨️ Live synchronous formatting on every keystroke'},
+  {tag: 'note9', backgroundColor: 'lavender', value: '⚡ Fully native experience:\n• selection\n• spellcheck\n• autocomplete'},
+  {tag: 'note10', backgroundColor: 'wheat', value: '🎨 Customizable styles'},
+];
+
+function Screen1({navigation}: NativeStackScreenProps<ParamList, 'Screen1'>) {
+  return (
+    <MasonryFlashList
+      contentContainerStyle={styles.flashlist}
+      data={DATA}
+      numColumns={2}
+      renderItem={({item}) => (
+        <SmallNote
+          tag={item.tag}
+          backgroundColor={item.backgroundColor}
+          text={item.value}
+          onPress={() => navigation.navigate('Screen2', {tag: item.tag, backgroundColor: item.backgroundColor, text: item.value})}
+        />
+      )}
+      estimatedItemSize={150}
+    />
+  );
+}
+
+function BigNote({tag, backgroundColor, text}: BigNoteProps) {
+  const [value, setValue] = React.useState(text);
+
+  return (
+    <AnimatedMarkdownTextInput
+      sharedTransitionTag={tag}
+      multiline
+      value={value}
+      onChangeText={setValue}
+      style={[styles.bigNote, {backgroundColor}]}
+      markdownStyle={MARKDOWN_STYLE}
+      autoCapitalize="none"
+    />
+  );
+}
+
+function Screen2({route, navigation}: NativeStackScreenProps<ParamList, 'Screen2'>) {
+  return (
+    <KeyboardAvoidingView
+      style={styles.flexOne}
+      behavior="padding"
+    >
+      <View style={styles.screen2}>
+        <View
+          style={styles.overlay}
+          onTouchStart={() => navigation.navigate('Screen1')}
+        />
+        <BigNote
+          tag={route.params.tag}
+          backgroundColor={route.params.backgroundColor}
+          text={route.params.text}
+        />
       </View>
-      {/* <Text>MarkdownTextInput singleline</Text>
-      <MarkdownTextInput
-        autoCapitalize="none"
-        value={value}
-        onChangeText={setValue}
-        style={styles.input}
-      /> */}
-      <Text>MarkdownTextInput multiline</Text>
-      <MarkdownTextInput
-        multiline
-        autoCapitalize="none"
-        value={value}
-        onChangeText={setValue}
-        style={styles.input}
-        ref={ref}
-      />
-      {/* <Text>TextInput singleline</Text>
-      <TextInput
-        autoCapitalize="none"
-        value={value}
-        onChangeText={setValue}
-        style={styles.input}
-      /> */}
-      {/* <Text>TextInput multiline</Text>
-      <TextInput
-        multiline
-        autoCapitalize="none"
-        value={value}
-        onChangeText={setValue}
-        style={styles.input}
-      /> */}
-      <Text style={styles.text}>{JSON.stringify(value)}</Text>
-      <Button
-        title="Focus"
-        onPress={() => {
-          if (!ref.current) {
-            return;
-          }
-          ref.current.focus();
+    </KeyboardAvoidingView>
+  );
+}
+
+const Stack = createNativeStackNavigator<ParamList>();
+
+export default function ManyTagsExample() {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator
+        screenOptions={{
+          animation: 'fade',
         }}
-      />
-      <Button
-        title="Blur"
-        onPress={() => {
-          if (!ref.current) {
-            return;
-          }
-          ref.current.blur();
-        }}
-      />
-      <Button
-        title="Reset"
-        onPress={() => setValue(DEFAULT_TEXT)}
-      />
-      <Button
-        title="Clear"
-        onPress={() => setValue('')}
-      />
-    </View>
+      >
+        <Stack.Screen
+          name="Screen1"
+          options={{headerTitle: 'Live Markdown Example'}}
+          component={Screen1}
+        />
+        <Stack.Screen
+          name="Screen2"
+          component={Screen2}
+          options={{headerShown: false, presentation: 'transparentModal'}}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  flashlist: {
+    padding: 6,
+  },
+  flexOne: {
+    flex: 1,
+  },
+  screen2: {
     flex: 1,
     alignItems: 'center',
-    marginTop: 60,
+    justifyContent: 'center',
   },
-  platform: {
+  center: {
+    flex: 1,
     alignItems: 'center',
-    marginBottom: 20,
+    justifyContent: 'center',
+    zIndex: 200,
   },
-  input: {
-    fontSize: 20,
+  overlay: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+    position: 'absolute',
+    backgroundColor: 'rgba(0,0,0,0.7)',
+  },
+  smallNote: {
+    fontSize: 16,
+    margin: 6,
+    padding: 10,
+    borderRadius: 10,
+    backgroundColor: 'gold',
+    overflow: 'hidden',
+    maxHeight: 200,
+  },
+  bigNote: {
+    fontSize: 16,
     width: 300,
-    padding: 5,
-    borderColor: 'gray',
-    borderWidth: 1,
-    textAlignVertical: 'top',
-  },
-  text: {
-    fontFamily: 'Courier New',
-    marginTop: 10,
-    height: 100,
+    minHeight: 300,
+    maxHeight: 300,
+    padding: 10,
+    borderRadius: 10,
+    backgroundColor: 'gold',
   },
 });
