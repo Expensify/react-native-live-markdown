@@ -56,6 +56,12 @@ jobs:
            - name: Set new version in GitHub ENV
              run: echo "NEW_VERSION=$(jq '.version' package.json)" >> $GITHUB_ENV
 
+           - name: Commit version bump
+             run: git commit -am "Bump version to ${{ env.NEW_VERSION }}"
+
+           - name: Tag version bump
+             run: git tag ${{ env.NEW_VERSION }}
+
            - name: Push branch and publish tags
              run: git push --set-upstream origin ${{ env.BRANCH_NAME }} && git push --tags
 
