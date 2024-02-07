@@ -509,8 +509,8 @@ const styles = StyleSheet.create({
     fontFamily: 'sans-serif',
     boxSizing: 'border-box',
     whiteSpace: 'pre-wrap',
-    overflow: 'scroll',
-    scrollbarWidth: 'none',
+    overflowY: 'scroll',
+    overflowX: 'scroll',
     overflowWrap: 'break-word',
   },
   disabledInputStyles: {
