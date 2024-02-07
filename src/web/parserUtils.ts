@@ -77,26 +77,12 @@ function addSubstringAsTextNode(root: HTMLElement, text: string, startIndex: num
   }
 }
 
-function addTextWithNewlines(root: HTMLElement, text: string, startIndex: number, endIndex: number) {
-  const textAfterLastRange = text.substring(startIndex, endIndex);
-  if (textAfterLastRange.length > 0) {
-    textAfterLastRange.split('\n').forEach((line, index, array) => {
-      if (index < array.length - 1) {
-        addSubstringAsTextNode(root, line, 0, line.length);
-        root.appendChild(document.createElement('br'));
-      } else {
-        addSubstringAsTextNode(root, line, 0, line.length);
-      }
-    });
-  }
-}
-
 function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownStyle: PartialMarkdownStyle = {}, disableInlineStyles = false): HTMLElement {
   const root: HTMLElement = document.createElement('span');
   root.className = 'root';
   const textLength = text.length;
   if (ranges.length === 0) {
-    addTextWithNewlines(root, text, 0, textLength);
+    addSubstringAsTextNode(root, text, 0, textLength);
     return root;
   }
 
@@ -116,7 +102,7 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
     const endOfCurrentRange = range.startIndex + range.length;
     const nextRangeStartIndex = stack.length > 0 && !!stack[0] ? stack[0].startIndex || 0 : textLength;
 
-    addTextWithNewlines(currentRoot.node, text, lastRangeEndIndex, range.startIndex); // add text with newlines before current range
+    addSubstringAsTextNode(currentRoot.node, text, lastRangeEndIndex, range.startIndex); // add text with newlines before current range
 
     const span = document.createElement('span');
     if (disableInlineStyles) {
@@ -131,13 +117,13 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
       nestedStack.push({node: span, endIndex: endOfCurrentRange});
       lastRangeEndIndex = range.startIndex;
     } else {
-      addTextWithNewlines(span, text, range.startIndex, endOfCurrentRange);
+      addSubstringAsTextNode(span, text, range.startIndex, endOfCurrentRange);
       currentRoot.node.appendChild(span);
       lastRangeEndIndex = endOfCurrentRange;
 
       // end of tag nesting
       while (nestedStack.length - 1 > 0 && nextRangeStartIndex >= currentRoot.endIndex) {
-        addTextWithNewlines(currentRoot.node, text, lastRangeEndIndex, currentRoot.endIndex);
+        addSubstringAsTextNode(currentRoot.node, text, lastRangeEndIndex, currentRoot.endIndex);
         const prevRoot = nestedStack.pop();
         if (!prevRoot) {
           break;
@@ -155,7 +141,7 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
     }
   }
 
-  addTextWithNewlines(root, text, lastRangeEndIndex, textLength);
+  addSubstringAsTextNode(root, text, lastRangeEndIndex, textLength);
   return root;
 }
 
