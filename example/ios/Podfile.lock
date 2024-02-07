@@ -485,7 +485,7 @@ PODS:
     - React-jsi (= 0.72.9)
     - React-logger (= 0.72.9)
     - React-perflogger (= 0.72.9)
-  - RNLiveMarkdown (0.1.0):
+  - RNLiveMarkdown (0.1.3):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
   - SocketRocket (0.6.1)
@@ -709,7 +709,7 @@ SPEC CHECKSUMS:
   React-runtimescheduler: a7b1442e155c6f131d8bdfaac47abdc303f50788
   React-utils: a3ffbc321572ee91911d7bc30965abe9aa4e16af
   ReactCommon: 180205f326d59f52e12fa724f5278fcf8fb6afc3
-  RNLiveMarkdown: e76d6cd583fe59179100055b2e58f444b807ac66
+  RNLiveMarkdown: 79f23328b984e15502395a44260917e999b07e08
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
   Yoga: eddf2bbe4a896454c248a8f23b4355891eb720a6
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
