@@ -104,6 +104,23 @@ function processMarkdownStyle(input: MarkdownStyle | undefined): MarkdownStyle {
   return processUnitsInMarkdownStyle(StyleUtils.mergeMarkdownStyleWithDefault(input));
 }
 
+function getElementHeight(node: Element, styles: TextStyle, numberOfLines: number | undefined = undefined): string {
+  if (!numberOfLines) {
+    return `${styles.height}px` || 'auto';
+  }
+
+  const computedStyle = window.getComputedStyle(node);
+  const lineHeight = computedStyle.getPropertyValue('line-height');
+  let lineHeightInPixels;
+  if (lineHeight.includes('px')) {
+    lineHeightInPixels = parseFloat(lineHeight);
+  } else {
+    lineHeightInPixels = parseFloat(computedStyle.fontSize) * 1.2;
+  }
+
+  return `${lineHeightInPixels * numberOfLines + parseFloat(computedStyle.paddingBottom) + parseFloat(computedStyle.paddingTop)}px`;
+}
+
 const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
   (
     {
@@ -115,6 +132,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       blurOnSubmit = false,
       clearTextOnFocus,
       dir = 'auto',
+      numberOfLines,
       multiline = false,
       markdownStyle,
       onBlur,
@@ -400,7 +418,13 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         };
 
         if (value === '' || value === undefined) {
+          // update to placeholder color when value is empty
           updateTextColor(r, r.innerText);
+        }
+
+        if (multiline && !flattenedStyle.height) {
+          // set height for multiline input based on number of lines
+          r.style.height = getElementHeight(r, flattenedStyle, numberOfLines);
         }
       }
 
