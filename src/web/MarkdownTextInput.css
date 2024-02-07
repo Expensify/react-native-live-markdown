@@ -1,23 +1,23 @@
-.react-native-live-markdown-input-singleline[contenteditable='true'] {
+.react-native-live-markdown-input-singleline {
   white-space: nowrap;
   overflow: auto;
 }
 
-.react-native-live-markdown-input-singleline[contenteditable='true']::-webkit-scrollbar {
+.react-native-live-markdown-input-singleline::-webkit-scrollbar {
   display: none;
 }
 
-.react-native-live-markdown-input-singleline[contenteditable='true'] br {
+.react-native-live-markdown-input-singleline br {
   display: none;
 }
 
-.react-native-live-markdown-input-singleline[contenteditable='true'] * {
+.react-native-live-markdown-input-singleline * {
   display: inline;
   white-space: nowrap;
 }
 
-.react-native-live-markdown-input-singleline[contenteditable='true']:empty::before,
-.react-native-live-markdown-input-multiline[contenteditable='true']:empty::before {
+.react-native-live-markdown-input-singleline:empty::before,
+.react-native-live-markdown-input-multiline:empty::before {
   pointer-events: none;
   display: block; /* For Firefox */
   content: attr(placeholder);

@@ -54,6 +54,7 @@ interface MarkdownTextInputProps extends TextInputProps {
   markdownStyle?: MarkdownStyle;
   onClick?: (e: MouseEvent<HTMLDivElement>) => void;
   dir?: string;
+  disabled?: boolean;
 }
 
 interface MarkdownNativeEvent extends Event {
@@ -132,6 +133,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       blurOnSubmit = false,
       clearTextOnFocus,
       dir = 'auto',
+      disabled = false,
       numberOfLines,
       multiline = false,
       markdownStyle,
@@ -458,13 +460,14 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       // eslint-disable-next-line jsx-a11y/no-static-element-interactions
       <div
         ref={setRef}
-        contentEditable
+        contentEditable={!disabled}
         style={
           StyleSheet.flatten([
             styles.defaultInputStyles,
             flattenedStyle && {
               caretColor: (flattenedStyle as TextStyle).color || 'black',
             },
+            disabled && styles.disabledInputStyles,
             createReactDOMStyle(preprocessStyle(flattenedStyle)),
           ]) as CSSProperties
         }
@@ -500,6 +503,11 @@ const styles = StyleSheet.create({
     whiteSpace: 'pre-wrap',
     overflow: 'scroll',
     scrollbarWidth: 'none',
+    overflowWrap: 'break-word',
+  },
+  disabledInputStyles: {
+    opacity: 0.75,
+    cursor: 'default',
   },
 });
 
