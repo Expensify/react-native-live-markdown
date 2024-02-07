@@ -47,11 +47,11 @@ jobs:
            - name: Create branch for version-bump pull request
              run: git checkout -b ${{ env.BRANCH_NAME }}
 
-           - name: Install npm packages
-             run: npm ci
+           - name: Install yarn packages
+             run: yarn install --immutable
 
            - name: Update npm version
-             run: npm version patch
+             run: yarn version --patch
 
            - name: Set new version in GitHub ENV
              run: echo "NEW_VERSION=$(jq '.version' package.json)" >> $GITHUB_ENV
@@ -79,9 +79,9 @@ jobs:
                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
            - name: Build package
-             run: npm run build
+             run: yarn pack
 
            - name: Publish to npm
-             run: npm publish
+             run: yarn publish
              env:
                NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
