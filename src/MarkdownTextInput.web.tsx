@@ -167,6 +167,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
     // Empty placeholder would collapse the div, so we need to use zero-width space to prevent it
     const heightSafePlaceholder = useMemo(() => getPlaceholderValue(placeholder), [placeholder]);
+
     const parseText = useCallback(
       (target: HTMLDivElement, text: string | null, customMarkdownStyles: MarkdownStyle, cursorPosition: number | null = null, shouldAddToHistory = true) => {
         if (text === null) {
@@ -196,6 +197,19 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       }
       return newMarkdownStyle;
     }, [markdownStyle]);
+
+    const inputStyles = useMemo(
+      () =>
+        StyleSheet.flatten([
+          styles.defaultInputStyles,
+          flattenedStyle && {
+            caretColor: (flattenedStyle as TextStyle).color || 'black',
+          },
+          disabled && styles.disabledInputStyles,
+          createReactDOMStyle(preprocessStyle(flattenedStyle)),
+        ]) as CSSProperties,
+      [flattenedStyle, disabled],
+    );
 
     const undo = useCallback(
       (target: HTMLDivElement) => {
@@ -461,16 +475,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       <div
         ref={setRef}
         contentEditable={!disabled}
-        style={
-          StyleSheet.flatten([
-            styles.defaultInputStyles,
-            flattenedStyle && {
-              caretColor: (flattenedStyle as TextStyle).color || 'black',
-            },
-            disabled && styles.disabledInputStyles,
-            createReactDOMStyle(preprocessStyle(flattenedStyle)),
-          ]) as CSSProperties
-        }
+        style={inputStyles}
         role={accessibilityRole || 'textbox'}
         aria-label={accessibilityLabel}
         aria-labelledby={`${accessibilityLabelledBy}`}
