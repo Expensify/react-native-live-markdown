@@ -9,7 +9,7 @@ import type {
   TextInputKeyPressEventData,
   TextInputFocusEventData,
 } from 'react-native';
-import React, {useEffect, useRef, useCallback, useMemo} from 'react';
+import React, {useEffect, useRef, useCallback, useMemo,useLayoutEffect} from 'react';
 import type {CSSProperties, MutableRefObject, ReactEventHandler, FocusEventHandler, MouseEvent, KeyboardEvent, SyntheticEvent} from 'react';
 import {StyleSheet} from 'react-native';
 import * as ParseUtils from './web/parserUtils';
@@ -20,6 +20,8 @@ import './web/MarkdownTextInput.css';
 import InputHistory from './web/InputHistory';
 
 require('../parser/react-native-live-markdown-parser.js');
+
+const useClientEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
 
 let createReactDOMStyle: (style: any) => any;
 try {
@@ -449,7 +451,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       divRef.current = r;
     };
 
-    useEffect(() => {
+    useClientEffect(() => {
       if (!divRef.current || processedValue === divRef.current.innerText) {
         return;
       }
@@ -464,7 +466,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       updateTextColor(divRef.current, value);
     }, [multiline, processedMarkdownStyle, processedValue]);
 
-    useEffect(() => {
+    useClientEffect(function adjustHeightt() {
       if (!divRef.current || !multiline) {
         return;
       }
