@@ -151,30 +151,19 @@ public class MarkdownUtils {
         setSpan(ssb, new MarkdownFontSizeSpan(mMarkdownStyle.getH1FontSize()), start, end);
         break;
       case "blockquote":
-        Object containSpan = checkIfInsideSpanType(ssb, MarkdownBlockquoteSpan.class, start, end);
-        if (containSpan != null) {
-          MarkdownBlockquoteSpan blockquoteSpan = (MarkdownBlockquoteSpan) containSpan;
-          blockquoteSpan.increaseNestingLevel();
-          break;
-        }
+        MarkdownBlockquoteSpan[] overlappingBlockquotes = ssb.getSpans(start, end, MarkdownBlockquoteSpan.class);
+        // get the start of the first overlapping blockquote - start of the leadingMarginSpan should be the start of the line
+        int startIndex = overlappingBlockquotes.length > 0 ? ssb.getSpanStart(overlappingBlockquotes[0]) : start;
         MarkdownBlockquoteSpan span = new MarkdownBlockquoteSpan(
           mMarkdownStyle.getBlockquoteBorderColor(),
           mMarkdownStyle.getBlockquoteBorderWidth(),
           mMarkdownStyle.getBlockquoteMarginLeft(),
           mMarkdownStyle.getBlockquotePaddingLeft());
-        setSpan(ssb, span, start, end);
+        setSpan(ssb, span, startIndex, end);
         break;
       default:
         throw new IllegalStateException("Unsupported type: " + type);
     }
-  }
-
-  private Object checkIfInsideSpanType(SpannableStringBuilder ssb, Class<?> spanClass, int start, int end) {
-    Object[] spans = ssb.getSpans(start, end, spanClass);
-    if(spans.length == 0) {
-      return null;
-    }
-    return spans[0];
   }
 
   private void setSpan(SpannableStringBuilder ssb, MarkdownSpan span, int start, int end) {
