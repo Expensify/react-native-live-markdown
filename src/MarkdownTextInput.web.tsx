@@ -167,6 +167,17 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     // Empty placeholder would collapse the div, so we need to use zero-width space to prevent it
     const heightSafePlaceholder = useMemo(() => getPlaceholderValue(placeholder), [placeholder]);
 
+    const updateSelection = useCallback(() => {
+      if (!divRef.current) {
+        return;
+      }
+      const selection = CursorUtils.getCurrentCursorPosition(divRef.current);
+      contentSelection.current = selection;
+      (divRef.current as HTMLInputElement).selectionStart = selection.start;
+      (divRef.current as HTMLInputElement).selectionEnd = selection.end;
+      return selection;
+    }, []);
+
     const parseText = useCallback(
       (target: HTMLDivElement, text: string | null, customMarkdownStyles: MarkdownStyle, cursorPosition: number | null = null, shouldAddToHistory = true) => {
         if (text === null) {
@@ -175,13 +186,6 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         const parsedText = ParseUtils.parseText(target, text, cursorPosition, customMarkdownStyles, !multiline);
         if (history.current && shouldAddToHistory) {
           history.current.debouncedAdd(parsedText.text, parsedText.cursorPosition);
-        }
-
-        if (parsedText.cursorPosition !== null) {
-          contentSelection.current = {
-            start: parsedText.cursorPosition,
-            end: parsedText.cursorPosition,
-          };
         }
 
         return parsedText;
@@ -350,13 +354,16 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       [onKeyPress],
     );
 
+    const handleKeyUp = useCallback(() => {
+      updateSelection();
+    }, []);
+
     const handleSelectionChange: ReactEventHandler<HTMLDivElement> = useCallback(
       (event) => {
         const e = event as unknown as NativeSyntheticEvent<TextInputSelectionChangeEventData>;
         setEventProps(e);
-        const selection = CursorUtils.getCurrentCursorPosition(e.target as unknown as HTMLElement);
-        contentSelection.current = selection;
-        if (onSelectionChange) {
+        const selection = updateSelection();
+        if (onSelectionChange && selection) {
           e.nativeEvent.selection = selection;
           onSelectionChange(e);
         }
@@ -414,6 +421,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
     const handleClick = useCallback(
       (e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>) => {
+        updateSelection();
         if (!onClick || !divRef.current) {
           return;
         }
@@ -488,6 +496,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         autoCapitalize={autoCapitalize}
         className={className}
         onKeyDown={handleKeyPress}
+        onKeyUp={handleKeyUp}
         onInput={handleOnChangeText}
         onSelect={handleSelectionChange}
         onClick={handleClick}
