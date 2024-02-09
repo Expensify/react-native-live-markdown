@@ -171,13 +171,10 @@ function parseText(
     };
   });
 
-  targetElement.innerHTML = '';
-  targetElement.innerText = '';
-
   // We don't want to parse text with single '\n', because contentEditable represents it as invisible <br />
   if (!!text && text !== '\n') {
     const dom = parseRangesToHTMLNodes(text, markdownRanges, markdownStyle);
-    target.appendChild(dom);
+    targetElement.innerHTML = dom.innerHTML;
   }
 
   if (alwaysMoveCursorToTheEnd) {
