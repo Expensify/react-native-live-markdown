@@ -477,15 +477,14 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       // update event listeners events objects
       const originalAddEventListener = EventTarget.prototype.addEventListener;
       EventTarget.prototype.addEventListener = function (eventName, callback) {
-        if (eventName === 'paste') {
+        if (eventName === 'paste' && typeof callback === 'function') {
           originalAddEventListener.call(this, eventName, function (event) {
             try {
               if (divRef.current && divRef.current.contains(event.target as Node)) {
+                // pasting returns styled span elements as event.target instead of the contentEditable div. We want to keep the div as the target
                 Object.defineProperty(event, 'target', {writable: false, value: divRef.current});
               }
-              if (typeof callback === 'function') {
-                callback(event);
-              }
+              callback(event);
               // eslint-disable-next-line no-empty
             } catch (e) {}
           });
