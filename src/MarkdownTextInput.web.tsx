@@ -473,6 +473,28 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       divRef.current.style.maxHeight = elementHeight;
     }, [numberOfLines]);
 
+    useEffect(() => {
+      // update event listeners events objects
+      const originalAddEventListener = EventTarget.prototype.addEventListener;
+      EventTarget.prototype.addEventListener = function (eventName, callback) {
+        if (eventName === 'paste') {
+          originalAddEventListener.call(this, eventName, function (event) {
+            try {
+              if (divRef.current && divRef.current.contains(event.target as Node)) {
+                Object.defineProperty(event, 'target', {writable: false, value: divRef.current});
+              }
+              if (typeof callback === 'function') {
+                callback(event);
+              }
+              // eslint-disable-next-line no-empty
+            } catch (e) {}
+          });
+        } else {
+          originalAddEventListener.call(this, eventName, callback);
+        }
+      };
+    }, []);
+
     return (
       // eslint-disable-next-line jsx-a11y/no-static-element-interactions
       <div
