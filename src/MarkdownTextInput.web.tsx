@@ -150,6 +150,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       spellCheck,
       style = {},
       value,
+      autoFocus = false,
     },
     ref,
   ) => {
@@ -472,6 +473,13 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       divRef.current.style.height = elementHeight;
       divRef.current.style.maxHeight = elementHeight;
     }, [numberOfLines]);
+
+    useEffect(() => {
+      if (!(divRef.current && autoFocus)) {
+        return;
+      }
+      divRef.current.focus();
+    }, []);
 
     return (
       // eslint-disable-next-line jsx-a11y/no-static-element-interactions
