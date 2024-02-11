@@ -114,16 +114,15 @@ public class MarkdownUtils {
         setSpan(ssb, new MarkdownStrikethroughSpan(), start, end);
         break;
       case "mention-here":
-        setSpan(ssb, new MarkdownBoldSpan(), start, end);
+        setSpan(ssb, new MarkdownForegroundColorSpan(mMarkdownStyle.getMentionHereColor()), start, end);
         setSpan(ssb, new MarkdownBackgroundColorSpan(mMarkdownStyle.getMentionHereBackgroundColor()), start, end);
         break;
       case "mention-user":
-        setSpan(ssb, new MarkdownBoldSpan(), start, end);
         // TODO: change mention color when it mentions current user
+        setSpan(ssb, new MarkdownForegroundColorSpan(mMarkdownStyle.getMentionUserColor()), start, end);
         setSpan(ssb, new MarkdownBackgroundColorSpan(mMarkdownStyle.getMentionUserBackgroundColor()), start, end);
         break;
       case "syntax":
-        setSpan(ssb, new MarkdownBoldSpan(), start, end);
         setSpan(ssb, new MarkdownForegroundColorSpan(mMarkdownStyle.getSyntaxColor()), start, end);
         break;
       case "link":

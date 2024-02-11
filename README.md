@@ -1,4 +1,4 @@
-# @expensify/react-native-live-markdown
+<img src="./assets/hero-animation.gif" alt="@expensify/react-native-live-markdown" />
 
 ## Features
 
@@ -84,9 +84,11 @@ const markdownStyle: MarkdownStyle = {
     backgroundColor: 'lightgray',
   },
   mentionHere: {
-    backgroundColor: 'yellow',
+    color: 'green',
+    backgroundColor: 'lime',
   },
   mentionUser: {
+    color: 'blue',
     backgroundColor: 'cyan',
   },
 };
@@ -112,7 +114,7 @@ Currently, `react-native-live-markdown` supports only [ExpensiMark](https://gith
 
 ## API reference
 
-`MarkdownTextInput` inherits all props of React Native's `TextInput` component.
+`MarkdownTextInput` inherits all props of React Native's `TextInput` component as well as introduces the following properties:
 
 | Prop            | Type            | Default     | Note                                                                                                                                                                                                                   |
 | --------------- | --------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -125,3 +127,13 @@ Currently, `react-native-live-markdown` supports only [ExpensiMark](https://gith
 ## License
 
 MIT
+
+---
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: light)" srcset="./assets/signature-light.png" />
+    <source media="(prefers-color-scheme: dark)" srcset="./assets/signature-dark.png" />
+    <img alt="Brought to you by Software Mansion + Expensify" src="./assets/signature-light.png" width="600" />
+  </picture>
+</p>

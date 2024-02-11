@@ -53,8 +53,15 @@ function getReactNativeVersion() {
   return `${major}.${minor}.${patch}`;
 }
 
+function getRandomColor() {
+  return `#${Math.floor(Math.random() * 16777215)
+    .toString(16)
+    .padStart(6, '0')}`;
+}
+
 export default function App() {
   const [value, setValue] = React.useState(DEFAULT_TEXT);
+  const [markdownStyle, setMarkdownStyle] = React.useState({});
 
   // TODO: use MarkdownTextInput ref instead of TextInput ref
   const ref = React.useRef<TextInput>(null);
@@ -89,6 +96,8 @@ export default function App() {
         onChangeText={setValue}
         style={styles.input}
         ref={ref}
+        markdownStyle={markdownStyle}
+        placeholder="Type here..."
       />
       {/* <Text>TextInput singleline</Text>
       <TextInput
@@ -126,11 +135,24 @@ export default function App() {
       />
       <Button
         title="Reset"
-        onPress={() => setValue(DEFAULT_TEXT)}
+        onPress={() => {
+          setValue(DEFAULT_TEXT);
+          setMarkdownStyle({});
+        }}
       />
       <Button
         title="Clear"
         onPress={() => setValue('')}
+      />
+      <Button
+        title="Change style"
+        onPress={() =>
+          setMarkdownStyle({
+            link: {
+              color: getRandomColor(),
+            },
+          })
+        }
       />
     </View>
   );
