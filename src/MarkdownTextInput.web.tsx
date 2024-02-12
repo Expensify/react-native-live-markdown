@@ -189,6 +189,8 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           history.current.debouncedAdd(parsedText.text, parsedText.cursorPosition);
         }
 
+        updateSelection();
+
         return parsedText;
       },
       [multiline],
