@@ -29,7 +29,7 @@
   if (markdownUtils != nil) {
     UITextRange *range = self.backedTextInputView.selectedTextRange;
     NSAttributedString *attributedText = [markdownUtils parseMarkdown:self.backedTextInputView.attributedText];
-    [self.backedTextInputView setAttributedText:attributedText];
+    // [self.backedTextInputView setAttributedText:attributedText];
     [self.backedTextInputView setSelectedTextRange:range notifyDelegate:YES];
   }
 
