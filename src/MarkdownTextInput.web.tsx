@@ -172,9 +172,10 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         return;
       }
       const selection = CursorUtils.getCurrentCursorPosition(divRef.current);
+      const markdownHTMLInput = divRef.current as HTMLInputElement;
+      markdownHTMLInput.selectionStart = selection.start;
+      markdownHTMLInput.selectionEnd = selection.end;
       contentSelection.current = selection;
-      (divRef.current as HTMLInputElement).selectionStart = selection.start;
-      (divRef.current as HTMLInputElement).selectionEnd = selection.end;
       return selection;
     }, []);
 
