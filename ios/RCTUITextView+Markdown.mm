@@ -19,8 +19,7 @@
     UITextRange *range = self.selectedTextRange;
     super.attributedText = [markdownUtils parseMarkdown:self.attributedText];
     [super setSelectedTextRange:range]; // prevents cursor from jumping at the end when typing in the middle of the text
-    // self.typingAttributes = self.defaultTextAttributes; // removes indent in new line when typing after blockquote
-    // NOTE: setting self.typingAttributes removes underline
+    self.typingAttributes = self.defaultTextAttributes; // removes indent in new line when typing after blockquote
   }
 
   // Call the original method
