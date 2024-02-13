@@ -2,6 +2,7 @@
 #import "react_native_assert.h"
 #import <React/RCTAssert.h>
 #import <React/RCTFont.h>
+#import <React/RCTTextAttributes.h>
 #import <JavaScriptCore/JavaScriptCore.h>
 
 @implementation RCTMarkdownUtils {
@@ -47,13 +48,17 @@
   JSValue *result = [function callWithArguments:@[inputString]];
   NSArray *ranges = [result toArray];
 
-  NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:inputString attributes:_backedTextInputView.defaultTextAttributes];
+  NSMutableAttributedString *attributedString = [input mutableCopy];
   [attributedString beginEditing];
+
+  NSMutableDictionary<NSAttributedStringKey, id> *attributes = [_backedTextInputView.defaultTextAttributes mutableCopy];
+  [attributes removeObjectForKey:RCTTextAttributesTagAttributeName];
+  [attributedString addAttributes:attributes range:NSMakeRange(0, attributedString.length)];
 
   // If the attributed string ends with underlined text, blurring the single-line input imprints the underline style across the whole string.
   // It looks like a bug in iOS, as there is no underline style to be found in the attributed string, especially after formatting.
   // This is a workaround that applies the NSUnderlineStyleNone to the string before iterating over ranges which resolves this problem.
-  [attributedString addAttribute:NSUnderlineStyleAttributeName value:[NSNumber numberWithInteger:NSUnderlineStyleNone] range:NSMakeRange(0, attributedString.length)];
+  [attributedString removeAttribute:NSUnderlineStyleAttributeName range:NSMakeRange(0, attributedString.length)];
 
   _blockquoteRanges = [NSMutableArray new];
 
