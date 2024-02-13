@@ -57,7 +57,7 @@
 
   // If the attributed string ends with underlined text, blurring the single-line input imprints the underline style across the whole string.
   // It looks like a bug in iOS, as there is no underline style to be found in the attributed string, especially after formatting.
-  // This is a workaround that applies the NSUnderlineStyleNone to the string before iterating over ranges which resolves this problem.
+  // The workaround is to remove NSUnderlineStyleAttributeName attribute for whole string before iterating over ranges.
   [attributedString removeAttribute:NSUnderlineStyleAttributeName range:NSMakeRange(0, attributedString.length)];
 
   _blockquoteRanges = [NSMutableArray new];
