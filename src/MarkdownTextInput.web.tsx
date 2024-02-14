@@ -176,7 +176,6 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       markdownHTMLInput.selectionStart = selection.start;
       markdownHTMLInput.selectionEnd = selection.end;
       contentSelection.current = selection;
-      return selection;
     }, []);
 
     const parseText = useCallback(
@@ -357,17 +356,13 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       [onKeyPress],
     );
 
-    const handleKeyUp = useCallback(() => {
-      updateSelection();
-    }, []);
-
     const handleSelectionChange: ReactEventHandler<HTMLDivElement> = useCallback(
       (event) => {
         const e = event as unknown as NativeSyntheticEvent<TextInputSelectionChangeEventData>;
         setEventProps(e);
-        const selection = updateSelection();
-        if (onSelectionChange && selection) {
-          e.nativeEvent.selection = selection;
+        updateSelection();
+        if (onSelectionChange && contentSelection.current) {
+          e.nativeEvent.selection = contentSelection.current;
           onSelectionChange(e);
         }
       },
@@ -499,7 +494,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         autoCapitalize={autoCapitalize}
         className={className}
         onKeyDown={handleKeyPress}
-        onKeyUp={handleKeyUp}
+        onKeyUp={updateSelection}
         onInput={handleOnChangeText}
         onSelect={handleSelectionChange}
         onClick={handleClick}
