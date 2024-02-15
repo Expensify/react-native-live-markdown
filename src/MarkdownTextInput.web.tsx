@@ -150,6 +150,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       spellCheck,
       style = {},
       value,
+      autoFocus = false,
     },
     ref,
   ) => {
@@ -498,6 +499,14 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           originalAddEventListener.call(this, eventName, callback);
         }
       };
+    }, []);
+
+    useEffect(() => {
+      // focus the input on mount if autoFocus is set
+      if (!(divRef.current && autoFocus)) {
+        return;
+      }
+      divRef.current.focus();
     }, []);
 
     return (
