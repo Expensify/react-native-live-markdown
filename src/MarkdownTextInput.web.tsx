@@ -491,7 +491,6 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
               Object.defineProperty(event, 'target', {writable: false, value: divRef.current});
             }
             callback(event);
-            // eslint-disable-next-line no-empty
           });
         } else {
           originalAddEventListener.call(this, eventName, callback);
