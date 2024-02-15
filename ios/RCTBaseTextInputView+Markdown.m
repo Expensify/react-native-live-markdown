@@ -32,13 +32,13 @@
     NSAttributedString *newAttributedText = [markdownUtils parseMarkdown:oldAttributedText];
     UITextRange *range = backedTextInputView.selectedTextRange;
 
-    // update attributed text without calling textInputDidChangeSelection and emitting onSelectionChange event
+    // update attributed text without emitting onSelectionChange event
     id<RCTBackedTextInputDelegate> delegate = backedTextInputView.textInputDelegate;
     backedTextInputView.textInputDelegate = nil;
     [backedTextInputView setAttributedText:newAttributedText];
     backedTextInputView.textInputDelegate = delegate;
 
-    // restore original selection
+    // restore original selection and emit onSelectionChange event
     [backedTextInputView setSelectedTextRange:range notifyDelegate:YES];
   }
 
