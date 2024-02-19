@@ -9,7 +9,7 @@ import type {
   TextInputKeyPressEventData,
   TextInputFocusEventData,
 } from 'react-native';
-import React, {useEffect, useRef, useCallback, useMemo,useLayoutEffect} from 'react';
+import React, {useEffect, useRef, useCallback, useMemo, useLayoutEffect} from 'react';
 import type {CSSProperties, MutableRefObject, ReactEventHandler, FocusEventHandler, MouseEvent, KeyboardEvent, SyntheticEvent} from 'react';
 import {StyleSheet} from 'react-native';
 import * as ParseUtils from './web/parserUtils';
@@ -451,29 +451,35 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       divRef.current = r;
     };
 
-    useClientEffect(() => {
-      if (!divRef.current || processedValue === divRef.current.innerText) {
-        return;
-      }
+    useClientEffect(
+      function parseAndStyleValue() {
+        if (!divRef.current || processedValue === divRef.current.innerText) {
+          return;
+        }
 
-      if (value === undefined) {
-        parseText(divRef.current, divRef.current.innerText, processedMarkdownStyle);
-        return;
-      }
+        if (value === undefined) {
+          parseText(divRef.current, divRef.current.innerText, processedMarkdownStyle);
+          return;
+        }
 
-      const text = processedValue !== undefined ? processedValue : '';
-      parseText(divRef.current, text, processedMarkdownStyle, text.length);
-      updateTextColor(divRef.current, value);
-    }, [multiline, processedMarkdownStyle, processedValue]);
+        const text = processedValue !== undefined ? processedValue : '';
+        parseText(divRef.current, text, processedMarkdownStyle, text.length);
+        updateTextColor(divRef.current, value);
+      },
+      [multiline, processedMarkdownStyle, processedValue],
+    );
 
-    useClientEffect(function adjustHeightt() {
-      if (!divRef.current || !multiline) {
-        return;
-      }
-      const elementHeight = getElementHeight(divRef.current, inputStyles, numberOfLines);
-      divRef.current.style.height = elementHeight;
-      divRef.current.style.maxHeight = elementHeight;
-    }, [numberOfLines]);
+    useClientEffect(
+      function adjustHeight() {
+        if (!divRef.current || !multiline) {
+          return;
+        }
+        const elementHeight = getElementHeight(divRef.current, inputStyles, numberOfLines);
+        divRef.current.style.height = elementHeight;
+        divRef.current.style.maxHeight = elementHeight;
+      },
+      [numberOfLines],
+    );
 
     return (
       // eslint-disable-next-line jsx-a11y/no-static-element-interactions
