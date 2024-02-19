@@ -10,7 +10,7 @@
     RCTMarkdownUtils *markdownUtils = [self valueForKey:@"markdownUtils"];
     [markdownUtils.blockquoteRanges enumerateObjectsUsingBlock:^(NSValue *item, NSUInteger idx, BOOL * _Nonnull stop) {
       NSRange range = [item rangeValue];
-      NSUInteger start = range.location - (nestingLevel * 2); // compensate for the `>` syntax which is not included in range (with optional space after `>`)
+      NSUInteger start = range.location;
       NSUInteger end = start + range.length;
       NSUInteger location = glyphRange.location;
       if (location >= start && location < end) {

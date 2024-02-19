@@ -105,11 +105,11 @@
     } else if ([type isEqualToString:@"blockquote"]) {
       CGFloat indent = _markdownStyle.blockquoteMarginLeft + _markdownStyle.blockquoteBorderWidth + _markdownStyle.blockquotePaddingLeft;
       NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
-      [_blockquoteRanges addObject:[NSValue valueWithRange:range]];
       NSRange circumferencingRange = [self getCircumferencingBlockquoteRange:range];
       int blockquoteNestLevel = [self getBlockquoteNestLevel:range];
       paragraphStyle.firstLineHeadIndent = indent * blockquoteNestLevel;
       paragraphStyle.headIndent = indent * blockquoteNestLevel;
+      [_blockquoteRanges addObject:[NSValue valueWithRange:circumferencingRange]];
       [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:circumferencingRange];
     } else if ([type isEqualToString:@"pre"]) {
       [attributedString addAttribute:NSForegroundColorAttributeName value:_markdownStyle.preColor range:range];
