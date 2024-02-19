@@ -70,7 +70,6 @@ public class MarkdownTextInputDecoratorView extends View {
       mReactEditText = null;
       mTextWatcher = null;
       mMarkdownUtils = null;
-      mMarkdownStyle = null;
     }
   }
 

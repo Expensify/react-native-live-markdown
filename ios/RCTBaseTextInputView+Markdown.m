@@ -1,5 +1,5 @@
-#import <react-native-live-markdown/RCTBaseTextInputView+Markdown.h>
-#import <react-native-live-markdown/RCTMarkdownUtils.h>
+#import <RNLiveMarkdown/RCTBaseTextInputView+Markdown.h>
+#import <RNLiveMarkdown/RCTMarkdownUtils.h>
 #import <objc/message.h>
 
 @implementation RCTBaseTextInputView (Markdown)
@@ -53,7 +53,7 @@
     }
 
     {
-      // swizzle setAttributedText
+      // swizzle updateLocalData
       SEL originalSelector = @selector(updateLocalData);
       SEL swizzledSelector = @selector(markdown_updateLocalData);
       Method originalMethod = class_getInstanceMethod(cls, originalSelector);

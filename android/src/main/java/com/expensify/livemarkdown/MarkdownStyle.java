@@ -47,7 +47,13 @@ public class MarkdownStyle {
   private final int mPreBackgroundColor;
 
   @ColorInt
+  private final int mMentionHereColor;
+
+  @ColorInt
   private final int mMentionHereBackgroundColor;
+
+  @ColorInt
+  private final int mMentionUserColor;
 
   @ColorInt
   private final int mMentionUserBackgroundColor;
@@ -66,7 +72,9 @@ public class MarkdownStyle {
     mPreFontFamily = parseString(map, "pre", "fontFamily");
     mPreColor = parseColor(map, "pre", "color", context);
     mPreBackgroundColor = parseColor(map, "pre", "backgroundColor", context);
+    mMentionHereColor = parseColor(map, "mentionHere", "color", context);
     mMentionHereBackgroundColor = parseColor(map, "mentionHere", "backgroundColor", context);
+    mMentionUserColor = parseColor(map, "mentionUser", "color", context);
     mMentionUserBackgroundColor = parseColor(map, "mentionUser", "backgroundColor", context);
   }
 
@@ -157,8 +165,18 @@ public class MarkdownStyle {
   }
 
   @ColorInt
+  public int getMentionHereColor() {
+    return mMentionHereColor;
+  }
+
+  @ColorInt
   public int getMentionHereBackgroundColor() {
     return mMentionHereBackgroundColor;
+  }
+
+  @ColorInt
+  public int getMentionUserColor() {
+    return mMentionUserColor;
   }
 
   @ColorInt

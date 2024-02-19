@@ -159,8 +159,21 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
   return [text, ranges];
 }
 
+// getTagPriority returns a priority for a tag, higher priority means the tag should be processed first
+function getTagPriority(tag: string) {
+  switch (tag) {
+    case 'blockquote':
+      return 2;
+    case 'h1':
+      return 1;
+    default:
+      return 0;
+  }
+}
+
 function sortRanges(ranges: Range[]) {
-  return ranges.sort((a, b) => a[1] - b[1]); // sort by location to properly handle bold+italic
+  // sort ranges by start position, then by length, then by tag hierarchy
+  return ranges.sort((a, b) => a[1] - b[1] || b[2] - a[2] || getTagPriority(b[0]) - getTagPriority(a[0]) || 0);
 }
 
 function parseExpensiMarkToRanges(markdown: string): Range[] {

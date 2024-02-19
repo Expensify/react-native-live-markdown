@@ -1,15 +1,15 @@
 #import <React/RCTUITextField.h>
-#import <react/debug/react_native_assert.h>
+#import "react_native_assert.h"
 
-#import <react-native-live-markdown/MarkdownLayoutManager.h>
-#import <react-native-live-markdown/MarkdownTextInputDecoratorView.h>
-#import <react-native-live-markdown/RCTBackedTextFieldDelegateAdapter+Markdown.h>
-#import <react-native-live-markdown/RCTUITextView+Markdown.h>
+#import <RNLiveMarkdown/MarkdownLayoutManager.h>
+#import <RNLiveMarkdown/MarkdownTextInputDecoratorView.h>
+#import <RNLiveMarkdown/RCTBackedTextFieldDelegateAdapter+Markdown.h>
+#import <RNLiveMarkdown/RCTUITextView+Markdown.h>
 
 #ifdef RCT_NEW_ARCH_ENABLED
-#import <react-native-live-markdown/RCTTextInputComponentView+Markdown.h>
+#import <RNLiveMarkdown/RCTTextInputComponentView+Markdown.h>
 #else
-#import <react-native-live-markdown/RCTBaseTextInputView+Markdown.h>
+#import <RNLiveMarkdown/RCTBaseTextInputView+Markdown.h>
 #endif /* RCT_NEW_ARCH_ENABLED */
 
 #import <objc/runtime.h>
@@ -70,8 +70,10 @@
   } else if ([backedTextInputView isKindOfClass:[RCTUITextView class]]) {
     _textView = (RCTUITextView *)backedTextInputView;
     [_textView setMarkdownUtils:_markdownUtils];
-    object_setClass(_textView.layoutManager, [MarkdownLayoutManager class]);
-    [_textView.layoutManager setValue:_markdownUtils forKey:@"markdownUtils"];
+    NSLayoutManager *layoutManager = _textView.layoutManager; // switching to TextKit 1 compatibility mode
+    layoutManager.allowsNonContiguousLayout = NO; // workaround for onScroll issue
+    object_setClass(layoutManager, [MarkdownLayoutManager class]);
+    [layoutManager setValue:_markdownUtils forKey:@"markdownUtils"];
   } else {
     react_native_assert(false && "Cannot enable Markdown for this type of TextInput.");
   }
