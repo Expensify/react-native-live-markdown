@@ -15,7 +15,7 @@ const toBeParsedAsHTML: MatcherFunction<[expectedHTML: string]> = function (actu
   let expected = expectedHTML;
   const ranges = global.parseExpensiMarkToRanges(actual);
   const markdownRanges: MarkdownTypes.MarkdownRange[] = ranges.map((range) => {
-    const [type, startIndex, length] = range;
+    const {style: type, start: startIndex, length} = range;
     return {
       type: type as MarkdownType,
       startIndex,

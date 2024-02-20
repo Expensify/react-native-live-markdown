@@ -1,6 +1,11 @@
 export {};
 
-type Range = [string, number, number]; // style, location, length
+type Range = {
+  style: string;
+  start: number;
+  length: number;
+  depth?: number;
+}; // style, location, length
 
 declare global {
   // eslint-disable-next-line no-var

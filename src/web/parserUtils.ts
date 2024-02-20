@@ -163,7 +163,7 @@ function parseText(
   const ranges = global.parseExpensiMarkToRanges(text);
 
   const markdownRanges: MarkdownRange[] = ranges.map((range) => {
-    const [type, startIndex, length] = range;
+    const {style: type, start: startIndex, length} = range;
     return {
       type: type as MarkdownType,
       startIndex,

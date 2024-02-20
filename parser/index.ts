@@ -3,8 +3,14 @@
 import {ExpensiMark} from 'expensify-common/lib/ExpensiMark';
 import _ from 'underscore';
 
-type Range = [string, number, number];
-type Token = ['TEXT' | 'HTML', string];
+// type Range = [string, number, number];
+type Range = {
+  style: string;
+  start: number;
+  length: number;
+  depth?: number;
+};
+type Token = ['TEXT' | 'HTML', string, number?];
 type StackItem = {tag: string; children: Array<StackItem | string>};
 
 function parseMarkdownToHTML(markdown: string): string {
@@ -86,7 +92,7 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
     const start = text.length;
     processChildren(node);
     const end = text.length;
-    ranges.push([style, start, end - start]);
+    ranges.push({style, start, length: end - start});
   }
 
   const ranges: Range[] = [];
@@ -123,8 +129,8 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
         // compensate for "> " at the beginning
         if (ranges.length > 0) {
           const curr = ranges[ranges.length - 1];
-          curr![1] -= 1;
-          curr![2] += 1;
+          curr!.start -= 1;
+          curr!.length += 1;
         }
       } else if (node.tag === '<h1>') {
         appendSyntax('# ');
@@ -173,7 +179,26 @@ function getTagPriority(tag: string) {
 
 function sortRanges(ranges: Range[]) {
   // sort ranges by start position, then by length, then by tag hierarchy
-  return ranges.sort((a, b) => a[1] - b[1] || b[2] - a[2] || getTagPriority(b[0]) - getTagPriority(a[0]) || 0);
+  return ranges.sort((a, b) => a.start - b.start || b.length - a.length || getTagPriority(b.style) - getTagPriority(a.style) || 0);
+}
+
+function groupRanges(ranges: Range[]) {
+  return ranges.reduce((acc, range) => {
+    const start = range.start;
+    const end = range.start + range.length;
+
+    const lastRangeWithSameStyle = acc.findLast((r) => r.style === range.style);
+
+    // Perform necessary operations with 'start', 'end', and 'last'
+    if (lastRangeWithSameStyle && lastRangeWithSameStyle.start <= start && lastRangeWithSameStyle.start + lastRangeWithSameStyle.length <= end && range.length > 1) {
+      // increment depth of overlapping range
+      lastRangeWithSameStyle.depth = (lastRangeWithSameStyle.depth || 1) + 1;
+    } else {
+      acc.push(range);
+    }
+
+    return acc; // Return the updated accumulator
+  }, [] as Range[]);
 }
 
 function parseExpensiMarkToRanges(markdown: string): Range[] {
@@ -186,7 +211,8 @@ function parseExpensiMarkToRanges(markdown: string): Range[] {
     return [];
   }
   const sortedRanges = sortRanges(ranges);
-  return sortedRanges;
+  const gruppedRanges = groupRanges(sortedRanges);
+  return gruppedRanges;
 }
 
 globalThis.parseExpensiMarkToRanges = parseExpensiMarkToRanges;
