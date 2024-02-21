@@ -13,7 +13,7 @@ using namespace facebook::react;
 
 @implementation MarkdownTextInputDecoratorComponentView {
   MarkdownTextInputDecoratorView *_view;
-  const ShadowNodeFamily *_textInputFamily;
+  ShadowNodeFamily::Shared _decoratorFamily;
 }
 
 + (ComponentDescriptorProvider)componentDescriptorProvider
@@ -38,15 +38,13 @@ using namespace facebook::react;
 - (void)updateState:(const facebook::react::State::Shared &)state oldState:(const facebook::react::State::Shared &)oldState
 {
     auto data = std::static_pointer_cast<MarkdownTextInputDecoratorShadowNode::ConcreteState const>(state)->getData();
-    
-    if (data.textInputFamily != _textInputFamily) {
-        _textInputFamily = data.textInputFamily;
-        return;
-    }
+    _decoratorFamily = data.decoratorFamily;
 }
 
 - (void)willMoveToSuperview:(UIView *)newSuperview {
-    _textInputFamily = nullptr;
+    if (newSuperview == nil) {
+      _decoratorFamily = nullptr;
+    }
     
     [super willMoveToSuperview:newSuperview];
 }

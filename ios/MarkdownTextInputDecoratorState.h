@@ -9,10 +9,10 @@ class JSI_EXPORT MarkdownTextInputDecoratorState final {
  public:
   using Shared = std::shared_ptr<const MarkdownTextInputDecoratorState>;
 
-  MarkdownTextInputDecoratorState() : textInputFamily() {};
-  MarkdownTextInputDecoratorState(const ShadowNodeFamily *textInputFamily_) : textInputFamily(textInputFamily_) {};
+  MarkdownTextInputDecoratorState() : decoratorFamily(nullptr) {};
+  MarkdownTextInputDecoratorState(const ShadowNodeFamily::Shared textInputFamily_) : decoratorFamily(textInputFamily_) {};
 
-  const ShadowNodeFamily* textInputFamily;
+  const ShadowNodeFamily::Shared decoratorFamily;
 
 #pragma mark - Getters
 };
