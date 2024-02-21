@@ -17,7 +17,7 @@ type NestedNode = {
   endIndex: number;
 };
 
-function addStyling(targetElement: HTMLElement, type: MarkdownType, markdownStyle: PartialMarkdownStyle, depth?: number) {
+function addStyling(targetElement: HTMLElement, type: MarkdownType, markdownStyle: PartialMarkdownStyle, depth: number) {
   const node = targetElement;
   switch (type) {
     case 'syntax':
@@ -53,7 +53,7 @@ function addStyling(targetElement: HTMLElement, type: MarkdownType, markdownStyl
 
     case 'blockquote': {
       // create a new span for each blockquote level
-      Array.from({length: depth!}).forEach(() => {
+      Array.from({length: depth}).forEach(() => {
         const span = document.createElement('span');
         Object.assign(span.style, {
           ...markdownStyle.blockquote,
@@ -115,7 +115,7 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
     if (disableInlineStyles) {
       span.className = range.style;
     } else {
-      addStyling(span, range.style, markdownStyle, range.depth);
+      addStyling(span, range.style, markdownStyle, range.depth || 0);
     }
 
     if (stack.length > 0 && nextRangeStartIndex < endOfCurrentRange && range.style !== 'syntax') {
