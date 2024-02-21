@@ -156,7 +156,7 @@
   },
   "codegenConfig": {
     "name": "RNLiveMarkdownSpec",
-    "type": "components",
+    "type": "all",
     "jsSrcsDir": "src"
   }
 }
