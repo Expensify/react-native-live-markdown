@@ -38,7 +38,7 @@ public class MarkdownBlockquoteSpan implements MarkdownSpan, LeadingMarginSpan {
 
     p.setStyle(Paint.Style.FILL);
     p.setColor(borderColor);
-    for(int level = 0; level < nestingLevel; level++) {
+    for (int level = 0; level < nestingLevel; level++) {
 
       float shift = (marginLeft + borderWidth + paddingLeft) * level;
       float left = x + dir * marginLeft + shift;

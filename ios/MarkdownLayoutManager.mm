@@ -23,14 +23,13 @@
     if (isBlockquote) {
       CGFloat paddingLeft = markdownUtils.backedTextInputView.textContainerInset.left;
       CGFloat paddingTop = markdownUtils.backedTextInputView.textContainerInset.top;
-      CGFloat x = paddingLeft + markdownUtils.markdownStyle.blockquoteMarginLeft;
       CGFloat y = paddingTop + rect.origin.y;
       CGFloat width = markdownUtils.markdownStyle.blockquoteBorderWidth;
       CGFloat height = rect.size.height;
-      CGFloat shift = paddingLeft + width + markdownUtils.markdownStyle.blockquoteMarginLeft;
-
+      CGFloat shift = markdownUtils.markdownStyle.blockquoteMarginLeft + markdownUtils.markdownStyle.blockquoteBorderWidth + markdownUtils.markdownStyle.blockquotePaddingLeft;
       for(int level = 0; level < currentDepth; level++) {
-        CGRect lineRect = CGRectMake(x + (level * shift), y, width, height);
+        CGFloat x = paddingLeft + markdownUtils.markdownStyle.blockquoteMarginLeft + (level * shift);
+        CGRect lineRect = CGRectMake(x, y, width, height);
         [markdownUtils.markdownStyle.blockquoteBorderColor setFill];
         UIRectFill(lineRect);
       }
