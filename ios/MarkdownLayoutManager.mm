@@ -29,11 +29,11 @@
       CGFloat height = rect.size.height;
       CGFloat nestShift = paddingLeft + width + markdownUtils.markdownStyle.blockquoteMarginLeft;
 
-       for(int strip = 0; strip < currentDepth; strip++) {
-         CGRect lineRect = CGRectMake(x + (strip * nestShift), y, width, height);
-         [markdownUtils.markdownStyle.blockquoteBorderColor setFill];
-         UIRectFill(lineRect);
-       }
+      for(int strip = 0; strip < currentDepth; strip++) {
+        CGRect lineRect = CGRectMake(x + (strip * nestShift), y, width, height);
+        [markdownUtils.markdownStyle.blockquoteBorderColor setFill];
+        UIRectFill(lineRect);
+      }
     }
   }];
 }
