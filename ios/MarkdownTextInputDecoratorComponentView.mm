@@ -1,6 +1,6 @@
 // This guard prevent this file to be compiled in the old architecture.
 #ifdef RCT_NEW_ARCH_ENABLED
-#import <react/renderer/components/RNLiveMarkdownSpec/ComponentDescriptors.h>
+#import "MarkdownTextInputDecoratorComponentDescriptor.h"
 #import <react/renderer/components/RNLiveMarkdownSpec/Props.h>
 
 #import <RNLiveMarkdown/MarkdownTextInputDecoratorComponentView.h>
@@ -13,11 +13,12 @@ using namespace facebook::react;
 
 @implementation MarkdownTextInputDecoratorComponentView {
   MarkdownTextInputDecoratorView *_view;
+  const ShadowNodeFamily *_textInputFamily;
 }
 
 + (ComponentDescriptorProvider)componentDescriptorProvider
 {
-  return concreteComponentDescriptorProvider<MarkdownTextInputDecoratorViewComponentDescriptor>();
+  return concreteComponentDescriptorProvider<MarkdownTextInputDecoratorComponentDescriptor>();
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -32,6 +33,22 @@ using namespace facebook::react;
   }
 
   return self;
+}
+
+- (void)updateState:(const facebook::react::State::Shared &)state oldState:(const facebook::react::State::Shared &)oldState
+{
+    auto data = std::static_pointer_cast<MarkdownTextInputDecoratorShadowNode::ConcreteState const>(state)->getData();
+    
+    if (data.textInputFamily != _textInputFamily) {
+        _textInputFamily = data.textInputFamily;
+        return;
+    }
+}
+
+- (void)willMoveToSuperview:(UIView *)newSuperview {
+    _textInputFamily = nullptr;
+    
+    [super willMoveToSuperview:newSuperview];
 }
 
 - (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps

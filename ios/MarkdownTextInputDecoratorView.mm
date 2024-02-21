@@ -63,6 +63,9 @@
   [_markdownUtils setMarkdownStyle:_markdownStyle];
 
   [_textInput setMarkdownUtils:_markdownUtils];
+    
+//    [_textInput performSelector:@selector(_updateState)];
+    
   if ([backedTextInputView isKindOfClass:[RCTUITextField class]]) {
     RCTUITextField *textField = (RCTUITextField *)backedTextInputView;
     _adapter = [textField valueForKey:@"textInputDelegateAdapter"];

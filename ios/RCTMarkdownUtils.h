@@ -12,6 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithBackedTextInputView:(UIView<RCTBackedTextInputViewProtocol> *)backedTextInputView;
 
 - (NSAttributedString *)parseMarkdown:(nullable NSAttributedString *)input;
+- (NSAttributedString *)parseMarkdown:(nullable NSAttributedString *)input withAttributes:(nullable NSDictionary<NSAttributedStringKey, id>*)attributes;
 
 @end
 
