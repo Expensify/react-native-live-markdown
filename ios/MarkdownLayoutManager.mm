@@ -7,9 +7,11 @@
 
   [self enumerateLineFragmentsForGlyphRange:glyphsToShow usingBlock:^(CGRect rect, CGRect usedRect, NSTextContainer * _Nonnull textContainer, NSRange glyphRange, BOOL * _Nonnull stop) {
     __block BOOL isBlockquote = NO;
+    __block int currentDepth = 0;
     RCTMarkdownUtils *markdownUtils = [self valueForKey:@"markdownUtils"];
-    [markdownUtils.blockquoteRanges enumerateObjectsUsingBlock:^(NSValue *item, NSUInteger idx, BOOL * _Nonnull stop) {
-      NSRange range = [item rangeValue];
+    [markdownUtils.leveledBlockquoteRanges enumerateObjectsUsingBlock:^(NSDictionary *item, NSUInteger idx, BOOL * _Nonnull stop) {
+      NSRange range = [[item valueForKey:@"range"] rangeValue];
+      currentDepth = [[item valueForKey:@"depth"] unsignedIntegerValue];
       NSUInteger start = range.location;
       NSUInteger end = start + range.length;
       NSUInteger location = glyphRange.location;
@@ -25,9 +27,13 @@
       CGFloat y = paddingTop + rect.origin.y;
       CGFloat width = markdownUtils.markdownStyle.blockquoteBorderWidth;
       CGFloat height = rect.size.height;
-      CGRect lineRect = CGRectMake(x, y, width, height);
-      [markdownUtils.markdownStyle.blockquoteBorderColor setFill];
-      UIRectFill(lineRect);
+      CGFloat nestShift = paddingLeft + width + markdownUtils.markdownStyle.blockquoteMarginLeft;
+
+       for(int strip = 0; strip < currentDepth; strip++) {
+         CGRect lineRect = CGRectMake(x + (strip * nestShift), y, width, height);
+         [markdownUtils.markdownStyle.blockquoteBorderColor setFill];
+         UIRectFill(lineRect);
+       }
     }
   }];
 }

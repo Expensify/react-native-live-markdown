@@ -55,13 +55,14 @@
   // This is a workaround that applies the NSUnderlineStyleNone to the string before iterating over ranges which resolves this problem.
   [attributedString addAttribute:NSUnderlineStyleAttributeName value:[NSNumber numberWithInteger:NSUnderlineStyleNone] range:NSMakeRange(0, attributedString.length)];
 
-  _blockquoteRanges = [NSMutableArray new];
+  _leveledBlockquoteRanges = [NSMutableArray new];
 
   [ranges enumerateObjectsUsingBlock:^(id _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-    NSArray *item = obj;
-    NSString *type = item[0];
-    NSUInteger location = [item[1] unsignedIntegerValue];
-    NSUInteger length = [item[2] unsignedIntegerValue];
+    NSDictionary *item = obj;
+    NSString *type = [item valueForKey:@"style"];
+    NSInteger location = [[item valueForKey:@"start"] unsignedIntegerValue];
+    NSInteger length = [[item valueForKey:@"length"] unsignedIntegerValue];
+    NSInteger depth = [[item valueForKey:@"depth"] unsignedIntegerValue];
     NSRange range = NSMakeRange(location, length);
 
     if ([type isEqualToString:@"bold"] || [type isEqualToString:@"italic"] || [type isEqualToString:@"code"] || [type isEqualToString:@"pre"] || [type isEqualToString:@"h1"]) {
@@ -105,10 +106,13 @@
     } else if ([type isEqualToString:@"blockquote"]) {
       CGFloat indent = _markdownStyle.blockquoteMarginLeft + _markdownStyle.blockquoteBorderWidth + _markdownStyle.blockquotePaddingLeft;
       NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
-      paragraphStyle.firstLineHeadIndent = indent;
-      paragraphStyle.headIndent = indent;
+      paragraphStyle.firstLineHeadIndent = indent * depth;
+      paragraphStyle.headIndent = indent * depth;
       [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:range];
-      [_blockquoteRanges addObject:[NSValue valueWithRange:range]];
+
+      NSArray *dictValues = @[[NSValue valueWithRange:range], [NSNumber numberWithInt:depth]];
+      NSArray *keys = @[@"range", @"depth"];
+      [_leveledBlockquoteRanges addObject: [NSDictionary dictionaryWithObjects:dictValues forKeys:keys]];
     } else if ([type isEqualToString:@"pre"]) {
       [attributedString addAttribute:NSForegroundColorAttributeName value:_markdownStyle.preColor range:range];
       NSRange rangeForBackground = [inputString characterAtIndex:range.location] == '\n' ? NSMakeRange(range.location + 1, range.length - 1) : range;
