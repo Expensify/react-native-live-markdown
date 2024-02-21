@@ -62,7 +62,7 @@
     NSString *type = [item valueForKey:@"style"];
     NSInteger location = [[item valueForKey:@"start"] unsignedIntegerValue];
     NSInteger length = [[item valueForKey:@"length"] unsignedIntegerValue];
-    NSInteger depth = [[item valueForKey:@"depth"] unsignedIntegerValue];
+      NSInteger depth = [[item valueForKey:@"depth"] unsignedIntegerValue] ?: 1;
     NSRange range = NSMakeRange(location, length);
 
     if ([type isEqualToString:@"bold"] || [type isEqualToString:@"italic"] || [type isEqualToString:@"code"] || [type isEqualToString:@"pre"] || [type isEqualToString:@"h1"]) {
