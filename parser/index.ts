@@ -194,7 +194,7 @@ function groupRanges(ranges: Range[]) {
 
     if (sameStyleRange && sameStyleRange.start <= start && sameStyleRange.start + sameStyleRange.length >= end && range.length > 1) {
       // increment depth of overlapping range
-      sameStyleRange.depth = (sameStyleRange.depth || 0) + 1;
+      sameStyleRange.depth = (sameStyleRange.depth || 1) + 1;
     } else {
       lastVisibleRangeIndex[range.style] = acc.length;
       acc.push(range);
