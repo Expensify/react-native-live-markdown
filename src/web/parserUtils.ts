@@ -6,7 +6,7 @@ type PartialMarkdownStyle = StyleUtilsTypes.PartialMarkdownStyle;
 type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax' | 'mention-here' | 'mention-user';
 
 type MarkdownRange = {
-  style: MarkdownType;
+  type: MarkdownType;
   start: number;
   length: number;
   depth?: number;
@@ -113,12 +113,12 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
 
     const span = document.createElement('span');
     if (disableInlineStyles) {
-      span.className = range.style;
+      span.className = range.type;
     } else {
-      addStyling(span, range.style, markdownStyle, range.depth || 0);
+      addStyling(span, range.type, markdownStyle, range.depth || 1);
     }
 
-    if (stack.length > 0 && nextRangeStartIndex < endOfCurrentRange && range.style !== 'syntax') {
+    if (stack.length > 0 && nextRangeStartIndex < endOfCurrentRange && range.type !== 'syntax') {
       // tag nesting
       currentRoot.node.appendChild(span);
       nestedStack.push({node: span, endIndex: endOfCurrentRange});

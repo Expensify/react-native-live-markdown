@@ -3,14 +3,14 @@
 import {ExpensiMark} from 'expensify-common/lib/ExpensiMark';
 import _ from 'underscore';
 
-type Styles = 'bold' | 'italic' | 'strikethrough' | 'mention-here' | 'mention-user' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax';
+type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'mention-here' | 'mention-user' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax';
 type Range = {
-  style: Styles;
+  type: MarkdownType;
   start: number;
   length: number;
   depth?: number;
 };
-type Token = ['TEXT' | 'HTML', string, number?];
+type Token = ['TEXT' | 'HTML', string];
 type StackItem = {tag: string; children: Array<StackItem | string>};
 
 function parseMarkdownToHTML(markdown: string): string {
@@ -88,11 +88,11 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
     addChildrenWithStyle(syntax, 'syntax');
   }
 
-  function addChildrenWithStyle(node: StackItem | string, style: Styles) {
+  function addChildrenWithStyle(node: StackItem | string, type: MarkdownType) {
     const start = text.length;
     processChildren(node);
     const end = text.length;
-    ranges.push({style, start, length: end - start});
+    ranges.push({type, start, length: end - start});
   }
 
   const ranges: Range[] = [];
@@ -179,24 +179,24 @@ function getTagPriority(tag: string) {
 
 function sortRanges(ranges: Range[]) {
   // sort ranges by start position, then by length, then by tag hierarchy
-  return ranges.sort((a, b) => a.start - b.start || b.length - a.length || getTagPriority(b.style) - getTagPriority(a.style) || 0);
+  return ranges.sort((a, b) => a.start - b.start || b.length - a.length || getTagPriority(b.type) - getTagPriority(a.type) || 0);
 }
 
 function groupRanges(ranges: Range[]) {
-  const lastVisibleRangeIndex: {[key in Styles]?: number} = {};
+  const lastVisibleRangeIndex: {[key in MarkdownType]?: number} = {};
 
   return ranges.reduce((acc, range) => {
     const start = range.start;
     const end = range.start + range.length;
 
-    const rangeWithSameStyleIndex = lastVisibleRangeIndex[range.style];
+    const rangeWithSameStyleIndex = lastVisibleRangeIndex[range.type];
     const sameStyleRange = rangeWithSameStyleIndex !== undefined ? acc[rangeWithSameStyleIndex] : undefined;
 
     if (sameStyleRange && sameStyleRange.start <= start && sameStyleRange.start + sameStyleRange.length >= end && range.length > 1) {
       // increment depth of overlapping range
       sameStyleRange.depth = (sameStyleRange.depth || 1) + 1;
     } else {
-      lastVisibleRangeIndex[range.style] = acc.length;
+      lastVisibleRangeIndex[range.type] = acc.length;
       acc.push(range);
     }
 

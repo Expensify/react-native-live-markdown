@@ -27,10 +27,10 @@
       CGFloat y = paddingTop + rect.origin.y;
       CGFloat width = markdownUtils.markdownStyle.blockquoteBorderWidth;
       CGFloat height = rect.size.height;
-      CGFloat nestShift = paddingLeft + width + markdownUtils.markdownStyle.blockquoteMarginLeft;
+      CGFloat shift = paddingLeft + width + markdownUtils.markdownStyle.blockquoteMarginLeft;
 
-      for(int strip = 0; strip < currentDepth; strip++) {
-        CGRect lineRect = CGRectMake(x + (strip * nestShift), y, width, height);
+      for(int level = 0; level < currentDepth; level++) {
+        CGRect lineRect = CGRectMake(x + (level * shift), y, width, height);
         [markdownUtils.markdownStyle.blockquoteBorderColor setFill];
         UIRectFill(lineRect);
       }

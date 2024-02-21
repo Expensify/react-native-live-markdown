@@ -92,7 +92,7 @@ public class MarkdownUtils {
       JSONArray ranges = new JSONArray(output);
       for (int i = 0; i < ranges.length(); i++) {
         JSONObject range = ranges.getJSONObject(i);
-        String type = range.getString("style");
+        String type = range.getString("type");
         int start = range.getInt("start");
         int end = start + range.getInt("length");
         int depth = range.optInt("depth", 1);

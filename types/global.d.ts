@@ -1,11 +1,12 @@
 export {};
 
+type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'mention-here' | 'mention-user' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax';
 type Range = {
-  style: string;
+  type: MarkdownType;
   start: number;
   length: number;
   depth?: number;
-}; // style, location, length
+};
 
 declare global {
   // eslint-disable-next-line no-var
