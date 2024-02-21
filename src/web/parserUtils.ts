@@ -6,9 +6,10 @@ type PartialMarkdownStyle = StyleUtilsTypes.PartialMarkdownStyle;
 type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax' | 'mention-here' | 'mention-user';
 
 type MarkdownRange = {
-  type: MarkdownType;
-  startIndex: number;
+  style: MarkdownType;
+  start: number;
   length: number;
+  depth?: number;
 };
 
 type NestedNode = {
@@ -16,7 +17,7 @@ type NestedNode = {
   endIndex: number;
 };
 
-function addStyling(targetElement: HTMLElement, type: MarkdownType, markdownStyle: PartialMarkdownStyle) {
+function addStyling(targetElement: HTMLElement, type: MarkdownType, markdownStyle: PartialMarkdownStyle, depth?: number) {
   const node = targetElement;
   switch (type) {
     case 'syntax':
@@ -50,15 +51,21 @@ function addStyling(targetElement: HTMLElement, type: MarkdownType, markdownStyl
       Object.assign(node.style, markdownStyle.pre);
       break;
 
-    case 'blockquote':
-      Object.assign(node.style, {
-        ...markdownStyle.blockquote,
-        borderLeftStyle: 'solid',
-        display: 'inline-block',
-        maxWidth: '100%',
-        boxSizing: 'border-box',
+    case 'blockquote': {
+      // create a new span for each blockquote level
+      Array.from({length: depth!}).forEach(() => {
+        const span = document.createElement('span');
+        Object.assign(span.style, {
+          ...markdownStyle.blockquote,
+          width: markdownStyle.blockquote!.borderWidth,
+          backgroundColor: markdownStyle.blockquote!.borderColor,
+          marginInlineEnd: markdownStyle.blockquote!.marginLeft,
+          boxSizing: 'border-box',
+        });
+        node.appendChild(span);
       });
       break;
+    }
     case 'h1':
       Object.assign(node.style, {
         ...markdownStyle.h1,
@@ -99,25 +106,25 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
       break;
     }
 
-    const endOfCurrentRange = range.startIndex + range.length;
-    const nextRangeStartIndex = stack.length > 0 && !!stack[0] ? stack[0].startIndex || 0 : textLength;
+    const endOfCurrentRange = range.start + range.length;
+    const nextRangeStartIndex = stack.length > 0 && !!stack[0] ? stack[0].start || 0 : textLength;
 
-    addSubstringAsTextNode(currentRoot.node, text, lastRangeEndIndex, range.startIndex); // add text with newlines before current range
+    addSubstringAsTextNode(currentRoot.node, text, lastRangeEndIndex, range.start); // add text with newlines before current range
 
     const span = document.createElement('span');
     if (disableInlineStyles) {
-      span.className = range.type;
+      span.className = range.style;
     } else {
-      addStyling(span, range.type, markdownStyle);
+      addStyling(span, range.style, markdownStyle, range.depth);
     }
 
-    if (stack.length > 0 && nextRangeStartIndex < endOfCurrentRange && range.type !== 'syntax') {
+    if (stack.length > 0 && nextRangeStartIndex < endOfCurrentRange && range.style !== 'syntax') {
       // tag nesting
       currentRoot.node.appendChild(span);
       nestedStack.push({node: span, endIndex: endOfCurrentRange});
-      lastRangeEndIndex = range.startIndex;
+      lastRangeEndIndex = range.start;
     } else {
-      addSubstringAsTextNode(span, text, range.startIndex, endOfCurrentRange);
+      addSubstringAsTextNode(span, text, range.start, endOfCurrentRange);
       currentRoot.node.appendChild(span);
       lastRangeEndIndex = endOfCurrentRange;
 
@@ -162,14 +169,7 @@ function parseText(
   }
   const ranges = global.parseExpensiMarkToRanges(text);
 
-  const markdownRanges: MarkdownRange[] = ranges.map((range) => {
-    const {style: type, start: startIndex, length} = range;
-    return {
-      type: type as MarkdownType,
-      startIndex,
-      length,
-    };
-  });
+  const markdownRanges = ranges as MarkdownRange[];
 
   targetElement.innerHTML = '';
   targetElement.innerText = '';
