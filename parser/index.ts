@@ -3,9 +3,9 @@
 import {ExpensiMark} from 'expensify-common/lib/ExpensiMark';
 import _ from 'underscore';
 
-// type Range = [string, number, number];
+type Styles = 'bold' | 'italic' | 'strikethrough' | 'mention-here' | 'mention-user' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax';
 type Range = {
-  style: string;
+  style: Styles;
   start: number;
   length: number;
   depth?: number;
@@ -88,7 +88,7 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
     addChildrenWithStyle(syntax, 'syntax');
   }
 
-  function addChildrenWithStyle(node: StackItem | string, style: string) {
+  function addChildrenWithStyle(node: StackItem | string, style: Styles) {
     const start = text.length;
     processChildren(node);
     const end = text.length;
@@ -183,21 +183,24 @@ function sortRanges(ranges: Range[]) {
 }
 
 function groupRanges(ranges: Range[]) {
+  const lastVisibleRangeIndex: {[key in Styles]?: number} = {};
+
   return ranges.reduce((acc, range) => {
     const start = range.start;
     const end = range.start + range.length;
 
-    const lastRangeWithSameStyle = acc.findLast((r) => r.style === range.style);
+    const rangeWithSameStyleIndex = lastVisibleRangeIndex[range.style];
+    const sameStyleRange = rangeWithSameStyleIndex !== undefined ? acc[rangeWithSameStyleIndex] : undefined;
 
-    // Perform necessary operations with 'start', 'end', and 'last'
-    if (lastRangeWithSameStyle && lastRangeWithSameStyle.start <= start && lastRangeWithSameStyle.start + lastRangeWithSameStyle.length <= end && range.length > 1) {
+    if (sameStyleRange && sameStyleRange.start <= start && sameStyleRange.start + sameStyleRange.length >= end && range.length > 1) {
       // increment depth of overlapping range
-      lastRangeWithSameStyle.depth = (lastRangeWithSameStyle.depth || 1) + 1;
+      sameStyleRange.depth = (sameStyleRange.depth || 0) + 1;
     } else {
+      lastVisibleRangeIndex[range.style] = acc.length;
       acc.push(range);
     }
 
-    return acc; // Return the updated accumulator
+    return acc;
   }, [] as Range[]);
 }
 
@@ -211,8 +214,8 @@ function parseExpensiMarkToRanges(markdown: string): Range[] {
     return [];
   }
   const sortedRanges = sortRanges(ranges);
-  const gruppedRanges = groupRanges(sortedRanges);
-  return gruppedRanges;
+  const groupedRanges = groupRanges(sortedRanges);
+  return groupedRanges;
 }
 
 globalThis.parseExpensiMarkToRanges = parseExpensiMarkToRanges;
