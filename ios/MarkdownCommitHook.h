@@ -34,14 +34,7 @@ class MarkdownCommitHook : public UIManagerCommitHook {
       RootShadowNode::Unshared const &newRootShadowNode)
       const noexcept override;
 
-    void setTextInputFamily(ShadowNodeFamily* textInputFamily) {
-        textInputFamily_ = textInputFamily;
-    }
-
  private:
-    void findTextInputNodes(std::shared_ptr<const ShadowNode> node, std::vector<MarkdownTextInputNode> &output) const;
-    
-    ShadowNodeFamily* textInputFamily_;
     std::shared_ptr<UIManager> uiManager_;
 };
 

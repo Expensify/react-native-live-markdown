@@ -8,6 +8,7 @@
 #import <RNLiveMarkdown/RCTMarkdownStyle.h>
 
 #import "RCTFabricComponentsPlugins.h"
+#import "RNLiveMarkdownModule.h"
 
 using namespace facebook::react;
 
@@ -38,11 +39,18 @@ using namespace facebook::react;
 - (void)updateState:(const facebook::react::State::Shared &)state oldState:(const facebook::react::State::Shared &)oldState
 {
     auto data = std::static_pointer_cast<MarkdownTextInputDecoratorShadowNode::ConcreteState const>(state)->getData();
+    
+    if (_decoratorFamily != nullptr) {
+        [RNLiveMarkdownModule unregisterFamilyForUpdates:_decoratorFamily];
+    }
+    
     _decoratorFamily = data.decoratorFamily;
+    [RNLiveMarkdownModule registerFamilyForUpdates:_decoratorFamily];
 }
 
 - (void)willMoveToSuperview:(UIView *)newSuperview {
     if (newSuperview == nil) {
+      [RNLiveMarkdownModule unregisterFamilyForUpdates:_decoratorFamily];
       _decoratorFamily = nullptr;
     }
     
