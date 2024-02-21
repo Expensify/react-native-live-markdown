@@ -95,7 +95,7 @@ public class MarkdownUtils {
         String type = range.getString("style");
         int start = range.getInt("start");
         int end = start + range.getInt("length");
-        int depth = range.getInt("depth");
+        int depth = range.optInt("depth", 1);
         applyRange(ssb, type, start, end, depth);
       }
     } catch (JSONException e) {
