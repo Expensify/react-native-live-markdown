@@ -16,7 +16,7 @@
 {
   RCTMarkdownUtils *markdownUtils = [self getMarkdownUtils];
   if (markdownUtils != nil) {
-    attributedText = [markdownUtils parseMarkdown:attributedText];
+    attributedText = [markdownUtils parseMarkdown:attributedText withAttributes:self.backedTextInputView.defaultTextAttributes];
   }
 
   // Call the original method
@@ -28,7 +28,7 @@
   RCTMarkdownUtils *markdownUtils = [self getMarkdownUtils];
   if (markdownUtils != nil) {
     UITextRange *range = self.backedTextInputView.selectedTextRange;
-    NSAttributedString *attributedText = [markdownUtils parseMarkdown:self.backedTextInputView.attributedText];
+    NSAttributedString *attributedText = [markdownUtils parseMarkdown:self.backedTextInputView.attributedText withAttributes:self.backedTextInputView.defaultTextAttributes];
     [self.backedTextInputView setAttributedText:attributedText];
     [self.backedTextInputView setSelectedTextRange:range notifyDelegate:YES];
   }

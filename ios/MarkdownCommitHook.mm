@@ -49,18 +49,23 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
          }];
         
         for (auto &nodes : nodesToUpdate) {
-            auto tag = nodes.textInput->getTag();
             rootNode = rootNode->cloneTree(nodes.textInput->getFamily(), [&nodes](const ShadowNode& node){
                 const auto &textInputState = *std::static_pointer_cast<const ConcreteState<TextInputState>>(nodes.textInput->getState());
                 const auto &stateData = textInputState.getData();
+
                 if (stateData.attributedStringBox.getMode() == AttributedStringBox::Mode::Value) {
                     const auto &markdownProps = *std::static_pointer_cast<MarkdownTextInputDecoratorViewProps const>(nodes.decorator->getProps());
+                    const auto &textInputProps = *std::static_pointer_cast<TextInputProps const>(nodes.textInput->getProps());
+                    
+                    const auto defaultTextAttributes =
+                        RCTNSTextAttributesFromTextAttributes(textInputProps.getEffectiveTextAttributes(RCTFontSizeMultiplier()));
+                    
                     RCTMarkdownStyle *markdownStyle = [[RCTMarkdownStyle alloc] initWithStruct:markdownProps.markdownStyle];
-                    RCTMarkdownUtils *utils = [[RCTMarkdownUtils alloc] initWithBackedTextInputView:nil];
+                    RCTMarkdownUtils *utils = [[RCTMarkdownUtils alloc] init];
                     [utils setMarkdownStyle:markdownStyle];
                     
                     auto nsAttributedString = RCTNSAttributedStringFromAttributedStringBox(stateData.attributedStringBox);
-                    auto newString = [utils parseMarkdownWithPreviousAttributes:nsAttributedString];
+                    auto newString = [utils parseMarkdown:nsAttributedString withAttributes:defaultTextAttributes];
                     
                     auto newStateData = std::make_shared<TextInputState>(stateData);
                     newStateData->attributedStringBox = RCTAttributedStringBoxFromNSAttributedString(newString);

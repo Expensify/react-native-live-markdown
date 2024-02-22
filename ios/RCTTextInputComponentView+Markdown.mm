@@ -13,8 +13,8 @@
 
   if (markdownUtils != nil) {
     // force Markdown formatting on first render because `_setAttributedText` is called before `setMarkdownUtils`
-    RCTUITextField *backedTextInputView = [self valueForKey:@"_backedTextInputView"];
-    backedTextInputView.attributedText = [markdownUtils parseMarkdown:backedTextInputView.attributedText];
+    RCTUITextField *backedTextInputView = [self getBackedTextInputView];
+    backedTextInputView.attributedText = [markdownUtils parseMarkdown:backedTextInputView.attributedText withAttributes:backedTextInputView.defaultTextAttributes];
   }
 }
 
@@ -22,11 +22,17 @@
   return objc_getAssociatedObject(self, @selector(getMarkdownUtils));
 }
 
+- (RCTUITextField *)getBackedTextInputView {
+  RCTUITextField *backedTextInputView = [self valueForKey:@"_backedTextInputView"];
+  return backedTextInputView;
+}
+
 - (void)markdown__setAttributedString:(NSAttributedString *)attributedString
 {
   RCTMarkdownUtils *markdownUtils = [self getMarkdownUtils];
-  if (markdownUtils != nil) {
-    attributedString = [markdownUtils parseMarkdown:attributedString];
+  RCTUITextField *backedTextInputView = [self getBackedTextInputView];
+  if (markdownUtils != nil && backedTextInputView != nil) {
+    attributedString = [markdownUtils parseMarkdown:attributedString withAttributes:backedTextInputView.defaultTextAttributes];
   }
 
   // Call the original method
