@@ -4,7 +4,7 @@
 #import <React/RCTEventEmitter.h>
 #import <RNLiveMarkdownSpec/RNLiveMarkdownSpec.h>
 
-
+// Without inheriting after RCTEventEmitter we don't get access to bridge
 @interface RCTLiveMarkdownModule : RCTEventEmitter <NativeMarkdownModuleSpec>
 @end
 

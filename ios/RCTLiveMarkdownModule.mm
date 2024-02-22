@@ -7,6 +7,9 @@
 #import "MarkdownCommitHook.h"
 #import "MarkdownShadowFamilyRegistry.h"
 
+// A turbomodule used to register the commit hook
+// I think this is the easiest way to access the UIManager, which we need to actually register the hook
+
 @implementation RCTLiveMarkdownModule {
     BOOL installed_;
     std::shared_ptr<livemarkdown::MarkdownCommitHook> commitHook_;

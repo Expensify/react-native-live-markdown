@@ -13,7 +13,7 @@ using namespace facebook::react;
 
 namespace livemarkdown {
 
-struct MarkdownTextInputNode {
+struct MarkdownTextInputDecoratorPair {
     std::shared_ptr<const TextInputShadowNode> textInput;
     std::shared_ptr<const MarkdownTextInputDecoratorShadowNode> decorator;
 };

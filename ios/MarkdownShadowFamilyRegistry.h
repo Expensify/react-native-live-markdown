@@ -2,6 +2,12 @@
 
 #include <mutex>
 
+// A registry to store pointers to the ShadowNodeFamilies of markdown decorators.
+// The only place we can _legally_ access the family of shadow node is in the constructor
+// and we need it inside commit hook. To achieve it, we use this simple registry where families
+// are registered when nodes are created and cleaned up when native view is removed from window
+// or when a turbomodule is deallocated.
+
 class MarkdownShadowFamilyRegistry {
 public:
     static void registerFamilyForUpdates(facebook::react::ShadowNodeFamily::Shared family);

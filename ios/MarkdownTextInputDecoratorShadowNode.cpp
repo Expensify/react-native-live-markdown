@@ -13,6 +13,9 @@ const ShadowNodeFragment::Value MarkdownTextInputDecoratorShadowNode::updateFrag
 
     MarkdownShadowFamilyRegistry::registerFamilyForUpdates(family);
     
+    // we pass the pointer to the ShadowNodeFamily in the initial state, so it's propagated on every clone
+    // we need it to clear the reference in the registry when the view is removed from window
+    // it cannot be done in the destructor, as multiple shadow nodes for the same family may be created
     return ShadowNodeFragment::Value({
         .props = fragment.props,
         .children = fragment.children,
