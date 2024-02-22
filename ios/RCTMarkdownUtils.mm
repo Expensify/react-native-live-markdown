@@ -55,7 +55,7 @@
   // This is a workaround that applies the NSUnderlineStyleNone to the string before iterating over ranges which resolves this problem.
   [attributedString addAttribute:NSUnderlineStyleAttributeName value:[NSNumber numberWithInteger:NSUnderlineStyleNone] range:NSMakeRange(0, attributedString.length)];
 
-  _leveledBlockquoteRanges = [NSMutableArray new];
+  _blockquoteRangesAndLevels = [NSMutableArray new];
 
   [ranges enumerateObjectsUsingBlock:^(id _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
     NSDictionary *item = obj;
@@ -109,9 +109,7 @@
       paragraphStyle.firstLineHeadIndent = indent;
       paragraphStyle.headIndent = indent;
       [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:range];
-
-//      NSValue *valueRange = [NSValue valueWithRange:range];
-      [_leveledBlockquoteRanges addObject:@{
+      [_blockquoteRangesAndLevels addObject:@{
         @"range": [NSValue valueWithRange:range],
         @"depth": @(depth)
       }];

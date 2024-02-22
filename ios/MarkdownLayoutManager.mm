@@ -9,7 +9,7 @@
     __block BOOL isBlockquote = NO;
     __block int currentDepth = 0;
     RCTMarkdownUtils *markdownUtils = [self valueForKey:@"markdownUtils"];
-    [markdownUtils.leveledBlockquoteRanges enumerateObjectsUsingBlock:^(NSDictionary *item, NSUInteger idx, BOOL * _Nonnull stop) {
+    [markdownUtils.blockquoteRangesAndLevels enumerateObjectsUsingBlock:^(NSDictionary *item, NSUInteger idx, BOOL * _Nonnull stop) {
       NSRange range = [[item valueForKey:@"range"] rangeValue];
       currentDepth = [[item valueForKey:@"depth"] unsignedIntegerValue];
       NSUInteger start = range.location;
@@ -27,8 +27,8 @@
       CGFloat width = markdownUtils.markdownStyle.blockquoteBorderWidth;
       CGFloat height = rect.size.height;
       CGFloat shift = markdownUtils.markdownStyle.blockquoteMarginLeft + markdownUtils.markdownStyle.blockquoteBorderWidth + markdownUtils.markdownStyle.blockquotePaddingLeft;
-      for(int level = 0; level < currentDepth; level++) {
-        CGFloat x = paddingLeft + markdownUtils.markdownStyle.blockquoteMarginLeft + (level * shift);
+      for (int level = 0; level < currentDepth; level++) {
+        CGFloat x =  paddingLeft + (level * shift) + markdownUtils.markdownStyle.blockquoteMarginLeft;
         CGRect lineRect = CGRectMake(x, y, width, height);
         [markdownUtils.markdownStyle.blockquoteBorderColor setFill];
         UIRectFill(lineRect);

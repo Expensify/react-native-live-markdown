@@ -94,8 +94,9 @@ public class MarkdownUtils {
         JSONObject range = ranges.getJSONObject(i);
         String type = range.getString("type");
         int start = range.getInt("start");
-        int end = start + range.getInt("length");
+        int length = range.getInt("length");
         int depth = range.optInt("depth", 1);
+        int end = start + length;
         applyRange(ssb, type, start, end, depth);
       }
     } catch (JSONException e) {
