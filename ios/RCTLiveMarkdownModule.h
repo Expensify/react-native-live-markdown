@@ -5,7 +5,7 @@
 #import <RNLiveMarkdownSpec/RNLiveMarkdownSpec.h>
 
 
-@interface RNLiveMarkdownModule : RCTEventEmitter <NativeMarkdownModuleSpec>
+@interface RCTLiveMarkdownModule : RCTEventEmitter <NativeMarkdownModuleSpec>
 @end
 
 #endif // RCT_NEW_ARCH_ENABLED

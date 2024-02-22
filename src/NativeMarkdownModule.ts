@@ -5,4 +5,4 @@ interface Spec extends TurboModule {
   install: () => boolean;
 }
 
-export default TurboModuleRegistry.get<Spec>('RNLiveMarkdownModule');
+export default TurboModuleRegistry.get<Spec>('RCTLiveMarkdownModule');

@@ -3,11 +3,11 @@
 #import <React/RCTSurfacePresenter.h>
 #import <React/RCTScheduler.h>
 
-#import "RNLiveMarkdownModule.h"
+#import "RCTLiveMarkdownModule.h"
 #import "MarkdownCommitHook.h"
 #import "MarkdownShadowFamilyRegistry.h"
 
-@implementation RNLiveMarkdownModule {
+@implementation RCTLiveMarkdownModule {
     BOOL installed_;
     std::shared_ptr<livemarkdown::MarkdownCommitHook> commitHook_;
 }
