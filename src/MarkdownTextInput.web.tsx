@@ -9,7 +9,7 @@ import type {
   TextInputKeyPressEventData,
   TextInputFocusEventData,
 } from 'react-native';
-import React, {useEffect, useRef, useCallback, useMemo} from 'react';
+import React, {useEffect, useRef, useCallback, useMemo, useLayoutEffect} from 'react';
 import type {CSSProperties, MutableRefObject, ReactEventHandler, FocusEventHandler, MouseEvent, KeyboardEvent, SyntheticEvent} from 'react';
 import {StyleSheet} from 'react-native';
 import * as ParseUtils from './web/parserUtils';
@@ -20,6 +20,8 @@ import './web/MarkdownTextInput.css';
 import InputHistory from './web/InputHistory';
 
 require('../parser/react-native-live-markdown-parser.js');
+
+const useClientEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
 
 let createReactDOMStyle: (style: any) => any;
 try {
@@ -150,6 +152,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       spellCheck,
       style = {},
       value,
+      autoFocus = false,
     },
     ref,
   ) => {
@@ -167,6 +170,17 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     // Empty placeholder would collapse the div, so we need to use zero-width space to prevent it
     const heightSafePlaceholder = useMemo(() => getPlaceholderValue(placeholder), [placeholder]);
 
+    const updateSelection = useCallback(() => {
+      if (!divRef.current) {
+        return;
+      }
+      const selection = CursorUtils.getCurrentCursorPosition(divRef.current);
+      const markdownHTMLInput = divRef.current as HTMLInputElement;
+      markdownHTMLInput.selectionStart = selection.start;
+      markdownHTMLInput.selectionEnd = selection.end;
+      contentSelection.current = selection;
+    }, []);
+
     const parseText = useCallback(
       (target: HTMLDivElement, text: string | null, customMarkdownStyles: MarkdownStyle, cursorPosition: number | null = null, shouldAddToHistory = true) => {
         if (text === null) {
@@ -177,12 +191,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           history.current.debouncedAdd(parsedText.text, parsedText.cursorPosition);
         }
 
-        if (parsedText.cursorPosition !== null) {
-          contentSelection.current = {
-            start: parsedText.cursorPosition,
-            end: parsedText.cursorPosition,
-          };
-        }
+        updateSelection();
 
         return parsedText;
       },
@@ -354,10 +363,9 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       (event) => {
         const e = event as unknown as NativeSyntheticEvent<TextInputSelectionChangeEventData>;
         setEventProps(e);
-        const selection = CursorUtils.getCurrentCursorPosition(e.target as unknown as HTMLElement);
-        contentSelection.current = selection;
-        if (onSelectionChange) {
-          e.nativeEvent.selection = selection;
+        updateSelection();
+        if (onSelectionChange && contentSelection.current) {
+          e.nativeEvent.selection = contentSelection.current;
           onSelectionChange(e);
         }
       },
@@ -414,6 +422,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
     const handleClick = useCallback(
       (e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>) => {
+        updateSelection();
         if (!onClick || !divRef.current) {
           return;
         }
@@ -449,29 +458,61 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       divRef.current = r;
     };
 
+    useClientEffect(
+      function parseAndStyleValue() {
+        if (!divRef.current || processedValue === divRef.current.innerText) {
+          return;
+        }
+
+        if (value === undefined) {
+          parseText(divRef.current, divRef.current.innerText, processedMarkdownStyle);
+          return;
+        }
+
+        const text = processedValue !== undefined ? processedValue : '';
+        parseText(divRef.current, text, processedMarkdownStyle, text.length);
+        updateTextColor(divRef.current, value);
+      },
+      [multiline, processedMarkdownStyle, processedValue],
+    );
+
+    useClientEffect(
+      function adjustHeight() {
+        if (!divRef.current || !multiline) {
+          return;
+        }
+        const elementHeight = getElementHeight(divRef.current, inputStyles, numberOfLines);
+        divRef.current.style.height = elementHeight;
+        divRef.current.style.maxHeight = elementHeight;
+      },
+      [numberOfLines],
+    );
+
     useEffect(() => {
-      if (!divRef.current || processedValue === divRef.current.innerText) {
-        return;
-      }
-
-      if (value === undefined) {
-        parseText(divRef.current, divRef.current.innerText, processedMarkdownStyle);
-        return;
-      }
-
-      const text = processedValue !== undefined ? processedValue : '';
-      parseText(divRef.current, text, processedMarkdownStyle, text.length);
-      updateTextColor(divRef.current, value);
-    }, [multiline, processedMarkdownStyle, processedValue]);
+      // update event listeners events objects
+      const originalAddEventListener = EventTarget.prototype.addEventListener;
+      EventTarget.prototype.addEventListener = function (eventName, callback) {
+        if (eventName === 'paste' && typeof callback === 'function') {
+          originalAddEventListener.call(this, eventName, function (event) {
+            if (divRef.current && divRef.current.contains(event.target as Node)) {
+              // pasting returns styled span elements as event.target instead of the contentEditable div. We want to keep the div as the target
+              Object.defineProperty(event, 'target', {writable: false, value: divRef.current});
+            }
+            callback(event);
+          });
+        } else {
+          originalAddEventListener.call(this, eventName, callback);
+        }
+      };
+    }, []);
 
     useEffect(() => {
-      if (!divRef.current || !multiline) {
+      // focus the input on mount if autoFocus is set
+      if (!(divRef.current && autoFocus)) {
         return;
       }
-      const elementHeight = getElementHeight(divRef.current, inputStyles, numberOfLines);
-      divRef.current.style.height = elementHeight;
-      divRef.current.style.maxHeight = elementHeight;
-    }, [numberOfLines]);
+      divRef.current.focus();
+    }, []);
 
     return (
       // eslint-disable-next-line jsx-a11y/no-static-element-interactions
@@ -488,6 +529,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         autoCapitalize={autoCapitalize}
         className={className}
         onKeyDown={handleKeyPress}
+        onKeyUp={updateSelection}
         onInput={handleOnChangeText}
         onSelect={handleSelectionChange}
         onClick={handleClick}
