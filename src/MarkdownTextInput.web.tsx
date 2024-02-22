@@ -250,7 +250,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         const text = normalizeValue(divRef.current.innerText || '');
         if (typeof e.target !== 'number') {
           // TODO: change the logic here so every event have value property
-          (e.target as HTMLInputElement).value = text;
+          (e.target as unknown as HTMLInputElement).value = text;
         }
         e.nativeEvent.text = text;
       }
@@ -543,7 +543,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
   },
 );
 
-const styles = StyleSheet.create({
+const styles = {
   defaultInputStyles: {
     borderColor: 'black',
     borderWidth: 1,
@@ -559,7 +559,7 @@ const styles = StyleSheet.create({
     opacity: 0.75,
     cursor: 'default',
   },
-});
+};
 
 export default MarkdownTextInput;
 
