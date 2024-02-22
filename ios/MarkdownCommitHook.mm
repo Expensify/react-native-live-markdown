@@ -58,15 +58,31 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
                     const auto &markdownProps = *std::static_pointer_cast<MarkdownTextInputDecoratorViewProps const>(nodes.decorator->getProps());
                     const auto &textInputProps = *std::static_pointer_cast<TextInputProps const>(nodes.textInput->getProps());
                     
-                    const auto defaultTextAttributes =
-                        RCTNSTextAttributesFromTextAttributes(textInputProps.getEffectiveTextAttributes(RCTFontSizeMultiplier()));
+                    const auto defaultTextAttributes = textInputProps.getEffectiveTextAttributes(RCTFontSizeMultiplier());
+                    const auto defaultNSTextAttributes = RCTNSTextAttributesFromTextAttributes(defaultTextAttributes);
                     
                     RCTMarkdownStyle *markdownStyle = [[RCTMarkdownStyle alloc] initWithStruct:markdownProps.markdownStyle];
                     RCTMarkdownUtils *utils = [[RCTMarkdownUtils alloc] init];
                     [utils setMarkdownStyle:markdownStyle];
                     
                     auto nsAttributedString = RCTNSAttributedStringFromAttributedStringBox(stateData.attributedStringBox);
-                    auto newString = [utils parseMarkdown:nsAttributedString withAttributes:defaultTextAttributes];
+                    
+                    auto plainString = std::string([[nsAttributedString string] UTF8String]);
+                    
+                    if (plainString != textInputProps.text) {
+                        auto attributedString = AttributedString{};
+
+                        attributedString.appendFragment(
+                            AttributedString::Fragment{textInputProps.text, defaultTextAttributes});
+
+                        auto attachments = BaseTextShadowNode::Attachments{};
+                        BaseTextShadowNode::buildAttributedString(
+                            defaultTextAttributes, *nodes.textInput, attributedString, attachments);
+                        
+                        nsAttributedString = RCTNSAttributedStringFromAttributedStringBox(AttributedStringBox{attributedString});
+                    }
+                    
+                    auto newString = [utils parseMarkdown:nsAttributedString withAttributes:defaultNSTextAttributes];
                     
                     auto newStateData = std::make_shared<TextInputState>(stateData);
                     newStateData->attributedStringBox = RCTAttributedStringBoxFromNSAttributedString(newString);
@@ -76,7 +92,9 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
                     });
                 }
                 
-                return node.clone({});
+                return node.clone({
+                    .state = node.getState()
+                });
             });
         }
 
