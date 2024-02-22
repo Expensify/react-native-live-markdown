@@ -2,12 +2,13 @@
 #ifdef RCT_NEW_ARCH_ENABLED
 
 #include <react/renderer/core/ComponentDescriptor.h>
-#import <react/renderer/textlayoutmanager/RCTAttributedTextUtils.h>
+#include <react/renderer/textlayoutmanager/RCTAttributedTextUtils.h>
+#include <React/RCTUtils.h>
 
 #include "MarkdownCommitHook.h"
 #include "RCTMarkdownStyle.h"
 #include "RCTMarkdownUtils.h"
-#include "RNLiveMarkdownModule.h"
+#include "MarkdownShadowFamilyRegistry.h"
 
 using namespace facebook::react;
 
@@ -29,7 +30,7 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
 
         std::vector<MarkdownTextInputNode> nodesToUpdate;
         
-        [RNLiveMarkdownModule runForEveryFamily:[&rootNode, &nodesToUpdate](ShadowNodeFamily::Shared family) {
+        MarkdownShadowFamilyRegistry::runForEveryFamily([&rootNode, &nodesToUpdate](ShadowNodeFamily::Shared family) {
          auto ancestors = family->getAncestors(*rootNode);
          
          if (!ancestors.empty()) {
@@ -46,7 +47,7 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
                  });
              }
          }
-         }];
+         });
         
         for (auto &nodes : nodesToUpdate) {
             rootNode = rootNode->cloneTree(nodes.textInput->getFamily(), [&nodes](const ShadowNode& node){

@@ -1,14 +1,14 @@
 // This guard prevent this file to be compiled in the old architecture.
 #ifdef RCT_NEW_ARCH_ENABLED
-#import "MarkdownTextInputDecoratorComponentDescriptor.h"
 #import <react/renderer/components/RNLiveMarkdownSpec/Props.h>
 
 #import <RNLiveMarkdown/MarkdownTextInputDecoratorComponentView.h>
 #import <RNLiveMarkdown/MarkdownTextInputDecoratorView.h>
 #import <RNLiveMarkdown/RCTMarkdownStyle.h>
 
+#import "MarkdownTextInputDecoratorComponentDescriptor.h"
+#import "MarkdownShadowFamilyRegistry.h"
 #import "RCTFabricComponentsPlugins.h"
-#import "RNLiveMarkdownModule.h"
 
 using namespace facebook::react;
 
@@ -41,16 +41,16 @@ using namespace facebook::react;
     auto data = std::static_pointer_cast<MarkdownTextInputDecoratorShadowNode::ConcreteState const>(state)->getData();
     
     if (_decoratorFamily != nullptr) {
-        [RNLiveMarkdownModule unregisterFamilyForUpdates:_decoratorFamily];
+        MarkdownShadowFamilyRegistry::unregisterFamilyForUpdates(_decoratorFamily);
     }
     
     _decoratorFamily = data.decoratorFamily;
-    [RNLiveMarkdownModule registerFamilyForUpdates:_decoratorFamily];
+    MarkdownShadowFamilyRegistry::registerFamilyForUpdates(_decoratorFamily);
 }
 
 - (void)willMoveToSuperview:(UIView *)newSuperview {
     if (newSuperview == nil) {
-      [RNLiveMarkdownModule unregisterFamilyForUpdates:_decoratorFamily];
+        MarkdownShadowFamilyRegistry::unregisterFamilyForUpdates(_decoratorFamily);
       _decoratorFamily = nullptr;
     }
     

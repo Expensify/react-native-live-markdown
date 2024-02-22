@@ -5,13 +5,12 @@
 
 #import "RNLiveMarkdownModule.h"
 #import "MarkdownCommitHook.h"
+#import "MarkdownShadowFamilyRegistry.h"
 
 @implementation RNLiveMarkdownModule {
     BOOL installed_;
     std::shared_ptr<livemarkdown::MarkdownCommitHook> commitHook_;
 }
-
-static std::set<facebook::react::ShadowNodeFamily::Shared> _familiesToUpdate;
 
 RCT_EXPORT_MODULE(@"RNLiveMarkdownModule")
 
@@ -36,34 +35,8 @@ RCT_EXPORT_MODULE(@"RNLiveMarkdownModule")
 
 - (void)invalidate
 {
-    @synchronized (self) {
-        _familiesToUpdate.clear();
-    }
-    
+    MarkdownShadowFamilyRegistry::clearRegisteredFamilies();
     [super invalidate];
-}
-
-+ (void) registerFamilyForUpdates:(facebook::react::ShadowNodeFamily::Shared)family
-{
-    @synchronized (self) {
-        _familiesToUpdate.insert(family);
-    }
-}
-
-+ (void)unregisterFamilyForUpdates:(facebook::react::ShadowNodeFamily::Shared)family
-{
-    @synchronized (self) {
-        _familiesToUpdate.erase(family);
-    }
-}
-
-+ (void)runForEveryFamily:(std::function<void (facebook::react::ShadowNodeFamily::Shared)>)fun
-{
-    @synchronized (self) {
-        for (auto &family : _familiesToUpdate) {
-            fun(family);
-        }
-    }
 }
 
 @end
