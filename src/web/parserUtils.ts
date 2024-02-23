@@ -78,6 +78,17 @@ function addSubstringAsTextNode(root: HTMLElement, text: string, startIndex: num
   }
 }
 
+function ungroupRanges(ranges: MarkdownRange[]): MarkdownRange[] {
+  const ungroupedRanges: MarkdownRange[] = [];
+  ranges.forEach((range) => {
+    if (!range.depth) {
+      ungroupedRanges.push(range);
+    }
+    Array.from({length: range.depth!}).forEach(() => ungroupedRanges.push(range));
+  });
+  return ungroupedRanges;
+}
+
 function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownStyle: PartialMarkdownStyle = {}, disableInlineStyles = false): HTMLElement {
   const root: HTMLElement = document.createElement('span');
   root.className = 'root';
@@ -87,7 +98,7 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
     return root;
   }
 
-  const stack = [...ranges];
+  const stack = [...ungroupRanges(ranges)];
   const nestedStack: NestedNode[] = [{node: root, endIndex: textLength}];
   let lastRangeEndIndex = 0;
   while (stack.length > 0) {
