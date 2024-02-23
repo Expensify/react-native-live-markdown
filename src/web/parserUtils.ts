@@ -98,7 +98,7 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
     return root;
   }
 
-  const stack = [...ungroupRanges(ranges)];
+  const stack = ungroupRanges(ranges);
   const nestedStack: NestedNode[] = [{node: root, endIndex: textLength}];
   let lastRangeEndIndex = 0;
   while (stack.length > 0) {
