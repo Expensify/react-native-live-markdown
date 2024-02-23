@@ -2,7 +2,7 @@ name: Test Android build
 on:
   pull_request:
     paths:
-      - .github/workflows/android-build.yml
+      - .github/workflows/build-android.yml
       - android/**
       - example/package.json
       - example/android/**
@@ -13,17 +13,22 @@ on:
     branches:
       - main
     paths:
-      - .github/workflows/android-build.yml
+      - .github/workflows/build-android.yml
       - android/**
       - example/package.json
       - example/android/**
 
 jobs:
-  build_android:
+  build:
+    if: github.repository == 'Expensify/react-native-live-markdown'
     runs-on: ubuntu-latest
     strategy:
-      matrix: {dir: ['example']}
+      matrix:
+        working-directory: [example]
       fail-fast: false
+    concurrency:
+      group: android-${{ matrix.working-directory }}-${{ github.ref }}
+      cancel-in-progress: true
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v4
@@ -34,9 +39,9 @@ jobs:
           distribution: 'zulu'
           java-version: 17
 
-      - name: Install root & example node dependencies
+      - name: Install dependencies
         run: yarn install --immutable
 
       - name: Build app
-        working-directory: ${{ matrix.dir }}/android
+        working-directory: ${{ matrix.working-directory }}/android
         run: ./gradlew assembleDebug --build-cache -PreactNativeArchitectures=arm64-v8a
