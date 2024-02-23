@@ -58,10 +58,10 @@
   _blockquoteRanges = [NSMutableArray new];
 
   [ranges enumerateObjectsUsingBlock:^(id _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-    NSArray *item = obj;
-    NSString *type = item[0];
-    NSUInteger location = [item[1] unsignedIntegerValue];
-    NSUInteger length = [item[2] unsignedIntegerValue];
+    NSDictionary *item = obj;
+    NSString *type = [item valueForKey:@"type"];
+    NSInteger location = [[item valueForKey:@"start"] unsignedIntegerValue];
+    NSInteger length = [[item valueForKey:@"length"] unsignedIntegerValue];
     NSRange range = NSMakeRange(location, length);
 
     if ([type isEqualToString:@"bold"] || [type isEqualToString:@"italic"] || [type isEqualToString:@"code"] || [type isEqualToString:@"pre"] || [type isEqualToString:@"h1"]) {
