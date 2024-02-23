@@ -96,15 +96,16 @@ public class MarkdownUtils {
         String type = range.getString("type");
         int start = range.getInt("start");
         int length = range.getInt("length");
+        int depth = range.optInt("depth", 1);
         int end = start + length;
-        applyRange(ssb, type, start, end);
+        applyRange(ssb, type, start, end, depth);
       }
     } catch (JSONException e) {
       // Do nothing
     }
   }
 
-  private void applyRange(SpannableStringBuilder ssb, String type, int start, int end) {
+  private void applyRange(SpannableStringBuilder ssb, String type, int start, int end, int depth) {
     switch (type) {
       case "bold":
         setSpan(ssb, new MarkdownBoldSpan(), start, end);
@@ -156,7 +157,8 @@ public class MarkdownUtils {
           mMarkdownStyle.getBlockquoteBorderColor(),
           mMarkdownStyle.getBlockquoteBorderWidth(),
           mMarkdownStyle.getBlockquoteMarginLeft(),
-          mMarkdownStyle.getBlockquotePaddingLeft());
+          mMarkdownStyle.getBlockquotePaddingLeft(),
+          depth);
         setSpan(ssb, span, start, end);
         break;
       default:
