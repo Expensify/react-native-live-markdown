@@ -332,4 +332,42 @@ describe('trailing whitespace', () => {
       ]);
     });
   });
+
+  describe('nested quotes', () => {
+    test('simple example', () => {
+      expect('>> Hello world').toBeParsedAs([
+        {type: 'blockquote', start: 0, length: 14, depth: 2},
+        {type: 'syntax', start: 0, length: 1},
+        {type: 'syntax', start: 1, length: 1},
+      ]);
+    });
+
+    test('with whitespace between syntax', () => {
+      expect('> > > Hello world').toBeParsedAs([
+        {type: 'blockquote', start: 0, length: 17, depth: 3},
+        {type: 'syntax', start: 0, length: 1},
+        {type: 'syntax', start: 2, length: 1},
+        {type: 'syntax', start: 4, length: 1},
+      ]);
+    });
+
+    test('two separate quote depths', () => {
+      expect('>> Hello 1 \n > Hello 2').toBeParsedAs([
+        {type: 'blockquote', start: 0, length: 11, depth: 2},
+        {type: 'syntax', start: 0, length: 1},
+        {type: 'syntax', start: 1, length: 1},
+      ]);
+    });
+
+    test('with diffrent markdown inside', () => {
+      expect('>> Hello *world*').toBeParsedAs([
+        {type: 'blockquote', start: 0, length: 16, depth: 2},
+        {type: 'syntax', start: 0, length: 1},
+        {type: 'syntax', start: 1, length: 1},
+        {type: 'syntax', start: 9, length: 1},
+        {type: 'bold', start: 10, length: 5},
+        {type: 'syntax', start: 15, length: 1},
+      ]);
+    });
+  });
 });
