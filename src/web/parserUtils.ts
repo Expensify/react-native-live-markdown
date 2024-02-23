@@ -84,7 +84,10 @@ function ungroupRanges(ranges: MarkdownRange[]): MarkdownRange[] {
     if (!range.depth) {
       ungroupedRanges.push(range);
     }
-    Array.from({length: range.depth!}).forEach(() => ungroupedRanges.push(range));
+    const {depth, ...rangeWithoutDepth} = range;
+    Array.from({length: depth!}).forEach(() => {
+      ungroupedRanges.push(rangeWithoutDepth);
+    });
   });
   return ungroupedRanges;
 }
