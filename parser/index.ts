@@ -3,7 +3,13 @@
 import {ExpensiMark} from 'expensify-common/lib/ExpensiMark';
 import _ from 'underscore';
 
-type Range = [string, number, number];
+type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'mention-here' | 'mention-user' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax';
+type Range = {
+  type: MarkdownType;
+  start: number;
+  length: number;
+  depth?: number;
+};
 type Token = ['TEXT' | 'HTML', string];
 type StackItem = {tag: string; children: Array<StackItem | string>};
 
@@ -82,11 +88,11 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
     addChildrenWithStyle(syntax, 'syntax');
   }
 
-  function addChildrenWithStyle(node: StackItem | string, style: string) {
+  function addChildrenWithStyle(node: StackItem | string, type: MarkdownType) {
     const start = text.length;
     processChildren(node);
     const end = text.length;
-    ranges.push([style, start, end - start]);
+    ranges.push({type, start, length: end - start});
   }
 
   const ranges: Range[] = [];
@@ -123,8 +129,8 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
         // compensate for "> " at the beginning
         if (ranges.length > 0) {
           const curr = ranges[ranges.length - 1];
-          curr![1] -= 1;
-          curr![2] += 1;
+          curr!.start -= 1;
+          curr!.length += 1;
         }
       } else if (node.tag === '<h1>') {
         appendSyntax('# ');
@@ -173,7 +179,7 @@ function getTagPriority(tag: string) {
 
 function sortRanges(ranges: Range[]) {
   // sort ranges by start position, then by length, then by tag hierarchy
-  return ranges.sort((a, b) => a[1] - b[1] || b[2] - a[2] || getTagPriority(b[0]) - getTagPriority(a[0]) || 0);
+  return ranges.sort((a, b) => a.start - b.start || b.length - a.length || getTagPriority(b.type) - getTagPriority(a.type) || 0);
 }
 
 function parseExpensiMarkToRanges(markdown: string): Range[] {
