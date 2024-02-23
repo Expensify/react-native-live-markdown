@@ -182,6 +182,28 @@ function sortRanges(ranges: Range[]) {
   return ranges.sort((a, b) => a.start - b.start || b.length - a.length || getTagPriority(b.type) - getTagPriority(a.type) || 0);
 }
 
+function groupRanges(ranges: Range[]) {
+  const lastVisibleRangeIndex: {[key in MarkdownType]?: number} = {};
+
+  return ranges.reduce((acc, range) => {
+    const start = range.start;
+    const end = range.start + range.length;
+
+    const rangeWithSameStyleIndex = lastVisibleRangeIndex[range.type];
+    const sameStyleRange = rangeWithSameStyleIndex !== undefined ? acc[rangeWithSameStyleIndex] : undefined;
+
+    if (sameStyleRange && sameStyleRange.start <= start && sameStyleRange.start + sameStyleRange.length >= end && range.length > 1) {
+      // increment depth of overlapping range
+      sameStyleRange.depth = (sameStyleRange.depth || 1) + 1;
+    } else {
+      lastVisibleRangeIndex[range.type] = acc.length;
+      acc.push(range);
+    }
+
+    return acc;
+  }, [] as Range[]);
+}
+
 function parseExpensiMarkToRanges(markdown: string): Range[] {
   const html = parseMarkdownToHTML(markdown);
   const tokens = parseHTMLToTokens(html);
@@ -192,7 +214,8 @@ function parseExpensiMarkToRanges(markdown: string): Range[] {
     return [];
   }
   const sortedRanges = sortRanges(ranges);
-  return sortedRanges;
+  const groupedRanges = groupRanges(sortedRanges);
+  return groupedRanges;
 }
 
 globalThis.parseExpensiMarkToRanges = parseExpensiMarkToRanges;
