@@ -543,12 +543,13 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
   },
 );
 
-const styles = {
+const styles = StyleSheet.create({
   defaultInputStyles: {
     borderColor: 'black',
     borderWidth: 1,
     borderStyle: 'solid',
     fontFamily: 'sans-serif',
+    // @ts-expect-error it works on web
     boxSizing: 'border-box',
     whiteSpace: 'pre-wrap',
     overflowY: 'scroll',
@@ -559,7 +560,7 @@ const styles = {
     opacity: 0.75,
     cursor: 'default',
   },
-};
+});
 
 export default MarkdownTextInput;
 
