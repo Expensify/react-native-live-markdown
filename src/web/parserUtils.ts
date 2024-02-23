@@ -17,7 +17,7 @@ type NestedNode = {
   endIndex: number;
 };
 
-function addStyling(targetElement: HTMLElement, type: MarkdownType, markdownStyle: PartialMarkdownStyle, depth: number) {
+function addStyling(targetElement: HTMLElement, type: MarkdownType, markdownStyle: PartialMarkdownStyle) {
   const node = targetElement;
   switch (type) {
     case 'syntax':
@@ -52,17 +52,12 @@ function addStyling(targetElement: HTMLElement, type: MarkdownType, markdownStyl
       break;
 
     case 'blockquote': {
-      // create a new span for each blockquote level
-      Array.from({length: depth}).forEach(() => {
-        const span = document.createElement('span');
-        Object.assign(span.style, {
-          ...markdownStyle.blockquote,
-          width: markdownStyle.blockquote!.borderWidth,
-          backgroundColor: markdownStyle.blockquote!.borderColor,
-          marginInlineEnd: markdownStyle.blockquote!.marginLeft,
-          boxSizing: 'border-box',
-        });
-        node.appendChild(span);
+      Object.assign(node.style, {
+        ...markdownStyle.blockquote,
+        borderLeftStyle: 'solid',
+        display: 'inline-block',
+        maxWidth: '100%',
+        boxSizing: 'border-box',
       });
       break;
     }
@@ -84,6 +79,17 @@ function addSubstringAsTextNode(root: HTMLElement, text: string, startIndex: num
   }
 }
 
+function ungroupRanges(ranges: MarkdownRange[]): MarkdownRange[] {
+  const ungroupedRanges: MarkdownRange[] = [];
+  ranges.forEach((range) => {
+    if (!range.depth) {
+      ungroupedRanges.push(range);
+    }
+    Array.from({length: range.depth!}).forEach(() => ungroupedRanges.push(range));
+  });
+  return ungroupedRanges;
+}
+
 function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownStyle: PartialMarkdownStyle = {}, disableInlineStyles = false): HTMLElement {
   const root: HTMLElement = document.createElement('span');
   root.className = 'root';
@@ -93,7 +99,7 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
     return root;
   }
 
-  const stack = [...ranges];
+  const stack = [...ungroupRanges(ranges)];
   const nestedStack: NestedNode[] = [{node: root, endIndex: textLength}];
   let lastRangeEndIndex = 0;
   while (stack.length > 0) {
@@ -115,7 +121,7 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
     if (disableInlineStyles) {
       span.className = range.type;
     } else {
-      addStyling(span, range.type, markdownStyle, range.depth || 1);
+      addStyling(span, range.type, markdownStyle);
     }
 
     if (stack.length > 0 && nextRangeStartIndex < endOfCurrentRange && range.type !== 'syntax') {
