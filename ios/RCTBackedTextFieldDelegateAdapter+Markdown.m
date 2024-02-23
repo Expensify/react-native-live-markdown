@@ -1,5 +1,5 @@
-#import <react-native-live-markdown/RCTBackedTextFieldDelegateAdapter+Markdown.h>
-#import <react-native-live-markdown/RCTMarkdownUtils.h>
+#import <RNLiveMarkdown/RCTBackedTextFieldDelegateAdapter+Markdown.h>
+#import <RNLiveMarkdown/RCTMarkdownUtils.h>
 #import <React/RCTUITextField.h>
 #import <objc/message.h>
 

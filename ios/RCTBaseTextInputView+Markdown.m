@@ -1,5 +1,5 @@
-#import <react-native-live-markdown/RCTBaseTextInputView+Markdown.h>
-#import <react-native-live-markdown/RCTMarkdownUtils.h>
+#import <RNLiveMarkdown/RCTBaseTextInputView+Markdown.h>
+#import <RNLiveMarkdown/RCTMarkdownUtils.h>
 #import <objc/message.h>
 
 @implementation RCTBaseTextInputView (Markdown)
@@ -27,10 +27,19 @@
 {
   RCTMarkdownUtils *markdownUtils = [self getMarkdownUtils];
   if (markdownUtils != nil) {
-    UITextRange *range = self.backedTextInputView.selectedTextRange;
-    NSAttributedString *attributedText = [markdownUtils parseMarkdown:self.backedTextInputView.attributedText];
-    [self.backedTextInputView setAttributedText:attributedText];
-    [self.backedTextInputView setSelectedTextRange:range notifyDelegate:YES];
+    id<RCTBackedTextInputViewProtocol> backedTextInputView = self.backedTextInputView;
+    NSAttributedString *oldAttributedText = backedTextInputView.attributedText;
+    NSAttributedString *newAttributedText = [markdownUtils parseMarkdown:oldAttributedText];
+    UITextRange *range = backedTextInputView.selectedTextRange;
+
+    // update attributed text without emitting onSelectionChange event
+    id<RCTBackedTextInputDelegate> delegate = backedTextInputView.textInputDelegate;
+    backedTextInputView.textInputDelegate = nil;
+    [backedTextInputView setAttributedText:newAttributedText];
+    backedTextInputView.textInputDelegate = delegate;
+
+    // restore original selection and emit onSelectionChange event
+    [backedTextInputView setSelectedTextRange:range notifyDelegate:YES];
   }
 
   // Call the original method
@@ -53,7 +62,7 @@
     }
 
     {
-      // swizzle setAttributedText
+      // swizzle updateLocalData
       SEL originalSelector = @selector(updateLocalData);
       SEL swizzledSelector = @selector(markdown_updateLocalData);
       Method originalMethod = class_getInstanceMethod(cls, originalSelector);

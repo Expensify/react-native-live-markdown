@@ -1,5 +1,5 @@
-#import <react-native-live-markdown/RCTMarkdownUtils.h>
-#import <react/debug/react_native_assert.h>
+#import <RNLiveMarkdown/RCTMarkdownUtils.h>
+#import "react_native_assert.h"
 #import <React/RCTAssert.h>
 #import <React/RCTFont.h>
 #import <JavaScriptCore/JavaScriptCore.h>
@@ -55,18 +55,19 @@
   // This is a workaround that applies the NSUnderlineStyleNone to the string before iterating over ranges which resolves this problem.
   [attributedString addAttribute:NSUnderlineStyleAttributeName value:[NSNumber numberWithInteger:NSUnderlineStyleNone] range:NSMakeRange(0, attributedString.length)];
 
-  _blockquoteRanges = [NSMutableArray new];
+  _blockquoteRangesAndLevels = [NSMutableArray new];
 
   [ranges enumerateObjectsUsingBlock:^(id _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-    NSArray *item = obj;
-    NSString *type = item[0];
-    NSUInteger location = [item[1] unsignedIntegerValue];
-    NSUInteger length = [item[2] unsignedIntegerValue];
+    NSDictionary *item = obj;
+    NSString *type = [item valueForKey:@"type"];
+    NSInteger location = [[item valueForKey:@"start"] unsignedIntegerValue];
+    NSInteger length = [[item valueForKey:@"length"] unsignedIntegerValue];
+    NSInteger depth = [[item valueForKey:@"depth"] unsignedIntegerValue] ?: 1;
     NSRange range = NSMakeRange(location, length);
 
-    if ([type isEqualToString:@"bold"] || [type isEqualToString:@"mention-here"] || [type isEqualToString:@"mention-user"] || [type isEqualToString:@"syntax"] || [type isEqualToString:@"italic"] || [type isEqualToString:@"code"] || [type isEqualToString:@"pre"] || [type isEqualToString:@"h1"]) {
+    if ([type isEqualToString:@"bold"] || [type isEqualToString:@"italic"] || [type isEqualToString:@"code"] || [type isEqualToString:@"pre"] || [type isEqualToString:@"h1"]) {
       UIFont *font = [attributedString attribute:NSFontAttributeName atIndex:location effectiveRange:NULL];
-      if ([type isEqualToString:@"bold"] || [type isEqualToString:@"mention-here"] || [type isEqualToString:@"mention-user"] || [type isEqualToString:@"syntax"]) {
+      if ([type isEqualToString:@"bold"]) {
         font = [RCTFont updateFont:font withWeight:@"bold"];
       } else if ([type isEqualToString:@"italic"]) {
         font = [RCTFont updateFont:font withStyle:@"italic"];
@@ -93,20 +94,25 @@
       [attributedString addAttribute:NSForegroundColorAttributeName value:_markdownStyle.codeColor range:range];
       [attributedString addAttribute:NSBackgroundColorAttributeName value:_markdownStyle.codeBackgroundColor range:range];
     } else if ([type isEqualToString:@"mention-here"]) {
-        [attributedString addAttribute:NSBackgroundColorAttributeName value:_markdownStyle.mentionHereBackgroundColor range:range];
+      [attributedString addAttribute:NSForegroundColorAttributeName value:_markdownStyle.mentionHereColor range:range];
+      [attributedString addAttribute:NSBackgroundColorAttributeName value:_markdownStyle.mentionHereBackgroundColor range:range];
     } else if ([type isEqualToString:@"mention-user"]) {
-        // TODO: change mention color when it mentions current user
-        [attributedString addAttribute:NSBackgroundColorAttributeName value:_markdownStyle.mentionUserBackgroundColor range:range];
+      // TODO: change mention color when it mentions current user
+      [attributedString addAttribute:NSForegroundColorAttributeName value:_markdownStyle.mentionUserColor range:range];
+      [attributedString addAttribute:NSBackgroundColorAttributeName value:_markdownStyle.mentionUserBackgroundColor range:range];
     } else if ([type isEqualToString:@"link"]) {
       [attributedString addAttribute:NSUnderlineStyleAttributeName value:[NSNumber numberWithInteger:NSUnderlineStyleSingle] range:range];
       [attributedString addAttribute:NSForegroundColorAttributeName value:_markdownStyle.linkColor range:range];
     } else if ([type isEqualToString:@"blockquote"]) {
-      CGFloat indent = _markdownStyle.blockquoteMarginLeft + _markdownStyle.blockquoteBorderWidth + _markdownStyle.blockquotePaddingLeft;
+      CGFloat indent = (_markdownStyle.blockquoteMarginLeft + _markdownStyle.blockquoteBorderWidth + _markdownStyle.blockquotePaddingLeft) * depth;
       NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
       paragraphStyle.firstLineHeadIndent = indent;
       paragraphStyle.headIndent = indent;
       [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:range];
-      [_blockquoteRanges addObject:[NSValue valueWithRange:range]];
+      [_blockquoteRangesAndLevels addObject:@{
+        @"range": [NSValue valueWithRange:range],
+        @"depth": @(depth)
+      }];
     } else if ([type isEqualToString:@"pre"]) {
       [attributedString addAttribute:NSForegroundColorAttributeName value:_markdownStyle.preColor range:range];
       NSRange rangeForBackground = [inputString characterAtIndex:range.location] == '\n' ? NSMakeRange(range.location + 1, range.length - 1) : range;

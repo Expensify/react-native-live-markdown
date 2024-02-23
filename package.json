@@ -1,7 +1,7 @@
 {
   "name": "@expensify/react-native-live-markdown",
-  "version": "0.1.0",
-  "description": "Lorem ipsum sit dolor amet.",
+  "version": "0.1.14",
+  "description": "Drop-in replacement for React Native's TextInput component with Markdown formatting.",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
   "types": "lib/typescript/src/index.d.ts",
@@ -36,7 +36,7 @@
     "lint:parser": "eslint parser --ext .js,.ts,.tsx",
     "lint:WebExample": "eslint WebExample --ext .js,.ts,.tsx",
     "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
-    "prepare": "bob build",
+    "prepare": "bob build && mkdir -p lib/parser && cp parser/react-native-live-markdown-parser.js lib/parser/react-native-live-markdown-parser.js",
     "release": "release-it"
   },
   "keywords": [
@@ -85,11 +85,13 @@
     "eslint-plugin-promise": "^6.1.1",
     "eslint-plugin-tsdoc": "^0.2.17",
     "jest": "^28.1.1",
+    "jest-environment-jsdom": "^29.7.0",
     "pod-install": "^0.1.0",
     "prettier": "^2.0.5",
     "react": "18.2.0",
     "react-native": "0.72.9",
     "react-native-builder-bob": "^0.20.0",
+    "react-native-web": "^0.19.10",
     "release-it": "^15.0.0",
     "turbo": "^1.10.7",
     "typescript": "^5.3.3"
@@ -113,7 +115,8 @@
     "modulePathIgnorePatterns": [
       "<rootDir>/example/node_modules",
       "<rootDir>/lib/"
-    ]
+    ],
+    "testEnvironment": "jsdom"
   },
   "commitlint": {
     "extends": [

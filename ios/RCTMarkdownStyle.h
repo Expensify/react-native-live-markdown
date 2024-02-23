@@ -19,7 +19,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) NSString *preFontFamily;
 @property (nonatomic) UIColor *preColor;
 @property (nonatomic) UIColor *preBackgroundColor;
+@property (nonatomic) UIColor *mentionHereColor;
 @property (nonatomic) UIColor *mentionHereBackgroundColor;
+@property (nonatomic) UIColor *mentionUserColor;
 @property (nonatomic) UIColor *mentionUserBackgroundColor;
 
 #ifdef RCT_NEW_ARCH_ENABLED
