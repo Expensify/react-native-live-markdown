@@ -333,12 +333,13 @@ describe('trailing whitespace', () => {
     });
   });
 
-  describe('nested quotes', () => {
-    test('simple example', () => {
-      expect('>> Hello world').toBeParsedAs([
-        {type: 'blockquote', start: 0, length: 14, depth: 2},
+  describe('nested blockquotes', () => {
+    test('without whitespace between syntax', () => {
+      expect('>>> Hello world').toBeParsedAs([
+        {type: 'blockquote', start: 0, length: 15, depth: 3},
         {type: 'syntax', start: 0, length: 1},
         {type: 'syntax', start: 1, length: 1},
+        {type: 'syntax', start: 2, length: 1},
       ]);
     });
 
@@ -351,15 +352,17 @@ describe('trailing whitespace', () => {
       ]);
     });
 
-    test('two separate quote depths', () => {
-      expect('>> Hello 1 \n > Hello 2').toBeParsedAs([
-        {type: 'blockquote', start: 0, length: 11, depth: 2},
+    test('different blockquote depths', () => {
+      expect('>> Hello 1\n> Hello 2').toBeParsedAs([
+        {type: 'blockquote', start: 0, length: 10, depth: 2},
         {type: 'syntax', start: 0, length: 1},
         {type: 'syntax', start: 1, length: 1},
+        {type: 'blockquote', start: 11, length: 9},
+        {type: 'syntax', start: 11, length: 1},
       ]);
     });
 
-    test('with diffrent markdown inside', () => {
+    test('with another style inside', () => {
       expect('>> Hello *world*').toBeParsedAs([
         {type: 'blockquote', start: 0, length: 16, depth: 2},
         {type: 'syntax', start: 0, length: 1},
