@@ -23,7 +23,7 @@ on:
 jobs:
   build:
     if: github.repository == 'Expensify/react-native-live-markdown'
-    runs-on: macos-12
+    runs-on: macos-13
     strategy:
       matrix:
         working-directory: [example]
