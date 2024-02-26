@@ -38,7 +38,7 @@ RCT_EXPORT_MODULE(@"RNLiveMarkdownModule")
 
 - (void)invalidate
 {
-    MarkdownShadowFamilyRegistry::clearRegisteredFamilies();
+    MarkdownShadowFamilyRegistry::reset();
     [super invalidate];
 }
 

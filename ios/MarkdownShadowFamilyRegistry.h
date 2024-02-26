@@ -13,10 +13,13 @@ class MarkdownShadowFamilyRegistry {
 public:
     static void registerFamilyForUpdates(facebook::react::ShadowNodeFamily::Shared family);
     static void unregisterFamilyForUpdates(facebook::react::ShadowNodeFamily::Shared family);
-    static void clearRegisteredFamilies();
+    static void reset();
     static void runForEveryFamily(std::function<void(facebook::react::ShadowNodeFamily::Shared family)> fun);
+    static void forceNextStateUpdate(facebook::react::Tag tag);
+    static bool shouldForceUpdate(facebook::react::Tag tag);
 
 private:
     static std::set<facebook::react::ShadowNodeFamily::Shared> _familiesToUpdate;
-    static std::mutex _familiesMutex;
+    static std::set<facebook::react::Tag> _forcedUpdates;
+    static std::mutex _mutex;
 };

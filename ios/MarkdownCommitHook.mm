@@ -80,7 +80,11 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
             // only source of that pointer (besides this commit hook) is RCTTextInputComponentView, which
             // has the relevant method swizzled to make sure the markdown styles are always applied before
             // updating state
-            if (stateData.attributedStringBox.getMode() == AttributedStringBox::Mode::Value) {
+            // There is one caveat, on the first render the swizzled method will not apply markdown since
+            // the native component is not mounted yet. In that case we save the tag to update in the
+            // method applying markdown formatting and apply it here instead, preventing wrong layout
+            // on reloads.
+            if (stateData.attributedStringBox.getMode() == AttributedStringBox::Mode::Value || MarkdownShadowFamilyRegistry::shouldForceUpdate(nodes.textInput->getTag())) {
                 rootNode = rootNode->cloneTree(nodes.textInput->getFamily(), [&nodes, &textInputState, &stateData](const ShadowNode& node) {
                     const auto &markdownProps = *std::static_pointer_cast<MarkdownTextInputDecoratorViewProps const>(nodes.decorator->getProps());
                     const auto &textInputProps = *std::static_pointer_cast<TextInputProps const>(nodes.textInput->getProps());
