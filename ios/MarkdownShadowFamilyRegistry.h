@@ -1,6 +1,7 @@
 #include <react/renderer/components/iostextinput/TextInputShadowNode.h>
 
 #include <mutex>
+#include <set>
 
 // A registry to store pointers to the ShadowNodeFamilies of markdown decorators.
 // The only place we can _legally_ access the family of shadow node is in the constructor

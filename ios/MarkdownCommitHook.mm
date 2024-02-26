@@ -25,7 +25,7 @@ MarkdownCommitHook::~MarkdownCommitHook() noexcept {
 RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
     ShadowTree const &,
     RootShadowNode::Shared const &,
-    RootShadowNode::Unshared const &newRootShadowNode) const noexcept {
+    RootShadowNode::Unshared const &newRootShadowNode) noexcept {
         auto rootNode = newRootShadowNode->ShadowNode::clone(ShadowNodeFragment{});
 
         // A preface to why we do the weird thing below:
