@@ -17,12 +17,12 @@
         if (input == nil) {
             return nil;
         }
-        
+
         NSString *inputString = [input string];
         if ([inputString isEqualToString:_prevInputString] && [attributes isEqualToDictionary:_prevTextAttributes] && [_markdownStyle isEqual:_prevMarkdownStyle]) {
             return _prevAttributedString;
         }
-        
+
         static JSContext *ctx = nil;
         static JSValue *function = nil;
         if (ctx == nil) {
@@ -34,25 +34,26 @@
             [ctx evaluateScript:content];
             function = ctx[@"parseExpensiMarkToRanges"];
         }
-        
+
         JSValue *result = [function callWithArguments:@[inputString]];
         NSArray *ranges = [result toArray];
-        
+
         NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:inputString attributes:attributes];
         [attributedString beginEditing];
-        
+
         // If the attributed string ends with underlined text, blurring the single-line input imprints the underline style across the whole string.
         // It looks like a bug in iOS, as there is no underline style to be found in the attributed string, especially after formatting.
         // This is a workaround that applies the NSUnderlineStyleNone to the string before iterating over ranges which resolves this problem.
         [attributedString addAttribute:NSUnderlineStyleAttributeName value:[NSNumber numberWithInteger:NSUnderlineStyleNone] range:NSMakeRange(0, attributedString.length)];
-        
-        _blockquoteRanges = [NSMutableArray new];
-        
+
+        _blockquoteRangesAndLevels = [NSMutableArray new];
+
         [ranges enumerateObjectsUsingBlock:^(id _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            NSArray *item = obj;
-            NSString *type = item[0];
-            NSUInteger location = [item[1] unsignedIntegerValue];
-            NSUInteger length = [item[2] unsignedIntegerValue];
+            NSDictionary *item = obj;
+            NSString *type = [item valueForKey:@"type"];
+            NSInteger location = [[item valueForKey:@"start"] unsignedIntegerValue];
+            NSInteger length = [[item valueForKey:@"length"] unsignedIntegerValue];
+            NSInteger depth = [[item valueForKey:@"depth"] unsignedIntegerValue] ?: 1;
             NSRange range = NSMakeRange(location, length);
             
             if ([type isEqualToString:@"bold"] || [type isEqualToString:@"italic"] || [type isEqualToString:@"code"] || [type isEqualToString:@"pre"] || [type isEqualToString:@"h1"]) {
@@ -94,12 +95,15 @@
                 [attributedString addAttribute:NSUnderlineStyleAttributeName value:[NSNumber numberWithInteger:NSUnderlineStyleSingle] range:range];
                 [attributedString addAttribute:NSForegroundColorAttributeName value:_markdownStyle.linkColor range:range];
             } else if ([type isEqualToString:@"blockquote"]) {
-                CGFloat indent = _markdownStyle.blockquoteMarginLeft + _markdownStyle.blockquoteBorderWidth + _markdownStyle.blockquotePaddingLeft;
+                CGFloat indent = (_markdownStyle.blockquoteMarginLeft + _markdownStyle.blockquoteBorderWidth + _markdownStyle.blockquotePaddingLeft) * depth;
                 NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
                 paragraphStyle.firstLineHeadIndent = indent;
                 paragraphStyle.headIndent = indent;
                 [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:range];
-                [_blockquoteRanges addObject:[NSValue valueWithRange:range]];
+                [_blockquoteRangesAndLevels addObject:@{
+                    @"range": [NSValue valueWithRange:range],
+                    @"depth": @(depth)
+                }];
             } else if ([type isEqualToString:@"pre"]) {
                 [attributedString addAttribute:NSForegroundColorAttributeName value:_markdownStyle.preColor range:range];
                 NSRange rangeForBackground = [inputString characterAtIndex:range.location] == '\n' ? NSMakeRange(range.location + 1, range.length - 1) : range;
@@ -111,14 +115,14 @@
                 [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:rangeWithHashAndSpace];
             }
         }];
-        
+
         [attributedString endEditing];
-        
+
         _prevInputString = inputString;
         _prevAttributedString = attributedString;
         _prevTextAttributes = attributes;
         _prevMarkdownStyle = _markdownStyle;
-        
+
         return attributedString;
     }
 }

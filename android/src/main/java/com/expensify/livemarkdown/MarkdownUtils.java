@@ -16,6 +16,7 @@ import com.facebook.soloader.SoLoader;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -91,18 +92,20 @@ public class MarkdownUtils {
     try {
       JSONArray ranges = new JSONArray(output);
       for (int i = 0; i < ranges.length(); i++) {
-        JSONArray range = ranges.getJSONArray(i);
-        String type = range.getString(0);
-        int start = range.getInt(1);
-        int end = start + range.getInt(2);
-        applyRange(ssb, type, start, end);
+        JSONObject range = ranges.getJSONObject(i);
+        String type = range.getString("type");
+        int start = range.getInt("start");
+        int length = range.getInt("length");
+        int depth = range.optInt("depth", 1);
+        int end = start + length;
+        applyRange(ssb, type, start, end, depth);
       }
     } catch (JSONException e) {
       // Do nothing
     }
   }
 
-  private void applyRange(SpannableStringBuilder ssb, String type, int start, int end) {
+  private void applyRange(SpannableStringBuilder ssb, String type, int start, int end, int depth) {
     switch (type) {
       case "bold":
         setSpan(ssb, new MarkdownBoldSpan(), start, end);
@@ -154,7 +157,8 @@ public class MarkdownUtils {
           mMarkdownStyle.getBlockquoteBorderColor(),
           mMarkdownStyle.getBlockquoteBorderWidth(),
           mMarkdownStyle.getBlockquoteMarginLeft(),
-          mMarkdownStyle.getBlockquotePaddingLeft());
+          mMarkdownStyle.getBlockquotePaddingLeft(),
+          depth);
         setSpan(ssb, span, start, end);
         break;
       default:

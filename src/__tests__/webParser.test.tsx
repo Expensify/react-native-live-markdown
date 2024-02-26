@@ -6,22 +6,13 @@ import type * as MarkdownTypes from '../web/parserUtils';
 
 require('../../parser/react-native-live-markdown-parser.js');
 
-type MarkdownType = MarkdownTypes.MarkdownType;
-
 const toBeParsedAsHTML: MatcherFunction<[expectedHTML: string]> = function (actual, expectedHTML) {
   if (typeof actual !== 'string') {
     throw new Error('Actual value must be a string');
   }
   let expected = expectedHTML;
   const ranges = global.parseExpensiMarkToRanges(actual);
-  const markdownRanges: MarkdownTypes.MarkdownRange[] = ranges.map((range) => {
-    const [type, startIndex, length] = range;
-    return {
-      type: type as MarkdownType,
-      startIndex,
-      length,
-    };
-  });
+  const markdownRanges = ranges as MarkdownTypes.MarkdownRange[];
 
   const actualDOM = ParserUtils.parseRangesToHTMLNodes(actual, markdownRanges, {}, true);
   const actualHTML = actualDOM.innerHTML;

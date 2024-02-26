@@ -7,8 +7,9 @@ type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'link' | 'code' | 'pre
 
 type MarkdownRange = {
   type: MarkdownType;
-  startIndex: number;
+  start: number;
   length: number;
+  depth?: number;
 };
 
 type NestedNode = {
@@ -77,6 +78,20 @@ function addSubstringAsTextNode(root: HTMLElement, text: string, startIndex: num
   }
 }
 
+function ungroupRanges(ranges: MarkdownRange[]): MarkdownRange[] {
+  const ungroupedRanges: MarkdownRange[] = [];
+  ranges.forEach((range) => {
+    if (!range.depth) {
+      ungroupedRanges.push(range);
+    }
+    const {depth, ...rangeWithoutDepth} = range;
+    Array.from({length: depth!}).forEach(() => {
+      ungroupedRanges.push(rangeWithoutDepth);
+    });
+  });
+  return ungroupedRanges;
+}
+
 function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownStyle: PartialMarkdownStyle = {}, disableInlineStyles = false): HTMLElement {
   const root: HTMLElement = document.createElement('span');
   root.className = 'root';
@@ -86,7 +101,7 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
     return root;
   }
 
-  const stack = [...ranges];
+  const stack = ungroupRanges(ranges);
   const nestedStack: NestedNode[] = [{node: root, endIndex: textLength}];
   let lastRangeEndIndex = 0;
   while (stack.length > 0) {
@@ -99,10 +114,10 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
       break;
     }
 
-    const endOfCurrentRange = range.startIndex + range.length;
-    const nextRangeStartIndex = stack.length > 0 && !!stack[0] ? stack[0].startIndex || 0 : textLength;
+    const endOfCurrentRange = range.start + range.length;
+    const nextRangeStartIndex = stack.length > 0 && !!stack[0] ? stack[0].start || 0 : textLength;
 
-    addSubstringAsTextNode(currentRoot.node, text, lastRangeEndIndex, range.startIndex); // add text with newlines before current range
+    addSubstringAsTextNode(currentRoot.node, text, lastRangeEndIndex, range.start); // add text with newlines before current range
 
     const span = document.createElement('span');
     if (disableInlineStyles) {
@@ -115,9 +130,9 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
       // tag nesting
       currentRoot.node.appendChild(span);
       nestedStack.push({node: span, endIndex: endOfCurrentRange});
-      lastRangeEndIndex = range.startIndex;
+      lastRangeEndIndex = range.start;
     } else {
-      addSubstringAsTextNode(span, text, range.startIndex, endOfCurrentRange);
+      addSubstringAsTextNode(span, text, range.start, endOfCurrentRange);
       currentRoot.node.appendChild(span);
       lastRangeEndIndex = endOfCurrentRange;
 
@@ -162,14 +177,7 @@ function parseText(
   }
   const ranges = global.parseExpensiMarkToRanges(text);
 
-  const markdownRanges: MarkdownRange[] = ranges.map((range) => {
-    const [type, startIndex, length] = range;
-    return {
-      type: type as MarkdownType,
-      startIndex,
-      length,
-    };
-  });
+  const markdownRanges: MarkdownRange[] = ranges as MarkdownRange[];
 
   targetElement.innerHTML = '';
   targetElement.innerText = '';

@@ -250,7 +250,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         const text = normalizeValue(divRef.current.innerText || '');
         if (typeof e.target !== 'number') {
           // TODO: change the logic here so every event have value property
-          (e.target as HTMLInputElement).value = text;
+          (e.target as unknown as HTMLInputElement).value = text;
         }
         e.nativeEvent.text = text;
       }
@@ -549,6 +549,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderStyle: 'solid',
     fontFamily: 'sans-serif',
+    // @ts-expect-error it works on web
     boxSizing: 'border-box',
     whiteSpace: 'pre-wrap',
     overflowY: 'scroll',
