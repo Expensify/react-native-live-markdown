@@ -49,7 +49,7 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
         std::vector<MarkdownTextInputDecoratorPair> nodesToUpdate;
         MarkdownShadowFamilyRegistry::runForEveryFamily([&rootNode, &nodesToUpdate](ShadowNodeFamily::Shared family) {
          // get the path from the root to the node from the decorator family
-         auto ancestors = family->getAncestors(*rootNode);
+         const auto ancestors = family->getAncestors(*rootNode);
          
          if (!ancestors.empty()) {
              auto &parentNode = ancestors.back().first.get();
