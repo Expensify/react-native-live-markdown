@@ -1,45 +1,45 @@
 #include "MarkdownShadowFamilyRegistry.h"
 
-std::set<facebook::react::ShadowNodeFamily::Shared> MarkdownShadowFamilyRegistry::_familiesToUpdate;
-std::set<facebook::react::Tag> MarkdownShadowFamilyRegistry::_forcedUpdates;
-std::mutex MarkdownShadowFamilyRegistry::_mutex;
+std::set<facebook::react::ShadowNodeFamily::Shared> MarkdownShadowFamilyRegistry::familiesToUpdate_;
+std::set<facebook::react::Tag> MarkdownShadowFamilyRegistry::forcedUpdates_;
+std::mutex MarkdownShadowFamilyRegistry::mutex_;
 
 void MarkdownShadowFamilyRegistry::registerFamilyForUpdates(facebook::react::ShadowNodeFamily::Shared family)
 {
-    auto lock = std::unique_lock<std::mutex>(MarkdownShadowFamilyRegistry::_mutex);
-    MarkdownShadowFamilyRegistry::_familiesToUpdate.insert(family);
+    auto lock = std::unique_lock<std::mutex>(MarkdownShadowFamilyRegistry::mutex_);
+    MarkdownShadowFamilyRegistry::familiesToUpdate_.insert(family);
 }
 
 void MarkdownShadowFamilyRegistry::unregisterFamilyForUpdates(facebook::react::ShadowNodeFamily::Shared family)
 {
-    auto lock = std::unique_lock<std::mutex>(MarkdownShadowFamilyRegistry::_mutex);
-    MarkdownShadowFamilyRegistry::_familiesToUpdate.erase(family);
+    auto lock = std::unique_lock<std::mutex>(MarkdownShadowFamilyRegistry::mutex_);
+    MarkdownShadowFamilyRegistry::familiesToUpdate_.erase(family);
 }
 
 void MarkdownShadowFamilyRegistry::reset() {
-    auto lock = std::unique_lock<std::mutex>(MarkdownShadowFamilyRegistry::_mutex);
-    MarkdownShadowFamilyRegistry::_familiesToUpdate.clear();
-    MarkdownShadowFamilyRegistry::_forcedUpdates.clear();
+    auto lock = std::unique_lock<std::mutex>(MarkdownShadowFamilyRegistry::mutex_);
+    MarkdownShadowFamilyRegistry::familiesToUpdate_.clear();
+    MarkdownShadowFamilyRegistry::forcedUpdates_.clear();
 }
 
 void MarkdownShadowFamilyRegistry::runForEveryFamily(std::function<void (facebook::react::ShadowNodeFamily::Shared)> fun)
 {
-    auto lock = std::unique_lock<std::mutex>(MarkdownShadowFamilyRegistry::_mutex);
-    for (auto &family : MarkdownShadowFamilyRegistry::_familiesToUpdate) {
+    auto lock = std::unique_lock<std::mutex>(MarkdownShadowFamilyRegistry::mutex_);
+    for (auto &family : MarkdownShadowFamilyRegistry::familiesToUpdate_) {
         fun(family);
     }
 }
 
 void MarkdownShadowFamilyRegistry::forceNextStateUpdate(facebook::react::Tag tag) {
-    auto lock = std::unique_lock<std::mutex>(MarkdownShadowFamilyRegistry::_mutex);
-    _forcedUpdates.insert(tag);
+    auto lock = std::unique_lock<std::mutex>(MarkdownShadowFamilyRegistry::mutex_);
+    forcedUpdates_.insert(tag);
 }
 
 bool MarkdownShadowFamilyRegistry::shouldForceUpdate(facebook::react::Tag tag) {
-    auto lock = std::unique_lock<std::mutex>(MarkdownShadowFamilyRegistry::_mutex);
-    bool force = _forcedUpdates.contains(tag);
+    auto lock = std::unique_lock<std::mutex>(MarkdownShadowFamilyRegistry::mutex_);
+    bool force = forcedUpdates_.contains(tag);
     if (force) {
-        _forcedUpdates.erase(tag);
+        forcedUpdates_.erase(tag);
         return true;
     }
     return false;

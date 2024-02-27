@@ -19,7 +19,7 @@ public:
     static bool shouldForceUpdate(facebook::react::Tag tag);
 
 private:
-    static std::set<facebook::react::ShadowNodeFamily::Shared> _familiesToUpdate;
-    static std::set<facebook::react::Tag> _forcedUpdates;
-    static std::mutex _mutex;
+    static std::set<facebook::react::ShadowNodeFamily::Shared> familiesToUpdate_;
+    static std::set<facebook::react::Tag> forcedUpdates_;
+    static std::mutex mutex_;
 };
