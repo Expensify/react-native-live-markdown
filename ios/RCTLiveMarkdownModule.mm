@@ -15,7 +15,7 @@
     std::shared_ptr<livemarkdown::MarkdownCommitHook> commitHook_;
 }
 
-RCT_EXPORT_MODULE(@"RNLiveMarkdownModule")
+RCT_EXPORT_MODULE(@"LiveMarkdownModule")
 
 - (NSNumber*)install
 {
@@ -33,7 +33,7 @@ RCT_EXPORT_MODULE(@"RNLiveMarkdownModule")
 
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:(const facebook::react::ObjCTurboModule::InitParams &)params
 {
-  return std::make_shared<facebook::react::NativeMarkdownModuleSpecJSI>(params);
+  return std::make_shared<facebook::react::NativeLiveMarkdownModuleSpecJSI>(params);
 }
 
 - (void)invalidate
