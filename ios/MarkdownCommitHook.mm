@@ -6,9 +6,9 @@
 #include <React/RCTUtils.h>
 
 #include "MarkdownCommitHook.h"
+#include "MarkdownShadowFamilyRegistry.h"
 #include "RCTMarkdownStyle.h"
 #include "RCTMarkdownUtils.h"
-#include "MarkdownShadowFamilyRegistry.h"
 
 using namespace facebook::react;
 
