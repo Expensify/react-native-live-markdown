@@ -13,8 +13,6 @@ class JSI_EXPORT MarkdownTextInputDecoratorState final {
   MarkdownTextInputDecoratorState(const ShadowNodeFamily::Shared textInputFamily_) : decoratorFamily(textInputFamily_) {};
 
   const ShadowNodeFamily::Shared decoratorFamily;
-
-#pragma mark - Getters
 };
 
 } // namespace react
