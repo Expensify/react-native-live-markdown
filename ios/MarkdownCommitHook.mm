@@ -1,4 +1,3 @@
-
 #ifdef RCT_NEW_ARCH_ENABLED
 
 #include <react/renderer/core/ComponentDescriptor.h>
@@ -50,7 +49,7 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
         std::vector<MarkdownTextInputDecoratorPair> nodesToUpdate;
         MarkdownShadowFamilyRegistry::runForEveryFamily([&rootNode, &nodesToUpdate](ShadowNodeFamily::Shared family) {
          // get the path from the root to the node from the decorator family
-         auto ancestors = family->getAncestors(*rootNode);
+         const auto ancestors = family->getAncestors(*rootNode);
          
          if (!ancestors.empty()) {
              auto &parentNode = ancestors.back().first.get();
@@ -74,7 +73,7 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
          }
          });
         
-        for (auto &nodes : nodesToUpdate) {
+        for (const auto &nodes : nodesToUpdate) {
             const auto &textInputState = *std::static_pointer_cast<const ConcreteState<TextInputState>>(nodes.textInput->getState());
             const auto &stateData = textInputState.getData();
             

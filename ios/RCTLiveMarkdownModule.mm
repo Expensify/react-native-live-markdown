@@ -17,7 +17,7 @@
 
 RCT_EXPORT_MODULE(@"LiveMarkdownModule")
 
-- (NSNumber*)install
+- (NSNumber *)install
 {
     if (!installed_) {
         installed_ = YES;
