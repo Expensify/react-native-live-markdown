@@ -14,8 +14,8 @@ using namespace facebook::react;
 namespace livemarkdown {
 
 struct MarkdownTextInputDecoratorPair {
-    std::shared_ptr<const TextInputShadowNode> textInput;
-    std::shared_ptr<const MarkdownTextInputDecoratorShadowNode> decorator;
+    const std::shared_ptr<const TextInputShadowNode> textInput;
+    const std::shared_ptr<const MarkdownTextInputDecoratorShadowNode> decorator;
 };
 
 class MarkdownCommitHook : public UIManagerCommitHook {
