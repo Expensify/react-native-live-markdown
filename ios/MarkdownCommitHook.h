@@ -20,7 +20,7 @@ struct MarkdownTextInputDecoratorPair {
 
 class MarkdownCommitHook : public UIManagerCommitHook {
  public:
-    MarkdownCommitHook(const std::shared_ptr<UIManager> &uiManager);
+  MarkdownCommitHook(const std::shared_ptr<UIManager> &uiManager);
 
   ~MarkdownCommitHook() noexcept override;
 
