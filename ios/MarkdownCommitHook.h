@@ -35,7 +35,7 @@ class MarkdownCommitHook : public UIManagerCommitHook {
       noexcept override;
 
  private:
-    std::shared_ptr<UIManager> uiManager_;
+    const std::shared_ptr<UIManager> uiManager_;
 };
 
 } // namespace reanimated
