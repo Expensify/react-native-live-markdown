@@ -56,16 +56,19 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
              auto &parentNode = ancestors.back().first.get();
              auto index = ancestors.back().second;
              
-             auto markdownNode = parentNode.getChildren().at(index);
+             // this is node represented by one of the registered families and since we only register markdown decorator
+             // shadow families, static casting should be safe here
+             const auto& decoratorNode =
+                std::static_pointer_cast<const MarkdownTextInputDecoratorShadowNode>(parentNode.getChildren().at(index));
              // text input always precedes the decorator component
-             auto previousSibling = parentNode.getChildren().at(index - 1);
+             const auto& previousSibling = parentNode.getChildren().at(index - 1);
              
-             if (auto textInputNode = std::dynamic_pointer_cast<const TextInputShadowNode>(previousSibling)) {
+             if (const auto& textInputNode = std::dynamic_pointer_cast<const TextInputShadowNode>(previousSibling)) {
                  // store the pair of text input and decorator to update in the next step
                  // we need both, decorator to get markdown style and text input to update it
                  nodesToUpdate.push_back({
                     textInputNode,
-                    std::dynamic_pointer_cast<const MarkdownTextInputDecoratorShadowNode>(markdownNode),
+                    decoratorNode,
                  });
              }
          }
