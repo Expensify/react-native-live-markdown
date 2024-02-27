@@ -70,7 +70,7 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
          }
          });
         
-        for (auto &nodes : nodesToUpdate) {
+        for (const auto &nodes : nodesToUpdate) {
             const auto &textInputState = *std::static_pointer_cast<const ConcreteState<TextInputState>>(nodes.textInput->getState());
             const auto &stateData = textInputState.getData();
             
