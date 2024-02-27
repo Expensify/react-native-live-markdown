@@ -1,4 +1,3 @@
-
 #ifdef RCT_NEW_ARCH_ENABLED
 
 #include <react/renderer/core/ComponentDescriptor.h>
