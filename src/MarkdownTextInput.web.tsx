@@ -150,6 +150,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       placeholderTextColor = `rgba(0,0,0,0.2)`,
       selectTextOnFocus,
       spellCheck,
+      selection,
       style = {},
       value,
       autoFocus = false,
@@ -158,7 +159,8 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
   ) => {
     const divRef = useRef<HTMLDivElement | null>(null);
     const currentlyFocusedField = useRef<HTMLDivElement | null>(null);
-    const contentSelection = useRef<Selection | null>(null);
+    const valueLength = value ? value.length : 0;
+    const contentSelection = useRef<Selection>({start: valueLength, end: valueLength});
     const className = `react-native-live-markdown-input-${multiline ? 'multiline' : 'singleline'}`;
     const history = useRef<InputHistory>();
     if (!history.current) {
@@ -170,15 +172,18 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     // Empty placeholder would collapse the div, so we need to use zero-width space to prevent it
     const heightSafePlaceholder = useMemo(() => getPlaceholderValue(placeholder), [placeholder]);
 
-    const updateSelection = useCallback(() => {
-      if (!divRef.current) {
-        return;
+    const setEventProps = useCallback((e: NativeSyntheticEvent<any>) => {
+      if (divRef.current) {
+        const text = normalizeValue(divRef.current.innerText || '');
+        if (e.target && typeof e.target !== 'number') {
+          // TODO: change the logic here so every event have value property
+          (e.target as unknown as HTMLInputElement).value = text;
+        }
+        if (e.nativeEvent && e.nativeEvent.text) {
+          e.nativeEvent.text = text;
+        }
       }
-      const selection = CursorUtils.getCurrentCursorPosition(divRef.current);
-      const markdownHTMLInput = divRef.current as HTMLInputElement;
-      markdownHTMLInput.selectionStart = selection.start;
-      markdownHTMLInput.selectionEnd = selection.end;
-      contentSelection.current = selection;
+      return e;
     }, []);
 
     const parseText = useCallback(
@@ -190,8 +195,6 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         if (history.current && shouldAddToHistory) {
           history.current.debouncedAdd(parsedText.text, parsedText.cursorPosition);
         }
-
-        updateSelection();
 
         return parsedText;
       },
@@ -245,18 +248,6 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       return value;
     }, [value]);
 
-    const setEventProps = useCallback((e: NativeSyntheticEvent<any>) => {
-      if (divRef.current) {
-        const text = normalizeValue(divRef.current.innerText || '');
-        if (typeof e.target !== 'number') {
-          // TODO: change the logic here so every event have value property
-          (e.target as unknown as HTMLInputElement).value = text;
-        }
-        e.nativeEvent.text = text;
-      }
-      return e;
-    }, []);
-
     // Placeholder text color logic
     const updateTextColor = useCallback((node: HTMLDivElement, text: string) => {
       // eslint-disable-next-line no-param-reassign -- we need to change the style of the node, so we need to modify it
@@ -297,6 +288,34 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       [multiline, onChange, onChangeText, setEventProps, processedMarkdownStyle],
     );
 
+    const handleSelectionChange: ReactEventHandler<HTMLDivElement> = useCallback(
+      (event) => {
+        const e = event as unknown as NativeSyntheticEvent<TextInputSelectionChangeEventData>;
+        setEventProps(e);
+        if (onSelectionChange && contentSelection.current) {
+          e.nativeEvent.selection = contentSelection.current;
+          onSelectionChange(e);
+        }
+      },
+      [onSelectionChange, setEventProps],
+    );
+
+    const updateSelection = useCallback((e) => {
+      if (!divRef.current) {
+        return;
+      }
+      const currentSelection = CursorUtils.getCurrentCursorPosition(divRef.current);
+
+      if (contentSelection.current.start !== currentSelection.start || contentSelection.current.end !== currentSelection.end) {
+        const markdownHTMLInput = divRef.current as HTMLInputElement;
+        markdownHTMLInput.selectionStart = currentSelection.start;
+        markdownHTMLInput.selectionEnd = currentSelection.end;
+        contentSelection.current = currentSelection;
+        // console.log(selection);
+        handleSelectionChange(e);
+      }
+    }, []);
+
     const handleKeyPress = useCallback(
       (e: KeyboardEvent<HTMLDivElement>) => {
         if (!divRef.current) {
@@ -331,6 +350,8 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           onKeyPress(event);
         }
 
+        updateSelection(event);
+
         if (
           e.key === 'Enter' &&
           !e.shiftKey &&
@@ -359,19 +380,6 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       [onKeyPress],
     );
 
-    const handleSelectionChange: ReactEventHandler<HTMLDivElement> = useCallback(
-      (event) => {
-        const e = event as unknown as NativeSyntheticEvent<TextInputSelectionChangeEventData>;
-        setEventProps(e);
-        updateSelection();
-        if (onSelectionChange && contentSelection.current) {
-          e.nativeEvent.selection = contentSelection.current;
-          onSelectionChange(e);
-        }
-      },
-      [onSelectionChange, setEventProps],
-    );
-
     const handleFocus: FocusEventHandler<HTMLDivElement> = useCallback(
       (event) => {
         const e = event as unknown as NativeSyntheticEvent<TextInputFocusEventData>;
@@ -379,7 +387,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         currentlyFocusedField.current = hostNode;
         setEventProps(e);
         if (divRef.current && contentSelection.current) {
-          CursorUtils.setCursorPosition(divRef.current, contentSelection.current.start || divRef.current.innerText.length, !multiline);
+          CursorUtils.setCursorPosition(divRef.current, contentSelection.current.end, !multiline);
         }
 
         if (onFocus) {
@@ -422,7 +430,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
     const handleClick = useCallback(
       (e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>) => {
-        updateSelection();
+        updateSelection(e);
         if (!onClick || !divRef.current) {
           return;
         }
@@ -514,6 +522,13 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       divRef.current.focus();
     }, []);
 
+    useEffect(() => {
+      if (!divRef.current || !selection || !(selection.start !== contentSelection.current.start || selection.end !== contentSelection.current.end)) {
+        return;
+      }
+      CursorUtils.setCursorPosition(divRef.current, selection.start, !multiline);
+    }, [selection]);
+
     return (
       // eslint-disable-next-line jsx-a11y/no-static-element-interactions
       <div
@@ -531,7 +546,6 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         onKeyDown={handleKeyPress}
         onKeyUp={updateSelection}
         onInput={handleOnChangeText}
-        onSelect={handleSelectionChange}
         onClick={handleClick}
         onFocus={handleFocus}
         onBlur={handleBlur}
