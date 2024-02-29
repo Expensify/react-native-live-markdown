@@ -155,7 +155,7 @@ test('inline code', () => {
 });
 
 test('codeblock', () => {
-  expect('```\nHello world!\n```').toBeParsedAsHTML('<span class="syntax">```</span><span class="pre"><br>Hello world!<br></span><span class="syntax">```</span>');
+  expect('```\nHello world!\n```').toBeParsedAsHTML('<span class="syntax">```</span><span class="pre">\nHello world!\n</span><span class="syntax">```</span>');
 });
 
 describe('quote', () => {
@@ -174,19 +174,19 @@ describe('quote', () => {
 
 test('multiple blockquotes', () => {
   expect('> Hello\n> beautiful\n> world').toBeParsedAsHTML(
-    '<span class="blockquote"><span class="syntax">&gt;</span> Hello</span><br><span class="blockquote"><span class="syntax">&gt;</span> beautiful</span><br><span class="blockquote"><span class="syntax">&gt;</span> world</span>',
+    '<span class="blockquote"><span class="syntax">&gt;</span> Hello</span>\n<span class="blockquote"><span class="syntax">&gt;</span> beautiful</span>\n<span class="blockquote"><span class="syntax">&gt;</span> world</span>',
   );
 });
 
 test('separate blockquotes', () => {
   expect('> Lorem ipsum\ndolor\n> sit amet').toBeParsedAsHTML(
-    '<span class="blockquote"><span class="syntax">&gt;</span> Lorem ipsum</span><br>dolor<br><span class="blockquote"><span class="syntax">&gt;</span> sit amet</span>',
+    '<span class="blockquote"><span class="syntax">&gt;</span> Lorem ipsum</span>\ndolor\n<span class="blockquote"><span class="syntax">&gt;</span> sit amet</span>',
   );
 });
 
 test('nested blockquotes', () => {
   expect('>>>> Lorem ipsum dolor sit amet').toBeParsedAsHTML(
-    '<span class="blockquote"><span class="syntax">&gt;</span><span class="blockquote"><span class="syntax">&gt;</span><span class="blockquote"><span class="syntax">&gt;</span><span class="blockquote"><span class="syntax">&gt;</span> Lorem ipsum dolor sit amet</span></span></span></span>',
+    '<span class="blockquote"><span class="blockquote"><span class="blockquote"><span class="blockquote"><span class="syntax">&gt;</span><span class="syntax">&gt;</span><span class="syntax">&gt;</span><span class="syntax">&gt;</span> Lorem ipsum dolor sit amet</span></span></span></span>',
   );
 });
 
@@ -225,7 +225,7 @@ describe('trailing whitespace', () => {
     });
 
     test('newline', () => {
-      expect('> Hello world\n').toBeParsedAsHTML('<span class="blockquote"><span class="syntax">&gt;</span> Hello world</span><br>');
+      expect('> Hello world\n').toBeParsedAsHTML('<span class="blockquote"><span class="syntax">&gt;</span> Hello world</span>\n');
     });
   });
 
@@ -243,12 +243,12 @@ describe('trailing whitespace', () => {
     });
 
     test('newline', () => {
-      expect('# Hello world\n').toBeParsedAsHTML('<span class="syntax"># </span><span class="h1">Hello world</span><br>');
+      expect('# Hello world\n').toBeParsedAsHTML('<span class="syntax"># </span><span class="h1">Hello world</span>\n');
     });
 
     test('multiple quotes', () => {
       expect('> # Hello\n> # world').toBeParsedAsHTML(
-        '<span class="blockquote"><span class="syntax">&gt;</span> <span class="syntax"># </span><span class="h1">Hello</span></span><br><span class="blockquote"><span class="syntax">&gt;</span> <span class="syntax"># </span><span class="h1">world</span></span>',
+        '<span class="blockquote"><span class="syntax">&gt;</span> <span class="syntax"># </span><span class="h1">Hello</span></span>\n<span class="blockquote"><span class="syntax">&gt;</span> <span class="syntax"># </span><span class="h1">world</span></span>',
       );
     });
   });
