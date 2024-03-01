@@ -5,7 +5,7 @@ import {Button, Platform, StyleSheet, Text, View} from 'react-native';
 import {MarkdownTextInput} from '@expensify/react-native-live-markdown';
 import type {TextInput} from 'react-native';
 
-const DEFAULT_TEXT = ['Hello, *world*!', 'https://expensify.com', '# Lorem ipsum', '> Hello world', '`foo`', '```\nbar\n```', '@here', '@someone@swmansion.com'].join('\n');
+const DEFAULT_TEXT = ['# aaa', '# bbb', '# ccc', '# ddd', '# eee', '# fff'].join('\n');
 
 function isWeb() {
   return Platform.OS === 'web';
@@ -68,7 +68,7 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.platform}>
+      {/* <View style={styles.platform}>
         <Text>
           Platform: {getPlatform()} {getPlatformVersion()}
         </Text>
@@ -80,7 +80,7 @@ export default function App() {
             <Text>RN runtime: {getRuntime()}</Text>
           </>
         )}
-      </View>
+      </View> */}
       {/* <Text>MarkdownTextInput singleline</Text>
       <MarkdownTextInput
         autoCapitalize="none"
@@ -88,7 +88,7 @@ export default function App() {
         onChangeText={setValue}
         style={styles.input}
       /> */}
-      <Text>MarkdownTextInput multiline</Text>
+      {/* <Text>MarkdownTextInput multiline</Text> */}
       <MarkdownTextInput
         multiline
         autoCapitalize="none"
@@ -114,7 +114,7 @@ export default function App() {
         onChangeText={setValue}
         style={styles.input}
       /> */}
-      <Text style={styles.text}>{JSON.stringify(value)}</Text>
+      {/* <Text style={styles.text}>{JSON.stringify(value)}</Text>
       <Button
         title="Focus"
         onPress={() => {
@@ -153,7 +153,7 @@ export default function App() {
             },
           })
         }
-      />
+      /> */}
     </View>
   );
 }
