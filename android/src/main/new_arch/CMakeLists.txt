@@ -77,6 +77,8 @@ set(LIB_LITERAL RNLiveMarkdownSpec)
 set(LIB_TARGET_NAME react_codegen_${LIB_LITERAL})
 
 set(LIB_ANDROID_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../..)
+set(LIB_CPP_DIR ${LIB_ANDROID_DIR}/../cpp)
+set(LIB_CUSTOM_SOURCES_DIR ${LIB_CPP_DIR}/react/renderer/components/${LIB_LITERAL})
 set(LIB_ANDROID_GENERATED_JNI_DIR ${LIB_ANDROID_DIR}/build/generated/source/codegen/jni)
 set(LIB_ANDROID_GENERATED_COMPONENTS_DIR ${LIB_ANDROID_GENERATED_JNI_DIR}/react/renderer/components/${LIB_LITERAL})
 
@@ -90,7 +92,7 @@ add_compile_options(
 )
 
 file(GLOB LIB_MODULE_SRCS CONFIGURE_DEPENDS *.cpp)
-file(GLOB LIB_CUSTOM_SRCS CONFIGURE_DEPENDS ./react/renderer/components/RNLiveMarkdownSpec/*.cpp)
+file(GLOB LIB_CUSTOM_SRCS CONFIGURE_DEPENDS ${LIB_CUSTOM_SOURCES_DIR}/*.cpp)
 file(GLOB LIB_CODEGEN_SRCS CONFIGURE_DEPENDS ${LIB_ANDROID_GENERATED_COMPONENTS_DIR}/*.cpp)
 
 add_library(
@@ -107,6 +109,7 @@ target_include_directories(
   .
   ${LIB_ANDROID_GENERATED_JNI_DIR}
   ${LIB_ANDROID_GENERATED_COMPONENTS_DIR}
+  ${LIB_CPP_DIR}
 )
 
 target_link_libraries(
