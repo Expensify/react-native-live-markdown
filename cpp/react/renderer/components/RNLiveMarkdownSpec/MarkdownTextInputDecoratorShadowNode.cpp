@@ -1,7 +1,7 @@
 #include <react/renderer/core/LayoutContext.h>
 
 #include "MarkdownTextInputDecoratorShadowNode.h"
-// #include "MarkdownShadowFamilyRegistry.h"
+#include "MarkdownShadowFamilyRegistry.h"
 
 namespace facebook {
 namespace react {
@@ -11,7 +11,7 @@ extern const char MarkdownTextInputDecoratorViewComponentName[] = "MarkdownTextI
 const ShadowNodeFragment::Value MarkdownTextInputDecoratorShadowNode::updateFragmentState(ShadowNodeFragment const &fragment, ShadowNodeFamily::Shared const &family) {
     const auto newStateData = std::make_shared<MarkdownTextInputDecoratorState>(family);
 
-    // MarkdownShadowFamilyRegistry::registerFamilyForUpdates(family);
+    MarkdownShadowFamilyRegistry::registerFamilyForUpdates(family);
     
     // we pass the pointer to the ShadowNodeFamily in the initial state, so it's propagated on every clone
     // we need it to clear the reference in the registry when the view is removed from window
