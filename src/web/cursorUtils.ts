@@ -62,31 +62,22 @@ function moveCursorToEnd(target: HTMLElement) {
   }
 }
 
-function getIndexedPosition(target: HTMLElement, range: Range, isStart: boolean) {
-  const marker = document.createTextNode('\0');
-  const rangeClone = range.cloneRange();
-
-  rangeClone.collapse(isStart);
-
-  rangeClone.insertNode(marker);
-  const position = target.innerText.indexOf('\0');
-  if (marker.parentNode) {
-    marker.parentNode.removeChild(marker);
-  }
-
-  return position;
-}
-
 function getCurrentCursorPosition(target: HTMLElement) {
-  const selection = document.getSelection();
-  if (!selection || selection.rangeCount === 0) {
-    return {start: target.innerText.length, end: target.innerText.length};
-  }
+  const sel = window.getSelection();
 
-  const range = selection.getRangeAt(0);
-  const start = getIndexedPosition(target, range, true);
-  const end = getIndexedPosition(target, range, false);
-  return {start, end};
+  if (sel && sel.rangeCount > 0) {
+    const range = sel.getRangeAt(0);
+    const preSelectionRange = range.cloneRange();
+    preSelectionRange.selectNodeContents(target);
+    preSelectionRange.setEnd(range.startContainer, range.startOffset);
+    const start = preSelectionRange.toString().length;
+
+    return {
+      start,
+      end: start + range.toString().length,
+    };
+  }
+  return {start: -1, end: -1};
 }
 
 export {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition};
