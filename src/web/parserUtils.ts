@@ -179,8 +179,6 @@ function parseText(
 
   const markdownRanges: MarkdownRange[] = ranges as MarkdownRange[];
 
-  let appended = false;
-
   // We don't want to parse text with single '\n', because contentEditable represents it as invisible <br />
   if (!!text && text !== '\n') {
     const dom = parseRangesToHTMLNodes(text, markdownRanges, markdownStyle);
@@ -191,8 +189,6 @@ function parseText(
       targetElement.innerText = '';
       target.appendChild(dom);
 
-      appended = true;
-
       if (alwaysMoveCursorToTheEnd) {
         CursorUtils.moveCursorToEnd(target);
       } else if (isFocused && cursorPosition !== null) {
@@ -201,7 +197,7 @@ function parseText(
     }
   }
 
-  return {text: appended ? text : target.innerText, cursorPosition: cursorPosition || 0};
+  return {text: target.innerText, cursorPosition: cursorPosition || 0};
 }
 
 export {parseText, parseRangesToHTMLNodes};
