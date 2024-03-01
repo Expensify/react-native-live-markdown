@@ -422,6 +422,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     const handleBlur: FocusEventHandler<HTMLDivElement> = useCallback(
       (event) => {
         const e = event as unknown as NativeSyntheticEvent<TextInputFocusEventData>;
+        CursorUtils.removeSelection();
         currentlyFocusedField.current = null;
         if (onBlur) {
           setEventProps(e);

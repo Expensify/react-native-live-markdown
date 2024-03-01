@@ -1,20 +1,22 @@
+function findTextNodes(textNodes: Text[], node: ChildNode) {
+  if (node.nodeType === 3) {
+    textNodes.push(node as Text);
+  } else {
+    for (let i = 0, len = node.childNodes.length; i < len; ++i) {
+      const childNode = node.childNodes[i];
+      if (childNode) {
+        findTextNodes(textNodes, childNode);
+      }
+    }
+  }
+}
+
 function setCursorPosition(target: HTMLElement, start: number, end: number | null = null) {
   const range = document.createRange();
   range.selectNodeContents(target);
 
   const textNodes: Text[] = [];
-  (function findTextNodes(node: ChildNode) {
-    if (node.nodeType === 3) {
-      textNodes.push(node as Text);
-    } else {
-      for (let i = 0, len = node.childNodes.length; i < len; ++i) {
-        const childNode = node.childNodes[i];
-        if (childNode) {
-          findTextNodes(childNode);
-        }
-      }
-    }
-  })(target);
+  findTextNodes(textNodes, target);
 
   let charCount = 0;
   let startNode: Text | null = null;
@@ -80,4 +82,11 @@ function getCurrentCursorPosition(target: HTMLElement) {
   return {start: -1, end: -1};
 }
 
-export {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition};
+function removeSelection() {
+  const sel = window.getSelection();
+  if (sel) {
+    sel.removeAllRanges();
+  }
+}
+
+export {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition, removeSelection};
