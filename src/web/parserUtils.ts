@@ -179,22 +179,29 @@ function parseText(
 
   const markdownRanges: MarkdownRange[] = ranges as MarkdownRange[];
 
-  targetElement.innerHTML = '';
-  targetElement.innerText = '';
+  let appended = false;
 
   // We don't want to parse text with single '\n', because contentEditable represents it as invisible <br />
   if (!!text && text !== '\n') {
     const dom = parseRangesToHTMLNodes(text, markdownRanges, markdownStyle);
-    target.appendChild(dom);
+
+    // eslint-disable-next-line es/no-optional-chaining
+    if ((targetElement.firstChild as HTMLElement | null)?.innerHTML !== dom.innerHTML) {
+      targetElement.innerHTML = '';
+      targetElement.innerText = '';
+      target.appendChild(dom);
+
+      appended = true;
+
+      if (alwaysMoveCursorToTheEnd) {
+        CursorUtils.moveCursorToEnd(target);
+      } else if (isFocused && cursorPosition !== null) {
+        CursorUtils.setCursorPosition(target, cursorPosition, disableNewLinesInCursorPositioning);
+      }
+    }
   }
 
-  if (alwaysMoveCursorToTheEnd) {
-    CursorUtils.moveCursorToEnd(target);
-  } else if (isFocused && cursorPosition !== null) {
-    CursorUtils.setCursorPosition(target, cursorPosition, disableNewLinesInCursorPositioning);
-  }
-
-  return {text: target.innerText, cursorPosition: cursorPosition || 0};
+  return {text: appended ? text : target.innerText, cursorPosition: cursorPosition || 0};
 }
 
 export {parseText, parseRangesToHTMLNodes};
