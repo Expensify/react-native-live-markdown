@@ -34,6 +34,7 @@ target_include_directories(
 
 target_link_libraries(
   ${LIB_TARGET_NAME}
+  fabricjni
   fbjni
   folly_runtime
   glog
@@ -46,6 +47,7 @@ target_link_libraries(
   react_render_graphics
   react_render_mapbuffer
   react_utils
+  runtimeexecutor
   rrc_view
   turbomodulejsijni
   yoga
@@ -60,6 +62,7 @@ target_compile_options(
   -fexceptions
   -frtti
   -Wall
+  -std=c++20
 )
 
 target_include_directories(
