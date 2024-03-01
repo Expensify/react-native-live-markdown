@@ -1,48 +1,53 @@
-function createRange(node: HTMLElement, targetPosition: number, ignoreNewLines = false) {
+function setCursorPosition(target: HTMLElement, start: number, end: number | null = null) {
   const range = document.createRange();
-  range.selectNode(node);
+  range.selectNodeContents(target);
 
-  let pos = 0;
-  const stack: Node[] = [node];
-  while (stack.length > 0) {
-    const current = stack.pop();
-    if (!current) {
-      break;
+  const textNodes: Text[] = [];
+  (function findTextNodes(node: ChildNode) {
+    if (node.nodeType === 3) {
+      textNodes.push(node as Text);
+    } else {
+      for (let i = 0, len = node.childNodes.length; i < len; ++i) {
+        const childNode = node.childNodes[i];
+        if (childNode) {
+          findTextNodes(childNode);
+        }
+      }
     }
-    if (current.nodeType === Node.TEXT_NODE || current.nodeName === 'BR') {
-      const textContentLength = current.textContent ? current.textContent.length : 0;
-      const len = current.nodeName === 'BR' ? 1 : textContentLength;
-      if (pos + len >= targetPosition) {
-        if (current.nodeName === 'BR') {
-          range.setStartAfter(current);
-          (current as HTMLElement).scrollIntoView();
-        } else {
-          range.setStart(current, targetPosition - pos);
-        }
-        return range;
-      }
-      pos += len;
-    } else if (current.childNodes && current.childNodes.length > 0) {
-      for (let i = current.childNodes.length - 1; i >= 0; i--) {
-        const currentNode = current.childNodes[i];
-        if (currentNode && (!ignoreNewLines || (ignoreNewLines && currentNode.nodeName !== 'BR'))) {
-          stack.push(currentNode);
+  })(target);
+
+  let charCount = 0;
+  let startNode: Text | null = null;
+  let endNode: Text | null = null;
+  const n = textNodes.length;
+  for (let i = 0; i < n; ++i) {
+    const textNode = textNodes[i];
+    if (textNode) {
+      const nextCharCount = charCount + textNode.length;
+
+      if (!startNode && start >= charCount && (start <= nextCharCount || (start === nextCharCount && i < n - 1))) {
+        startNode = textNode;
+        range.setStart(textNode, start - charCount);
+        if (!end) {
+          break;
         }
       }
+      if (end && !endNode && end >= charCount && (end <= nextCharCount || (end === nextCharCount && i < n - 1))) {
+        endNode = textNode;
+        range.setEnd(textNode, end - charCount);
+      }
+      charCount = nextCharCount;
     }
   }
 
-  range.setStart(node, node.childNodes.length);
-  return range;
-}
-
-function setCursorPosition(target: HTMLElement, targetPosition: number, ignoreNewLines = false) {
-  const range = createRange(target, targetPosition, ignoreNewLines);
-  const selection = window.getSelection();
-  if (selection) {
+  if (!end) {
     range.collapse(true);
-    selection.removeAllRanges();
-    selection.addRange(range);
+  }
+
+  const sel = window.getSelection();
+  if (sel) {
+    sel.removeAllRanges();
+    sel.addRange(range);
   }
 }
 

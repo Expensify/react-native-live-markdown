@@ -300,7 +300,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       [onSelectionChange, setEventProps],
     );
 
-    const updateSelection = useCallback((e) => {
+    const updateSelection = useCallback((e: SyntheticEvent<HTMLDivElement> | null = null) => {
       if (!divRef.current) {
         return;
       }
@@ -311,8 +311,10 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         markdownHTMLInput.selectionStart = currentSelection.start;
         markdownHTMLInput.selectionEnd = currentSelection.end;
         contentSelection.current = currentSelection;
-        // console.log(selection);
-        handleSelectionChange(e);
+
+        if (e) {
+          handleSelectionChange(e);
+        }
       }
     }, []);
 
@@ -350,7 +352,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           onKeyPress(event);
         }
 
-        updateSelection(event);
+        updateSelection(event as unknown as SyntheticEvent<HTMLDivElement, Event>);
 
         if (
           e.key === 'Enter' &&
@@ -387,7 +389,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         currentlyFocusedField.current = hostNode;
         setEventProps(e);
         if (divRef.current && contentSelection.current) {
-          CursorUtils.setCursorPosition(divRef.current, contentSelection.current.end, !multiline);
+          CursorUtils.setCursorPosition(divRef.current, contentSelection.current.end || contentSelection.current.start);
         }
 
         if (onFocus) {
@@ -526,7 +528,8 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       if (!divRef.current || !selection || !(selection.start !== contentSelection.current.start || selection.end !== contentSelection.current.end)) {
         return;
       }
-      CursorUtils.setCursorPosition(divRef.current, selection.start, !multiline);
+      CursorUtils.setCursorPosition(divRef.current, selection.start, selection.end);
+      updateSelection();
     }, [selection]);
 
     return (

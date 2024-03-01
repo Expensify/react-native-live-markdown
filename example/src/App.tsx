@@ -62,6 +62,7 @@ function getRandomColor() {
 export default function App() {
   const [value, setValue] = React.useState(DEFAULT_TEXT);
   const [markdownStyle, setMarkdownStyle] = React.useState({});
+  const [selection, setSelection] = React.useState({start: 0, end: 0});
 
   // TODO: use MarkdownTextInput ref instead of TextInput ref
   const ref = React.useRef<TextInput>(null);
@@ -98,6 +99,10 @@ export default function App() {
         ref={ref}
         markdownStyle={markdownStyle}
         placeholder="Type here..."
+        onSelectionChange={(e) => {
+          setSelection({...e.nativeEvent.selection});
+        }}
+        selection={selection}
       />
       {/* <Text>TextInput singleline</Text>
       <TextInput
@@ -153,6 +158,16 @@ export default function App() {
             },
           })
         }
+      />
+      <Button
+        title="Change selection"
+        onPress={() => {
+          if (!ref.current) {
+            return;
+          }
+          ref.current.focus();
+          setSelection({start: 0, end: 20});
+        }}
       />
     </View>
   );

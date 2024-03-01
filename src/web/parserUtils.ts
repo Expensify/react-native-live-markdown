@@ -160,14 +160,7 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
   return root;
 }
 
-function parseText(
-  target: HTMLElement,
-  text: string,
-  curosrPositionIndex: number | null,
-  markdownStyle: PartialMarkdownStyle = {},
-  disableNewLinesInCursorPositioning = false,
-  alwaysMoveCursorToTheEnd = false,
-) {
+function parseText(target: HTMLElement, text: string, curosrPositionIndex: number | null, markdownStyle: PartialMarkdownStyle = {}, alwaysMoveCursorToTheEnd = false) {
   const targetElement = target;
 
   let cursorPosition: number | null = curosrPositionIndex;
@@ -191,7 +184,7 @@ function parseText(
   if (alwaysMoveCursorToTheEnd) {
     CursorUtils.moveCursorToEnd(target);
   } else if (isFocused && cursorPosition !== null) {
-    CursorUtils.setCursorPosition(target, cursorPosition, disableNewLinesInCursorPositioning);
+    CursorUtils.setCursorPosition(target, cursorPosition);
   }
 
   return {text: target.innerText, cursorPosition: cursorPosition || 0};
