@@ -1,4 +1,4 @@
-#include <react/renderer/components/iostextinput/TextInputShadowNode.h>
+#include <react/renderer/core/ShadowNodeFamily.h>
 
 #include <mutex>
 #include <set>

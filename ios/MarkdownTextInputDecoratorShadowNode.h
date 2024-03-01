@@ -4,7 +4,6 @@
 #include <react/renderer/components/RNLiveMarkdownSpec/EventEmitters.h>
 #include <react/renderer/components/RNLiveMarkdownSpec/Props.h>
 #include <react/renderer/components/view/ConcreteViewShadowNode.h>
-#include <react/renderer/components/iostextinput/TextInputShadowNode.h>
 #include <jsi/jsi.h>
 
 namespace facebook {
