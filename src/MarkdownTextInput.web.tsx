@@ -9,7 +9,7 @@ import type {
   TextInputKeyPressEventData,
   TextInputFocusEventData,
 } from 'react-native';
-import React, {useEffect, useRef, useCallback, useMemo, useLayoutEffect, useState} from 'react';
+import React, {useEffect, useRef, useCallback, useMemo, useLayoutEffect} from 'react';
 import type {CSSProperties, MutableRefObject, ReactEventHandler, FocusEventHandler, MouseEvent, KeyboardEvent, SyntheticEvent} from 'react';
 import {StyleSheet} from 'react-native';
 import * as ParseUtils from './web/parserUtils';
@@ -156,7 +156,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     },
     ref,
   ) => {
-    const [isComposition, setIsComposition] = useState(false);
+    const compositionRef = useRef<boolean | null>(null);
     const divRef = useRef<HTMLDivElement | null>(null);
     const currentlyFocusedField = useRef<HTMLDivElement | null>(null);
     const contentSelection = useRef<Selection | null>(null);
@@ -270,8 +270,8 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           return;
         }
 
-        if (isComposition) {
-          setIsComposition(false);
+        if (compositionRef.current) {
+          compositionRef.current = false;
           return;
         }
 
@@ -300,7 +300,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           onChangeText(normalizedText);
         }
       },
-      [multiline, isComposition, onChange, onChangeText, setEventProps, processedMarkdownStyle],
+      [multiline, onChange, onChangeText, setEventProps, processedMarkdownStyle],
     );
 
     const handleKeyPress = useCallback(
@@ -520,6 +520,10 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       divRef.current.focus();
     }, []);
 
+    const startComposition = () => {
+      compositionRef.current = true;
+    };
+
     return (
       // eslint-disable-next-line jsx-a11y/no-static-element-interactions
       <div
@@ -535,7 +539,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         autoCapitalize={autoCapitalize}
         className={className}
         onKeyDown={handleKeyPress}
-        onCompositionStart={() => setIsComposition(true)}
+        onCompositionStart={startComposition}
         onKeyUp={updateSelection}
         onInput={handleOnChangeText}
         onSelect={handleSelectionChange}
