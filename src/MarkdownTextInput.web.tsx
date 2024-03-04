@@ -9,7 +9,7 @@ import type {
   TextInputKeyPressEventData,
   TextInputFocusEventData,
 } from 'react-native';
-import React, {useEffect, useRef, useCallback, useMemo, useLayoutEffect} from 'react';
+import React, {useEffect, useRef, useCallback, useMemo, useLayoutEffect, useState} from 'react';
 import type {CSSProperties, MutableRefObject, ReactEventHandler, FocusEventHandler, MouseEvent, KeyboardEvent, SyntheticEvent} from 'react';
 import {StyleSheet} from 'react-native';
 import * as ParseUtils from './web/parserUtils';
@@ -156,6 +156,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     },
     ref,
   ) => {
+    const [isComposition, setIsComposition] = useState(false);
     const divRef = useRef<HTMLDivElement | null>(null);
     const currentlyFocusedField = useRef<HTMLDivElement | null>(null);
     const contentSelection = useRef<Selection | null>(null);
@@ -269,6 +270,11 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           return;
         }
 
+        if (isComposition) {
+          setIsComposition(false);
+          return;
+        }
+
         let text = '';
         const nativeEvent = e.nativeEvent as MarkdownNativeEvent;
         switch (nativeEvent.inputType) {
@@ -294,7 +300,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           onChangeText(normalizedText);
         }
       },
-      [multiline, onChange, onChangeText, setEventProps, processedMarkdownStyle],
+      [multiline, isComposition, onChange, onChangeText, setEventProps, processedMarkdownStyle],
     );
 
     const handleKeyPress = useCallback(
@@ -529,6 +535,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         autoCapitalize={autoCapitalize}
         className={className}
         onKeyDown={handleKeyPress}
+        onCompositionStart={() => setIsComposition(true)}
         onKeyUp={updateSelection}
         onInput={handleOnChangeText}
         onSelect={handleSelectionChange}
