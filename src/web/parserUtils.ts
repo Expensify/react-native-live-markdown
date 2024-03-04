@@ -183,8 +183,8 @@ function parseText(
   if (!!text && text !== '\n') {
     const dom = parseRangesToHTMLNodes(text, markdownRanges, markdownStyle);
 
-    // eslint-disable-next-line es/no-optional-chaining
-    if ((targetElement.firstChild as HTMLElement | null)?.innerHTML !== dom.innerHTML) {
+    const rootSpan = targetElement.firstChild as HTMLElement | null;
+    if (!rootSpan || rootSpan.innerHTML !== dom.innerHTML) {
       targetElement.innerHTML = '';
       targetElement.innerText = '';
       target.appendChild(dom);
