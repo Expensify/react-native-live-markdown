@@ -1,6 +1,6 @@
-#include <android/log.h>
 #include <fbjni/fbjni.h>
-// #include <react/fabric/Binding.h>
+#include <react/fabric/Binding.h>
+#include <react/renderer/scheduler/Scheduler.h>
 
 #include <string>
 
@@ -27,10 +27,10 @@ void NativeProxy::registerNatives() {
 }
 
 void NativeProxy::createCommitHook(jni::alias_ref<facebook::react::JFabricUIManager::javaobject> fabricUIManager) {
-    // const auto &uiManager =
-    //         fabricUIManager->getBinding()->getScheduler()->getUIManager();
+  const auto &uiManager =
+            fabricUIManager->getBinding()->getScheduler()->getUIManager();
 
-   __android_log_print(ANDROID_LOG_ERROR, "MDWN", "createCommitHook called");
+ this->commitHook_ = std::make_shared<MarkdownCommitHook>(uiManager);
 }
 
 jni::local_ref<NativeProxy::jhybriddata> NativeProxy::initHybrid(jni::alias_ref<jhybridobject> jThis) {

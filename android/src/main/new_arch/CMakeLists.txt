@@ -15,6 +15,8 @@ file(GLOB LIB_MODULE_SRCS CONFIGURE_DEPENDS *.cpp)
 file(GLOB LIB_CUSTOM_SRCS CONFIGURE_DEPENDS ${LIB_CUSTOM_SOURCES_DIR}/*.cpp)
 file(GLOB LIB_CODEGEN_SRCS CONFIGURE_DEPENDS ${LIB_ANDROID_GENERATED_COMPONENTS_DIR}/*.cpp)
 
+set(RN_DIR ${LIB_ANDROID_DIR}/../example/node_modules/react-native)
+
 add_library(
   ${LIB_TARGET_NAME}
   SHARED 
@@ -30,10 +32,34 @@ target_include_directories(
   ${LIB_ANDROID_GENERATED_JNI_DIR}
   ${LIB_ANDROID_GENERATED_COMPONENTS_DIR}
   ${LIB_CPP_DIR}
+  ${RN_DIR}/ReactCommon/
+  ${RN_DIR}/ReactCommon/react/renderer/components/textinput/androidtextinput
+  ${RN_DIR}/ReactCommon/react/renderer/textlayoutmanager/platform/android
+  /Users/jakubpiasecki/REACT_NATIVE_DOWNLOAD_DIR/boost_1_83_0
 )
+
+find_library(
+  RRC_TEXT_LIB
+  rrc_text
+  PATHS ${CMAKE_CURRENT_SOURCE_DIR}/arm64-v8a
+  NO_DEFAULT_PATH
+  NO_CMAKE_FIND_ROOT_PATH
+)
+
+find_library(
+  RRC_TEXTINPUT_LIB
+  rrc_textinput
+  PATHS ${CMAKE_CURRENT_SOURCE_DIR}/arm64-v8a
+  NO_DEFAULT_PATH
+  NO_CMAKE_FIND_ROOT_PATH
+)
+
+find_package(ReactAndroid REQUIRED CONFIG)
 
 target_link_libraries(
   ${LIB_TARGET_NAME}
+  ${RRC_TEXT_LIB}
+  ${RRC_TEXTINPUT_LIB}
   fabricjni
   fbjni
   folly_runtime
@@ -46,6 +72,8 @@ target_link_libraries(
   react_render_debug
   react_render_graphics
   react_render_mapbuffer
+  ReactAndroid::react_render_uimanager
+  ReactAndroid::react_render_scheduler
   react_utils
   runtimeexecutor
   rrc_view

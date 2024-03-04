@@ -5,6 +5,8 @@
 
 #include <string>
 
+#include "MarkdownCommitHook.h"
+
 namespace livemarkdown {
 
 using namespace facebook;
@@ -22,6 +24,7 @@ class NativeProxy : public jni::HybridClass<NativeProxy> {
  private:
   friend HybridBase;
   jni::global_ref<NativeProxy::javaobject> javaPart_;
+  std::shared_ptr<MarkdownCommitHook> commitHook_;
 
   explicit NativeProxy(jni::alias_ref<NativeProxy::javaobject> jThis);
 
