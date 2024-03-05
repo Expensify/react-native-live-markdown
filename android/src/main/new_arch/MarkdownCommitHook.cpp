@@ -15,6 +15,11 @@ MarkdownCommitHook::MarkdownCommitHook(const std::shared_ptr<UIManager> &uiManag
 
 MarkdownCommitHook::~MarkdownCommitHook() noexcept {
   uiManager_->unregisterCommitHook(*this);
+  free(customVTable_);
+}
+
+Size customMeasureContent(AndroidTextInputShadowNode* node, LayoutContext& context, LayoutConstraints& constraints) {
+    return {100, 50};
 }
 
 RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
@@ -73,7 +78,38 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
             const auto &textInputState = *std::static_pointer_cast<const ConcreteState<AndroidTextInputState>>(nodes.textInput->getState());
             const auto &stateData = textInputState.getData();
 
-            __android_log_print(ANDROID_LOG_ERROR, "MDWN", "commit hook found text input");
+            if (customVTable_ == nullptr) {
+                // size from ghidra
+                const int vtableAddresses = 24;
+                const int ptrSize = sizeof(void*);
+                customVTable_ = static_cast<void **>(malloc(vtableAddresses * ptrSize));
+
+                void** textInputShadowNodeVTable = *(void***)(&(*nodes.textInput));
+                // pointer to vtable points below top_offset and type_info, we need to copy those too
+                memcpy(customVTable_, textInputShadowNodeVTable - 2, vtableAddresses * ptrSize);
+
+                // we store the separate pointer that also points below the top_offset and type_info
+                // as that's where our replaced vtable_ptr must point
+                customVTableStartPtr_ = customVTable_ + 2;
+                // index from ghidra
+                customVTable_[7] = (void*)&customMeasureContent;
+            }
+
+            rootNode = rootNode->cloneTree(nodes.textInput->getFamily(), [this, &stateData, &textInputState](ShadowNode const& node) {
+                auto newStateData = std::make_shared<AndroidTextInputState>(stateData);
+                newStateData->cachedAttributedStringId = 0;
+
+                // clone the text input with the new state
+                auto newNode = node.clone({
+                    .state = std::make_shared<const ConcreteState<AndroidTextInputState>>(newStateData, textInputState),
+                });
+
+                // replace vtable with our custom one
+                void** textInputShadowNodeVTable = (void**)(&(*newNode));
+                memcpy(textInputShadowNodeVTable, &customVTableStartPtr_, sizeof(void*));
+
+                return newNode;
+            });
         }
 
   return std::static_pointer_cast<RootShadowNode>(rootNode);

@@ -35,6 +35,8 @@ class MarkdownCommitHook : public UIManagerCommitHook {
 
  private:
     const std::shared_ptr<UIManager> uiManager_;
+    void** customVTable_ = nullptr;
+    void** customVTableStartPtr_ = nullptr;
 };
 
 } // namespace livemarkdown
