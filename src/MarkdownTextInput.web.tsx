@@ -312,7 +312,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       }
       const currentSelection = CursorUtils.getCurrentCursorPosition(divRef.current);
 
-      if (contentSelection.current.start !== currentSelection.start || contentSelection.current.end !== currentSelection.end) {
+      if (currentSelection && (contentSelection.current.start !== currentSelection.start || contentSelection.current.end !== currentSelection.end)) {
         if (contentSelection.current.start >= 0 && contentSelection.current.end >= 0) {
           updateRefSelectionVariables(contentSelection.current.start, contentSelection.current.end);
           contentSelection.current = currentSelection;

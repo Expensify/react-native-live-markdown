@@ -166,7 +166,8 @@ function parseText(target: HTMLElement, text: string, curosrPositionIndex: numbe
   let cursorPosition: number | null = curosrPositionIndex;
   const isFocused = document.activeElement === target;
   if (isFocused && curosrPositionIndex === null) {
-    cursorPosition = CursorUtils.getCurrentCursorPosition(target).start;
+    const selection = CursorUtils.getCurrentCursorPosition(target);
+    cursorPosition = selection ? selection.end : null;
   }
   const ranges = global.parseExpensiMarkToRanges(text);
 
@@ -182,7 +183,7 @@ function parseText(target: HTMLElement, text: string, curosrPositionIndex: numbe
   }
 
   if (isFocused) {
-    if (alwaysMoveCursorToTheEnd || (cursorPosition !== null && cursorPosition < 0)) {
+    if (alwaysMoveCursorToTheEnd || cursorPosition === null) {
       CursorUtils.moveCursorToEnd(target);
     } else if (cursorPosition !== null) {
       CursorUtils.setCursorPosition(target, cursorPosition);

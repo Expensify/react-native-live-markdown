@@ -75,7 +75,7 @@ function getCurrentCursorPosition(target: HTMLElement) {
     const end = start + range.toString().length;
     return {start, end};
   }
-  return {start: -1, end: -1};
+  return null;
 }
 
 function removeSelection() {
