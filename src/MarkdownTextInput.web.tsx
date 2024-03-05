@@ -300,6 +300,12 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       [onSelectionChange, setEventProps],
     );
 
+    const updateRefSelectionVariables = useCallback((start: number, end: number) => {
+      const markdownHTMLInput = divRef.current as HTMLInputElement;
+      markdownHTMLInput.selectionStart = start;
+      markdownHTMLInput.selectionEnd = end;
+    }, []);
+
     const updateSelection = useCallback((e: SyntheticEvent<HTMLDivElement> | null = null) => {
       if (!divRef.current) {
         return;
@@ -308,9 +314,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
       if (contentSelection.current.start !== currentSelection.start || contentSelection.current.end !== currentSelection.end) {
         if (contentSelection.current.start >= 0 && contentSelection.current.end >= 0) {
-          const markdownHTMLInput = divRef.current as HTMLInputElement;
-          markdownHTMLInput.selectionStart = currentSelection.start;
-          markdownHTMLInput.selectionEnd = currentSelection.end;
+          updateRefSelectionVariables(contentSelection.current.start, contentSelection.current.end);
           contentSelection.current = currentSelection;
         }
         if (e) {
@@ -519,11 +523,14 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     }, []);
 
     useEffect(() => {
-      // focus the input on mount if autoFocus is set
-      if (!(divRef.current && autoFocus)) {
+      if (!divRef.current) {
         return;
       }
-      divRef.current.focus();
+      // focus the input on mount if autoFocus is set
+      if (autoFocus) {
+        divRef.current.focus();
+      }
+      updateRefSelectionVariables(contentSelection.current.start, contentSelection.current.end);
     }, []);
 
     useEffect(() => {
