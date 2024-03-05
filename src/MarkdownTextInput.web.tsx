@@ -156,7 +156,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     },
     ref,
   ) => {
-    const compositionRef = useRef<boolean | null>(null);
+    const compositionRef = useRef<boolean>(false);
     const divRef = useRef<HTMLDivElement | null>(null);
     const currentlyFocusedField = useRef<HTMLDivElement | null>(null);
     const contentSelection = useRef<Selection | null>(null);
@@ -520,9 +520,9 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       divRef.current.focus();
     }, []);
 
-    const startComposition = () => {
+    const startComposition = useCallback(() => {
       compositionRef.current = true;
-    };
+    }, []);
 
     return (
       // eslint-disable-next-line jsx-a11y/no-static-element-interactions
