@@ -46,10 +46,10 @@ function setCursorPosition(target: HTMLElement, start: number, end: number | nul
     range.collapse(true);
   }
 
-  const sel = window.getSelection();
-  if (sel) {
-    sel.removeAllRanges();
-    sel.addRange(range);
+  const selection = window.getSelection();
+  if (selection) {
+    selection.removeAllRanges();
+    selection.addRange(range);
   }
 }
 
@@ -65,27 +65,23 @@ function moveCursorToEnd(target: HTMLElement) {
 }
 
 function getCurrentCursorPosition(target: HTMLElement) {
-  const sel = window.getSelection();
-
-  if (sel && sel.rangeCount > 0) {
-    const range = sel.getRangeAt(0);
+  const selection = window.getSelection();
+  if (selection && selection.rangeCount > 0) {
+    const range = selection.getRangeAt(0);
     const preSelectionRange = range.cloneRange();
     preSelectionRange.selectNodeContents(target);
     preSelectionRange.setEnd(range.startContainer, range.startOffset);
     const start = preSelectionRange.toString().length;
-
-    return {
-      start,
-      end: start + range.toString().length,
-    };
+    const end = start + range.toString().length;
+    return {start, end};
   }
   return {start: -1, end: -1};
 }
 
 function removeSelection() {
-  const sel = window.getSelection();
-  if (sel) {
-    sel.removeAllRanges();
+  const selection = window.getSelection();
+  if (selection) {
+    selection.removeAllRanges();
   }
 }
 

@@ -181,10 +181,12 @@ function parseText(target: HTMLElement, text: string, curosrPositionIndex: numbe
     target.appendChild(dom);
   }
 
-  if (alwaysMoveCursorToTheEnd) {
-    CursorUtils.moveCursorToEnd(target);
-  } else if (isFocused && cursorPosition !== null) {
-    CursorUtils.setCursorPosition(target, cursorPosition);
+  if (isFocused) {
+    if (alwaysMoveCursorToTheEnd || (cursorPosition !== null && cursorPosition < 0)) {
+      CursorUtils.moveCursorToEnd(target);
+    } else if (cursorPosition !== null) {
+      CursorUtils.setCursorPosition(target, cursorPosition);
+    }
   }
 
   return {text: target.innerText, cursorPosition: cursorPosition || 0};
