@@ -99,9 +99,7 @@ export default function App() {
         ref={ref}
         markdownStyle={markdownStyle}
         placeholder="Type here..."
-        onSelectionChange={(e) => {
-          setSelection(e.nativeEvent.selection);
-        }}
+        onSelectionChange={(e) => setSelection(e.nativeEvent.selection)}
         selection={selection}
       />
       {/* <Text>TextInput singleline</Text>

@@ -300,7 +300,8 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       [onSelectionChange, setEventProps],
     );
 
-    const updateRefSelectionVariables = useCallback((start: number, end: number) => {
+    const updateRefSelectionVariables = useCallback((newSelection: Selection) => {
+      const {start, end} = newSelection;
       const markdownHTMLInput = divRef.current as HTMLInputElement;
       markdownHTMLInput.selectionStart = start;
       markdownHTMLInput.selectionEnd = end;
@@ -310,12 +311,12 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       if (!divRef.current) {
         return;
       }
-      const currentSelection = CursorUtils.getCurrentCursorPosition(divRef.current);
+      const newSelection = CursorUtils.getCurrentCursorPosition(divRef.current);
 
-      if (currentSelection && (contentSelection.current.start !== currentSelection.start || contentSelection.current.end !== currentSelection.end)) {
+      if (newSelection && (contentSelection.current.start !== newSelection.start || contentSelection.current.end !== newSelection.end)) {
         if (contentSelection.current.start >= 0 && contentSelection.current.end >= 0) {
-          updateRefSelectionVariables(contentSelection.current.start, contentSelection.current.end);
-          contentSelection.current = currentSelection;
+          updateRefSelectionVariables(contentSelection.current);
+          contentSelection.current = newSelection;
         }
         if (e) {
           handleSelectionChange(e);
@@ -530,7 +531,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       if (autoFocus) {
         divRef.current.focus();
       }
-      updateRefSelectionVariables(contentSelection.current.start, contentSelection.current.end);
+      updateRefSelectionVariables(contentSelection.current);
     }, []);
 
     useEffect(() => {

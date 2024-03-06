@@ -1,8 +1,8 @@
 function findTextNodes(textNodes: Text[], node: ChildNode) {
-  if (node.nodeType === 3) {
+  if (node.nodeType === Node.TEXT_NODE) {
     textNodes.push(node as Text);
   } else {
-    for (let i = 0, len = node.childNodes.length; i < len; ++i) {
+    for (let i = 0, length = node.childNodes.length; i < length; ++i) {
       const childNode = node.childNodes[i];
       if (childNode) {
         findTextNodes(textNodes, childNode);
@@ -66,16 +66,16 @@ function moveCursorToEnd(target: HTMLElement) {
 
 function getCurrentCursorPosition(target: HTMLElement) {
   const selection = window.getSelection();
-  if (selection && selection.rangeCount > 0) {
-    const range = selection.getRangeAt(0);
-    const preSelectionRange = range.cloneRange();
-    preSelectionRange.selectNodeContents(target);
-    preSelectionRange.setEnd(range.startContainer, range.startOffset);
-    const start = preSelectionRange.toString().length;
-    const end = start + range.toString().length;
-    return {start, end};
+  if (!selection || (selection && selection.rangeCount === 0)) {
+    return null;
   }
-  return null;
+  const range = selection.getRangeAt(0);
+  const preSelectionRange = range.cloneRange();
+  preSelectionRange.selectNodeContents(target);
+  preSelectionRange.setEnd(range.startContainer, range.startOffset);
+  const start = preSelectionRange.toString().length;
+  const end = start + range.toString().length;
+  return {start, end};
 }
 
 function removeSelection() {
