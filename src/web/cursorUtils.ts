@@ -1,48 +1,55 @@
-function createRange(node: HTMLElement, targetPosition: number, ignoreNewLines = false) {
-  const range = document.createRange();
-  range.selectNode(node);
-
-  let pos = 0;
-  const stack: Node[] = [node];
-  while (stack.length > 0) {
-    const current = stack.pop();
-    if (!current) {
-      break;
-    }
-    if (current.nodeType === Node.TEXT_NODE || current.nodeName === 'BR') {
-      const textContentLength = current.textContent ? current.textContent.length : 0;
-      const len = current.nodeName === 'BR' ? 1 : textContentLength;
-      if (pos + len >= targetPosition) {
-        if (current.nodeName === 'BR') {
-          range.setStartAfter(current);
-          (current as HTMLElement).scrollIntoView();
-        } else {
-          range.setStart(current, targetPosition - pos);
-        }
-        return range;
-      }
-      pos += len;
-    } else if (current.childNodes && current.childNodes.length > 0) {
-      for (let i = current.childNodes.length - 1; i >= 0; i--) {
-        const currentNode = current.childNodes[i];
-        if (currentNode && (!ignoreNewLines || (ignoreNewLines && currentNode.nodeName !== 'BR'))) {
-          stack.push(currentNode);
-        }
+function findTextNodes(textNodes: Text[], node: ChildNode) {
+  if (node.nodeType === 3) {
+    textNodes.push(node as Text);
+  } else {
+    for (let i = 0, len = node.childNodes.length; i < len; ++i) {
+      const childNode = node.childNodes[i];
+      if (childNode) {
+        findTextNodes(textNodes, childNode);
       }
     }
   }
-
-  range.setStart(node, node.childNodes.length);
-  return range;
 }
 
-function setCursorPosition(target: HTMLElement, targetPosition: number, ignoreNewLines = false) {
-  const range = createRange(target, targetPosition, ignoreNewLines);
-  const selection = window.getSelection();
-  if (selection) {
+function setCursorPosition(target: HTMLElement, start: number, end: number | null = null) {
+  const range = document.createRange();
+  range.selectNodeContents(target);
+
+  const textNodes: Text[] = [];
+  findTextNodes(textNodes, target);
+
+  let charCount = 0;
+  let startNode: Text | null = null;
+  let endNode: Text | null = null;
+  const n = textNodes.length;
+  for (let i = 0; i < n; ++i) {
+    const textNode = textNodes[i];
+    if (textNode) {
+      const nextCharCount = charCount + textNode.length;
+
+      if (!startNode && start >= charCount && (start <= nextCharCount || (start === nextCharCount && i < n - 1))) {
+        startNode = textNode;
+        range.setStart(textNode, start - charCount);
+        if (!end) {
+          break;
+        }
+      }
+      if (end && !endNode && end >= charCount && (end <= nextCharCount || (end === nextCharCount && i < n - 1))) {
+        endNode = textNode;
+        range.setEnd(textNode, end - charCount);
+      }
+      charCount = nextCharCount;
+    }
+  }
+
+  if (!end) {
     range.collapse(true);
-    selection.removeAllRanges();
-    selection.addRange(range);
+  }
+
+  const sel = window.getSelection();
+  if (sel) {
+    sel.removeAllRanges();
+    sel.addRange(range);
   }
 }
 
@@ -57,31 +64,29 @@ function moveCursorToEnd(target: HTMLElement) {
   }
 }
 
-function getIndexedPosition(target: HTMLElement, range: Range, isStart: boolean) {
-  const marker = document.createTextNode('\0');
-  const rangeClone = range.cloneRange();
-
-  rangeClone.collapse(isStart);
-
-  rangeClone.insertNode(marker);
-  const position = target.innerText.indexOf('\0');
-  if (marker.parentNode) {
-    marker.parentNode.removeChild(marker);
-  }
-
-  return position;
-}
-
 function getCurrentCursorPosition(target: HTMLElement) {
-  const selection = document.getSelection();
-  if (!selection || selection.rangeCount === 0) {
-    return {start: target.innerText.length, end: target.innerText.length};
-  }
+  const sel = window.getSelection();
 
-  const range = selection.getRangeAt(0);
-  const start = getIndexedPosition(target, range, true);
-  const end = getIndexedPosition(target, range, false);
-  return {start, end};
+  if (sel && sel.rangeCount > 0) {
+    const range = sel.getRangeAt(0);
+    const preSelectionRange = range.cloneRange();
+    preSelectionRange.selectNodeContents(target);
+    preSelectionRange.setEnd(range.startContainer, range.startOffset);
+    const start = preSelectionRange.toString().length;
+
+    return {
+      start,
+      end: start + range.toString().length,
+    };
+  }
+  return {start: -1, end: -1};
 }
 
-export {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition};
+function removeSelection() {
+  const sel = window.getSelection();
+  if (sel) {
+    sel.removeAllRanges();
+  }
+}
+
+export {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition, removeSelection};
