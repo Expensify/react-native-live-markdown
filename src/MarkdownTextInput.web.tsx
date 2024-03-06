@@ -258,6 +258,12 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       return e;
     }, []);
 
+    // Placeholder text color logic
+    const updateTextColor = useCallback((node: HTMLDivElement, text: string) => {
+      // eslint-disable-next-line no-param-reassign -- we need to change the style of the node, so we need to modify it
+      node.style.color = String(placeholder && (text === '' || text === '\n') ? placeholderTextColor : flattenedStyle.color || 'black');
+    }, []);
+
     const handleOnChangeText = useCallback(
       (e: SyntheticEvent<HTMLDivElement>) => {
         if (!divRef.current || !(e.target instanceof HTMLElement)) {
@@ -265,6 +271,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         }
 
         if (compositionRef.current) {
+          updateTextColor(divRef.current, e.target.innerText);
           compositionRef.current = false;
           return;
         }
@@ -281,6 +288,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           default:
             text = parseText(divRef.current, e.target.innerText, processedMarkdownStyle).text;
         }
+        updateTextColor(divRef.current, e.target.innerText);
 
         if (onChange) {
           const event = e as unknown as NativeSyntheticEvent<any>;
@@ -437,7 +445,13 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         (r as unknown as TextInput).isFocused = () => document.activeElement === r;
         (r as unknown as TextInput).clear = () => {
           r.innerText = '';
+          updateTextColor(r, '');
         };
+
+        if (value === '' || value === undefined) {
+          // update to placeholder color when value is empty
+          updateTextColor(r, r.innerText);
+        }
       }
 
       if (ref) {
@@ -464,6 +478,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
         const text = processedValue !== undefined ? processedValue : '';
         parseText(divRef.current, text, processedMarkdownStyle, text.length);
+        updateTextColor(divRef.current, value);
       },
       [multiline, processedMarkdownStyle, processedValue],
     );
@@ -505,10 +520,6 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       }
       divRef.current.focus();
     }, []);
-
-    useEffect(() => {
-      document.documentElement.style.setProperty('--placeholder-color', placeholderTextColor as string);
-    }, [placeholderTextColor]);
 
     const startComposition = useCallback(() => {
       compositionRef.current = true;
