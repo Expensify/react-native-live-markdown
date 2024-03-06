@@ -156,6 +156,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     },
     ref,
   ) => {
+    const compositionRef = useRef<boolean>(false);
     const divRef = useRef<HTMLDivElement | null>(null);
     const currentlyFocusedField = useRef<HTMLDivElement | null>(null);
     const contentSelection = useRef<Selection | null>(null);
@@ -266,6 +267,12 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     const handleOnChangeText = useCallback(
       (e: SyntheticEvent<HTMLDivElement>) => {
         if (!divRef.current || !(e.target instanceof HTMLElement)) {
+          return;
+        }
+
+        if (compositionRef.current) {
+          updateTextColor(divRef.current, e.target.innerText);
+          compositionRef.current = false;
           return;
         }
 
@@ -514,6 +521,10 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       divRef.current.focus();
     }, []);
 
+    const startComposition = useCallback(() => {
+      compositionRef.current = true;
+    }, []);
+
     return (
       // eslint-disable-next-line jsx-a11y/no-static-element-interactions
       <div
@@ -529,6 +540,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         autoCapitalize={autoCapitalize}
         className={className}
         onKeyDown={handleKeyPress}
+        onCompositionStart={startComposition}
         onKeyUp={updateSelection}
         onInput={handleOnChangeText}
         onSelect={handleSelectionChange}
