@@ -21,4 +21,5 @@
   pointer-events: none;
   display: block; /* For Firefox */
   content: attr(placeholder);
+  color: var(--placeholder-color);
 }
