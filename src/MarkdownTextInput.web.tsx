@@ -499,13 +499,16 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     }, []);
 
     useEffect(() => {
-      document.documentElement.style.setProperty('--placeholder-color', placeholderTextColor as string);
       // focus the input on mount if autoFocus is set
       if (!(divRef.current && autoFocus)) {
         return;
       }
       divRef.current.focus();
     }, []);
+
+    useEffect(() => {
+      document.documentElement.style.setProperty('--placeholder-color', placeholderTextColor as string);
+    }, [placeholderTextColor]);
 
     const startComposition = useCallback(() => {
       compositionRef.current = true;
