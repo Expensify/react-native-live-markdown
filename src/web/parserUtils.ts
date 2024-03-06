@@ -179,19 +179,26 @@ function parseText(
 
   const markdownRanges: MarkdownRange[] = ranges as MarkdownRange[];
 
-  targetElement.innerHTML = '';
-  targetElement.innerText = '';
-
   // We don't want to parse text with single '\n', because contentEditable represents it as invisible <br />
   if (!!text && text !== '\n') {
     const dom = parseRangesToHTMLNodes(text, markdownRanges, markdownStyle);
-    target.appendChild(dom);
-  }
 
-  if (alwaysMoveCursorToTheEnd) {
-    CursorUtils.moveCursorToEnd(target);
-  } else if (isFocused && cursorPosition !== null) {
-    CursorUtils.setCursorPosition(target, cursorPosition, disableNewLinesInCursorPositioning);
+    const rootSpan = targetElement.firstChild as HTMLElement | null;
+    if (!rootSpan || rootSpan.innerHTML !== dom.innerHTML) {
+      if (rootSpan) {
+        rootSpan.replaceWith(dom);
+      } else {
+        targetElement.innerHTML = '';
+        targetElement.innerText = '';
+        target.appendChild(dom);
+      }
+
+      if (alwaysMoveCursorToTheEnd) {
+        CursorUtils.moveCursorToEnd(target);
+      } else if (isFocused && cursorPosition !== null) {
+        CursorUtils.setCursorPosition(target, cursorPosition, disableNewLinesInCursorPositioning);
+      }
+    }
   }
 
   return {text: target.innerText, cursorPosition: cursorPosition || 0};
