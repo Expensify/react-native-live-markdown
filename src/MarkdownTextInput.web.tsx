@@ -175,7 +175,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     const setEventProps = useCallback((e: NativeSyntheticEvent<any>) => {
       if (divRef.current) {
         const text = normalizeValue(divRef.current.innerText || '');
-        if (e.target && typeof e.target !== 'number') {
+        if (e.target) {
           // TODO: change the logic here so every event have value property
           (e.target as unknown as HTMLInputElement).value = text;
         }
@@ -535,7 +535,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     }, []);
 
     useEffect(() => {
-      if (!divRef.current || !selection || !(selection.start !== currentSelection.current.start || selection.end !== currentSelection.current.end)) {
+      if (!divRef.current || !selection || (selection.start === currentSelection.current.start && selection.end === currentSelection.current.end)) {
         return;
       }
       CursorUtils.setCursorPosition(divRef.current, selection.start, selection.end);
