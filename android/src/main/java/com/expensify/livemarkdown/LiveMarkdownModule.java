@@ -18,7 +18,9 @@ public class LiveMarkdownModule extends NativeLiveMarkdownModuleSpec {
     FabricUIManager uiManager =
       (FabricUIManager) UIManagerHelper.getUIManager(getReactApplicationContext(), UIManagerType.FABRIC);
 
-    mNativeProxy.createCommitHook(uiManager);
+    FabricUIManager customFabricUIManager = CustomFabricUIManager.create(uiManager);
+
+    mNativeProxy.createCommitHook(uiManager, customFabricUIManager);
 
     return true;
   }

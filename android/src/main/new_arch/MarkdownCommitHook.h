@@ -8,7 +8,8 @@
 
 #include "react/renderer/components/RNLiveMarkdownSpec/MarkdownTextInputDecoratorShadowNode.h"
 
-using namespace facebook::react;
+using namespace facebook;
+using namespace react;
 
 namespace livemarkdown {
 
@@ -19,7 +20,7 @@ struct MarkdownTextInputDecoratorPair {
 
 class MarkdownCommitHook : public UIManagerCommitHook {
  public:
-  MarkdownCommitHook(const std::shared_ptr<UIManager> &uiManager);
+  MarkdownCommitHook(const std::shared_ptr<UIManager> &uiManager, jni::global_ref<jni::JObject> customFabricUIManager);
 
  ~MarkdownCommitHook() noexcept override;
 
@@ -35,8 +36,7 @@ class MarkdownCommitHook : public UIManagerCommitHook {
 
  private:
     const std::shared_ptr<UIManager> uiManager_;
-    void** customVTable_ = nullptr;
-    void** customVTableStartPtr_ = nullptr;
+    SharedTextLayoutManager textLayoutManager_;
 };
 
 } // namespace livemarkdown

@@ -19,5 +19,5 @@ public class NativeProxy {
 
  private native HybridData initHybrid();
 
- public native void createCommitHook(FabricUIManager fabricUIManager);
+ public native void createCommitHook(FabricUIManager fabricUIManager, Object customFabricUIManager);
 }

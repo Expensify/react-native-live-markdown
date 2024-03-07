@@ -26,11 +26,15 @@ void NativeProxy::registerNatives() {
        makeNativeMethod("createCommitHook", NativeProxy::createCommitHook)});
 }
 
-void NativeProxy::createCommitHook(jni::alias_ref<facebook::react::JFabricUIManager::javaobject> fabricUIManager) {
+void NativeProxy::createCommitHook(
+  jni::alias_ref<facebook::react::JFabricUIManager::javaobject> fabricUIManager,
+  jni::alias_ref<jni::JObject> customFabricUIManager
+) {
   const auto &uiManager =
             fabricUIManager->getBinding()->getScheduler()->getUIManager();
+  auto globalCustomFabricUIManager = jni::make_global(customFabricUIManager);
 
- this->commitHook_ = std::make_shared<MarkdownCommitHook>(uiManager);
+ this->commitHook_ = std::make_shared<MarkdownCommitHook>(uiManager, globalCustomFabricUIManager);
 }
 
 jni::local_ref<NativeProxy::jhybriddata> NativeProxy::initHybrid(jni::alias_ref<jhybridobject> jThis) {

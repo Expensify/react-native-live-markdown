@@ -54,12 +54,21 @@ find_library(
   NO_CMAKE_FIND_ROOT_PATH
 )
 
+find_library(
+  REACT_RENDER_TEXTLAYOUTMANAGER_LIB
+  react_render_textlayoutmanager
+  PATHS ${CMAKE_CURRENT_SOURCE_DIR}/arm64-v8a
+  NO_DEFAULT_PATH
+  NO_CMAKE_FIND_ROOT_PATH
+)
+
 find_package(ReactAndroid REQUIRED CONFIG)
 
 target_link_libraries(
   ${LIB_TARGET_NAME}
   ${RRC_TEXT_LIB}
   ${RRC_TEXTINPUT_LIB}
+  ${REACT_RENDER_TEXTLAYOUTMANAGER_LIB}
   fabricjni
   fbjni
   folly_runtime
