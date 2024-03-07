@@ -172,13 +172,10 @@ function moveCursor(isFocused: boolean, alwaysMoveCursorToTheEnd: boolean, curso
   }
 }
 
-type Window = {
-  chrome: unknown;
-};
+const isChromium = 'chrome' in window;
 
 function parseText(target: HTMLElement, text: string, curosrPositionIndex: number | null, markdownStyle: PartialMarkdownStyle = {}, alwaysMoveCursorToTheEnd = false) {
   const targetElement = target;
-  const isChromium = (window as unknown as Window).chrome;
 
   let cursorPosition: number | null = curosrPositionIndex;
   const isFocused = document.activeElement === target;
