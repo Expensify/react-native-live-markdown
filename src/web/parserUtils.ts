@@ -160,6 +160,20 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
   return root;
 }
 
+function moveCursor(isFocused: boolean, alwaysMoveCursorToTheEnd: boolean, cursorPosition: number | null, target: HTMLElement) {
+  if (!isFocused) {
+    return;
+  }
+
+  if (alwaysMoveCursorToTheEnd || cursorPosition === null) {
+    CursorUtils.moveCursorToEnd(target);
+  } else if (cursorPosition !== null) {
+    CursorUtils.setCursorPosition(target, cursorPosition);
+  }
+}
+
+const isChromium = 'chrome' in window;
+
 function parseText(target: HTMLElement, text: string, curosrPositionIndex: number | null, markdownStyle: PartialMarkdownStyle = {}, alwaysMoveCursorToTheEnd = false) {
   const targetElement = target;
 
@@ -172,21 +186,29 @@ function parseText(target: HTMLElement, text: string, curosrPositionIndex: numbe
   const ranges = global.parseExpensiMarkToRanges(text);
 
   const markdownRanges: MarkdownRange[] = ranges as MarkdownRange[];
+  const rootSpan = targetElement.firstChild as HTMLElement | null;
 
-  targetElement.innerHTML = '';
-  targetElement.innerText = '';
-
-  // We don't want to parse text with single '\n', because contentEditable represents it as invisible <br />
-  if (!!text && text !== '\n') {
-    const dom = parseRangesToHTMLNodes(text, markdownRanges, markdownStyle);
-    target.appendChild(dom);
+  if (targetElement.innerHTML === '<br>' || (rootSpan && rootSpan.innerHTML === '\n')) {
+    targetElement.innerHTML = '';
+    targetElement.innerText = '';
   }
 
-  if (isFocused) {
-    if (alwaysMoveCursorToTheEnd || cursorPosition === null) {
-      CursorUtils.moveCursorToEnd(target);
-    } else if (cursorPosition !== null) {
-      CursorUtils.setCursorPosition(target, cursorPosition);
+  // We don't want to parse text with single '\n', because contentEditable represents it as invisible <br />
+  if (text) {
+    const dom = parseRangesToHTMLNodes(text, markdownRanges, markdownStyle);
+
+    if (!rootSpan || rootSpan.innerHTML !== dom.innerHTML) {
+      targetElement.innerHTML = '';
+      targetElement.innerText = '';
+      target.appendChild(dom);
+
+      if (isChromium) {
+        moveCursor(isFocused, alwaysMoveCursorToTheEnd, cursorPosition, target);
+      }
+    }
+
+    if (!isChromium) {
+      moveCursor(isFocused, alwaysMoveCursorToTheEnd, cursorPosition, target);
     }
   }
 
