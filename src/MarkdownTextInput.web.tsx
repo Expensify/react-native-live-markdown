@@ -157,6 +157,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     },
     ref,
   ) => {
+    const compositionRef = useRef<boolean>(false);
     const divRef = useRef<HTMLDivElement | null>(null);
     const currentlyFocusedField = useRef<HTMLDivElement | null>(null);
     const valueLength = value ? value.length : 0;
@@ -257,6 +258,12 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     const handleOnChangeText = useCallback(
       (e: SyntheticEvent<HTMLDivElement>) => {
         if (!divRef.current || !(e.target instanceof HTMLElement)) {
+          return;
+        }
+
+        if (compositionRef.current) {
+          updateTextColor(divRef.current, e.target.innerText);
+          compositionRef.current = false;
           return;
         }
 
@@ -449,6 +456,10 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       [onClick],
     );
 
+    const startComposition = useCallback(() => {
+      compositionRef.current = true;
+    }, []);
+
     const setRef = (currentRef: HTMLDivElement | null) => {
       const r = currentRef;
       if (r) {
@@ -557,6 +568,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         autoCapitalize={autoCapitalize}
         className={className}
         onKeyDown={handleKeyPress}
+        onCompositionStart={startComposition}
         onKeyUp={updateSelection}
         onInput={handleOnChangeText}
         onClick={handleClick}
