@@ -322,7 +322,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
       if (newSelection && (contentSelection.current.start !== newSelection.start || contentSelection.current.end !== newSelection.end)) {
         if (contentSelection.current.start >= 0 && contentSelection.current.end >= 0) {
-          updateRefSelectionVariables(contentSelection.current);
+          updateRefSelectionVariables(newSelection);
           contentSelection.current = newSelection;
         }
         if (e) {
