@@ -189,12 +189,17 @@ function parseText(target: HTMLElement, text: string, curosrPositionIndex: numbe
   const ranges = global.parseExpensiMarkToRanges(text);
 
   const markdownRanges: MarkdownRange[] = ranges as MarkdownRange[];
+  const rootSpan = targetElement.firstChild as HTMLElement | null;
+
+  if (targetElement.innerHTML === '<br>' || (rootSpan && rootSpan.innerHTML === '\n')) {
+    targetElement.innerHTML = '';
+    targetElement.innerText = '';
+  }
 
   // We don't want to parse text with single '\n', because contentEditable represents it as invisible <br />
-  if (!!text && text !== '\n') {
+  if (text) {
     const dom = parseRangesToHTMLNodes(text, markdownRanges, markdownStyle);
 
-    const rootSpan = targetElement.firstChild as HTMLElement | null;
     if (!rootSpan || rootSpan.innerHTML !== dom.innerHTML) {
       targetElement.innerHTML = '';
       targetElement.innerText = '';
