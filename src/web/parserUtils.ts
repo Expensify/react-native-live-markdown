@@ -185,13 +185,9 @@ function parseText(
 
     const rootSpan = targetElement.firstChild as HTMLElement | null;
     if (!rootSpan || rootSpan.innerHTML !== dom.innerHTML) {
-      if (rootSpan) {
-        rootSpan.replaceWith(dom);
-      } else {
-        targetElement.innerHTML = '';
-        targetElement.innerText = '';
-        target.appendChild(dom);
-      }
+      targetElement.innerHTML = '';
+      targetElement.innerText = '';
+      target.appendChild(dom);
 
       if (alwaysMoveCursorToTheEnd) {
         CursorUtils.moveCursorToEnd(target);
