@@ -160,20 +160,14 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
   return root;
 }
 
-function parseText(
-  target: HTMLElement,
-  text: string,
-  curosrPositionIndex: number | null,
-  markdownStyle: PartialMarkdownStyle = {},
-  disableNewLinesInCursorPositioning = false,
-  alwaysMoveCursorToTheEnd = false,
-) {
+function parseText(target: HTMLElement, text: string, curosrPositionIndex: number | null, markdownStyle: PartialMarkdownStyle = {}, alwaysMoveCursorToTheEnd = false) {
   const targetElement = target;
 
   let cursorPosition: number | null = curosrPositionIndex;
   const isFocused = document.activeElement === target;
   if (isFocused && curosrPositionIndex === null) {
-    cursorPosition = CursorUtils.getCurrentCursorPosition(target).start;
+    const selection = CursorUtils.getCurrentCursorPosition(target);
+    cursorPosition = selection ? selection.end : null;
   }
   const ranges = global.parseExpensiMarkToRanges(text);
 
@@ -188,10 +182,12 @@ function parseText(
     target.appendChild(dom);
   }
 
-  if (alwaysMoveCursorToTheEnd) {
-    CursorUtils.moveCursorToEnd(target);
-  } else if (isFocused && cursorPosition !== null) {
-    CursorUtils.setCursorPosition(target, cursorPosition, disableNewLinesInCursorPositioning);
+  if (isFocused) {
+    if (alwaysMoveCursorToTheEnd || cursorPosition === null) {
+      CursorUtils.moveCursorToEnd(target);
+    } else if (cursorPosition !== null) {
+      CursorUtils.setCursorPosition(target, cursorPosition);
+    }
   }
 
   return {text: target.innerText, cursorPosition: cursorPosition || 0};
