@@ -368,25 +368,21 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
         if (
           e.key === 'Enter' &&
-          !e.shiftKey &&
           // Do not call submit if composition is occuring.
           !isComposing &&
           !e.isDefaultPrevented()
         ) {
           // prevent "Enter" from inserting a newline or submitting a form
           e.preventDefault();
-          if ((blurOnSubmit || !multiline) && onSubmitEditing) {
+          if (!e.shiftKey && (blurOnSubmit || !multiline) && onSubmitEditing) {
             onSubmitEditing(event as unknown as NativeSyntheticEvent<TextInputSubmitEditingEventData>);
-          } else {
-            e.preventDefault();
+          } else if (multiline) {
             //   We need to change normal behavior of "Enter" key to insert a line breaks, to prevent wrapping contentEditable text in <div> tags.
             //  Thanks to that in every situation we have proper amount of new lines in our parsed text. Without it pressing enter in empty lines will add 2 more new lines.
-            if (multiline) {
-              document.execCommand('insertLineBreak');
-            }
+            document.execCommand('insertLineBreak');
           }
 
-          if ((shouldBlurOnSubmit && hostNode !== null) || !multiline) {
+          if (!e.shiftKey && ((shouldBlurOnSubmit && hostNode !== null) || !multiline)) {
             setTimeout(() => divRef.current && divRef.current.blur(), 0);
           }
         }
