@@ -1,5 +1,6 @@
 import * as CursorUtils from './cursorUtils';
 import type * as StyleUtilsTypes from '../styleUtils';
+import * as BrowserUtils from './browserUtils';
 
 type PartialMarkdownStyle = StyleUtilsTypes.PartialMarkdownStyle;
 
@@ -172,8 +173,6 @@ function moveCursor(isFocused: boolean, alwaysMoveCursorToTheEnd: boolean, curso
   }
 }
 
-const isChromium = 'chrome' in window;
-
 function parseText(target: HTMLElement, text: string, curosrPositionIndex: number | null, markdownStyle: PartialMarkdownStyle = {}, alwaysMoveCursorToTheEnd = false) {
   const targetElement = target;
 
@@ -202,12 +201,12 @@ function parseText(target: HTMLElement, text: string, curosrPositionIndex: numbe
       targetElement.innerText = '';
       target.appendChild(dom);
 
-      if (isChromium) {
+      if (BrowserUtils.isChromium) {
         moveCursor(isFocused, alwaysMoveCursorToTheEnd, cursorPosition, target);
       }
     }
 
-    if (!isChromium) {
+    if (!BrowserUtils.isChromium) {
       moveCursor(isFocused, alwaysMoveCursorToTheEnd, cursorPosition, target);
     }
   }
