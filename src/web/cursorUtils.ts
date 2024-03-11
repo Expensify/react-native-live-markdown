@@ -1,3 +1,5 @@
+import * as BrowserUtils from './browserUtils';
+
 function findTextNodes(textNodes: Text[], node: ChildNode) {
   if (node.nodeType === Node.TEXT_NODE) {
     textNodes.push(node as Text);
@@ -88,12 +90,30 @@ function removeSelection() {
 }
 
 function scrollCursorIntoView(target: HTMLInputElement) {
-  if (target.selectionStart === null || !target.value) {
+  if (target.selectionStart === null || !target.value || BrowserUtils.isFirefox) {
     return;
   }
-  const lineHeight = target.scrollHeight / target.value.split('\n').length;
-  const linesFromTop = target.value.substring(0, target.selectionStart + 1).split('\n').length;
-  target.scrollTo(0, lineHeight * (linesFromTop - 1));
+
+  const selection = window.getSelection();
+  if (!selection) {
+    return;
+  }
+
+  const caretRect = selection.getRangeAt(0).getClientRects()[0];
+  const editableRect = target.getBoundingClientRect();
+
+  // Adjust for padding and border
+  const paddingTop = parseFloat(window.getComputedStyle(target).paddingTop);
+  const borderTop = parseFloat(window.getComputedStyle(target).borderTopWidth);
+
+  if (caretRect && !(caretRect.top >= editableRect.top + paddingTop + borderTop && caretRect.bottom <= editableRect.bottom - 2 * (paddingTop - borderTop))) {
+    const topToCaret = caretRect.top - editableRect.top;
+    const inputHeight = editableRect.height;
+    // Chrome Rects don't include padding & border, so we're adding them manually
+    const inputOffset = caretRect.height - inputHeight + paddingTop + borderTop + (BrowserUtils.isChromium ? 0 : 4 * (paddingTop + borderTop));
+
+    target.scrollTo(0, topToCaret + target.scrollTop + inputOffset);
+  }
 }
 
 export {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition, removeSelection, scrollCursorIntoView};
