@@ -51,6 +51,8 @@ function setCursorPosition(target: HTMLElement, start: number, end: number | nul
     selection.removeAllRanges();
     selection.addRange(range);
   }
+
+  scrollCursorIntoView(target as HTMLInputElement);
 }
 
 function moveCursorToEnd(target: HTMLElement) {
@@ -85,4 +87,13 @@ function removeSelection() {
   }
 }
 
-export {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition, removeSelection};
+function scrollCursorIntoView(target: HTMLInputElement) {
+  if (target.selectionStart === null || !target.value) {
+    return;
+  }
+  const lineHeight = target.scrollHeight / target.value.split('\n').length;
+  const linesFromTop = target.value.substring(0, target.selectionStart + 1).split('\n').length;
+  target.scrollTo(0, lineHeight * (linesFromTop - 1));
+}
+
+export {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition, removeSelection, scrollCursorIntoView};

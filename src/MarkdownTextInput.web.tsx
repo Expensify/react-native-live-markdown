@@ -15,7 +15,6 @@ import {StyleSheet} from 'react-native';
 import * as ParseUtils from './web/parserUtils';
 import * as CursorUtils from './web/cursorUtils';
 import * as StyleUtils from './styleUtils';
-import * as BrowserUtils from './web/browserUtils';
 import type * as MarkdownTextInputDecoratorViewNativeComponent from './MarkdownTextInputDecoratorViewNativeComponent';
 import './web/MarkdownTextInput.css';
 import InputHistory from './web/InputHistory';
@@ -381,14 +380,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
             //   We need to change normal behavior of "Enter" key to insert a line breaks, to prevent wrapping contentEditable text in <div> tags.
             //  Thanks to that in every situation we have proper amount of new lines in our parsed text. Without it pressing enter in empty lines will add 2 more new lines.
             document.execCommand('insertLineBreak');
-
-            const range = window.getSelection();
-            if (range && !BrowserUtils.isFirefox) {
-              const scrollMarkerNode = document.createElement('div');
-              range.getRangeAt(0).insertNode(scrollMarkerNode);
-              scrollMarkerNode.scrollIntoView();
-              scrollMarkerNode.remove();
-            }
+            CursorUtils.scrollCursorIntoView(divRef.current as HTMLInputElement);
           }
 
           if (!e.shiftKey && ((shouldBlurOnSubmit && hostNode !== null) || !multiline)) {
