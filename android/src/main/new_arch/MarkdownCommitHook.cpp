@@ -1,3 +1,4 @@
+#include <react/jni/ReadableNativeMap.h>
 #include <react/renderer/core/ComponentDescriptor.h>
 
 #include "MarkdownCommitHook.h"
@@ -78,7 +79,7 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
             const auto &textInputState = *std::static_pointer_cast<const ConcreteState<AndroidTextInputState>>(nodes.textInput->getState());
             const auto &stateData = textInputState.getData();
 
-            rootNode = rootNode->cloneTree(nodes.textInput->getFamily(), [this, &stateData, &textInputState](ShadowNode const& node) {
+            rootNode = rootNode->cloneTree(nodes.textInput->getFamily(), [this, &stateData, &textInputState, &nodes](ShadowNode const& node) {
                 auto newStateData = std::make_shared<AndroidTextInputState>(stateData);
                 newStateData->cachedAttributedStringId = 0;
 
@@ -86,6 +87,9 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
                 auto newNode = node.clone({
                     .state = std::make_shared<const ConcreteState<AndroidTextInputState>>(newStateData, textInputState),
                 });
+
+                // TODO: figure out how to pass this to CustomMountingManager
+                auto decoratorProps = ReadableNativeMap::newObjectCxxArgs(nodes.decorator->getProps()->rawProps);
 
                 auto newTextInputShadowNode = std::static_pointer_cast<AndroidTextInputShadowNode>(newNode);
                 newTextInputShadowNode->setTextLayoutManager(textLayoutManager_);
