@@ -161,8 +161,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     const compositionRef = useRef<boolean>(false);
     const divRef = useRef<HTMLDivElement | null>(null);
     const currentlyFocusedField = useRef<HTMLDivElement | null>(null);
-    const valueLength = value ? value.length : 0;
-    const contentSelection = useRef<Selection>({start: valueLength, end: valueLength});
+    const contentSelection = useRef<Selection | null>(null);
     const className = `react-native-live-markdown-input-${multiline ? 'multiline' : 'singleline'}`;
     const history = useRef<InputHistory>();
     if (!history.current) {
@@ -280,6 +279,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           default:
             text = parseText(divRef.current, e.target.innerText, processedMarkdownStyle).text;
         }
+        updateSelection(e);
         updateTextColor(divRef.current, e.target.innerText);
 
         if (onChange) {
@@ -321,7 +321,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       }
       const newSelection = CursorUtils.getCurrentCursorPosition(divRef.current);
 
-      if (newSelection && (contentSelection.current.start !== newSelection.start || contentSelection.current.end !== newSelection.end)) {
+      if (newSelection && (!contentSelection.current || contentSelection.current.start !== newSelection.start || contentSelection.current.end !== newSelection.end)) {
         updateRefSelectionVariables(newSelection);
         contentSelection.current = newSelection;
 
@@ -405,8 +405,10 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         const hostNode = e.target as unknown as HTMLDivElement;
         currentlyFocusedField.current = hostNode;
         setEventProps(e);
-        if (divRef.current && contentSelection.current) {
-          CursorUtils.setCursorPosition(divRef.current, contentSelection.current.end || contentSelection.current.start);
+        if (divRef.current) {
+          const valueLength = value ? value.length : 0;
+          CursorUtils.setCursorPosition(divRef.current, contentSelection.current ? contentSelection.current.end : valueLength);
+          updateSelection(event);
         }
 
         if (onFocus) {
@@ -546,11 +548,10 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       if (autoFocus) {
         divRef.current.focus();
       }
-      updateRefSelectionVariables(contentSelection.current);
     }, []);
 
     useEffect(() => {
-      if (!divRef.current || !selection || (selection.start === contentSelection.current.start && selection.end === contentSelection.current.end)) {
+      if (!divRef.current || !selection || (contentSelection.current && selection.start === contentSelection.current.start && selection.end === contentSelection.current.end)) {
         return;
       }
       CursorUtils.setCursorPosition(divRef.current, selection.start, selection.end);
