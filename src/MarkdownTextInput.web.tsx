@@ -280,6 +280,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           default:
             text = parseText(divRef.current, e.target.innerText, processedMarkdownStyle).text;
         }
+        updateSelection(e);
         updateTextColor(divRef.current, e.target.innerText);
 
         if (onChange) {
