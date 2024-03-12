@@ -308,10 +308,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       [onSelectionChange, setEventProps],
     );
 
-    const updateRefSelectionVariables = useCallback((newSelection: Selection | null) => {
-      if (!newSelection) {
-        return;
-      }
+    const updateRefSelectionVariables = useCallback((newSelection: Selection) => {
       const {start, end} = newSelection;
       const markdownHTMLInput = divRef.current as HTMLInputElement;
       markdownHTMLInput.selectionStart = start;
@@ -551,7 +548,6 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       if (autoFocus) {
         divRef.current.focus();
       }
-      updateRefSelectionVariables(contentSelection.current);
     }, []);
 
     useEffect(() => {
