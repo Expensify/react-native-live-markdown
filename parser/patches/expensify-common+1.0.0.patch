@@ -1,18 +1,26 @@
 diff --git a/node_modules/expensify-common/lib/CONST.jsx b/node_modules/expensify-common/lib/CONST.jsx
-index 4225717..0ae0962 100644
+index a8efadf..8b7ca6d 100644
 --- a/node_modules/expensify-common/lib/CONST.jsx
 +++ b/node_modules/expensify-common/lib/CONST.jsx
-@@ -351,7 +351,7 @@ export const CONST = {
+@@ -356,14 +356,14 @@ export const CONST = {
           *
           * @type RegExp
           */
 -        EMOJIS: /[\p{Extended_Pictographic}\u200d\u{1f1e6}-\u{1f1ff}\u{1f3fb}-\u{1f3ff}\u{e0020}-\u{e007f}\u20E3\uFE0F]|[#*0-9]\uFE0F?\u20E3/gu,
 +        EMOJIS: /[\u200d\u{1f1e6}-\u{1f1ff}\u{1f3fb}-\u{1f3ff}\u{e0020}-\u{e007f}\u20E3\uFE0F]|[#*0-9]\uFE0F?\u20E3/gu,
+ 
+         /**
+          * Regex matching an text containing an Emoji that can be a single emoji or made up by some different emojis
+          *
+          * @type RegExp
+          */
+-        EMOJI_RULE: /[\p{Extended_Pictographic}](\u200D[\p{Extended_Pictographic}]|[\u{1F3FB}-\u{1F3FF}]|[\u{E0020}-\u{E007F}]|\uFE0F|\u20E3)*|[\u{1F1E6}-\u{1F1FF}]{2}|[#*0-9]\uFE0F?\u20E3/gu,
++        EMOJI_RULE: /^(?!x)x/gu,
      },
  
      REPORT: {
 diff --git a/node_modules/expensify-common/lib/ExpensiMark.js b/node_modules/expensify-common/lib/ExpensiMark.js
-index 4e149ca..c94b383 100644
+index f835d84..c65d2c6 100644
 --- a/node_modules/expensify-common/lib/ExpensiMark.js
 +++ b/node_modules/expensify-common/lib/ExpensiMark.js
 @@ -7,8 +7,8 @@ const MARKDOWN_LINK_REGEX = new RegExp(`\\[([^\\][]*(?:\\[[^\\][]*][^\\][]*)*)]\
@@ -26,16 +34,16 @@ index 4e149ca..c94b383 100644
          /**
           * The list of regex replacements to do on a comment. Check the link regex is first so links are processed
           * before other delimiters
-@@ -457,7 +457,7 @@ export default class ExpensiMark {
-          * @type {Object[]}
+@@ -489,7 +489,7 @@ export default class ExpensiMark {
+          * @type {Number}
           */
-         this.shouldKeepWhitespaceRules = this.rules.filter(rule => !this.whitespaceRulesToDisable.includes(rule.name)).map(rule => rule.name);
+         this.currentQuoteDepth = 0;
 -    }
 +    },
  
      /**
       * Replaces markdown with html elements
-@@ -503,7 +503,7 @@ export default class ExpensiMark {
+@@ -535,7 +535,7 @@ export default class ExpensiMark {
          }
  
          return replacedText;
@@ -44,7 +52,7 @@ index 4e149ca..c94b383 100644
  
      /**
       * Checks matched URLs for validity and replace valid links with html elements
-@@ -610,7 +610,7 @@ export default class ExpensiMark {
+@@ -642,7 +642,7 @@ export default class ExpensiMark {
          }
  
          return replacedText;
@@ -53,7 +61,7 @@ index 4e149ca..c94b383 100644
  
      /**
       * Checks matched Emails for validity and replace valid links with html elements
-@@ -649,7 +649,7 @@ export default class ExpensiMark {
+@@ -681,7 +681,7 @@ export default class ExpensiMark {
              replacedText = replacedText.concat(textToCheck.substr(startIndex));
          }
          return replacedText;
@@ -62,7 +70,7 @@ index 4e149ca..c94b383 100644
  
      /**
       * replace block element with '\n' if :
-@@ -689,7 +689,7 @@ export default class ExpensiMark {
+@@ -721,7 +721,7 @@ export default class ExpensiMark {
          });
  
          return joinedText;
@@ -71,7 +79,7 @@ index 4e149ca..c94b383 100644
  
      /**
       * Replaces HTML with markdown
-@@ -716,7 +716,7 @@ export default class ExpensiMark {
+@@ -748,7 +748,7 @@ export default class ExpensiMark {
              generatedMarkdown = generatedMarkdown.replace(rule.regex, rule.replacement);
          });
          return Str.htmlDecode(this.replaceBlockElementWithNewLine(generatedMarkdown));
@@ -80,7 +88,7 @@ index 4e149ca..c94b383 100644
  
      /**
       * Convert HTML to text
-@@ -735,7 +735,7 @@ export default class ExpensiMark {
+@@ -767,7 +767,7 @@ export default class ExpensiMark {
          // We use 'htmlDecode' instead of 'unescape' to replace entities like '&#32;'
          replacedText = Str.htmlDecode(replacedText);
          return replacedText;
@@ -89,7 +97,7 @@ index 4e149ca..c94b383 100644
  
      /**
       * Modify text for Quotes replacing chevrons with html elements
-@@ -798,7 +798,7 @@ export default class ExpensiMark {
+@@ -830,7 +830,7 @@ export default class ExpensiMark {
              replacedText = textToCheck;
          }
          return replacedText;
@@ -98,7 +106,7 @@ index 4e149ca..c94b383 100644
  
      /**
       * Format the content of blockquote if the text matches the regex or else just return the original text
-@@ -819,7 +819,7 @@ export default class ExpensiMark {
+@@ -851,7 +851,7 @@ export default class ExpensiMark {
              return replacement(textToFormat);
          }
          return textToCheck;
@@ -107,7 +115,7 @@ index 4e149ca..c94b383 100644
  
      /**
       * Check if the input text includes only the open or the close tag of an element.
-@@ -858,7 +858,7 @@ export default class ExpensiMark {
+@@ -890,7 +890,7 @@ export default class ExpensiMark {
  
          // If there are any tags left in the stack, they're unclosed
          return tagStack.length !== 0;
@@ -116,7 +124,7 @@ index 4e149ca..c94b383 100644
  
      /**
       * @param {String} comment
-@@ -880,7 +880,7 @@ export default class ExpensiMark {
+@@ -912,7 +912,7 @@ export default class ExpensiMark {
              console.warn('Error parsing url in ExpensiMark.extractLinksInMarkdownComment', {error: e});
              return undefined;
          }
@@ -125,7 +133,7 @@ index 4e149ca..c94b383 100644
  
      /**
       * Compares two markdown comments and returns a list of the links removed in a new comment.
-@@ -895,3 +895,5 @@ export default class ExpensiMark {
+@@ -927,3 +927,5 @@ export default class ExpensiMark {
          return linksInOld === undefined || linksInNew === undefined ? [] : _.difference(linksInOld, linksInNew);
      }
  }

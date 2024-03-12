@@ -157,7 +157,7 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
           appendSyntax(')');
         }
       } else {
-        throw new Error(`Unknown tag: {node.tag}`);
+        throw new Error(`Unknown tag: ${node.tag}`);
       }
     }
   }
