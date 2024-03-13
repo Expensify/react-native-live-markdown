@@ -19,6 +19,8 @@
 
     _h1FontSize = style.h1.fontSize;
 
+    _emojiFontSize = style.emoji.fontSize;
+
     _blockquoteBorderColor = RCTUIColorFromSharedColor(style.blockquote.borderColor);
     _blockquoteBorderWidth = style.blockquote.borderWidth;
     _blockquoteMarginLeft = style.blockquote.marginLeft;
@@ -52,6 +54,8 @@
     _linkColor = [RCTConvert UIColor:json[@"link"][@"color"]];
 
     _h1FontSize = [RCTConvert CGFloat:json[@"h1"][@"fontSize"]];
+
+    _emojiFontSize = [RCTConvert CGFloat:json[@"emoji"][@"fontSize"]];
 
     _blockquoteBorderColor = [RCTConvert UIColor:json[@"blockquote"][@"borderColor"]];
     _blockquoteBorderWidth = [RCTConvert CGFloat:json[@"blockquote"][@"borderWidth"]];
