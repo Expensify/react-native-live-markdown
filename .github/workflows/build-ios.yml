@@ -1,0 +1,62 @@
+name: Test iOS build
+on:
+  pull_request:
+    paths:
+      - .github/workflows/build-ios.yml
+      - RNLiveMarkdown.podspec
+      - ios/**
+      - example/package.json
+      - example/ios/**
+  merge_group:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/build-ios.yml
+      - RNLiveMarkdown.podspec
+      - ios/**
+      - example/package.json
+      - example/ios/**
+
+jobs:
+  build:
+    if: github.repository == 'Expensify/react-native-live-markdown'
+    runs-on: macos-13
+    strategy:
+      matrix:
+        working-directory: [example]
+      fail-fast: false
+    concurrency:
+      group: ios-${{ matrix.working-directory }}-${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v4
+
+      - name: Install node_modules
+        run: yarn install --immutable
+
+      - name: Restore Pods from cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ matrix.working-directory }}/ios/Pods
+            ~/Library/Caches/CocoaPods
+            ~/.cocoapods
+          key: ${{ runner.os }}-pods-${{ matrix.working-directory }}-${{ hashFiles(format('{0}/ios/Podfile.lock', matrix.working-directory)) }}
+
+      - name: Install Pods
+        working-directory: ${{ matrix.working-directory }}/ios
+        run: bundler install && bundler exec pod install
+
+      - name: Restore build artifacts from cache
+        uses: actions/cache@v4
+        with:
+          path: ~/Library/Developer/Xcode/DerivedData
+          key: ${{ runner.os }}-ios-derived-data-${{ matrix.working-directory }}-${{ hashFiles(format('{0}/ios/Podfile.lock', matrix.working-directory)) }}
+
+      - name: Build app
+        working-directory: ${{ matrix.working-directory }}
+        run: yarn build:ios
