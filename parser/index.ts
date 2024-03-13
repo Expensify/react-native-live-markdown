@@ -3,7 +3,7 @@
 import {ExpensiMark} from 'expensify-common/lib/ExpensiMark';
 import _ from 'underscore';
 
-type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'mention-here' | 'mention-user' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax';
+type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'emoji' | 'mention-here' | 'mention-user' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax';
 type Range = {
   type: MarkdownType;
   start: number;
@@ -115,6 +115,8 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
         appendSyntax('~');
         addChildrenWithStyle(node, 'strikethrough');
         appendSyntax('~');
+      } else if (node.tag === '<emoji>') {
+        addChildrenWithStyle(node, 'emoji');
       } else if (node.tag === '<code>') {
         appendSyntax('`');
         addChildrenWithStyle(node, 'code');
@@ -205,7 +207,7 @@ function groupRanges(ranges: Range[]) {
 }
 
 function parseExpensiMarkToRanges(markdown: string): Range[] {
-  const html = parseMarkdownToHTML(markdown);
+  const html = parseMarkdownToHTML(markdown).replace('😎', '<emoji>😎</emoji>'); // TODO: remove replace
   const tokens = parseHTMLToTokens(html);
   const tree = parseTokensToTree(tokens);
   const [text, ranges] = parseTreeToTextAndRanges(tree);
