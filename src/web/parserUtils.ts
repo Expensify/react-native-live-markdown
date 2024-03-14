@@ -187,7 +187,7 @@ function parseText(target: HTMLElement, text: string, curosrPositionIndex: numbe
   const markdownRanges: MarkdownRange[] = ranges as MarkdownRange[];
   const rootSpan = targetElement.firstChild as HTMLElement | null;
 
-  if (!text || targetElement.innerHTML === '<br>' || (rootSpan && rootSpan.innerHTML === '\n')) {
+  if (targetElement.innerHTML === '<br>' || (rootSpan && rootSpan.innerHTML === '\n')) {
     targetElement.innerHTML = '';
     targetElement.innerText = '';
   }
