@@ -1,5 +1,6 @@
 import * as CursorUtils from './cursorUtils';
 import type * as StyleUtilsTypes from '../styleUtils';
+import * as BrowserUtils from './browserUtils';
 
 type PartialMarkdownStyle = StyleUtilsTypes.PartialMarkdownStyle;
 
@@ -160,38 +161,54 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
   return root;
 }
 
-function parseText(
-  target: HTMLElement,
-  text: string,
-  curosrPositionIndex: number | null,
-  markdownStyle: PartialMarkdownStyle = {},
-  disableNewLinesInCursorPositioning = false,
-  alwaysMoveCursorToTheEnd = false,
-) {
+function moveCursor(isFocused: boolean, alwaysMoveCursorToTheEnd: boolean, cursorPosition: number | null, target: HTMLElement) {
+  if (!isFocused) {
+    return;
+  }
+
+  if (alwaysMoveCursorToTheEnd || cursorPosition === null) {
+    CursorUtils.moveCursorToEnd(target);
+  } else if (cursorPosition !== null) {
+    CursorUtils.setCursorPosition(target, cursorPosition);
+  }
+}
+
+function parseText(target: HTMLElement, text: string, curosrPositionIndex: number | null, markdownStyle: PartialMarkdownStyle = {}, alwaysMoveCursorToTheEnd = false) {
   const targetElement = target;
 
   let cursorPosition: number | null = curosrPositionIndex;
   const isFocused = document.activeElement === target;
   if (isFocused && curosrPositionIndex === null) {
-    cursorPosition = CursorUtils.getCurrentCursorPosition(target).start;
+    const selection = CursorUtils.getCurrentCursorPosition(target);
+    cursorPosition = selection ? selection.end : null;
   }
   const ranges = global.parseExpensiMarkToRanges(text);
 
   const markdownRanges: MarkdownRange[] = ranges as MarkdownRange[];
+  const rootSpan = targetElement.firstChild as HTMLElement | null;
 
-  targetElement.innerHTML = '';
-  targetElement.innerText = '';
-
-  // We don't want to parse text with single '\n', because contentEditable represents it as invisible <br />
-  if (!!text && text !== '\n') {
-    const dom = parseRangesToHTMLNodes(text, markdownRanges, markdownStyle);
-    target.appendChild(dom);
+  if (!text || targetElement.innerHTML === '<br>' || (rootSpan && rootSpan.innerHTML === '\n')) {
+    targetElement.innerHTML = '';
+    targetElement.innerText = '';
   }
 
-  if (alwaysMoveCursorToTheEnd) {
-    CursorUtils.moveCursorToEnd(target);
-  } else if (isFocused && cursorPosition !== null) {
-    CursorUtils.setCursorPosition(target, cursorPosition, disableNewLinesInCursorPositioning);
+  // We don't want to parse text with single '\n', because contentEditable represents it as invisible <br />
+  if (text) {
+    const dom = parseRangesToHTMLNodes(text, markdownRanges, markdownStyle);
+
+    if (!rootSpan || rootSpan.innerHTML !== dom.innerHTML) {
+      targetElement.innerHTML = '';
+      targetElement.innerText = '';
+      target.appendChild(dom);
+
+      if (BrowserUtils.isChromium) {
+        moveCursor(isFocused, alwaysMoveCursorToTheEnd, cursorPosition, target);
+      }
+    }
+
+    if (!BrowserUtils.isChromium) {
+      moveCursor(isFocused, alwaysMoveCursorToTheEnd, cursorPosition, target);
+    }
   }
 
   return {text: target.innerText, cursorPosition: cursorPosition || 0};
