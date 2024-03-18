@@ -1,10 +1,14 @@
 #pragma once
 
+#include <react/fabric/JFabricUIManager.h>
+#include <fbjni/fbjni.h>
+
 #include <react/renderer/uimanager/UIManager.h>
 #include <react/renderer/uimanager/UIManagerCommitHook.h>
 #include <react/renderer/components/androidtextinput/AndroidTextInputShadowNode.h>
 
 #include <memory>
+#include <unordered_map>
 
 #include "react/renderer/components/RNLiveMarkdownSpec/MarkdownTextInputDecoratorShadowNode.h"
 
@@ -20,7 +24,7 @@ struct MarkdownTextInputDecoratorPair {
 
 class MarkdownCommitHook : public UIManagerCommitHook {
  public:
-  MarkdownCommitHook(const std::shared_ptr<UIManager> &uiManager, jni::global_ref<jni::JObject> customFabricUIManager);
+  MarkdownCommitHook(jni::global_ref<facebook::react::JFabricUIManager::javaobject> fabricUIManager);
 
  ~MarkdownCommitHook() noexcept override;
 
@@ -35,8 +39,10 @@ class MarkdownCommitHook : public UIManagerCommitHook {
       noexcept override;
 
  private:
+    const jni::global_ref<facebook::react::JFabricUIManager::javaobject> fabricUIManager_;
     const std::shared_ptr<UIManager> uiManager_;
-    SharedTextLayoutManager textLayoutManager_;
+    std::unordered_map<facebook::react::Tag, SharedTextLayoutManager> textLayoutManagers_;
+    std::unordered_map<facebook::react::Tag, jni::global_ref<facebook::react::JFabricUIManager::javaobject>> customUIManagers_;
 };
 
 } // namespace livemarkdown

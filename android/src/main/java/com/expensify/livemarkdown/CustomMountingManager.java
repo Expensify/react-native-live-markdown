@@ -2,6 +2,8 @@ package com.expensify.livemarkdown;
 
 import static com.facebook.react.views.text.TextAttributeProps.UNSET;
 
+import android.content.Context;
+import android.content.res.AssetManager;
 import android.text.BoringLayout;
 import android.text.Layout;
 import android.text.Spannable;
@@ -13,6 +15,7 @@ import androidx.annotation.Nullable;
 
 import com.facebook.common.logging.FLog;
 import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.common.mapbuffer.MapBuffer;
 import com.facebook.react.fabric.mounting.MountingManager;
 import com.facebook.react.uimanager.PixelUtil;
@@ -30,8 +33,26 @@ public class CustomMountingManager extends MountingManager {
   private static final boolean DEFAULT_INCLUDE_FONT_PADDING = true;
   private static final TextPaint sTextPaintInstance = new TextPaint(TextPaint.ANTI_ALIAS_FLAG);
 
-  public CustomMountingManager(@NonNull ViewManagerRegistry viewManagerRegistry, @NonNull MountItemExecutor mountItemExecutor) {
+  private Context context;
+  private MarkdownUtils markdownUtils;
+
+  public CustomMountingManager(
+      @NonNull ViewManagerRegistry viewManagerRegistry,
+      @NonNull MountItemExecutor mountItemExecutor,
+      @NonNull Context context,
+      @NonNull ReadableMap decoratorProps) {
     super(viewManagerRegistry, mountItemExecutor);
+
+    AssetManager assetManager = context.getAssets();
+    MarkdownUtils.maybeInitializeRuntime(assetManager);
+
+    this.context = context;
+    this.markdownUtils = new MarkdownUtils(assetManager);
+    this.markdownUtils.setMarkdownStyle(new MarkdownStyle(decoratorProps.getMap("markdownStyle"), context));
+  }
+
+  public void setDecoratorProps(ReadableMap decoratorProps) {
+    this.markdownUtils.setMarkdownStyle(new MarkdownStyle(decoratorProps.getMap("markdownStyle"), context));
   }
 
   @Override
@@ -74,7 +95,11 @@ public class CustomMountingManager extends MountingManager {
       text = sb;
     }
 
-    // I guess this is the place where we want to apply markdown
+    markdownUtils.applyMarkdownFormatting((SpannableStringBuilder)text);
+
+    for (Object objSpan : text.getSpans(0, text.length(), Object.class)) {
+      android.util.Log.w("MDWN", "Found span: " + objSpan.toString());
+    }
 
     BoringLayout.Metrics boring = BoringLayout.isBoring(text, sTextPaintInstance);
 

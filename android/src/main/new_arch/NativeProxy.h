@@ -29,8 +29,8 @@ class NativeProxy : public jni::HybridClass<NativeProxy> {
   explicit NativeProxy(jni::alias_ref<NativeProxy::javaobject> jThis);
 
   void createCommitHook(
-      jni::alias_ref<facebook::react::JFabricUIManager::javaobject> fabricUIManager,
-      jni::alias_ref<jni::JObject> customFabricUIManager);
+      jni::alias_ref<facebook::react::JFabricUIManager::javaobject> fabricUIManager
+  );
 };
 
 } // namespace livemarkdown

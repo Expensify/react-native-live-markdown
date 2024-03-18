@@ -29,9 +29,7 @@ public class MarkdownUtils {
 
   private static boolean IS_RUNTIME_INITIALIZED = false;
 
-  @ThreadConfined(UI)
-  public static void maybeInitializeRuntime(AssetManager assetManager) {
-    UiThreadUtil.assertOnUiThread();
+  public static synchronized void maybeInitializeRuntime(AssetManager assetManager) {
     if (IS_RUNTIME_INITIALIZED) {
       return;
     }
@@ -50,9 +48,7 @@ public class MarkdownUtils {
 
   private static native void nativeInitializeRuntime(String code);
 
-  @ThreadConfined(UI)
-  private static String parseMarkdown(String input) {
-    UiThreadUtil.assertOnUiThread();
+  private synchronized static String parseMarkdown(String input) {
     return nativeParseMarkdown(input);
   }
 

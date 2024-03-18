@@ -1,5 +1,7 @@
+#include <react/fabric/Binding.h>
 #include <react/jni/ReadableNativeMap.h>
 #include <react/renderer/core/ComponentDescriptor.h>
+#include <react/renderer/scheduler/Scheduler.h>
 
 #include "MarkdownCommitHook.h"
 #include "react/renderer/components/RNLiveMarkdownSpec/MarkdownShadowFamilyRegistry.h"
@@ -11,12 +13,8 @@ using namespace react;
 
 namespace livemarkdown {
 
-MarkdownCommitHook::MarkdownCommitHook(const std::shared_ptr<UIManager> &uiManager, jni::global_ref<jni::JObject> customFabricUIManager) : uiManager_(uiManager) {
+MarkdownCommitHook::MarkdownCommitHook(jni::global_ref<facebook::react::JFabricUIManager::javaobject> fabricUIManager) : fabricUIManager_(fabricUIManager), uiManager_(fabricUIManager->getBinding()->getScheduler()->getUIManager()) {
   uiManager_->registerCommitHook(*this);
-
-  const ContextContainer::Shared contextContainer = std::make_shared<ContextContainer const>();
-  contextContainer->insert("FabricUIManager", customFabricUIManager);
-  textLayoutManager_ = std::make_shared<TextLayoutManager>(contextContainer);
 }
 
 MarkdownCommitHook::~MarkdownCommitHook() noexcept {
@@ -88,11 +86,35 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
                     .state = std::make_shared<const ConcreteState<AndroidTextInputState>>(newStateData, textInputState),
                 });
 
-                // TODO: figure out how to pass this to CustomMountingManager
-                auto decoratorProps = ReadableNativeMap::newObjectCxxArgs(nodes.decorator->getProps()->rawProps);
+                auto const decoratorPropsRNM = ReadableNativeMap::newObjectCxxArgs(nodes.decorator->getProps()->rawProps);
+                auto const decoratorPropsRM = jni::make_local(reinterpret_cast<ReadableMap::javaobject>(decoratorPropsRNM.get()));
+
+                static auto customUIManagerClass = jni::findClassStatic("com/expensify/livemarkdown/CustomFabricUIManager");
+                if (!textLayoutManagers_.contains(nodes.textInput->getTag())) {
+                    static auto createCustomUIManager =
+                            customUIManagerClass
+                                    ->getStaticMethod<JFabricUIManager::javaobject(
+                                            JFabricUIManager::javaobject,
+                                            ReadableMap::javaobject)>("create");
+
+                    const auto customUIManager = jni::make_global(createCustomUIManager(customUIManagerClass, fabricUIManager_.get(), decoratorPropsRM.get()));
+                    const ContextContainer::Shared contextContainer = std::make_shared<ContextContainer const>();
+                    contextContainer->insert("FabricUIManager", customUIManager);
+                    textLayoutManagers_[nodes.textInput->getTag()] = std::make_shared<TextLayoutManager>(contextContainer);
+                    customUIManagers_[nodes.textInput->getTag()] = customUIManager;
+                } else {
+                    static auto setMarkdownProps =
+                            customUIManagerClass
+                                    ->getStaticMethod<void(
+                                            JFabricUIManager::javaobject,
+                                            ReadableMap::javaobject)>("setDecoratorProps");
+
+                    auto customUIManager = customUIManagers_[nodes.textInput->getTag()];
+                    setMarkdownProps(customUIManagerClass, customUIManager.get(), decoratorPropsRM.get());
+                }
 
                 auto newTextInputShadowNode = std::static_pointer_cast<AndroidTextInputShadowNode>(newNode);
-                newTextInputShadowNode->setTextLayoutManager(textLayoutManager_);
+                newTextInputShadowNode->setTextLayoutManager(textLayoutManagers_[nodes.textInput->getTag()]);
 
                 return newNode;
             });
