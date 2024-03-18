@@ -109,6 +109,10 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
                                             JFabricUIManager::javaobject,
                                             ReadableMap::javaobject)>("setDecoratorProps");
 
+                    // TODO: this can be optimized by not updating decorator props when they didn't change
+                    // we also need to re-create the textlayoutmanager when the props do change to clear
+                    // the cpp-side cache that's not aware of markdown style
+
                     auto customUIManager = customUIManagers_[nodes.textInput->getTag()];
                     setMarkdownProps(customUIManagerClass, customUIManager.get(), decoratorPropsRM.get());
                 }

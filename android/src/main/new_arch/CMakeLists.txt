@@ -32,43 +32,16 @@ target_include_directories(
   ${LIB_ANDROID_GENERATED_JNI_DIR}
   ${LIB_ANDROID_GENERATED_COMPONENTS_DIR}
   ${LIB_CPP_DIR}
-  ${RN_DIR}/ReactCommon/
-  ${RN_DIR}/ReactCommon/react/renderer/components/textinput/androidtextinput
-  ${RN_DIR}/ReactCommon/react/renderer/textlayoutmanager/platform/android
-  /Users/jakubpiasecki/REACT_NATIVE_DOWNLOAD_DIR/boost_1_83_0
-)
-
-find_library(
-  RRC_TEXT_LIB
-  rrc_text
-  PATHS ${CMAKE_CURRENT_SOURCE_DIR}/arm64-v8a
-  NO_DEFAULT_PATH
-  NO_CMAKE_FIND_ROOT_PATH
-)
-
-find_library(
-  RRC_TEXTINPUT_LIB
-  rrc_textinput
-  PATHS ${CMAKE_CURRENT_SOURCE_DIR}/arm64-v8a
-  NO_DEFAULT_PATH
-  NO_CMAKE_FIND_ROOT_PATH
-)
-
-find_library(
-  REACT_RENDER_TEXTLAYOUTMANAGER_LIB
-  react_render_textlayoutmanager
-  PATHS ${CMAKE_CURRENT_SOURCE_DIR}/arm64-v8a
-  NO_DEFAULT_PATH
-  NO_CMAKE_FIND_ROOT_PATH
 )
 
 find_package(ReactAndroid REQUIRED CONFIG)
 
 target_link_libraries(
   ${LIB_TARGET_NAME}
-  ${RRC_TEXT_LIB}
-  ${RRC_TEXTINPUT_LIB}
-  ${REACT_RENDER_TEXTLAYOUTMANAGER_LIB}
+  ReactAndroid::rrc_text
+  ReactAndroid::rrc_textinput
+  ReactAndroid::react_render_textlayoutmanager
+  ReactAndroid::react_render_imagemanager
   fabricjni
   fbjni
   folly_runtime

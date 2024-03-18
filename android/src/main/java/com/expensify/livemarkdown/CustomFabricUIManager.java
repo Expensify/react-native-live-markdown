@@ -11,7 +11,6 @@ import com.facebook.react.uimanager.events.BatchEventDispatchedListener;
 
 import java.lang.reflect.Field;
 
-@DoNotStrip
 public class CustomFabricUIManager {
 
   public static void setDecoratorProps(FabricUIManager uiManager, ReadableMap decoratorProps) {
