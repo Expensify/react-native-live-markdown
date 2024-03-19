@@ -33,7 +33,6 @@ public class CustomMountingManager extends MountingManager {
   private static final boolean DEFAULT_INCLUDE_FONT_PADDING = true;
   private static final TextPaint sTextPaintInstance = new TextPaint(TextPaint.ANTI_ALIAS_FLAG);
 
-  private Context context;
   private MarkdownUtils markdownUtils;
 
   public CustomMountingManager(
@@ -45,8 +44,7 @@ public class CustomMountingManager extends MountingManager {
 
     AssetManager assetManager = context.getAssets();
     MarkdownUtils.maybeInitializeRuntime(assetManager);
-
-    this.context = context;
+    
     this.markdownUtils = new MarkdownUtils(assetManager);
     this.markdownUtils.setMarkdownStyle(new MarkdownStyle(decoratorProps, context));
   }
