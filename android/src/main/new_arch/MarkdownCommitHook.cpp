@@ -28,24 +28,29 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
         auto rootNode = newRootShadowNode->ShadowNode::clone(ShadowNodeFragment{});
 
         // A preface to why we do the weird thing below:
-        // On the new architecture there are two ways of measuring text on iOS: by value and by pointer.
-        // When done by value, the attributed string to be measured is created on the c++ side. We cannot
-        // modify this process as we do not extend TextInputShadowNode. We also cannot really change the
-        // layout manager used to do this, since it's a private field (ok, we can but in a not very nice way).
-        // But also, the logic for parsing and applying markdown is written in JS/ObjC and we really wouldn't
-        // want to reimplement it in c++.
+        // On the new architecture there are two ways of measuring text on Android: by passing a cache key,
+        // or by passing a measured text with attributes by a map buffer. We could implement both, but that
+        // would increase the complexity of the code and duplication between here and RN core, so we implement
+        // measurement for map buffers since it's the independent one, and force RN to use this path every time.
+        // It shouldn't have a negative performance impact, since there is a cpp cache layer anyway.
         //
-        // Nice thing is that it can also be done by pointer to NSAttributedString, which is the platform's
-        // way to handle styled text, and is also used by Live Markdown. On this path, the measurement is done
-        // by the OS APIs. The thing we want to make sure of, is that markdown-decorated text input always uses
-        // this path and uses a pointer to a string with markdown styles applied. Thankfully, RN provides nice
-        // utility functions that allow to convert between the RN's AttributedString and iOS's NSAttributedString.
-        // The logic below does exactly that.
+        // AndroidTextInputShadowNode is closed pretty tightly, but there's a one place where we can insert ourselves
+        // (well, there are two but we really shouldn't mess with vtable). The path to measurement looks like this:
+        // AndroidTextInputShadowNode::measureContent -> TextLayoutManager::measureAndroidComponentMapBuffer
+        //  -> (jni) -> FabricUIManager::measureMapBuffer -> MountingManager::measureMapBuffer
+        // We cannot modify the shadow node directly, but we can replace its TextLayoutManager. Literally every method
+        // it has is linked statically so we cannot override anything, but we can replace its ContextContainer where
+        // a jni reference to the FabricUIManager is stored. Now `measureMapBuffer` is private in the ui manager,
+        // but the only thing it does is calling `measureMapBuffer` on MountingManager where it's public.
+        // At this point the path forward is clear: we make a custom MountingManager that will perform our measurement,
+        // then create a custom FabricUIManager which will direct measurement to our MountingManager. Then we only
+        // need to create the ContextContainer with our FabricUIManager, create the TextLayoutManager with the newly
+        // created ContextContainer and replace the pointer to TextLayoutManager inside the AndroidTextInputShadowNode.
 
         // In order to properly apply markdown formatting to the text input, we need to update the TextInputShadowNode's
-        // state with styled string, but we only have access to the ShadowNodeFamilies of the decorator components.
-        // We also know that a markdown decorator is always preceded with the TextInput to decorate, so we need to take
-        // the sibling.
+        // state to reset the cache key and update its TextLayoutManager reference, but we only have access to the
+        // ShadowNodeFamilies of the decorator components. We also know that a markdown decorator is always preceded
+        // with the TextInput to decorate, so we need to take the sibling.
         std::vector<MarkdownTextInputDecoratorPair> nodesToUpdate;
         MarkdownShadowFamilyRegistry::runForEveryFamily([&rootNode, &nodesToUpdate](ShadowNodeFamily::Shared family) {
          // get the path from the root to the node from the decorator family
@@ -89,6 +94,10 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
 
                 const auto currentDecoratorProps = nodes.decorator->getProps()->rawProps;
 
+                // if it's the first time we encounter this particular input or the markdown styles
+                // have changed (in which case we need to reset the cpp cache, to which we don't have
+                // a direct access), create a new instance of TextLayoutManager that will be performing
+                // measurement for this particular input
                 if (!textLayoutManagers_.contains(nodes.textInput->getTag()) || previousDecoratorProps_[nodes.textInput->getTag()] != currentDecoratorProps) {
                     static auto customUIManagerClass = jni::findClassStatic("com/expensify/livemarkdown/CustomFabricUIManager");
                     static auto createCustomUIManager =
@@ -107,6 +116,8 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
                     previousDecoratorProps_[nodes.textInput->getTag()] = currentDecoratorProps;
                 }
 
+                // we need to replace the TextLayoutManager every time to make sure the correct
+                // measurement code is run
                 auto newTextInputShadowNode = std::static_pointer_cast<AndroidTextInputShadowNode>(newNode);
                 newTextInputShadowNode->setTextLayoutManager(textLayoutManagers_[nodes.textInput->getTag()]);
 
