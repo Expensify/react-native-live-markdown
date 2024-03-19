@@ -48,7 +48,7 @@ public class CustomMountingManager extends MountingManager {
 
     this.context = context;
     this.markdownUtils = new MarkdownUtils(assetManager);
-    this.markdownUtils.setMarkdownStyle(new MarkdownStyle(decoratorProps.getMap("markdownStyle"), context));
+    this.markdownUtils.setMarkdownStyle(new MarkdownStyle(decoratorProps, context));
   }
 
   @Override

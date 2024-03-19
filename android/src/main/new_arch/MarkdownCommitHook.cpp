@@ -92,7 +92,7 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
                     .state = std::make_shared<const ConcreteState<AndroidTextInputState>>(newStateData, textInputState),
                 });
 
-                const auto currentDecoratorProps = nodes.decorator->getProps()->rawProps;
+                const auto currentDecoratorProps = nodes.decorator->getProps()->rawProps["markdownStyle"];
 
                 // if it's the first time we encounter this particular input or the markdown styles
                 // have changed (in which case we need to reset the cpp cache, to which we don't have
