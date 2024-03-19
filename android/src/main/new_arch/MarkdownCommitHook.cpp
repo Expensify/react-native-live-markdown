@@ -79,6 +79,7 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
 
             rootNode = rootNode->cloneTree(nodes.textInput->getFamily(), [this, &stateData, &textInputState, &nodes](ShadowNode const& node) {
                 auto newStateData = std::make_shared<AndroidTextInputState>(stateData);
+                // force measurement of a map buffer
                 newStateData->cachedAttributedStringId = 0;
 
                 // clone the text input with the new state
@@ -86,35 +87,24 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
                     .state = std::make_shared<const ConcreteState<AndroidTextInputState>>(newStateData, textInputState),
                 });
 
-                auto const decoratorPropsRNM = ReadableNativeMap::newObjectCxxArgs(nodes.decorator->getProps()->rawProps);
-                auto const decoratorPropsRM = jni::make_local(reinterpret_cast<ReadableMap::javaobject>(decoratorPropsRNM.get()));
+                const auto currentDecoratorProps = nodes.decorator->getProps()->rawProps;
 
-                static auto customUIManagerClass = jni::findClassStatic("com/expensify/livemarkdown/CustomFabricUIManager");
-                if (!textLayoutManagers_.contains(nodes.textInput->getTag())) {
+                if (!textLayoutManagers_.contains(nodes.textInput->getTag()) || previousDecoratorProps_[nodes.textInput->getTag()] != currentDecoratorProps) {
+                    static auto customUIManagerClass = jni::findClassStatic("com/expensify/livemarkdown/CustomFabricUIManager");
                     static auto createCustomUIManager =
                             customUIManagerClass
                                     ->getStaticMethod<JFabricUIManager::javaobject(
                                             JFabricUIManager::javaobject,
                                             ReadableMap::javaobject)>("create");
 
+                    auto const decoratorPropsRNM = ReadableNativeMap::newObjectCxxArgs(currentDecoratorProps);
+                    auto const decoratorPropsRM = jni::make_local(reinterpret_cast<ReadableMap::javaobject>(decoratorPropsRNM.get()));
+
                     const auto customUIManager = jni::make_global(createCustomUIManager(customUIManagerClass, fabricUIManager_.get(), decoratorPropsRM.get()));
                     const ContextContainer::Shared contextContainer = std::make_shared<ContextContainer const>();
                     contextContainer->insert("FabricUIManager", customUIManager);
                     textLayoutManagers_[nodes.textInput->getTag()] = std::make_shared<TextLayoutManager>(contextContainer);
-                    customUIManagers_[nodes.textInput->getTag()] = customUIManager;
-                } else {
-                    static auto setMarkdownProps =
-                            customUIManagerClass
-                                    ->getStaticMethod<void(
-                                            JFabricUIManager::javaobject,
-                                            ReadableMap::javaobject)>("setDecoratorProps");
-
-                    // TODO: this can be optimized by not updating decorator props when they didn't change
-                    // we also need to re-create the textlayoutmanager when the props do change to clear
-                    // the cpp-side cache that's not aware of markdown style
-
-                    auto customUIManager = customUIManagers_[nodes.textInput->getTag()];
-                    setMarkdownProps(customUIManagerClass, customUIManager.get(), decoratorPropsRM.get());
+                    previousDecoratorProps_[nodes.textInput->getTag()] = currentDecoratorProps;
                 }
 
                 auto newTextInputShadowNode = std::static_pointer_cast<AndroidTextInputShadowNode>(newNode);

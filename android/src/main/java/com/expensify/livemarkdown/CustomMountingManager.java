@@ -51,10 +51,6 @@ public class CustomMountingManager extends MountingManager {
     this.markdownUtils.setMarkdownStyle(new MarkdownStyle(decoratorProps.getMap("markdownStyle"), context));
   }
 
-  public void setDecoratorProps(ReadableMap decoratorProps) {
-    this.markdownUtils.setMarkdownStyle(new MarkdownStyle(decoratorProps.getMap("markdownStyle"), context));
-  }
-
   @Override
   public long measureMapBuffer(
       @NonNull ReactContext context,

@@ -13,15 +13,6 @@ import java.lang.reflect.Field;
 
 public class CustomFabricUIManager {
 
-  public static void setDecoratorProps(FabricUIManager uiManager, ReadableMap decoratorProps) {
-    try {
-      CustomMountingManager mountingManager = readPrivateField(uiManager, "mMountingManager");
-      mountingManager.setDecoratorProps(decoratorProps);
-    } catch (NoSuchFieldException | IllegalAccessException e) {
-      throw new RuntimeException("[LiveMarkdown] Cannot read data from FabricUIManager");
-    }
-  }
-
   public static FabricUIManager create(FabricUIManager source, ReadableMap markdownProps) {
     Class<? extends FabricUIManager> uiManagerClass = source.getClass();
 

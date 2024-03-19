@@ -42,7 +42,7 @@ class MarkdownCommitHook : public UIManagerCommitHook {
     const jni::global_ref<facebook::react::JFabricUIManager::javaobject> fabricUIManager_;
     const std::shared_ptr<UIManager> uiManager_;
     std::unordered_map<facebook::react::Tag, SharedTextLayoutManager> textLayoutManagers_;
-    std::unordered_map<facebook::react::Tag, jni::global_ref<facebook::react::JFabricUIManager::javaobject>> customUIManagers_;
+    std::unordered_map<facebook::react::Tag, folly::dynamic> previousDecoratorProps_;
 };
 
 } // namespace livemarkdown
