@@ -1,8 +1,9 @@
 #import <RNLiveMarkdown/RCTMarkdownUtils.h>
+#import <RNLiveMarkdown/MarkdownGlobal.h>
 #import "react_native_assert.h"
 #import <React/RCTAssert.h>
 #import <React/RCTFont.h>
-#import <JavaScriptCore/JavaScriptCore.h>
+#include <jsi/jsi.h>
 
 @implementation RCTMarkdownUtils {
   NSString *_prevInputString;
@@ -32,20 +33,21 @@
     return _prevAttributedString;
   }
 
-  static JSContext *ctx = nil;
-  static JSValue *function = nil;
-  if (ctx == nil) {
-    NSString *path = [[NSBundle mainBundle] pathForResource:@"react-native-live-markdown-parser" ofType:@"js"];
-    assert(path != nil && "[react-native-live-markdown] Markdown parser bundle not found");
-    NSString *content = [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:NULL];
-    assert(content != nil && "[react-native-live-markdown] Markdown parser bundle is empty");
-    ctx = [[JSContext alloc] init];
-    [ctx evaluateScript:content];
-    function = ctx[@"parseExpensiMarkToRanges"];
-  }
+  auto markdownRuntime = expensify::livemarkdown::getMarkdownRuntime();
+  jsi::Runtime &rt = markdownRuntime->getJSIRuntime();
 
-  JSValue *result = [function callWithArguments:@[inputString]];
-  NSArray *ranges = [result toArray];
+  auto markdownWorklet = expensify::livemarkdown::getMarkdownWorklet();
+
+  auto text = jsi::String::createFromUtf8(rt, [inputString UTF8String]);
+  auto output = markdownRuntime->runGuarded(markdownWorklet, text);
+
+  auto json = rt.global().getPropertyAsObject(rt, "JSON").getPropertyAsFunction(rt, "stringify").call(rt, output).asString(rt).utf8(rt);
+  NSData *data = [NSData dataWithBytes:json.data() length:json.length()];
+  NSError *error = nil;
+  NSArray *ranges = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
+  if (error != nil) {
+    return input;
+  }
 
   NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:inputString attributes:_backedTextInputView.defaultTextAttributes];
   [attributedString beginEditing];

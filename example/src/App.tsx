@@ -2,10 +2,11 @@ import * as React from 'react';
 
 import {Button, Platform, StyleSheet, Text, View} from 'react-native';
 
-import {MarkdownTextInput} from '@expensify/react-native-live-markdown';
+import {MarkdownTextInput, useMarkdownParser} from '@expensify/react-native-live-markdown';
 import type {TextInput} from 'react-native';
+import {useSharedValue, withRepeat, withTiming} from 'react-native-reanimated';
 
-const DEFAULT_TEXT = ['Hello, *world*!', 'https://expensify.com', '# Lorem ipsum', '> Hello world', '`foo`', '```\nbar\n```', '@here', '@someone@swmansion.com'].join('\n');
+const DEFAULT_TEXT = ['Hello, *world*!'].join('\n');
 
 function isWeb() {
   return Platform.OS === 'web';
@@ -67,6 +68,21 @@ export default function App() {
   // TODO: use MarkdownTextInput ref instead of TextInput ref
   const ref = React.useRef<TextInput>(null);
 
+  const parser = useMarkdownParser((text: string) => {
+    'worklet';
+
+    // eslint-disable-next-line no-console
+    // console.log(_WORKLET, Math.random());
+
+    const matches = [...text.matchAll(/[@#][a-z]+/gi)];
+
+    return matches.map((match) => ({
+      start: match.index,
+      length: match[0].length,
+      type: match[0].startsWith('@') ? 'mention-here' : 'link',
+    }));
+  }, []);
+
   return (
     <View style={styles.container}>
       <View style={styles.platform}>
@@ -98,6 +114,7 @@ export default function App() {
         style={styles.input}
         ref={ref}
         markdownStyle={markdownStyle}
+        parser={parser}
         placeholder="Type here..."
         onSelectionChange={(e) => setSelection(e.nativeEvent.selection)}
         selection={selection}

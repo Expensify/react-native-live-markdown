@@ -2,9 +2,17 @@ import {StyleSheet, TextInput, processColor} from 'react-native';
 import React from 'react';
 import type {TextInputProps} from 'react-native';
 import MarkdownTextInputDecoratorViewNativeComponent from './MarkdownTextInputDecoratorViewNativeComponent';
+import NativeLiveMarkdownModule from './NativeLiveMarkdownModule';
 import type * as MarkdownTextInputDecoratorViewNativeComponentTypes from './MarkdownTextInputDecoratorViewNativeComponent';
 import * as StyleUtils from './styleUtils';
 import type * as StyleUtilsTypes from './styleUtils';
+import getMarkdownRuntime from './native/getMarkdownRuntime';
+
+NativeLiveMarkdownModule.install();
+
+const markdownRuntime = getMarkdownRuntime();
+// @ts-expect-error TODO
+global.setMarkdownRuntime(markdownRuntime);
 
 type PartialMarkdownStyle = StyleUtilsTypes.PartialMarkdownStyle;
 type MarkdownStyle = MarkdownTextInputDecoratorViewNativeComponentTypes.MarkdownStyle;
