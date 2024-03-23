@@ -207,7 +207,7 @@ function groupRanges(ranges: Range[]) {
 }
 
 function parseExpensiMarkToRanges(markdown: string): Range[] {
-  const html = parseMarkdownToHTML(markdown).replace('😎', '<emoji>😎</emoji>'); // TODO: remove replace
+  const html = parseMarkdownToHTML(markdown);
   const tokens = parseHTMLToTokens(html);
   const tree = parseTokensToTree(tokens);
   const [text, ranges] = parseTreeToTextAndRanges(tree);
