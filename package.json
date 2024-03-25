@@ -10,7 +10,6 @@
   "files": [
     "src",
     "lib",
-    "parser/react-native-live-markdown-parser.js",
     "android",
     "ios",
     "cpp",
@@ -159,6 +158,9 @@
   "codegenConfig": {
     "name": "RNLiveMarkdownSpec",
     "type": "all",
-    "jsSrcsDir": "src"
+    "jsSrcsDir": "src",
+    "android": {
+      "javaPackageName": "com.expensify.livemarkdown"
+    }
   }
 }
