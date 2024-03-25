@@ -116,6 +116,9 @@ public class MarkdownUtils {
       case "strikethrough":
         setSpan(ssb, new MarkdownStrikethroughSpan(), start, end);
         break;
+      case "emoji":
+        setSpan(ssb, new MarkdownEmojiSpan(mMarkdownStyle.getEmojiFontSize()), start, end);
+        break;
       case "mention-here":
         setSpan(ssb, new MarkdownForegroundColorSpan(mMarkdownStyle.getMentionHereColor()), start, end);
         setSpan(ssb, new MarkdownBackgroundColorSpan(mMarkdownStyle.getMentionHereBackgroundColor()), start, end);

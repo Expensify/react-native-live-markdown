@@ -45,6 +45,10 @@ test('strikethrough', () => {
   ]);
 });
 
+test('emoji', () => {
+  expect('Hello, 😎').toBeParsedAs([{type: 'emoji', start: 7, length: 2}]);
+});
+
 describe('mention-here', () => {
   test('normal', () => {
     expect('@here Hello!').toBeParsedAs([{type: 'mention-here', start: 0, length: 5}]);
