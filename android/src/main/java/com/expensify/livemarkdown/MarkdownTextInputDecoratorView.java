@@ -53,7 +53,6 @@ public class MarkdownTextInputDecoratorView extends View {
 
     if (previousSibling instanceof ReactEditText) {
       AssetManager assetManager = getContext().getAssets();
-      MarkdownUtils.maybeInitializeRuntime(assetManager);
       mMarkdownUtils = new MarkdownUtils(assetManager);
       mMarkdownUtils.setMarkdownStyle(mMarkdownStyle);
       mReactEditText = (ReactEditText) previousSibling;

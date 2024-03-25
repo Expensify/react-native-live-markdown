@@ -27,29 +27,6 @@ public class MarkdownUtils {
     SoLoader.loadLibrary("livemarkdown");
   }
 
-  private static boolean IS_RUNTIME_INITIALIZED = false;
-
-  @ThreadConfined(UI)
-  public static void maybeInitializeRuntime(AssetManager assetManager) {
-    UiThreadUtil.assertOnUiThread();
-    if (IS_RUNTIME_INITIALIZED) {
-      return;
-    }
-    try {
-      InputStream inputStream = assetManager.open("react-native-live-markdown-parser.js");
-      byte[] buffer = new byte[inputStream.available()];
-      inputStream.read(buffer);
-      inputStream.close();
-      String code = new String(buffer);
-      nativeInitializeRuntime(code);
-      IS_RUNTIME_INITIALIZED = true;
-    } catch (IOException e) {
-      throw new RuntimeException("Failed to initialize Markdown runtime");
-    }
-  }
-
-  private static native void nativeInitializeRuntime(String code);
-
   @ThreadConfined(UI)
   private static String parseMarkdown(String input) {
     UiThreadUtil.assertOnUiThread();
