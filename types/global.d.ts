@@ -1,6 +1,6 @@
 export {};
 
-type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'mention-here' | 'mention-user' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax';
+type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'emoji' | 'mention-here' | 'mention-user' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax';
 
 type Range = {
   type: MarkdownType;
