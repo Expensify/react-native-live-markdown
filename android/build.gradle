@@ -111,6 +111,7 @@ android {
       "**/libjsi.so",
       "**/libreactnativejni.so",
       "**/libreact_nativemodule_core.so",
+      "**/libreanimated.so",
     ]
   }
 }
