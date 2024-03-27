@@ -10,6 +10,7 @@
     "build:ios": "cd ios && xcodebuild -workspace LiveMarkdownExample.xcworkspace -scheme LiveMarkdownExample -configuration Debug -sdk iphonesimulator CC=clang CPLUSPLUS=clang++ LD=clang LDPLUSPLUS=clang++ GCC_OPTIMIZATION_LEVEL=0 GCC_PRECOMPILE_PREFIX_HEADER=YES ASSETCATALOG_COMPILER_OPTIMIZATION=time DEBUG_INFORMATION_FORMAT=dwarf COMPILER_INDEX_STORE_ENABLE=NO"
   },
   "dependencies": {
+    "expensify-common": "Expensify/expensify-common#4e020cfa13ffabde14313c92b341285aeb919f29",
     "react": "18.2.0",
     "react-native": "0.73.4",
     "react-native-reanimated": "^3.8.1"

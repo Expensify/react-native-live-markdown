@@ -1,0 +1,215 @@
+diff --git a/lib/ExpensiMark.js b/lib/ExpensiMark.js
+index 02d408c88f1823204041a34c386a23720abab104..6cfbff608194e19241e1ae9a86cc1164f19b7189 100644
+--- a/lib/ExpensiMark.js
++++ b/lib/ExpensiMark.js
+@@ -1,4 +1,3 @@
+-import _ from 'underscore';
+ import Str from './str';
+ import {MARKDOWN_URL_REGEX, LOOSE_URL_REGEX, URL_REGEX} from './Url';
+ import {CONST} from './CONST';
+@@ -9,8 +8,11 @@ const MARKDOWN_IMAGE_REGEX = new RegExp(`\\!${MARKDOWN_LINK}`, 'gi');
+ 
+ const SLACK_SPAN_NEW_LINE_TAG = '<span class="c-mrkdwn__br" data-stringify-type="paragraph-break" style="box-sizing: inherit; display: block; height: unset;"></span>';
+ 
+-export default class ExpensiMark {
+-    constructor() {
++export function makeExpensiMark() {
++'worklet';
++
++const ExpensiMark = {
++    initialize() {
+         /**
+          * The list of regex replacements to do on a comment. Check the link regex is first so links are processed
+          * before other delimiters
+@@ -516,7 +518,7 @@ export default class ExpensiMark {
+          * @type {Number}
+          */
+         this.currentQuoteDepth = 0;
+-    }
++    },
+ 
+     /**
+      * Replaces markdown with html elements
+@@ -530,10 +532,31 @@ export default class ExpensiMark {
+      * @returns {String}
+      */
+     replace(text, {filterRules = [], shouldEscapeText = true, shouldKeepRawInput = false} = {}) {
++        function escape(text) {
++            const matchHtmlRegExp = /["'&<>]/g;
++        
++            return text.replace(matchHtmlRegExp, function(match) {
++                switch (match) {
++                    case '&':
++                        return '&amp;';
++                    case '<':
++                        return '&lt;';
++                    case '>':
++                        return '&gt;';
++                    case '"':
++                        return '&quot;';
++                    case "'":
++                        return '&#39;';
++                    default:
++                        return match;
++                }
++            });
++        }
++
+         // This ensures that any html the user puts into the comment field shows as raw html
+-        let replacedText = shouldEscapeText ? _.escape(text) : text;
++        let replacedText = shouldEscapeText ? escape(text) : text;
+         const enabledRules = shouldKeepRawInput ? this.shouldKeepWhitespaceRules : this.rules;
+-        const rules = _.isEmpty(filterRules) ? enabledRules : _.filter(this.rules, rule => _.contains(filterRules, rule.name));
++        const rules = filterRules.length === 0 ? enabledRules : this.rules.filter(rule => filterRules.includes(rule.name));
+ 
+         try {
+             rules.forEach((rule) => {
+@@ -557,12 +580,33 @@ export default class ExpensiMark {
+             // eslint-disable-next-line no-console
+             console.warn('Error replacing text with html in ExpensiMark.replace', {error: e});
+ 
++            function escape(text) {
++                const matchHtmlRegExp = /["'&<>]/g;
++            
++                return text.replace(matchHtmlRegExp, function(match) {
++                    switch (match) {
++                        case '&':
++                            return '&amp;';
++                        case '<':
++                            return '&lt;';
++                        case '>':
++                            return '&gt;';
++                        case '"':
++                            return '&quot;';
++                        case "'":
++                            return '&#39;';
++                        default:
++                            return match;
++                    }
++                });
++            }
++
+             // We want to return text without applying rules if exception occurs during replacing
+-            return shouldEscapeText ? _.escape(text) : text;
++            return shouldEscapeText ? escape(text) : text;
+         }
+ 
+         return replacedText;
+-    }
++    },
+ 
+     /**
+      * Checks matched URLs for validity and replace valid links with html elements
+@@ -669,7 +713,7 @@ export default class ExpensiMark {
+         }
+ 
+         return replacedText;
+-    }
++    },
+ 
+     /**
+      * Checks matched Emails for validity and replace valid links with html elements
+@@ -708,7 +752,7 @@ export default class ExpensiMark {
+             replacedText = replacedText.concat(textToCheck.substr(startIndex));
+         }
+         return replacedText;
+-    }
++    },
+ 
+     /**
+      * replace block element with '\n' if :
+@@ -748,7 +792,7 @@ export default class ExpensiMark {
+         });
+ 
+         return joinedText;
+-    }
++    },
+ 
+     /**
+      * Replaces HTML with markdown
+@@ -775,7 +819,7 @@ export default class ExpensiMark {
+             generatedMarkdown = generatedMarkdown.replace(rule.regex, rule.replacement);
+         });
+         return Str.htmlDecode(this.replaceBlockElementWithNewLine(generatedMarkdown));
+-    }
++    },
+ 
+     /**
+      * Convert HTML to text
+@@ -794,7 +838,7 @@ export default class ExpensiMark {
+         // We use 'htmlDecode' instead of 'unescape' to replace entities like '&#32;'
+         replacedText = Str.htmlDecode(replacedText);
+         return replacedText;
+-    }
++    },
+ 
+     /**
+      * Modify text for Quotes replacing chevrons with html elements
+@@ -857,7 +901,7 @@ export default class ExpensiMark {
+             replacedText = textToCheck;
+         }
+         return replacedText;
+-    }
++    },
+ 
+     /**
+      * Format the content of blockquote if the text matches the regex or else just return the original text
+@@ -878,7 +922,7 @@ export default class ExpensiMark {
+             return replacement(textToFormat);
+         }
+         return textToCheck;
+-    }
++    },
+ 
+     /**
+      * Check if the input text includes only the open or the close tag of an element.
+@@ -917,7 +961,7 @@ export default class ExpensiMark {
+ 
+         // If there are any tags left in the stack, they're unclosed
+         return tagStack.length !== 0;
+-    }
++    },
+ 
+     /**
+      * @param {String} comment
+@@ -932,14 +976,14 @@ export default class ExpensiMark {
+             const matches = [...htmlString.matchAll(regex)];
+ 
+             // Element 1 from match is the regex group if it exists which contains the link URLs
+-            const links = _.map(matches, match => Str.sanitizeURL(match[1]));
++            const links = matches.map(match => Str.sanitizeURL(match[1]));
+             return links;
+         } catch (e) {
+             // eslint-disable-next-line no-console
+             console.warn('Error parsing url in ExpensiMark.extractLinksInMarkdownComment', {error: e});
+             return undefined;
+         }
+-    }
++    },
+ 
+     /**
+      * Compares two markdown comments and returns a list of the links removed in a new comment.
+@@ -951,8 +995,8 @@ export default class ExpensiMark {
+     getRemovedMarkdownLinks(oldComment, newComment) {
+         const linksInOld = this.extractLinksInMarkdownComment(oldComment);
+         const linksInNew = this.extractLinksInMarkdownComment(newComment);
+-        return linksInOld === undefined || linksInNew === undefined ? [] : _.difference(linksInOld, linksInNew);
+-    }
++        return linksInOld === undefined || linksInNew === undefined ? [] : linksInOld.filter(link => !linksInNew.includes(link));
++    },
+ 
+     /**
+      * Replace MD characters with their HTML entity equivalent
+@@ -975,5 +1019,11 @@ export default class ExpensiMark {
+         };
+ 
+         return text.replace(pattern, char => entities[char] || char);
+-    }
++    },
++}
++
++ExpensiMark.initialize();
++
++return ExpensiMark;
++
+ }

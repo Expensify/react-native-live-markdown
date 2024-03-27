@@ -97,7 +97,8 @@
     "typescript": "^5.3.3"
   },
   "resolutions": {
-    "@types/react": "17.0.21"
+    "@types/react": "17.0.21",
+    "expensify-common@Expensify/expensify-common#4e020cfa13ffabde14313c92b341285aeb919f29": "patch:expensify-common@https%3A//github.com/Expensify/expensify-common.git%23commit=4e020cfa13ffabde14313c92b341285aeb919f29#./.yarn/patches/expensify-common-https-ae2a96d818.patch"
   },
   "peerDependencies": {
     "react": "*",

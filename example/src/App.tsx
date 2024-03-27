@@ -4,7 +4,8 @@ import {Button, Platform, StyleSheet, Text, View} from 'react-native';
 
 import {MarkdownTextInput, useMarkdownParser} from '@expensify/react-native-live-markdown';
 import type {TextInput} from 'react-native';
-import {useSharedValue, withRepeat, withTiming} from 'react-native-reanimated';
+
+import {makeExpensiMark} from 'expensify-common/lib/ExpensiMark';
 
 const DEFAULT_TEXT = ['Hello, *world*!'].join('\n');
 
@@ -71,8 +72,9 @@ export default function App() {
   const parser = useMarkdownParser((text: string) => {
     'worklet';
 
-    // eslint-disable-next-line no-console
-    // console.log(_WORKLET, Math.random());
+    const parser = makeExpensiMark();
+    const html = parser.replace(text, {shouldKeepRawInput: true});
+    console.log(html);
 
     const matches = [...text.matchAll(/[@#][a-z]+/gi)];
 
