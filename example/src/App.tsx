@@ -2,10 +2,9 @@ import * as React from 'react';
 
 import {Button, Platform, StyleSheet, Text, View} from 'react-native';
 
-import {MarkdownTextInput, useMarkdownParser} from '@expensify/react-native-live-markdown';
+import {MarkdownTextInput} from '@expensify/react-native-live-markdown';
 import type {TextInput} from 'react-native';
-
-import {makeExpensiMark} from 'expensify-common/lib/ExpensiMark';
+import useExpensiMarkParser from './useExpensiMarkParser';
 
 const DEFAULT_TEXT = ['Hello, *world*!'].join('\n');
 
@@ -69,21 +68,7 @@ export default function App() {
   // TODO: use MarkdownTextInput ref instead of TextInput ref
   const ref = React.useRef<TextInput>(null);
 
-  const parser = useMarkdownParser((text: string) => {
-    'worklet';
-
-    const parser = makeExpensiMark();
-    const html = parser.replace(text, {shouldKeepRawInput: true});
-    console.log(html);
-
-    const matches = [...text.matchAll(/[@#][a-z]+/gi)];
-
-    return matches.map((match) => ({
-      start: match.index,
-      length: match[0].length,
-      type: match[0].startsWith('@') ? 'mention-here' : 'link',
-    }));
-  }, []);
+  const parser = useExpensiMarkParser();
 
   return (
     <View style={styles.container}>
