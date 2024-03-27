@@ -1,5 +1,5 @@
 diff --git a/lib/ExpensiMark.js b/lib/ExpensiMark.js
-index 02d408c88f1823204041a34c386a23720abab104..6cfbff608194e19241e1ae9a86cc1164f19b7189 100644
+index 02d408c88f1823204041a34c386a23720abab104..b3377f1b30d4428ac052f21e45fa33878dcc765e 100644
 --- a/lib/ExpensiMark.js
 +++ b/lib/ExpensiMark.js
 @@ -1,4 +1,3 @@
@@ -34,7 +34,7 @@ index 02d408c88f1823204041a34c386a23720abab104..6cfbff608194e19241e1ae9a86cc1164
       * @returns {String}
       */
      replace(text, {filterRules = [], shouldEscapeText = true, shouldKeepRawInput = false} = {}) {
-+        function escape(text) {
++        function escapeText(text) {
 +            const matchHtmlRegExp = /["'&<>]/g;
 +        
 +            return text.replace(matchHtmlRegExp, function(match) {
@@ -57,18 +57,21 @@ index 02d408c88f1823204041a34c386a23720abab104..6cfbff608194e19241e1ae9a86cc1164
 +
          // This ensures that any html the user puts into the comment field shows as raw html
 -        let replacedText = shouldEscapeText ? _.escape(text) : text;
-+        let replacedText = shouldEscapeText ? escape(text) : text;
++        let replacedText = shouldEscapeText ? escapeText(text) : text;
          const enabledRules = shouldKeepRawInput ? this.shouldKeepWhitespaceRules : this.rules;
 -        const rules = _.isEmpty(filterRules) ? enabledRules : _.filter(this.rules, rule => _.contains(filterRules, rule.name));
 +        const rules = filterRules.length === 0 ? enabledRules : this.rules.filter(rule => filterRules.includes(rule.name));
  
          try {
              rules.forEach((rule) => {
-@@ -557,12 +580,33 @@ export default class ExpensiMark {
+@@ -555,14 +578,35 @@ export default class ExpensiMark {
+             });
+         } catch (e) {
              // eslint-disable-next-line no-console
-             console.warn('Error replacing text with html in ExpensiMark.replace', {error: e});
- 
-+            function escape(text) {
+-            console.warn('Error replacing text with html in ExpensiMark.replace', {error: e});
++            console.warn('Error replacing text with html in ExpensiMark.replace', {error: String(e)});
++
++            function escapeText(text) {
 +                const matchHtmlRegExp = /["'&<>]/g;
 +            
 +                return text.replace(matchHtmlRegExp, function(match) {
@@ -88,10 +91,10 @@ index 02d408c88f1823204041a34c386a23720abab104..6cfbff608194e19241e1ae9a86cc1164
 +                    }
 +                });
 +            }
-+
+ 
              // We want to return text without applying rules if exception occurs during replacing
 -            return shouldEscapeText ? _.escape(text) : text;
-+            return shouldEscapeText ? escape(text) : text;
++            return shouldEscapeText ? escapeText(text) : text;
          }
  
          return replacedText;
