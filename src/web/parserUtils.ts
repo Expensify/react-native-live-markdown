@@ -214,6 +214,8 @@ function parseText(target: HTMLElement, text: string, curosrPositionIndex: numbe
     }
   }
 
+  CursorUtils.setPrevText(target);
+
   return {text: target.innerText, cursorPosition: cursorPosition || 0};
 }
 
