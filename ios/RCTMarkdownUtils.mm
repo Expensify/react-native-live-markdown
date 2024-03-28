@@ -55,8 +55,8 @@
             NSInteger length = [[item valueForKey:@"length"] unsignedIntegerValue];
             NSInteger depth = [[item valueForKey:@"depth"] unsignedIntegerValue] ?: 1;
             NSRange range = NSMakeRange(location, length);
-            
-            if ([type isEqualToString:@"bold"] || [type isEqualToString:@"italic"] || [type isEqualToString:@"code"] || [type isEqualToString:@"pre"] || [type isEqualToString:@"h1"]) {
+
+            if ([type isEqualToString:@"bold"] || [type isEqualToString:@"italic"] || [type isEqualToString:@"code"] || [type isEqualToString:@"pre"] || [type isEqualToString:@"h1"] || [type isEqualToString:@"emoji"]) {
                 UIFont *font = [attributedString attribute:NSFontAttributeName atIndex:location effectiveRange:NULL];
                 if ([type isEqualToString:@"bold"]) {
                     font = [RCTFont updateFont:font withWeight:@"bold"];
@@ -68,15 +68,22 @@
                     font = [RCTFont updateFont:font withFamily:_markdownStyle.preFontFamily];
                 } else if ([type isEqualToString:@"h1"]) {
                     font = [RCTFont updateFont:font withFamily:nil
-                                          size:[NSNumber numberWithFloat:_markdownStyle.h1FontSize]
-                                        weight:@"bold"
-                                         style:nil
-                                       variant:nil
-                               scaleMultiplier:0];
+                                                          size:[NSNumber numberWithFloat:_markdownStyle.h1FontSize]
+                                                        weight:@"bold"
+                                                         style:nil
+                                                       variant:nil
+                                               scaleMultiplier:0];
+                } else if ([type isEqualToString:@"emoji"]) {
+                    font = [RCTFont updateFont:font withFamily:nil
+                                                          size:[NSNumber numberWithFloat:_markdownStyle.emojiFontSize]
+                                                        weight:nil
+                                                         style:nil
+                                                       variant:nil
+                                               scaleMultiplier:0];
                 }
                 [attributedString addAttribute:NSFontAttributeName value:font range:range];
             }
-            
+
             if ([type isEqualToString:@"syntax"]) {
                 [attributedString addAttribute:NSForegroundColorAttributeName value:_markdownStyle.syntaxColor range:range];
             } else if ([type isEqualToString:@"strikethrough"]) {

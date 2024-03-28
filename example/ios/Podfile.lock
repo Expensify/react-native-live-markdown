@@ -1152,7 +1152,7 @@ PODS:
     - React-jsi (= 0.73.4)
     - React-logger (= 0.73.4)
     - React-perflogger (= 0.73.4)
-  - RNLiveMarkdown (0.1.15):
+  - RNLiveMarkdown (0.1.33):
     - glog
     - hermes-engine
     - RCT-Folly (= 2022.05.16.00)
@@ -1439,7 +1439,7 @@ SPEC CHECKSUMS:
   React-runtimescheduler: ed48e5faac6751e66ee1261c4bd01643b436f112
   React-utils: 6e5ad394416482ae21831050928ae27348f83487
   ReactCommon: 840a955d37b7f3358554d819446bffcf624b2522
-  RNLiveMarkdown: 243f4c656b12826f15b2b9a6d50bf2da7df6a119
+  RNLiveMarkdown: 44d4eebd9a4fa032fd6c070ea3c0b7be20ed0802
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
   Yoga: 64cd2a583ead952b0315d5135bf39e053ae9be70
 

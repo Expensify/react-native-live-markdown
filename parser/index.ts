@@ -3,7 +3,7 @@
 import {ExpensiMark} from 'expensify-common/lib/ExpensiMark';
 import _ from 'underscore';
 
-type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'mention-here' | 'mention-user' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax';
+type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'emoji' | 'mention-here' | 'mention-user' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax';
 type Range = {
   type: MarkdownType;
   start: number;
@@ -115,6 +115,8 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
         appendSyntax('~');
         addChildrenWithStyle(node, 'strikethrough');
         appendSyntax('~');
+      } else if (node.tag === '<emoji>') {
+        addChildrenWithStyle(node, 'emoji');
       } else if (node.tag === '<code>') {
         appendSyntax('`');
         addChildrenWithStyle(node, 'code');
@@ -157,7 +159,7 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
           appendSyntax(')');
         }
       } else {
-        throw new Error(`Unknown tag: {node.tag}`);
+        throw new Error(`Unknown tag: ${node.tag}`);
       }
     }
   }

@@ -45,6 +45,8 @@ module.exports = {
     'import/no-unresolved': 'error',
     'import/consistent-type-specifier-style': ['error', 'prefer-top-level'],
     'no-use-before-define': 'off',
+    'es/no-nullish-coalescing-operators': 'off',
+    'es/no-optional-chaining': 'off',
     '@typescript-eslint/no-use-before-define': 'off', // TODO consider enabling this (currently it reports styles defined at the bottom of the file)
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     '@typescript-eslint/consistent-type-imports': [

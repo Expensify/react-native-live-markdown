@@ -1,9 +1,10 @@
 import * as CursorUtils from './cursorUtils';
 import type * as StyleUtilsTypes from '../styleUtils';
+import * as BrowserUtils from './browserUtils';
 
 type PartialMarkdownStyle = StyleUtilsTypes.PartialMarkdownStyle;
 
-type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax' | 'mention-here' | 'mention-user';
+type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'emoji' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax' | 'mention-here' | 'mention-user';
 
 type MarkdownRange = {
   type: MarkdownType;
@@ -31,6 +32,9 @@ function addStyling(targetElement: HTMLElement, type: MarkdownType, markdownStyl
       break;
     case 'strikethrough':
       node.style.textDecoration = 'line-through';
+      break;
+    case 'emoji':
+      Object.assign(node.style, markdownStyle.emoji);
       break;
     case 'mention-here':
       Object.assign(node.style, markdownStyle.mentionHere);
@@ -160,39 +164,57 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
   return root;
 }
 
-function parseText(
-  target: HTMLElement,
-  text: string,
-  curosrPositionIndex: number | null,
-  markdownStyle: PartialMarkdownStyle = {},
-  disableNewLinesInCursorPositioning = false,
-  alwaysMoveCursorToTheEnd = false,
-) {
+function moveCursor(isFocused: boolean, alwaysMoveCursorToTheEnd: boolean, cursorPosition: number | null, target: HTMLElement) {
+  if (!isFocused) {
+    return;
+  }
+
+  if (alwaysMoveCursorToTheEnd || cursorPosition === null) {
+    CursorUtils.moveCursorToEnd(target);
+  } else if (cursorPosition !== null) {
+    CursorUtils.setCursorPosition(target, cursorPosition);
+  }
+}
+
+function parseText(target: HTMLElement, text: string, curosrPositionIndex: number | null, markdownStyle: PartialMarkdownStyle = {}, alwaysMoveCursorToTheEnd = false) {
   const targetElement = target;
 
   let cursorPosition: number | null = curosrPositionIndex;
   const isFocused = document.activeElement === target;
   if (isFocused && curosrPositionIndex === null) {
-    cursorPosition = CursorUtils.getCurrentCursorPosition(target).start;
+    const selection = CursorUtils.getCurrentCursorPosition(target);
+    cursorPosition = selection ? selection.end : null;
   }
   const ranges = global.parseExpensiMarkToRanges(text);
 
   const markdownRanges: MarkdownRange[] = ranges as MarkdownRange[];
+  const rootSpan = targetElement.firstChild as HTMLElement | null;
 
-  targetElement.innerHTML = '';
-  targetElement.innerText = '';
+  if (!text || targetElement.innerHTML === '<br>' || (rootSpan && rootSpan.innerHTML === '\n')) {
+    targetElement.innerHTML = '';
+    targetElement.innerText = '';
+  }
 
   // We don't want to parse text with single '\n', because contentEditable represents it as invisible <br />
-  if (!!text && text !== '\n') {
+  if (text) {
     const dom = parseRangesToHTMLNodes(text, markdownRanges, markdownStyle);
-    target.appendChild(dom);
+
+    if (!rootSpan || rootSpan.innerHTML !== dom.innerHTML) {
+      targetElement.innerHTML = '';
+      targetElement.innerText = '';
+      target.appendChild(dom);
+
+      if (BrowserUtils.isChromium) {
+        moveCursor(isFocused, alwaysMoveCursorToTheEnd, cursorPosition, target);
+      }
+    }
+
+    if (!BrowserUtils.isChromium) {
+      moveCursor(isFocused, alwaysMoveCursorToTheEnd, cursorPosition, target);
+    }
   }
 
-  if (alwaysMoveCursorToTheEnd) {
-    CursorUtils.moveCursorToEnd(target);
-  } else if (isFocused && cursorPosition !== null) {
-    CursorUtils.setCursorPosition(target, cursorPosition, disableNewLinesInCursorPositioning);
-  }
+  CursorUtils.setPrevText(target);
 
   return {text: target.innerText, cursorPosition: cursorPosition || 0};
 }
