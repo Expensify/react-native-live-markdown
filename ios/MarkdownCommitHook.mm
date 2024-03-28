@@ -76,6 +76,7 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
         for (const auto &nodes : nodesToUpdate) {
             const auto &textInputState = *std::static_pointer_cast<const ConcreteState<TextInputState>>(nodes.textInput->getState());
             const auto &stateData = textInputState.getData();
+            const auto fontSizeMultiplier = newRootShadowNode->getConcreteProps().layoutContext.fontSizeMultiplier;
             
             // We only want to update the shadow node when the attributed string is stored by value
             // If it's stored by pointer, the markdown formatting should already by applied to it, since the
@@ -87,11 +88,11 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
             // method applying markdown formatting and apply it here instead, preventing wrong layout
             // on reloads.
             if (stateData.attributedStringBox.getMode() == AttributedStringBox::Mode::Value || MarkdownShadowFamilyRegistry::shouldForceUpdate(nodes.textInput->getTag())) {
-                rootNode = rootNode->cloneTree(nodes.textInput->getFamily(), [&nodes, &textInputState, &stateData](const ShadowNode& node) {
+                rootNode = rootNode->cloneTree(nodes.textInput->getFamily(), [&nodes, &textInputState, &stateData, fontSizeMultiplier](const ShadowNode& node) {
                     const auto &markdownProps = *std::static_pointer_cast<MarkdownTextInputDecoratorViewProps const>(nodes.decorator->getProps());
                     const auto &textInputProps = *std::static_pointer_cast<TextInputProps const>(nodes.textInput->getProps());
                     
-                    const auto defaultTextAttributes = textInputProps.getEffectiveTextAttributes(RCTFontSizeMultiplier());
+                    const auto defaultTextAttributes = textInputProps.getEffectiveTextAttributes(fontSizeMultiplier);
                     const auto defaultNSTextAttributes = RCTNSTextAttributesFromTextAttributes(defaultTextAttributes);
                     
                     // this can possibly be optimized

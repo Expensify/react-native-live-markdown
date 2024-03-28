@@ -4,7 +4,7 @@ import * as BrowserUtils from './browserUtils';
 
 type PartialMarkdownStyle = StyleUtilsTypes.PartialMarkdownStyle;
 
-type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax' | 'mention-here' | 'mention-user';
+type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'emoji' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax' | 'mention-here' | 'mention-user';
 
 type MarkdownRange = {
   type: MarkdownType;
@@ -32,6 +32,9 @@ function addStyling(targetElement: HTMLElement, type: MarkdownType, markdownStyl
       break;
     case 'strikethrough':
       node.style.textDecoration = 'line-through';
+      break;
+    case 'emoji':
+      Object.assign(node.style, markdownStyle.emoji);
       break;
     case 'mention-here':
       Object.assign(node.style, markdownStyle.mentionHere);
@@ -210,6 +213,8 @@ function parseText(target: HTMLElement, text: string, curosrPositionIndex: numbe
       moveCursor(isFocused, alwaysMoveCursorToTheEnd, cursorPosition, target);
     }
   }
+
+  CursorUtils.setPrevText(target);
 
   return {text: target.innerText, cursorPosition: cursorPosition || 0};
 }

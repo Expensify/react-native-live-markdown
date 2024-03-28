@@ -38,6 +38,6 @@ class MarkdownCommitHook : public UIManagerCommitHook {
     const std::shared_ptr<UIManager> uiManager_;
 };
 
-} // namespace reanimated
+} // namespace livemarkdown
 
 #endif // RCT_NEW_ARCH_ENABLED

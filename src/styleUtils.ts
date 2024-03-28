@@ -23,6 +23,9 @@ function makeDefaultMarkdownStyle(): MarkdownStyle {
     h1: {
       fontSize: 25,
     },
+    emoji: {
+      fontSize: 20,
+    },
     blockquote: {
       borderColor: 'gray',
       borderWidth: 6,
