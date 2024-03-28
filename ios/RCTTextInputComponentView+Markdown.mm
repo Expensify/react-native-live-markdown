@@ -6,6 +6,8 @@
 #import <React/RCTUITextField.h>
 #import <objc/message.h>
 
+#import "MarkdownShadowFamilyRegistry.h"
+
 @implementation RCTTextInputComponentView (Markdown)
 
 - (void)setMarkdownUtils:(RCTMarkdownUtils *)markdownUtils {
@@ -13,8 +15,8 @@
 
   if (markdownUtils != nil) {
     // force Markdown formatting on first render because `_setAttributedText` is called before `setMarkdownUtils`
-    RCTUITextField *backedTextInputView = [self valueForKey:@"_backedTextInputView"];
-    backedTextInputView.attributedText = [markdownUtils parseMarkdown:backedTextInputView.attributedText];
+    RCTUITextField *backedTextInputView = [self getBackedTextInputView];
+    backedTextInputView.attributedText = [markdownUtils parseMarkdown:backedTextInputView.attributedText withAttributes:backedTextInputView.defaultTextAttributes];
   }
 }
 
@@ -22,11 +24,23 @@
   return objc_getAssociatedObject(self, @selector(getMarkdownUtils));
 }
 
+- (RCTUITextField *)getBackedTextInputView {
+  RCTUITextField *backedTextInputView = [self valueForKey:@"_backedTextInputView"];
+  return backedTextInputView;
+}
+
 - (void)markdown__setAttributedString:(NSAttributedString *)attributedString
 {
   RCTMarkdownUtils *markdownUtils = [self getMarkdownUtils];
-  if (markdownUtils != nil) {
-    attributedString = [markdownUtils parseMarkdown:attributedString];
+  RCTUITextField *backedTextInputView = [self getBackedTextInputView];
+  if (markdownUtils != nil && backedTextInputView != nil) {
+    attributedString = [markdownUtils parseMarkdown:attributedString withAttributes:backedTextInputView.defaultTextAttributes];
+  } else {
+    // If markdownUtils is undefined, the text input hasn't been mounted yet. It will
+    // update its state with the unformatted attributed string, we want to prevent displaying
+    // this state by applying markdown in the commit hook where we can read markdown styles
+    // from decorator props.
+    MarkdownShadowFamilyRegistry::forceNextStateUpdate((facebook::react::Tag)self.tag);
   }
 
   // Call the original method
