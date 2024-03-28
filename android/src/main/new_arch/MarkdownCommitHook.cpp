@@ -6,8 +6,6 @@
 #include "MarkdownCommitHook.h"
 #include "react/renderer/components/RNLiveMarkdownSpec/MarkdownShadowFamilyRegistry.h"
 
-#include <android/Log.h>
-
 using namespace facebook;
 using namespace react;
 
