@@ -137,7 +137,7 @@ function scrollCursorIntoView(target: HTMLInputElement) {
   }
 
   const selection = window.getSelection();
-  if (!selection) {
+  if (!selection || (selection && selection.rangeCount === 0)) {
     return;
   }
 
