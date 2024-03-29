@@ -19,7 +19,7 @@ index abdc31b..d99df0c 100644
  
      REPORT: {
 diff --git a/node_modules/expensify-common/lib/ExpensiMark.js b/node_modules/expensify-common/lib/ExpensiMark.js
-index 02d408c..4d034f1 100644
+index 02d408c..41b285a 100644
 --- a/node_modules/expensify-common/lib/ExpensiMark.js
 +++ b/node_modules/expensify-common/lib/ExpensiMark.js
 @@ -9,8 +9,8 @@ const MARKDOWN_IMAGE_REGEX = new RegExp(`\\!${MARKDOWN_LINK}`, 'gi');
@@ -33,6 +33,15 @@ index 02d408c..4d034f1 100644
          /**
           * The list of regex replacements to do on a comment. Check the link regex is first so links are processed
           * before other delimiters
+@@ -46,7 +46,7 @@ export default class ExpensiMark {
+                     return `<pre>${group}</pre>`;
+                 },
+                 rawInputReplacement: (match, __, textWithinFences) => {
+-                    const withinFences = match.replace(/(?:&#x60;&#x60;&#x60;)([\s\S]*?)(?:&#x60;&#x60;&#x60;)/g, '$1');
++                    const withinFences = match.replace(/(?:&#x60;&#x60;&#x60;)([\s\S]*?)(?:&#x60;&#x60;&#x60;)/g, '$1').replace(/<emoji>|<\/emoji>/g, '');
+                     const group = textWithinFences.replace(/(?:(?![\n\r])\s)/g, '&#32;');
+                     return `<pre data-code-raw="${withinFences}">${group}</pre>`;
+                 }
 @@ -516,7 +516,7 @@ export default class ExpensiMark {
           * @type {Number}
           */
