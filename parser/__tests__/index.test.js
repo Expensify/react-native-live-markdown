@@ -378,3 +378,90 @@ describe('trailing whitespace', () => {
     });
   });
 });
+
+describe('inline image', () => {
+  test('with alt text', () => {
+    expect('![test](https://example.com/image.png)').toBeParsedAs([
+      {type: 'syntax', start: 0, length: 2},
+      {type: 'syntax', start: 6, length: 2},
+      {type: 'link', start: 8, length: 29},
+      {type: 'syntax', start: 37, length: 1},
+    ]);
+  });
+
+  test('without alt text', () => {
+    expect('![](https://example.com/image.png)').toBeParsedAs([
+      {type: 'syntax', start: 0, length: 2},
+      {type: 'syntax', start: 2, length: 2},
+      {type: 'link', start: 4, length: 29},
+      {type: 'syntax', start: 33, length: 1},
+    ]);
+  });
+  test('with same alt text as src', () => {
+    expect('![https://example.com/image.png](https://example.com/image.png)').toBeParsedAs([
+      {type: 'syntax', start: 0, length: 2},
+      {type: 'syntax', start: 31, length: 2},
+      {type: 'link', start: 33, length: 29},
+      {type: 'syntax', start: 62, length: 1},
+    ]);
+  });
+
+  test('text containing images', () => {
+    expect('An image of a banana: ![banana](https://example.com/banana.png) an image of a developer: ![dev](https://example.com/developer.png)').toBeParsedAs([
+      {type: 'syntax', start: 22, length: 2},
+      {type: 'syntax', start: 30, length: 2},
+      {type: 'link', start: 32, length: 30},
+      {type: 'syntax', start: 62, length: 1},
+      {type: 'syntax', start: 89, length: 2},
+      {type: 'syntax', start: 94, length: 2},
+      {type: 'link', start: 96, length: 33},
+      {type: 'syntax', start: 129, length: 1},
+    ]);
+  });
+
+  test('with alt text containing markdown', () => {
+    expect('![# fake-heading *bold* _italic_ ~strike~ [:-)]](https://example.com/image.png)').toBeParsedAs([
+      {type: 'syntax', start: 0, length: 2},
+      {type: 'syntax', start: 47, length: 2},
+      {type: 'link', start: 49, length: 29},
+      {type: 'syntax', start: 78, length: 1},
+    ]);
+  });
+
+  test('text containing image and autolink', () => {
+    expect('An image of a banana: ![banana](https://example.com/banana.png) an autolink: example.com').toBeParsedAs([
+      {type: 'syntax', start: 22, length: 2},
+      {type: 'syntax', start: 30, length: 2},
+      {type: 'link', start: 32, length: 30},
+      {type: 'syntax', start: 62, length: 1},
+      {type: 'link', start: 77, length: 11},
+    ]);
+  });
+
+  test('with invalid url', () => {
+    expect('![test](invalid)').toBeParsedAs([]);
+  });
+
+  test('trying to pass additional attributes', () => {
+    expect('![test](https://example.com/image.png "title" class="image")').toBeParsedAs([{type: 'link', start: 8, length: 29}]);
+  });
+
+  test('trying to inject additional attributes', () => {
+    expect('![test" onerror="alert(\'xss\')](https://example.com/image.png)').toBeParsedAs([
+      {type: 'syntax', start: 0, length: 2},
+      {type: 'syntax', start: 29, length: 2},
+      {type: 'link', start: 31, length: 29},
+      {type: 'syntax', start: 60, length: 1},
+    ]);
+  });
+
+  test('inline code in alt', () => {
+    // TODO: fix this test
+    expect('![`code`](https://example.com/image.png)').toBeParsedAs([]);
+  });
+
+  test('blockquote in alt', () => {
+    // TODO: confirm the expected value
+    expect('![```blockquote```](https://example.com/image.png)').toBeParsedAs([]);
+  });
+});
