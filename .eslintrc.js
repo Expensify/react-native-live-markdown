@@ -9,6 +9,7 @@ module.exports = {
   },
   extends: [
     'expensify',
+    'plugin:react-hooks/recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:@typescript-eslint/stylistic',
     'plugin:import/typescript',
