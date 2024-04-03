@@ -24,11 +24,13 @@ interface MarkdownStyle {
   };
   code: {
     fontFamily: string;
+    fontSize: Float;
     color: ColorValue;
     backgroundColor: ColorValue;
   };
   pre: {
     fontFamily: string;
+    fontSize: Float;
     color: ColorValue;
     backgroundColor: ColorValue;
   };

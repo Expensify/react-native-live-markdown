@@ -277,11 +277,11 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     }, []);
 
     const updateSelection = useCallback(
-      (e: SyntheticEvent<HTMLDivElement> | null = null) => {
+      (e: SyntheticEvent<HTMLDivElement> | null = null, predefinedSelection: Selection | null = null) => {
         if (!divRef.current) {
           return;
         }
-        const newSelection = CursorUtils.getCurrentCursorPosition(divRef.current);
+        const newSelection = predefinedSelection || CursorUtils.getCurrentCursorPosition(divRef.current);
 
         if (newSelection && (!contentSelection.current || contentSelection.current.start !== newSelection.start || contentSelection.current.end !== newSelection.end)) {
           updateRefSelectionVariables(newSelection);
@@ -536,7 +536,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         return;
       }
       CursorUtils.setCursorPosition(divRef.current, selection.start, selection.end);
-      updateSelection();
+      updateSelection(null, {start: selection.start, end: selection.end || selection.start});
     }, [selection, updateSelection]);
 
     return (

@@ -72,9 +72,19 @@
       } else if ([type isEqualToString:@"italic"]) {
         font = [RCTFont updateFont:font withStyle:@"italic"];
       } else if ([type isEqualToString:@"code"]) {
-        font = [RCTFont updateFont:font withFamily:_markdownStyle.codeFontFamily];
+        font = [RCTFont updateFont:font withFamily:_markdownStyle.codeFontFamily
+                                              size:[NSNumber numberWithFloat:_markdownStyle.codeFontSize]
+                                            weight:nil
+                                             style:nil
+                                           variant:nil
+                                   scaleMultiplier:0];
       } else if ([type isEqualToString:@"pre"]) {
-        font = [RCTFont updateFont:font withFamily:_markdownStyle.preFontFamily];
+        font = [RCTFont updateFont:font withFamily:_markdownStyle.preFontFamily
+                                              size:[NSNumber numberWithFloat:_markdownStyle.preFontSize]
+                                            weight:nil
+                                             style:nil
+                                           variant:nil
+                                   scaleMultiplier:0];
       } else if ([type isEqualToString:@"h1"]) {
         font = [RCTFont updateFont:font withFamily:nil
                                               size:[NSNumber numberWithFloat:_markdownStyle.h1FontSize]
