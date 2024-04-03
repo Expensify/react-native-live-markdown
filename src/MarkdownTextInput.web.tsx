@@ -388,7 +388,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           }
         }
       },
-      [onKeyPress, onSubmitEditing],
+      [onKeyPress, onSubmitEditing, setEventProps, handleOnChangeText, updateSelection],
     );
 
     const handleFocus: FocusEventHandler<HTMLDivElement> = useCallback(
