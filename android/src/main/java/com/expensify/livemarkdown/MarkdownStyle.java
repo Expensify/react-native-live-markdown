@@ -34,6 +34,8 @@ public class MarkdownStyle {
 
   private final String mCodeFontFamily;
 
+  private final float mCodeFontSize;
+
   @ColorInt
   private final int mCodeColor;
 
@@ -41,6 +43,8 @@ public class MarkdownStyle {
   private final int mCodeBackgroundColor;
 
   private final String mPreFontFamily;
+
+  private final float mPreFontSize;
 
   @ColorInt
   private final int mPreColor;
@@ -70,9 +74,11 @@ public class MarkdownStyle {
     mBlockquoteMarginLeft = parseFloat(map, "blockquote", "marginLeft");
     mBlockquotePaddingLeft = parseFloat(map, "blockquote", "paddingLeft");
     mCodeFontFamily = parseString(map, "code", "fontFamily");
+    mCodeFontSize = parseFloat(map, "code", "fontSize");
     mCodeColor = parseColor(map, "code", "color", context);
     mCodeBackgroundColor = parseColor(map, "code", "backgroundColor", context);
     mPreFontFamily = parseString(map, "pre", "fontFamily");
+    mPreFontSize = parseFloat(map, "pre", "fontSize");
     mPreColor = parseColor(map, "pre", "color", context);
     mPreBackgroundColor = parseColor(map, "pre", "backgroundColor", context);
     mMentionHereColor = parseColor(map, "mentionHere", "color", context);
@@ -147,6 +153,10 @@ public class MarkdownStyle {
     return mCodeFontFamily;
   }
 
+  public float getCodeFontSize() {
+    return mCodeFontSize;
+  }
+
   @ColorInt
   public int getCodeColor() {
     return mCodeColor;
@@ -159,6 +169,10 @@ public class MarkdownStyle {
 
   public String getPreFontFamily() {
     return mPreFontFamily;
+  }
+
+  public float getPreFontSize() {
+    return mPreFontSize;
   }
 
   @ColorInt
