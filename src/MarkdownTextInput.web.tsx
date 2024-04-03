@@ -528,8 +528,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       if (autoFocus) {
         divRef.current.focus();
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [autoFocus]);
 
     useEffect(() => {
       if (!divRef.current || !selection || (contentSelection.current && selection.start === contentSelection.current.start && selection.end === contentSelection.current.end)) {
