@@ -158,6 +158,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     ref,
   ) => {
     const compositionRef = useRef<boolean>(false);
+    const pasteRef = useRef<boolean>(false);
     const divRef = useRef<HTMLDivElement | null>(null);
     const currentlyFocusedField = useRef<HTMLDivElement | null>(null);
     const contentSelection = useRef<Selection | null>(null);
@@ -207,7 +208,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         parseText(divRef.current, divRef.current.innerText, newMarkdownStyle);
       }
       return newMarkdownStyle;
-    }, [markdownStyle]);
+    }, [markdownStyle, parseText]);
 
     const inputStyles = useMemo(
       () =>
@@ -228,7 +229,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         const item = history.current.undo();
         return parseText(target, item ? item.text : null, processedMarkdownStyle, item ? item.cursorPosition : null, false).text;
       },
-      [processedMarkdownStyle],
+      [parseText, processedMarkdownStyle],
     );
 
     const redo = useCallback(
@@ -237,7 +238,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         const item = history.current.redo();
         return parseText(target, item ? item.text : null, processedMarkdownStyle, item ? item.cursorPosition : null, false).text;
       },
-      [processedMarkdownStyle],
+      [parseText, processedMarkdownStyle],
     );
 
     // We have to process value property since contentEditable div adds one additional '\n' at the end of the text if we are entering new line
@@ -249,10 +250,51 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     }, [value]);
 
     // Placeholder text color logic
-    const updateTextColor = useCallback((node: HTMLDivElement, text: string) => {
-      // eslint-disable-next-line no-param-reassign -- we need to change the style of the node, so we need to modify it
-      node.style.color = String(placeholder && (text === '' || text === '\n') ? placeholderTextColor : flattenedStyle.color || 'black');
+    const updateTextColor = useCallback(
+      (node: HTMLDivElement, text: string) => {
+        // eslint-disable-next-line no-param-reassign -- we need to change the style of the node, so we need to modify it
+        node.style.color = String(placeholder && (text === '' || text === '\n') ? placeholderTextColor : flattenedStyle.color || 'black');
+      },
+      [flattenedStyle.color, placeholder, placeholderTextColor],
+    );
+
+    const handleSelectionChange: ReactEventHandler<HTMLDivElement> = useCallback(
+      (event) => {
+        const e = event as unknown as NativeSyntheticEvent<TextInputSelectionChangeEventData>;
+        setEventProps(e);
+        if (onSelectionChange && contentSelection.current) {
+          e.nativeEvent.selection = contentSelection.current;
+          onSelectionChange(e);
+        }
+      },
+      [onSelectionChange, setEventProps],
+    );
+
+    const updateRefSelectionVariables = useCallback((newSelection: Selection) => {
+      const {start, end} = newSelection;
+      const markdownHTMLInput = divRef.current as HTMLInputElement;
+      markdownHTMLInput.selectionStart = start;
+      markdownHTMLInput.selectionEnd = end;
     }, []);
+
+    const updateSelection = useCallback(
+      (e: SyntheticEvent<HTMLDivElement> | null = null, predefinedSelection: Selection | null = null) => {
+        if (!divRef.current) {
+          return;
+        }
+        const newSelection = predefinedSelection || CursorUtils.getCurrentCursorPosition(divRef.current);
+
+        if (newSelection && (!contentSelection.current || contentSelection.current.start !== newSelection.start || contentSelection.current.end !== newSelection.end)) {
+          updateRefSelectionVariables(newSelection);
+          contentSelection.current = newSelection;
+
+          if (e) {
+            handleSelectionChange(e);
+          }
+        }
+      },
+      [handleSelectionChange, updateRefSelectionVariables],
+    );
 
     const handleOnChangeText = useCallback(
       (e: SyntheticEvent<HTMLDivElement>) => {
@@ -278,7 +320,10 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           default:
             text = parseText(divRef.current, e.target.innerText, processedMarkdownStyle).text;
         }
-        updateSelection(e);
+        if (pasteRef?.current) {
+          pasteRef.current = false;
+          updateSelection(e);
+        }
         updateTextColor(divRef.current, e.target.innerText);
 
         if (onChange) {
@@ -292,43 +337,8 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           onChangeText(normalizedText);
         }
       },
-      [multiline, onChange, onChangeText, setEventProps, processedMarkdownStyle],
+      [updateSelection, updateTextColor, onChange, onChangeText, undo, redo, parseText, processedMarkdownStyle, setEventProps],
     );
-
-    const handleSelectionChange: ReactEventHandler<HTMLDivElement> = useCallback(
-      (event) => {
-        const e = event as unknown as NativeSyntheticEvent<TextInputSelectionChangeEventData>;
-        setEventProps(e);
-        if (onSelectionChange && contentSelection.current) {
-          e.nativeEvent.selection = contentSelection.current;
-          onSelectionChange(e);
-        }
-      },
-      [onSelectionChange, setEventProps],
-    );
-
-    const updateRefSelectionVariables = useCallback((newSelection: Selection) => {
-      const {start, end} = newSelection;
-      const markdownHTMLInput = divRef.current as HTMLInputElement;
-      markdownHTMLInput.selectionStart = start;
-      markdownHTMLInput.selectionEnd = end;
-    }, []);
-
-    const updateSelection = useCallback((e: SyntheticEvent<HTMLDivElement> | null = null) => {
-      if (!divRef.current) {
-        return;
-      }
-      const newSelection = CursorUtils.getCurrentCursorPosition(divRef.current);
-
-      if (newSelection && (!contentSelection.current || contentSelection.current.start !== newSelection.start || contentSelection.current.end !== newSelection.end)) {
-        updateRefSelectionVariables(newSelection);
-        contentSelection.current = newSelection;
-
-        if (e) {
-          handleSelectionChange(e);
-        }
-      }
-    }, []);
 
     const handleKeyPress = useCallback(
       (e: KeyboardEvent<HTMLDivElement>) => {
@@ -388,7 +398,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           }
         }
       },
-      [onKeyPress],
+      [multiline, blurOnSubmit, setEventProps, onKeyPress, updateSelection, handleOnChangeText, onSubmitEditing],
     );
 
     const handleFocus: FocusEventHandler<HTMLDivElement> = useCallback(
@@ -426,7 +436,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           }
         }
       },
-      [clearTextOnFocus, multiline, onFocus, selectTextOnFocus, setEventProps],
+      [clearTextOnFocus, onFocus, selectTextOnFocus, setEventProps, updateSelection, value],
     );
 
     const handleBlur: FocusEventHandler<HTMLDivElement> = useCallback(
@@ -451,8 +461,12 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         (e.target as HTMLInputElement).value = normalizeValue(divRef.current.innerText || '');
         onClick(e);
       },
-      [onClick],
+      [onClick, updateSelection],
     );
+
+    const handlePaste = useCallback(() => {
+      pasteRef.current = true;
+    }, []);
 
     const startComposition = useCallback(() => {
       compositionRef.current = true;
@@ -522,15 +536,15 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       if (autoFocus) {
         divRef.current.focus();
       }
-    }, []);
+    }, [autoFocus]);
 
     useEffect(() => {
       if (!divRef.current || !selection || (contentSelection.current && selection.start === contentSelection.current.start && selection.end === contentSelection.current.end)) {
         return;
       }
       CursorUtils.setCursorPosition(divRef.current, selection.start, selection.end);
-      updateSelection();
-    }, [selection]);
+      updateSelection(null, {start: selection.start, end: selection.end || selection.start});
+    }, [selection, updateSelection]);
 
     return (
       // eslint-disable-next-line jsx-a11y/no-static-element-interactions
@@ -553,6 +567,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         onClick={handleClick}
         onFocus={handleFocus}
         onBlur={handleBlur}
+        onPaste={handlePaste}
         placeholder={heightSafePlaceholder}
         spellCheck={spellCheck}
         dir={dir}

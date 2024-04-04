@@ -27,10 +27,12 @@
     _blockquotePaddingLeft = style.blockquote.paddingLeft;
 
     _codeFontFamily = RCTNSStringFromString(style.code.fontFamily);
+    _codeFontSize = style.code.fontSize;
     _codeColor = RCTUIColorFromSharedColor(style.code.color);
     _codeBackgroundColor = RCTUIColorFromSharedColor(style.code.backgroundColor);
 
     _preFontFamily = RCTNSStringFromString(style.pre.fontFamily);
+    _preFontSize = style.pre.fontSize;
     _preColor = RCTUIColorFromSharedColor(style.pre.color);
     _preBackgroundColor = RCTUIColorFromSharedColor(style.pre.backgroundColor);
 
@@ -63,10 +65,12 @@
     _blockquotePaddingLeft = [RCTConvert CGFloat:json[@"blockquote"][@"paddingLeft"]];
 
     _codeFontFamily = [RCTConvert NSString:json[@"code"][@"fontFamily"]];
+    _codeFontSize = [RCTConvert CGFloat:json[@"code"][@"fontSize"]];
     _codeColor = [RCTConvert UIColor:json[@"code"][@"color"]];
     _codeBackgroundColor = [RCTConvert UIColor:json[@"code"][@"backgroundColor"]];
 
     _preFontFamily = [RCTConvert NSString:json[@"pre"][@"fontFamily"]];
+    _preFontSize = [RCTConvert CGFloat:json[@"pre"][@"fontSize"]];
     _preColor = [RCTConvert UIColor:json[@"pre"][@"color"]];
     _preBackgroundColor = [RCTConvert UIColor:json[@"pre"][@"backgroundColor"]];
 
