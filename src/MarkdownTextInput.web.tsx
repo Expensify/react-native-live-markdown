@@ -464,9 +464,9 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       [onClick, updateSelection],
     );
 
-    const handlePaste = () => {
+    const handlePaste = useCallback(() => {
       pasteRef.current = true;
-    };
+    }, []);
 
     const startComposition = useCallback(() => {
       compositionRef.current = true;
