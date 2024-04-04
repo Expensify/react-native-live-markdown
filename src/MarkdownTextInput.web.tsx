@@ -158,6 +158,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     ref,
   ) => {
     const compositionRef = useRef<boolean>(false);
+    const pasteRef = useRef<boolean>(false);
     const divRef = useRef<HTMLDivElement | null>(null);
     const currentlyFocusedField = useRef<HTMLDivElement | null>(null);
     const contentSelection = useRef<Selection | null>(null);
@@ -319,7 +320,10 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           default:
             text = parseText(divRef.current, e.target.innerText, processedMarkdownStyle).text;
         }
-        updateSelection(e);
+        if (pasteRef?.current) {
+          pasteRef.current = false;
+          updateSelection(e);
+        }
         updateTextColor(divRef.current, e.target.innerText);
 
         if (onChange) {
@@ -460,6 +464,10 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       [onClick, updateSelection],
     );
 
+    const handlePaste = useCallback(() => {
+      pasteRef.current = true;
+    }, []);
+
     const startComposition = useCallback(() => {
       compositionRef.current = true;
     }, []);
@@ -559,6 +567,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         onClick={handleClick}
         onFocus={handleFocus}
         onBlur={handleBlur}
+        onPaste={handlePaste}
         placeholder={heightSafePlaceholder}
         spellCheck={spellCheck}
         dir={dir}
