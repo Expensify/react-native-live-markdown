@@ -1,8 +1,6 @@
 // @ts-expect-error - to review how it's implemented in ExpensiMark
 // eslint-disable-next-line import/no-unresolved
 import {ExpensiMark} from 'expensify-common/lib/ExpensiMark';
-// eslint-disable-next-line import/no-unresolved
-import Str from 'expensify-common/lib/str';
 import _ from 'underscore';
 
 type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'emoji' | 'mention-here' | 'mention-user' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax';
@@ -166,10 +164,15 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
         }
       } else if (node.tag.startsWith('<img src="')) {
         const src = node.tag.match(/src="([^"]*)"/)![1]!; // always present
-        const alt = Str.htmlDecode(node.tag.match(/alt="([^"]*)"/)![1]!); // always present
-        appendSyntax('![');
-        processChildren(alt);
-        appendSyntax('](');
+        const alt = node.tag.match(/alt="([^"]*)"/);
+
+        appendSyntax('!');
+        if (alt !== null) {
+          appendSyntax('[');
+          processChildren(_.unescape(alt[1]!));
+          appendSyntax(']');
+        }
+        appendSyntax('(');
         addChildrenWithStyle(src, 'link');
         appendSyntax(')');
       } else {
