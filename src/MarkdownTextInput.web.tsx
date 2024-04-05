@@ -551,6 +551,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         return;
       }
       history.current.add(value ?? '', (value ?? '').length);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (
