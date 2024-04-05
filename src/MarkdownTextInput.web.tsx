@@ -546,6 +546,13 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       updateSelection(null, {start: selection.start, end: selection.end || selection.start});
     }, [selection, updateSelection]);
 
+    useEffect(() => {
+      if (history.current?.history.length !== 0) {
+        return;
+      }
+      history.current.add(value ?? '', (value ?? '').length);
+    }, []);
+
     return (
       // eslint-disable-next-line jsx-a11y/no-static-element-interactions
       <div
