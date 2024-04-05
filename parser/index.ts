@@ -165,11 +165,12 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
       } else if (node.tag.startsWith('<img src="')) {
         const src = node.tag.match(/src="([^"]*)"/)![1]!; // always present
         const alt = node.tag.match(/alt="([^"]*)"/);
+        const isLabeledLink = node.tag.match(/data-link-variant="([^"]*)"/)![1] === 'labeled';
 
         appendSyntax('!');
-        if (alt !== null) {
+        if (isLabeledLink) {
           appendSyntax('[');
-          processChildren(_.unescape(alt[1]!));
+          processChildren(_.unescape(alt?.[1] || '')); // alt is optional
           appendSyntax(']');
         }
         appendSyntax('(');
@@ -225,6 +226,7 @@ function groupRanges(ranges: Range[]) {
 
 function parseExpensiMarkToRanges(markdown: string): Range[] {
   const html = parseMarkdownToHTML(markdown);
+  console.log(html);
   const tokens = parseHTMLToTokens(html);
   const tree = parseTokensToTree(tokens);
   const [text, ranges] = parseTreeToTextAndRanges(tree);
