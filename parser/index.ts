@@ -226,7 +226,6 @@ function groupRanges(ranges: Range[]) {
 
 function parseExpensiMarkToRanges(markdown: string): Range[] {
   const html = parseMarkdownToHTML(markdown);
-  console.log(html);
   const tokens = parseHTMLToTokens(html);
   const tree = parseTokensToTree(tokens);
   const [text, ranges] = parseTreeToTextAndRanges(tree);
