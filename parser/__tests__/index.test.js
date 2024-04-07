@@ -391,7 +391,7 @@ describe('inline image', () => {
     ]);
   });
 
-  test.only('without alt text', () => {
+  test('without alt text', () => {
     expect('![](https://example.com/image.png)').toBeParsedAs([
       {type: 'syntax', start: 0, length: 1},
       {type: 'syntax', start: 1, length: 1},
@@ -484,7 +484,14 @@ describe('inline image', () => {
 
   test('blockquote in alt', () => {
     // TODO: this test is failing !!!
-    expect('![```test```](https://example.com/image.png)').toBeParsedAs([]);
+    expect('![```test```](https://example.com/image.png)').toBeParsedAs([
+      {type: 'syntax', start: 0, length: 1},
+      {type: 'syntax', start: 1, length: 1},
+      {type: 'syntax', start: 12, length: 1},
+      {type: 'syntax', start: 13, length: 1},
+      {type: 'link', start: 14, length: 29},
+      {type: 'syntax', start: 43, length: 1},
+    ]);
   });
 
   test('image without alt text', () => {

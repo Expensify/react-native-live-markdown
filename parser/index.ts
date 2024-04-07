@@ -170,7 +170,7 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
         appendSyntax('!');
         if (isLabeledLink) {
           appendSyntax('[');
-          processChildren(_.unescape(alt?.[1] || '')); // alt is optional
+          processChildren(_.unescape(alt?.[1] || ''));
           appendSyntax(']');
         }
         appendSyntax('(');

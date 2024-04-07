@@ -19,18 +19,20 @@ index abdc31b..d99df0c 100644
  
      REPORT: {
 diff --git a/node_modules/expensify-common/lib/ExpensiMark.js b/node_modules/expensify-common/lib/ExpensiMark.js
-index 02d408c..d73d5f7 100644
+index 02d408c..c508734 100644
 --- a/node_modules/expensify-common/lib/ExpensiMark.js
 +++ b/node_modules/expensify-common/lib/ExpensiMark.js
-@@ -3,14 +3,13 @@ import Str from './str';
+@@ -2,15 +2,15 @@ import _ from 'underscore';
+ import Str from './str';
  import {MARKDOWN_URL_REGEX, LOOSE_URL_REGEX, URL_REGEX} from './Url';
  import {CONST} from './CONST';
++import * as UrlPatterns from './Url';
  
 -const MARKDOWN_LINK = `\\[([^\\][]*(?:\\[[^\\][]*][^\\][]*)*)]\\(${MARKDOWN_URL_REGEX}\\)(?![^<]*(<\\/pre>|<\\/code>))`;
 -const MARKDOWN_LINK_REGEX = new RegExp(MARKDOWN_LINK, 'gi');
 -const MARKDOWN_IMAGE_REGEX = new RegExp(`\\!${MARKDOWN_LINK}`, 'gi');
-+const MARKDOWN_LINK_REGEX = new RegExp(`\\[([^\\][]*(?:\\[[^\\][]*][^\\][]*)*)]\\(${MARKDOWN_URL_REGEX}\\)(?![^<]*(<\\/pre>|<\\/code>))`, 'gi');
-+const MARKDOWN_IMAGE_REGEX = new RegExp(`\\!(?:\\[([^\\][]*(?:\\[[^\\][]*][^\\][]*)*)])?\\(${MARKDOWN_URL_REGEX}\\)(?![^<]*(<\\/pre>|<\\/code>))`, 'gi');
++const MARKDOWN_LINK_REGEX = new RegExp(`\\[([^\\][]*(?:\\[[^\\][]*][^\\][]*)*)]\\(${UrlPatterns.MARKDOWN_URL_REGEX}\\)(?![^<]*(<\\/pre>|<\\/code>))`, 'gi');
++const MARKDOWN_IMAGE_REGEX = new RegExp(`\\!(?:\\[([^\\][]*(?:\\[[^\\][]*][^\\][]*)*)])?\\(${UrlPatterns.MARKDOWN_URL_REGEX}\\)(?![^<]*(<\\/pre>|<\\/code>))`, 'gi');
  
  const SLACK_SPAN_NEW_LINE_TAG = '<span class="c-mrkdwn__br" data-stringify-type="paragraph-break" style="box-sizing: inherit; display: block; height: unset;"></span>';
  
@@ -41,7 +43,7 @@ index 02d408c..d73d5f7 100644
          /**
           * The list of regex replacements to do on a comment. Check the link regex is first so links are processed
           * before other delimiters
-@@ -46,7 +45,7 @@ export default class ExpensiMark {
+@@ -46,7 +46,7 @@ export default class ExpensiMark {
                      return `<pre>${group}</pre>`;
                  },
                  rawInputReplacement: (match, __, textWithinFences) => {
@@ -50,43 +52,51 @@ index 02d408c..d73d5f7 100644
                      const group = textWithinFences.replace(/(?:(?![\n\r])\s)/g, '&#32;');
                      return `<pre data-code-raw="${withinFences}">${group}</pre>`;
                  }
-@@ -125,8 +124,8 @@ export default class ExpensiMark {
+@@ -120,13 +120,17 @@ export default class ExpensiMark {
+              * Converts markdown style images to img tags e.g. ![Expensify](https://www.expensify.com/attachment.png)
+              * We need to convert before linking rules since they will not try to create a link from an existing img
+              * tag.
+-             * Additional sanitization is done to the alt attribute to prevent parsing it further to html by later rules.
++             * Additional sanitization is done to the alt attribute to prevent parsing it further to html by later
++             * rules.
+              */
              {
                  name: 'image',
                  regex: MARKDOWN_IMAGE_REGEX,
 -                replacement: (match, g1, g2) => `<img src="${Str.sanitizeURL(g2)}" alt="${this.escapeMarkdownEntities(g1)}" />`,
 -                rawInputReplacement: (match, g1, g2) => `<img src="${Str.sanitizeURL(g2)}" alt="${this.escapeMarkdownEntities(g1)}" data-raw-href="${g2}" data-link-variant="labeled" />`
-+                replacement: (match, g1, g2) => `<img src="${Str.sanitizeURL(g2)}"${g1 ? ` alt="${g1}"` : ''} />`,
-+                rawInputReplacement: (match, g1, g2) => `<img src="${Str.sanitizeURL(g2)}"${g1 ? ` alt="${g1}"` : ''} data-raw-href="${g2}" data-link-variant="labeled" />`
++                replacement: (match, g1, g2) => `<img src="${Str.sanitizeURL(g2)}"${g1 ? ` alt="${this.escapeAttributeContent(g1)}"` : ''} />`,
++                rawInputReplacement: (match, g1, g2) => {
++                    return `<img src="${Str.sanitizeURL(g2)}"${g1 ? ` alt="${this.escapeAttributeContent(g1)}"` : ''} data-raw-href="${g2}" data-link-variant="${typeof(g1) === 'string' ? 'labeled': 'auto'}" />`
++                }
              },
  
              /**
-@@ -330,6 +329,24 @@ export default class ExpensiMark {
-                 regex: /<\/h1><br\s*[/]?>/gi,
-                 replacement: '</h1>',
-             },
-+            {
-+                // This rule is designed to address cases where HTML content ends up within attribute values,
-+                // HTML can end up within attributes, because different rules are applied in sequence
-+                // To ensure cleanliness and correctness of HTML attributes, this cleanup rule is executed last.
-+                // We're limiting the scope of this rule to 'img' tags and their 'alt' attributes, which are the
-+                // primary sources of such issues. This approach keeps the operation efficient and focused.
-+                // However, the pattern is extensible to additional tags and attributes as needed.
-+                name: 'attributeCleanup',
-+                regex: /<(?:img)[^>]*\s(?:alt)=(["'])([^"']*)\1[^>]*>/gi,
-+                replacement: (match, g1, g2) => {
-+                    const cleanedG2 = this.htmlToMarkdown(g2);
-+                    if (cleanedG2 === g2) {
-+                        return match;
-+                    }
-+
-+                    return match.replace(g2, _.escape(cleanedG2));
-+                }
-+            }
-         ];
+@@ -271,7 +275,7 @@ export default class ExpensiMark {
+                  * Use [\s\S]* instead of .* to match newline
+                  */
+                 name: 'italic',
+-                regex: /(\b_+|\b)(?!_blank")_((?![\s_])[\s\S]*?[^\s_])_(?![^\W_])(?![^<]*(<\/pre>|<\/code>|<\/a>|<\/mention-user>|_blank))/g,
++                regex: /(?<!<[^>]*)(\b_+|\b)(?!_blank")_((?![\s_])[\s\S]*?[^\s_](?<!\s))_(?![^\W_])(?![^<]*>)(?![^<]*(<\/pre>|<\/code>|<\/a>|<\/mention-user>|_blank))/g,
  
-         /**
-@@ -441,7 +458,13 @@ export default class ExpensiMark {
+                 // We want to add extraLeadingUnderscores back before the <em> tag unless textWithinUnderscores starts with valid email
+                 replacement: (match, extraLeadingUnderscores, textWithinUnderscores) => {
+@@ -305,12 +309,12 @@ export default class ExpensiMark {
+                 // \B will match everything that \b doesn't, so it works
+                 // for * and ~: https://www.rexegg.com/regex-boundaries.html#notb
+                 name: 'bold',
+-                regex: /\B\*((?![\s*])[\s\S]*?[^\s*])\*\B(?![^<]*(<\/pre>|<\/code>|<\/a>))/g,
++                regex: /(?<!<[^>]*)\B\*((?![\s*])[\s\S]*?[^\s*](?<!\s))\*\B(?![^<]*>)(?![^<]*(<\/pre>|<\/code>|<\/a>))/g,
+                 replacement: (match, g1) => (g1.includes('</pre>') || this.containsNonPairTag(g1) ? match : `<strong>${g1}</strong>`),
+             },
+             {
+                 name: 'strikethrough',
+-                regex: /\B~((?![\s~])[\s\S]*?[^\s~])~\B(?![^<]*(<\/pre>|<\/code>|<\/a>))/g,
++                regex: /(?<!<[^>]*)\B~((?![\s~])[\s\S]*?[^\s~](?<!\s))~\B(?![^<]*>)(?![^<]*(<\/pre>|<\/code>|<\/a>))/g,
+                 replacement: (match, g1) => (g1.includes('</pre>') || this.containsNonPairTag(g1) ? match : `<del>${g1}</del>`),
+             },
+             {
+@@ -441,7 +445,13 @@ export default class ExpensiMark {
              {
                  name: 'image',
                  regex: /<img[^><]*src\s*=\s*(['"])(.*?)\1(?:[^><]*alt\s*=\s*(['"])(.*?)\3)?[^><]*>*(?![^<][\s\S]*?(<\/pre>|<\/code>))/gi,
@@ -101,7 +111,7 @@ index 02d408c..d73d5f7 100644
              }
          ];
  
-@@ -516,7 +539,7 @@ export default class ExpensiMark {
+@@ -516,7 +526,7 @@ export default class ExpensiMark {
           * @type {Number}
           */
          this.currentQuoteDepth = 0;
@@ -110,7 +120,7 @@ index 02d408c..d73d5f7 100644
  
      /**
       * Replaces markdown with html elements
-@@ -562,7 +585,7 @@ export default class ExpensiMark {
+@@ -562,7 +572,7 @@ export default class ExpensiMark {
          }
  
          return replacedText;
@@ -119,7 +129,7 @@ index 02d408c..d73d5f7 100644
  
      /**
       * Checks matched URLs for validity and replace valid links with html elements
-@@ -669,7 +692,7 @@ export default class ExpensiMark {
+@@ -669,7 +679,7 @@ export default class ExpensiMark {
          }
  
          return replacedText;
@@ -128,7 +138,7 @@ index 02d408c..d73d5f7 100644
  
      /**
       * Checks matched Emails for validity and replace valid links with html elements
-@@ -708,7 +731,7 @@ export default class ExpensiMark {
+@@ -708,7 +718,7 @@ export default class ExpensiMark {
              replacedText = replacedText.concat(textToCheck.substr(startIndex));
          }
          return replacedText;
@@ -137,7 +147,7 @@ index 02d408c..d73d5f7 100644
  
      /**
       * replace block element with '\n' if :
-@@ -748,7 +771,7 @@ export default class ExpensiMark {
+@@ -748,7 +758,7 @@ export default class ExpensiMark {
          });
  
          return joinedText;
@@ -146,7 +156,7 @@ index 02d408c..d73d5f7 100644
  
      /**
       * Replaces HTML with markdown
-@@ -775,7 +798,7 @@ export default class ExpensiMark {
+@@ -775,7 +785,7 @@ export default class ExpensiMark {
              generatedMarkdown = generatedMarkdown.replace(rule.regex, rule.replacement);
          });
          return Str.htmlDecode(this.replaceBlockElementWithNewLine(generatedMarkdown));
@@ -155,7 +165,7 @@ index 02d408c..d73d5f7 100644
  
      /**
       * Convert HTML to text
-@@ -794,7 +817,7 @@ export default class ExpensiMark {
+@@ -794,7 +804,7 @@ export default class ExpensiMark {
          // We use 'htmlDecode' instead of 'unescape' to replace entities like '&#32;'
          replacedText = Str.htmlDecode(replacedText);
          return replacedText;
@@ -164,7 +174,7 @@ index 02d408c..d73d5f7 100644
  
      /**
       * Modify text for Quotes replacing chevrons with html elements
-@@ -857,7 +880,7 @@ export default class ExpensiMark {
+@@ -857,7 +867,7 @@ export default class ExpensiMark {
              replacedText = textToCheck;
          }
          return replacedText;
@@ -173,7 +183,7 @@ index 02d408c..d73d5f7 100644
  
      /**
       * Format the content of blockquote if the text matches the regex or else just return the original text
-@@ -878,7 +901,7 @@ export default class ExpensiMark {
+@@ -878,7 +888,7 @@ export default class ExpensiMark {
              return replacement(textToFormat);
          }
          return textToCheck;
@@ -182,7 +192,7 @@ index 02d408c..d73d5f7 100644
  
      /**
       * Check if the input text includes only the open or the close tag of an element.
-@@ -917,7 +940,7 @@ export default class ExpensiMark {
+@@ -917,7 +927,7 @@ export default class ExpensiMark {
  
          // If there are any tags left in the stack, they're unclosed
          return tagStack.length !== 0;
@@ -191,33 +201,60 @@ index 02d408c..d73d5f7 100644
  
      /**
       * @param {String} comment
-@@ -939,20 +962,7 @@ export default class ExpensiMark {
+@@ -939,41 +949,24 @@ export default class ExpensiMark {
              console.warn('Error parsing url in ExpensiMark.extractLinksInMarkdownComment', {error: e});
              return undefined;
          }
 -    }
--
--    /**
++    },
+ 
+     /**
 -     * Compares two markdown comments and returns a list of the links removed in a new comment.
 -     *
 -     * @param {String} oldComment
 -     * @param {String} newComment
 -     * @returns {Array}
--     */
++          * Escapes the content of an HTML attribute value
++     * @param {String} content - string content that possible contains HTML
++     * @returns {String} - original MD content escaped for use in HTML attribute value
+      */
 -    getRemovedMarkdownLinks(oldComment, newComment) {
 -        const linksInOld = this.extractLinksInMarkdownComment(oldComment);
 -        const linksInNew = this.extractLinksInMarkdownComment(newComment);
 -        return linksInOld === undefined || linksInNew === undefined ? [] : _.difference(linksInOld, linksInNew);
 -    }
-+    },
++    escapeAttributeContent(content) {
++        let originalContent = this.htmlToMarkdown(content);
++        if (content === originalContent) {
++            return content;
++        }
  
-     /**
-      * Replace MD characters with their HTML entity equivalent
-@@ -975,5 +985,7 @@ export default class ExpensiMark {
-         };
- 
-         return text.replace(pattern, char => entities[char] || char);
+-    /**
+-     * Replace MD characters with their HTML entity equivalent
+-     * @param {String} text
+-     * @return {String}
+-     */
+-    escapeMarkdownEntities(text) {
+-        // A regex pattern matching special MD characters we'd like to escape
+-        const pattern = /([*_{}[\]~])/g;
+-
+-        // A map of MD characters to their HTML entity equivalent
+-        const entities = {
+-            '*': '&ast;',
+-            _: '&lowbar;',
+-            '{': '&lbrace;',
+-            '}': '&rbrace;',
+-            '[': '&lbrack;',
+-            ']': '&rbrack;',
+-            '~': '&#126;',
+-        };
+-
+-        return text.replace(pattern, char => entities[char] || char);
 -    }
++        // When the attribute contains HTML and is converted back to MD we need to re-escape it to avoid
++        // illegal attribute value characters like `," or ' which might break the HTML
++        originalContent = Str.replaceAll(originalContent, '\n', '');
++        return _.escape(originalContent);
 +    },
  }
 +
