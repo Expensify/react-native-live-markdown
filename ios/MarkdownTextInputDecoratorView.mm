@@ -100,7 +100,7 @@
 {
   _markdownStyle = markdownStyle;
   [_markdownUtils setMarkdownStyle:markdownStyle];
-  [_textInput textInputDidChange]; // trigger attributed text update
+  [_textInput setAttributedText:_textInput.attributedText]; // apply new styles
 }
 
 @end
