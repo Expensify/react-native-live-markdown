@@ -17,7 +17,7 @@ public class LiveMarkdownModule extends NativeLiveMarkdownModuleSpec {
   @Override
   public boolean install() {
     if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
-      UIManager uiManager =
+      FabricUIManager UIManager uiManager =
         (FabricUIManager) UIManagerHelper.getUIManager(getReactApplicationContext(), UIManagerType.FABRIC);
       mNativeProxy.createCommitHook(uiManager);
     }
