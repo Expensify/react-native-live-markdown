@@ -550,7 +550,8 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       if (history.current?.history.length !== 0) {
         return;
       }
-      history.current.add(value ?? '', (value ?? '').length);
+      const currentValue = value ?? '';
+      history.current.add(currentValue, currentValue.length);
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
