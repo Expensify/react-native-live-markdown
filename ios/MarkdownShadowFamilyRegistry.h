@@ -1,3 +1,5 @@
+#pragma once
+
 #include <react/renderer/components/iostextinput/TextInputShadowNode.h>
 
 #include <mutex>
