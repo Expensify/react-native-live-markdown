@@ -401,6 +401,7 @@ describe('inline image', () => {
       {type: 'syntax', start: 33, length: 1},
     ]);
   });
+
   test('with same alt text as src', () => {
     expect('![https://example.com/image.png](https://example.com/image.png)').toBeParsedAs([
       {type: 'syntax', start: 0, length: 1},
