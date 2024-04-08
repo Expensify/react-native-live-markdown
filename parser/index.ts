@@ -166,6 +166,8 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
         const src = node.tag.match(/src="([^"]*)"/)![1]!; // always present
         const alt = node.tag.match(/alt="([^"]*)"/);
         const hasAlt = node.tag.match(/data-link-variant="([^"]*)"/)![1] === 'labeled';
+        const rawLink = node.tag.match(/data-raw-href="([^"]*)"/);
+        const linkString = rawLink ? _.unescape(rawLink[1]!) : src;
 
         appendSyntax('!');
         if (hasAlt) {
@@ -174,7 +176,7 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
           appendSyntax(']');
         }
         appendSyntax('(');
-        addChildrenWithStyle(src, 'link');
+        addChildrenWithStyle(linkString, 'link');
         appendSyntax(')');
       } else {
         throw new Error(`Unknown tag: ${node.tag}`);
