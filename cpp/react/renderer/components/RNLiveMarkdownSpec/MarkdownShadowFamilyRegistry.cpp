@@ -1,3 +1,5 @@
+#ifdef RCT_NEW_ARCH_ENABLED
+
 #include "MarkdownShadowFamilyRegistry.h"
 
 std::set<facebook::react::ShadowNodeFamily::Shared> MarkdownShadowFamilyRegistry::familiesToUpdate_;
@@ -44,3 +46,5 @@ bool MarkdownShadowFamilyRegistry::shouldForceUpdate(facebook::react::Tag tag) {
     }
     return false;
 }
+
+#endif

@@ -9,15 +9,16 @@ public class NativeProxy {
   static {
     SoLoader.loadLibrary("react_codegen_RNLiveMarkdownSpec");
   }
- @DoNotStrip
- @SuppressWarnings("unused")
- private final HybridData mHybridData;
+  
+  @DoNotStrip
+  @SuppressWarnings("unused")
+  private final HybridData mHybridData;
 
- public NativeProxy() {
-   mHybridData = initHybrid();
- }
+  public NativeProxy() {
+    mHybridData = initHybrid();
+  }
 
- private native HybridData initHybrid();
+  private native HybridData initHybrid();
 
- public native void createCommitHook(FabricUIManager fabricUIManager);
+  public native void createCommitHook(FabricUIManager fabricUIManager);
 }
