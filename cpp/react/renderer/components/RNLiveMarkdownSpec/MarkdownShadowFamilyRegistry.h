@@ -1,3 +1,5 @@
+#pragma once
+
 #include <react/renderer/core/ShadowNodeFamily.h>
 
 #include <mutex>

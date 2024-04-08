@@ -1,6 +1,7 @@
 #pragma once
 
 #include "MarkdownTextInputDecoratorState.h"
+#include "MarkdownShadowFamilyRegistry.h"
 #include <react/renderer/components/RNLiveMarkdownSpec/EventEmitters.h>
 #include <react/renderer/components/RNLiveMarkdownSpec/Props.h>
 #include <react/renderer/components/view/ConcreteViewShadowNode.h>
@@ -27,8 +28,13 @@ class JSI_EXPORT MarkdownTextInputDecoratorShadowNode final : public ConcreteVie
         MarkdownTextInputDecoratorShadowNode(
             ShadowNode const &sourceShadowNode,
             ShadowNodeFragment const &fragment)
-            : ConcreteViewShadowNode(sourceShadowNode, fragment) {}
-
+            : ConcreteViewShadowNode(sourceShadowNode, fragment) {
+                // if the props changed, we need to update the shadow node state to reflect potential style changes
+                if (fragment.props != ShadowNodeFragment::propsPlaceholder()) {
+                    MarkdownShadowFamilyRegistry::forceNextStateUpdate(this->getTag());
+                }
+            }
+        
  private:
         static const ShadowNodeFragment::Value updateFragmentState(ShadowNodeFragment const &fragment, ShadowNodeFamily::Shared const &family);
 };
