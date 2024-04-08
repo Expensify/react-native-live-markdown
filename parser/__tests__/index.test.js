@@ -484,7 +484,6 @@ describe('inline image', () => {
   });
 
   test('blockquote in alt', () => {
-    // TODO: this test is failing !!!
     expect('![```test```](https://example.com/image.png)').toBeParsedAs([
       {type: 'syntax', start: 0, length: 1},
       {type: 'syntax', start: 1, length: 1},
