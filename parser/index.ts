@@ -165,10 +165,10 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
       } else if (node.tag.startsWith('<img src="')) {
         const src = node.tag.match(/src="([^"]*)"/)![1]!; // always present
         const alt = node.tag.match(/alt="([^"]*)"/);
-        const isLabeledLink = node.tag.match(/data-link-variant="([^"]*)"/)![1] === 'labeled';
+        const hasAlt = node.tag.match(/data-link-variant="([^"]*)"/)![1] === 'labeled';
 
         appendSyntax('!');
-        if (isLabeledLink) {
+        if (hasAlt) {
           appendSyntax('[');
           processChildren(_.unescape(alt?.[1] || ''));
           appendSyntax(']');
