@@ -506,13 +506,13 @@ describe('inline image', () => {
   test('image with empty alt text and not completed link', () => {
     expect('# ![](example.com)').toBeParsedAs([
       {type: 'syntax', start: 0, length: 2},
-      {type: 'h1', start: 2, length: 12},
+      {type: 'h1', start: 2, length: 16},
       {type: 'syntax', start: 2, length: 1},
       {type: 'syntax', start: 3, length: 1},
       {type: 'syntax', start: 4, length: 1},
       {type: 'syntax', start: 5, length: 1},
-      {type: 'link', start: 6, length: 7},
-      {type: 'syntax', start: 13, length: 1},
+      {type: 'link', start: 6, length: 11},
+      {type: 'syntax', start: 17, length: 1},
     ]);
   });
 });
