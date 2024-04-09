@@ -1,5 +1,7 @@
 #pragma once
+#ifdef RCT_NEW_ARCH_ENABLED
 
+#include "MarkdownShadowFamilyRegistry.h"
 #include "MarkdownTextInputDecoratorState.h"
 #include "MarkdownShadowFamilyRegistry.h"
 #include <react/renderer/components/RNLiveMarkdownSpec/EventEmitters.h>
@@ -12,18 +14,28 @@ namespace react {
 
 JSI_EXPORT extern const char MarkdownTextInputDecoratorViewComponentName[];
 
+class JSI_EXPORT MarkdownTextInputDecoratorShadowNode final
+    : public ConcreteViewShadowNode<MarkdownTextInputDecoratorViewComponentName,
+                                    MarkdownTextInputDecoratorViewProps,
+                                    MarkdownTextInputDecoratorViewEventEmitter,
+                                    MarkdownTextInputDecoratorState> {
+public:
+  MarkdownTextInputDecoratorShadowNode(ShadowNodeFragment const &fragment,
+                                       ShadowNodeFamily::Shared const &family,
+                                       ShadowNodeTraits traits)
+      : ConcreteViewShadowNode(static_cast<ShadowNodeFragment>(
+                                   updateFragmentState(fragment, family)),
+                               family, traits) {}
 
-class JSI_EXPORT MarkdownTextInputDecoratorShadowNode final : public ConcreteViewShadowNode<
-    MarkdownTextInputDecoratorViewComponentName,
-    MarkdownTextInputDecoratorViewProps,
-    MarkdownTextInputDecoratorViewEventEmitter,
-    MarkdownTextInputDecoratorState> {
- public:
-        MarkdownTextInputDecoratorShadowNode(
-            ShadowNodeFragment const &fragment,
-            ShadowNodeFamily::Shared const &family,
-            ShadowNodeTraits traits)
-            : ConcreteViewShadowNode(static_cast<ShadowNodeFragment>(updateFragmentState(fragment, family)), family, traits) {}
+  MarkdownTextInputDecoratorShadowNode(ShadowNode const &sourceShadowNode,
+                                       ShadowNodeFragment const &fragment)
+      : ConcreteViewShadowNode(sourceShadowNode, fragment) {
+    // if the props changed, we need to update the shadow node state to reflect
+    // potential style changes
+    if (fragment.props != ShadowNodeFragment::propsPlaceholder()) {
+      MarkdownShadowFamilyRegistry::forceNextStateUpdate(this->getTag());
+    }
+  }
 
         MarkdownTextInputDecoratorShadowNode(
             ShadowNode const &sourceShadowNode,
@@ -41,3 +53,5 @@ class JSI_EXPORT MarkdownTextInputDecoratorShadowNode final : public ConcreteVie
 
 } // namespace react
 } // namespace facebook
+
+#endif
