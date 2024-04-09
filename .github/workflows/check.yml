@@ -27,12 +27,25 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable
 
-      - name: Typecheck
-        run: |
-          yarn tsc --project tsconfig.json --noEmit
-          yarn tsc --project parser/tsconfig.json --noEmit
-          yarn tsc --project example/tsconfig.json --noEmit
-          yarn tsc --project WebExample/tsconfig.json --noEmit
+      - name: Install parser dependencies
+        working-directory: parser
+        run: npm ci
+
+      - name: Install WebExample dependencies
+        working-directory: WebExample
+        run: npm ci
+
+      - name: Typecheck library
+        run: yarn tsc --project tsconfig.json --noEmit
+
+      - name: Typecheck parser
+        run: yarn tsc --project parser/tsconfig.json --noEmit
+
+      - name: Typecheck example app
+        run: yarn tsc --project example/tsconfig.json --noEmit
+
+      - name: Typecheck WebExample app
+        run: yarn tsc --project WebExample/tsconfig.json --noEmit
 
       - name: Lint
         run: yarn lint
