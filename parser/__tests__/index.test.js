@@ -504,7 +504,7 @@ describe('inline image', () => {
   });
 
   test('image with empty alt text and not completed link', () => {
-    expect('# ![](onet.pl)').toBeParsedAs([
+    expect('# ![](example.com)').toBeParsedAs([
       {type: 'syntax', start: 0, length: 2},
       {type: 'h1', start: 2, length: 12},
       {type: 'syntax', start: 2, length: 1},
