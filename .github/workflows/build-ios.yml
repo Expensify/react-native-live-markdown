@@ -59,4 +59,4 @@ jobs:
 
       - name: Build app
         working-directory: ${{ matrix.working-directory }}
-        run: yarn build:ios
+        run: npx react-native run-ios --no-packager
