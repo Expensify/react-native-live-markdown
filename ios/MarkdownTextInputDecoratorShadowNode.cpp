@@ -1,3 +1,5 @@
+#ifdef RCT_NEW_ARCH_ENABLED
+
 #include <react/renderer/core/LayoutContext.h>
 
 #include "MarkdownTextInputDecoratorShadowNode.h"
@@ -25,3 +27,5 @@ const ShadowNodeFragment::Value MarkdownTextInputDecoratorShadowNode::updateFrag
 
 } // namespace react
 } // namespace facebook
+
+#endif

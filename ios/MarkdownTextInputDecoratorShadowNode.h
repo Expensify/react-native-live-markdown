@@ -1,4 +1,5 @@
 #pragma once
+#ifdef RCT_NEW_ARCH_ENABLED
 
 #include "MarkdownTextInputDecoratorState.h"
 #include "MarkdownShadowFamilyRegistry.h"
@@ -42,3 +43,5 @@ class JSI_EXPORT MarkdownTextInputDecoratorShadowNode final : public ConcreteVie
 
 } // namespace react
 } // namespace facebook
+
+#endif

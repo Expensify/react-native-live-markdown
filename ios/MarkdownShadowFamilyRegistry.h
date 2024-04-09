@@ -1,4 +1,5 @@
 #pragma once
+#ifdef RCT_NEW_ARCH_ENABLED
 
 #include <react/renderer/components/iostextinput/TextInputShadowNode.h>
 
@@ -25,3 +26,5 @@ private:
     static std::set<facebook::react::Tag> forcedUpdates_;
     static std::mutex mutex_;
 };
+
+#endif
