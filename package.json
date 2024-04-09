@@ -68,6 +68,7 @@
     "@types/jest": "^28.1.2",
     "@types/react": "~17.0.21",
     "@types/react-native": "0.70.0",
+    "@types/underscore": "^1.11.15",
     "@typescript-eslint/eslint-plugin": "^6.15.0",
     "@typescript-eslint/parser": "^6.15.0",
     "del-cli": "^5.0.0",
@@ -104,7 +105,8 @@
     "react-native": "*"
   },
   "workspaces": [
-    "example"
+    "example",
+    "WebExample"
   ],
   "packageManager": "yarn@3.6.1",
   "engines": {
