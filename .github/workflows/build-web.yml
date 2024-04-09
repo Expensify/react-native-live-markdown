@@ -20,12 +20,8 @@ jobs:
   build:
     if: github.repository == 'Expensify/react-native-live-markdown'
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        working-directory: [WebExample]
-      fail-fast: false
     concurrency:
-      group: build-web-${{ matrix.working-directory }}-${{ github.ref }}
+      group: build-web-${{ github.ref }}
       cancel-in-progress: true
     steps:
       - name: Check out Git repository
@@ -34,10 +30,10 @@ jobs:
       - name: Install node_modules
         run: yarn install --immutable
 
-      - name: Install ${{ matrix.working-directory }} dependencies
-        working-directory: ${{ matrix.working-directory }}
+      - name: Install WebExample node_modules
+        working-directory: WebExample
         run: npm ci
 
       - name: Build app
-        working-directory: ${{ matrix.working-directory }}
+        working-directory: WebExample
         run: npx expo export:web
