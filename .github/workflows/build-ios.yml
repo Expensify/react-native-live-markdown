@@ -57,6 +57,10 @@ jobs:
           path: ~/Library/Developer/Xcode/DerivedData
           key: ${{ runner.os }}-ios-derived-data-${{ matrix.working-directory }}-${{ hashFiles(format('{0}/ios/Podfile.lock', matrix.working-directory)) }}
 
+      - name: Configure NODE_BINARY
+        working-directory: ${{ matrix.working-directory }}/ios
+        run: echo export NODE_BINARY=$(command -v node) > .xcode.env
+
       - name: Build app
         working-directory: ${{ matrix.working-directory }}
         run: npx react-native@latest run-ios --no-packager --simulator="iPhone 15"
