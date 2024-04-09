@@ -100,7 +100,11 @@
 {
   _markdownStyle = markdownStyle;
   [_markdownUtils setMarkdownStyle:markdownStyle];
+#ifdef RCT_NEW_ARCH_ENABLED
+  [_textInput textInputDidChange]; // apply new styles
+#else
   [_textInput setAttributedText:_textInput.attributedText]; // apply new styles
+#endif
 }
 
 @end
