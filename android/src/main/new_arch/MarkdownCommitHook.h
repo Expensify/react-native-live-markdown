@@ -1,11 +1,11 @@
 #pragma once
 
-#include <react/fabric/JFabricUIManager.h>
 #include <fbjni/fbjni.h>
+#include <react/fabric/JFabricUIManager.h>
 
+#include <react/renderer/components/androidtextinput/AndroidTextInputShadowNode.h>
 #include <react/renderer/uimanager/UIManager.h>
 #include <react/renderer/uimanager/UIManagerCommitHook.h>
-#include <react/renderer/components/androidtextinput/AndroidTextInputShadowNode.h>
 
 #include <memory>
 #include <unordered_map>
@@ -18,15 +18,17 @@ using namespace react;
 namespace livemarkdown {
 
 struct MarkdownTextInputDecoratorPair {
-    const std::shared_ptr<const AndroidTextInputShadowNode> textInput;
-    const std::shared_ptr<const MarkdownTextInputDecoratorShadowNode> decorator;
+  const std::shared_ptr<const AndroidTextInputShadowNode> textInput;
+  const std::shared_ptr<const MarkdownTextInputDecoratorShadowNode> decorator;
 };
 
 class MarkdownCommitHook : public UIManagerCommitHook {
- public:
-  MarkdownCommitHook(jni::global_ref<facebook::react::JFabricUIManager::javaobject> fabricUIManager);
+public:
+  MarkdownCommitHook(
+      jni::global_ref<facebook::react::JFabricUIManager::javaobject>
+          fabricUIManager);
 
- ~MarkdownCommitHook() noexcept override;
+  ~MarkdownCommitHook() noexcept override;
 
   void commitHookWasRegistered(UIManager const &) noexcept override {}
 
@@ -35,14 +37,16 @@ class MarkdownCommitHook : public UIManagerCommitHook {
   RootShadowNode::Unshared shadowTreeWillCommit(
       ShadowTree const &shadowTree,
       RootShadowNode::Shared const &oldRootShadowNode,
-      RootShadowNode::Unshared const &newRootShadowNode)
-      noexcept override;
+      RootShadowNode::Unshared const &newRootShadowNode) noexcept override;
 
- private:
-    const jni::global_ref<facebook::react::JFabricUIManager::javaobject> fabricUIManager_;
-    const std::shared_ptr<UIManager> uiManager_;
-    std::unordered_map<facebook::react::Tag, SharedTextLayoutManager> textLayoutManagers_;
-    std::unordered_map<facebook::react::Tag, folly::dynamic> previousDecoratorProps_;
+private:
+  const jni::global_ref<facebook::react::JFabricUIManager::javaobject>
+      fabricUIManager_;
+  const std::shared_ptr<UIManager> uiManager_;
+  std::unordered_map<facebook::react::Tag, SharedTextLayoutManager>
+      textLayoutManagers_;
+  std::unordered_map<facebook::react::Tag, folly::dynamic>
+      previousDecoratorProps_;
 };
 
 } // namespace livemarkdown

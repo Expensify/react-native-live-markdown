@@ -12,13 +12,9 @@ using namespace facebook;
 using namespace react;
 
 NativeProxy::NativeProxy(jni::alias_ref<NativeProxy::javaobject> jThis)
-  : javaPart_(jni::make_global(jThis)) {
+    : javaPart_(jni::make_global(jThis)) {}
 
-}
-
-NativeProxy::~NativeProxy() {
-
-}
+NativeProxy::~NativeProxy() {}
 
 void NativeProxy::registerNatives() {
   registerHybrid(
@@ -27,14 +23,15 @@ void NativeProxy::registerNatives() {
 }
 
 void NativeProxy::createCommitHook(
-  jni::alias_ref<facebook::react::JFabricUIManager::javaobject> fabricUIManager
-) {
+    jni::alias_ref<facebook::react::JFabricUIManager::javaobject>
+        fabricUIManager) {
   const auto &globalUIManager = jni::make_global(fabricUIManager);
 
- this->commitHook_ = std::make_shared<MarkdownCommitHook>(globalUIManager);
+  this->commitHook_ = std::make_shared<MarkdownCommitHook>(globalUIManager);
 }
 
-jni::local_ref<NativeProxy::jhybriddata> NativeProxy::initHybrid(jni::alias_ref<jhybridobject> jThis) {
+jni::local_ref<NativeProxy::jhybriddata>
+NativeProxy::initHybrid(jni::alias_ref<jhybridobject> jThis) {
   return makeCxxInstance(jThis);
 }
 

@@ -3,11 +3,10 @@
 
 #include "MarkdownShadowFamilyRegistry.h"
 #include "MarkdownTextInputDecoratorState.h"
-#include "MarkdownShadowFamilyRegistry.h"
+#include <jsi/jsi.h>
 #include <react/renderer/components/RNLiveMarkdownSpec/EventEmitters.h>
 #include <react/renderer/components/RNLiveMarkdownSpec/Props.h>
 #include <react/renderer/components/view/ConcreteViewShadowNode.h>
-#include <jsi/jsi.h>
 
 namespace facebook {
 namespace react {
@@ -37,18 +36,20 @@ public:
     }
   }
 
-        MarkdownTextInputDecoratorShadowNode(
-            ShadowNode const &sourceShadowNode,
-            ShadowNodeFragment const &fragment)
-            : ConcreteViewShadowNode(sourceShadowNode, fragment) {
-                // if the props changed, we need to update the shadow node state to reflect potential style changes
-                if (fragment.props != ShadowNodeFragment::propsPlaceholder()) {
-                    MarkdownShadowFamilyRegistry::forceNextStateUpdate(this->getTag());
-                }
-            }
-        
- private:
-        static const ShadowNodeFragment::Value updateFragmentState(ShadowNodeFragment const &fragment, ShadowNodeFamily::Shared const &family);
+  MarkdownTextInputDecoratorShadowNode(ShadowNode const &sourceShadowNode,
+                                       ShadowNodeFragment const &fragment)
+      : ConcreteViewShadowNode(sourceShadowNode, fragment) {
+    // if the props changed, we need to update the shadow node state to reflect
+    // potential style changes
+    if (fragment.props != ShadowNodeFragment::propsPlaceholder()) {
+      MarkdownShadowFamilyRegistry::forceNextStateUpdate(this->getTag());
+    }
+  }
+
+private:
+  static const ShadowNodeFragment::Value
+  updateFragmentState(ShadowNodeFragment const &fragment,
+                      ShadowNodeFamily::Shared const &family);
 };
 
 } // namespace react

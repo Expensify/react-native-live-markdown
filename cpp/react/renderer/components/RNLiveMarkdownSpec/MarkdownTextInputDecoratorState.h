@@ -16,9 +16,8 @@ public:
 
 #ifdef ANDROID
   MarkdownTextInputDecoratorState(
-      MarkdownTextInputDecoratorState const &previousState,
-      folly::dynamic data)
-      : decoratorFamily(previousState.decoratorFamily) {};
+      MarkdownTextInputDecoratorState const &previousState, folly::dynamic data)
+      : decoratorFamily(previousState.decoratorFamily){};
 #endif
 
   const ShadowNodeFamily::Shared decoratorFamily;
@@ -27,9 +26,7 @@ public:
   folly::dynamic getDynamic() const {
     return folly::dynamic::object("decoratorFamily", "pointer should be here?");
   }
-  MapBuffer getMapBuffer() const {
-    return MapBufferBuilder::EMPTY();
-  };
+  MapBuffer getMapBuffer() const { return MapBufferBuilder::EMPTY(); };
 #endif
 };
 
