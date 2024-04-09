@@ -19,4 +19,11 @@ Pod::Spec.new do |s|
   s.resources = "parser/react-native-live-markdown-parser.js"
 
   install_modules_dependencies(s)
+
+  if ENV['USE_FRAMEWORKS'] && ENV['RCT_NEW_ARCH_ENABLED']
+    add_dependency(s, "React-Fabric", :additional_framework_paths => [
+      "react/renderer/textlayoutmanager/platform/ios",
+      "react/renderer/components/textinput/iostextinput",
+    ])
+  end
 end
