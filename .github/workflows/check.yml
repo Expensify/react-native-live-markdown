@@ -24,14 +24,14 @@ jobs:
         with:
           node-version: 18
 
-      - name: Install dependencies
+      - name: Install node_modules
         run: yarn install --immutable
 
-      - name: Install parser dependencies
+      - name: Install parser node_modules
         working-directory: parser
         run: npm ci
 
-      - name: Install WebExample dependencies
+      - name: Install WebExample node_modules
         working-directory: WebExample
         run: npm ci
 

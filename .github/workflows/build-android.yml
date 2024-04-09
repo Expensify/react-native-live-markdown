@@ -39,7 +39,7 @@ jobs:
           distribution: 'zulu'
           java-version: 17
 
-      - name: Install dependencies
+      - name: Install node_modules
         run: yarn install --immutable
 
       - name: Build app
