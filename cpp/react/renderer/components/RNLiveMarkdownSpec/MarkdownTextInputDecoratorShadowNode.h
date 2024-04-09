@@ -1,5 +1,5 @@
 #pragma once
-#ifdef RCT_NEW_ARCH_ENABLED
+#if defined(RCT_NEW_ARCH_ENABLED) || defined(ANDROID)
 
 #include "MarkdownShadowFamilyRegistry.h"
 #include "MarkdownTextInputDecoratorState.h"

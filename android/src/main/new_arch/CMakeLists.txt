@@ -17,8 +17,6 @@ file(GLOB LIB_CODEGEN_SRCS CONFIGURE_DEPENDS ${LIB_ANDROID_GENERATED_COMPONENTS_
 
 set(RN_DIR ${LIB_ANDROID_DIR}/../example/node_modules/react-native)
 
-add_compile_definitions(RCT_NEW_ARCH_ENABLED)
-
 add_library(
   ${LIB_TARGET_NAME}
   SHARED 
