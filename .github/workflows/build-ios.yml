@@ -29,7 +29,7 @@ jobs:
         working-directory: [example]
       fail-fast: false
     concurrency:
-      group: ios-${{ matrix.working-directory }}-${{ github.ref }}
+      group: build-ios-${{ matrix.working-directory }}-${{ github.ref }}
       cancel-in-progress: true
     steps:
       - name: Check out Git repository

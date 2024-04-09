@@ -27,7 +27,7 @@ jobs:
         working-directory: [example]
       fail-fast: false
     concurrency:
-      group: android-${{ matrix.working-directory }}-${{ github.ref }}
+      group: build-android-${{ matrix.working-directory }}-${{ github.ref }}
       cancel-in-progress: true
     steps:
       - name: Check out Git repository
