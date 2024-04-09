@@ -13,11 +13,16 @@ jobs:
     if: github.repository == 'Expensify/react-native-live-markdown'
     runs-on: ubuntu-latest
     concurrency:
-      group: root-${{ github.ref }}
+      group: check-root-${{ github.ref }}
       cancel-in-progress: true
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v4
+
+      - name: Use Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
 
       - name: Install dependencies
         run: yarn install --immutable
