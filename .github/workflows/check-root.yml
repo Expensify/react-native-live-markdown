@@ -1,0 +1,32 @@
+name: Test TypeScript and Lint
+on:
+  pull_request:
+  merge_group:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  check:
+    if: github.repository == 'Expensify/react-native-live-markdown'
+    runs-on: ubuntu-latest
+    concurrency:
+      group: root-${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Check types
+        run: yarn typecheck
+
+      - name: Lint
+        run: yarn lint:root
+
+      - name: Test
+        run: yarn test
