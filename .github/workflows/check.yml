@@ -1,4 +1,4 @@
-name: Test TypeScript and Lint
+name: Typecheck, lint and test
 on:
   pull_request:
   merge_group:
@@ -27,11 +27,15 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable
 
-      - name: Check types
-        run: yarn typecheck
+      - name: Typecheck
+        run: |
+          yarn tsc --project tsconfig.json --noEmit
+          yarn tsc --project parser/tsconfig.json --noEmit
+          yarn tsc --project example/tsconfig.json --noEmit
+          yarn tsc --project WebExample/tsconfig.json --noEmit
 
       - name: Lint
-        run: yarn lint:root
+        run: yarn lint
 
       - name: Test
         run: yarn test
