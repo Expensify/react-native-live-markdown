@@ -57,6 +57,10 @@ jobs:
           path: ~/Library/Developer/Xcode/DerivedData
           key: ${{ runner.os }}-ios-derived-data-${{ matrix.working-directory }}-${{ hashFiles(format('{0}/ios/Podfile.lock', matrix.working-directory)) }}
 
+      - name: Run doctor
+        working-directory: ${{ matrix.working-directory }}
+        run: npx react-native doctor
+
       - name: Build app
         working-directory: ${{ matrix.working-directory }}
         run: npx react-native@latest run-ios --no-packager
