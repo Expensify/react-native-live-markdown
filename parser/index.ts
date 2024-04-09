@@ -59,6 +59,10 @@ function parseTokensToTree(tokens: Token[]): StackItem {
         const child = stack.pop();
         const top = stack[stack.length - 1];
         top!.children.push(child!);
+      } else if (payload.endsWith('/>')) {
+        // self-closing tag
+        const top = stack[stack.length - 1];
+        top!.children.push({tag: payload, children: []});
       } else {
         // opening tag
         stack.push({tag: payload, children: []});
@@ -146,7 +150,7 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
       } else if (node.tag.startsWith('<a href="')) {
         const rawHref = node.tag.match(/href="([^"]*)"/)![1]!; // always present
         const href = _.unescape(rawHref);
-        const isLabeledLink = node.tag.match(/link-variant="([^"]*)"/)![1] === 'labeled';
+        const isLabeledLink = node.tag.match(/data-link-variant="([^"]*)"/)![1] === 'labeled';
         const dataRawHref = node.tag.match(/data-raw-href="([^"]*)"/);
         const matchString = dataRawHref ? _.unescape(dataRawHref[1]!) : href;
         if (!isLabeledLink && node.children.length === 1 && typeof node.children[0] === 'string' && (node.children[0] === matchString || `mailto:${node.children[0]}` === href)) {
@@ -158,6 +162,22 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
           addChildrenWithStyle(matchString, 'link');
           appendSyntax(')');
         }
+      } else if (node.tag.startsWith('<img src="')) {
+        const src = node.tag.match(/src="([^"]*)"/)![1]!; // always present
+        const alt = node.tag.match(/alt="([^"]*)"/);
+        const hasAlt = node.tag.match(/data-link-variant="([^"]*)"/)![1] === 'labeled';
+        const rawLink = node.tag.match(/data-raw-href="([^"]*)"/);
+        const linkString = rawLink ? _.unescape(rawLink[1]!) : src;
+
+        appendSyntax('!');
+        if (hasAlt) {
+          appendSyntax('[');
+          processChildren(_.unescape(alt?.[1] || ''));
+          appendSyntax(']');
+        }
+        appendSyntax('(');
+        addChildrenWithStyle(linkString, 'link');
+        appendSyntax(')');
       } else {
         throw new Error(`Unknown tag: ${node.tag}`);
       }
