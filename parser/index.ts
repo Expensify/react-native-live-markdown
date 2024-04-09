@@ -227,17 +227,23 @@ function groupRanges(ranges: Range[]) {
 }
 
 function parseExpensiMarkToRanges(markdown: string): Range[] {
-  const html = parseMarkdownToHTML(markdown);
-  const tokens = parseHTMLToTokens(html);
-  const tree = parseTokensToTree(tokens);
-  const [text, ranges] = parseTreeToTextAndRanges(tree);
-  if (text !== markdown) {
-    // text mismatch, don't return any ranges
+  try {
+    const html = parseMarkdownToHTML(markdown);
+    const tokens = parseHTMLToTokens(html);
+    const tree = parseTokensToTree(tokens);
+    const [text, ranges] = parseTreeToTextAndRanges(tree);
+    if (text !== markdown) {
+      // text mismatch, don't return any ranges
+      return [];
+    }
+    const sortedRanges = sortRanges(ranges);
+    const groupedRanges = groupRanges(sortedRanges);
+    return groupedRanges;
+  } catch (error) {
+    console.error(error);
+    // returning an empty array in case of error
     return [];
   }
-  const sortedRanges = sortRanges(ranges);
-  const groupedRanges = groupRanges(sortedRanges);
-  return groupedRanges;
 }
 
 globalThis.parseExpensiMarkToRanges = parseExpensiMarkToRanges;
