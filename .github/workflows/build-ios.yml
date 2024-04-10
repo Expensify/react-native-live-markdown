@@ -24,29 +24,49 @@ jobs:
   build:
     if: github.repository == 'Expensify/react-native-live-markdown'
     runs-on: macos-13
-    strategy:
-      matrix:
-        working-directory: [example]
-      fail-fast: false
     concurrency:
-      group: ios-${{ matrix.working-directory }}-${{ github.ref }}
+      group: ios-${{ github.ref }}
       cancel-in-progress: true
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v4
 
-      - name: Use Node.js 18
-        uses: actions/setup-node@v4
+      - name: Restore node_modules from cache
+        uses: actions/cache@v4
         with:
-          node-version: 18
+          path: |
+            node_modules
+            example/node_modules
+          key: ios-node-modules-${{ hashFiles('yarn.lock') }}
 
       - name: Install node_modules
         run: yarn install --immutable
 
+      - name: Restore Pods from cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            example/ios/Pods
+            ~/Library/Caches/CocoaPods
+            ~/.cocoapods
+          key: ios-pods-${{ hashFiles('example/ios/Podfile.lock') }}
+
+      - name: Install Pods
+        working-directory: example/ios
+        run: |
+          bundler install
+          bundler exec pod install
+
       - name: Remove .xcode.env.local
-        working-directory: ${{ matrix.working-directory }}/ios
+        working-directory: example/ios
         run: rm -rf .xcode.env.local
 
+      - name: Restore build artifacts from cache
+        uses: actions/cache@v4
+        with:
+          path: ~/Library/Developer/Xcode/DerivedData
+          key: ios-derived-data-${{ hashFiles('example/ios/Podfile.lock') }}
+
       - name: Build app
-        working-directory: ${{ matrix.working-directory }}
+        working-directory: example
         run: npx react-native@latest run-ios --no-packager
