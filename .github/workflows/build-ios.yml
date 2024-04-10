@@ -38,6 +38,7 @@ jobs:
             node_modules
             example/node_modules
           key: build-ios-node-modules-${{ hashFiles('yarn.lock') }}
+          restore-keys: build-ios-node-modules-
 
       - name: Install node_modules
         run: yarn install --immutable
@@ -50,6 +51,7 @@ jobs:
             ~/Library/Caches/CocoaPods
             ~/.cocoapods
           key: build-ios-pods-${{ hashFiles('example/ios/Podfile.lock') }}
+          restore-keys: build-ios-pods-
 
       - name: Install Pods
         working-directory: example/ios
@@ -66,6 +68,7 @@ jobs:
         with:
           path: ~/Library/Developer/Xcode/DerivedData
           key: build-ios-derived-data-${{ hashFiles('example/ios/Podfile.lock') }}
+          restore-keys: build-ios-derived-data-
 
       - name: Build app
         working-directory: example
