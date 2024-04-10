@@ -47,7 +47,6 @@ jobs:
         working-directory: ${{ matrix.working-directory }}/ios
         run: |
           rm -rf Pods Podfile.lock build
-          rm -rf .xcode.env.local
           echo export NODE_BINARY=$(command -v node) > .xcode.env
           bundler install && bundler exec pod install
 
