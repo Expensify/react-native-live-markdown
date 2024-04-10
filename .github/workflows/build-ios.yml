@@ -47,6 +47,9 @@ jobs:
         working-directory: ${{ matrix.working-directory }}/ios
         run: bundler install && bundler exec pod install
 
+      - name: Setup upterm session
+        uses: lhotari/action-upterm@v1
+
       - name: Build app
         working-directory: ${{ matrix.working-directory }}
         run: npx react-native run-ios --no-packager
