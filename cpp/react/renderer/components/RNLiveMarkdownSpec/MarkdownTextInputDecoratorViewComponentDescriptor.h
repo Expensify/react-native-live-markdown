@@ -7,7 +7,7 @@
 namespace facebook {
 namespace react {
 
-class MarkdownTextInputDecoratorComponentDescriptor final
+class MarkdownTextInputDecoratorViewComponentDescriptor final
     : public ConcreteComponentDescriptor<MarkdownTextInputDecoratorShadowNode> {
 public:
   using ConcreteComponentDescriptor::ConcreteComponentDescriptor;

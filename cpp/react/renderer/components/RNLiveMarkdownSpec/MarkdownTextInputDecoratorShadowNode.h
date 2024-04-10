@@ -1,12 +1,11 @@
 #pragma once
-#ifdef RCT_NEW_ARCH_ENABLED
+#if defined(RCT_NEW_ARCH_ENABLED) || defined(ANDROID)
 
 #include "MarkdownShadowFamilyRegistry.h"
 #include "MarkdownTextInputDecoratorState.h"
 #include <jsi/jsi.h>
 #include <react/renderer/components/RNLiveMarkdownSpec/EventEmitters.h>
 #include <react/renderer/components/RNLiveMarkdownSpec/Props.h>
-#include <react/renderer/components/iostextinput/TextInputShadowNode.h>
 #include <react/renderer/components/view/ConcreteViewShadowNode.h>
 
 namespace facebook {

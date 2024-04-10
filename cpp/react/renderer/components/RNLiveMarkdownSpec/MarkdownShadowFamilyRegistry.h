@@ -1,7 +1,7 @@
 #pragma once
-#ifdef RCT_NEW_ARCH_ENABLED
+#if defined(RCT_NEW_ARCH_ENABLED) || defined(ANDROID)
 
-#include <react/renderer/components/iostextinput/TextInputShadowNode.h>
+#include <react/renderer/core/ShadowNodeFamily.h>
 
 #include <mutex>
 #include <set>

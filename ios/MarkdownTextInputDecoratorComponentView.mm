@@ -6,7 +6,7 @@
 #import <RNLiveMarkdown/MarkdownTextInputDecoratorView.h>
 #import <RNLiveMarkdown/RCTMarkdownStyle.h>
 
-#import "MarkdownTextInputDecoratorComponentDescriptor.h"
+#import <RNLiveMarkdown/MarkdownTextInputDecoratorViewComponentDescriptor.h>
 #import "MarkdownShadowFamilyRegistry.h"
 #import "RCTFabricComponentsPlugins.h"
 
@@ -19,7 +19,7 @@ using namespace facebook::react;
 
 + (ComponentDescriptorProvider)componentDescriptorProvider
 {
-  return concreteComponentDescriptorProvider<MarkdownTextInputDecoratorComponentDescriptor>();
+  return concreteComponentDescriptorProvider<MarkdownTextInputDecoratorViewComponentDescriptor>();
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
