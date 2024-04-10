@@ -14,9 +14,16 @@ Pod::Spec.new do |s|
   s.platforms    = { :ios => "11.0" }
   s.source       = { :git => "https://github.com/expensify/react-native-live-markdown.git", :tag => "#{s.version}" }
 
-  s.source_files = "ios/**/*.{h,m,mm}"
+  s.source_files = "ios/**/*.{h,m,mm,cpp}"
 
   s.resources = "parser/react-native-live-markdown-parser.js"
 
   install_modules_dependencies(s)
+
+  if ENV['USE_FRAMEWORKS'] && ENV['RCT_NEW_ARCH_ENABLED']
+    add_dependency(s, "React-Fabric", :additional_framework_paths => [
+      "react/renderer/textlayoutmanager/platform/ios",
+      "react/renderer/components/textinput/iostextinput",
+    ])
+  end
 end
