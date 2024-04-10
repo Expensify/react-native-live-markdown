@@ -22,12 +22,8 @@ jobs:
   build:
     if: github.repository == 'Expensify/react-native-live-markdown'
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        working-directory: [example]
-      fail-fast: false
     concurrency:
-      group: build-android-${{ matrix.working-directory }}-${{ github.ref }}
+      group: android-${{ github.ref }}
       cancel-in-progress: true
     steps:
       - name: Check out Git repository
@@ -43,5 +39,5 @@ jobs:
         run: yarn install --immutable
 
       - name: Build app
-        working-directory: ${{ matrix.working-directory }}/android
+        working-directory: example/android
         run: ./gradlew assembleDebug --build-cache -PreactNativeArchitectures=arm64-v8a
