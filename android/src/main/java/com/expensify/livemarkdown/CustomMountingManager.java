@@ -91,10 +91,6 @@ public class CustomMountingManager extends MountingManager {
 
     markdownUtils.applyMarkdownFormatting((SpannableStringBuilder)text);
 
-    for (Object objSpan : text.getSpans(0, text.length(), Object.class)) {
-      android.util.Log.w("MDWN", "Found span: " + objSpan.toString());
-    }
-
     BoringLayout.Metrics boring = BoringLayout.isBoring(text, sTextPaintInstance);
 
     Class<TextLayoutManagerMapBuffer> mapBufferClass = TextLayoutManagerMapBuffer.class;
