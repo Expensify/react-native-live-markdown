@@ -48,7 +48,6 @@ jobs:
         run: |
           rm -rf .xcode.env.local
           echo export NODE_BINARY=$(command -v node) > .xcode.env
-          bundler install && bundler exec pod install
 
       - name: Build app
         working-directory: ${{ matrix.working-directory }}
