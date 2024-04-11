@@ -117,10 +117,10 @@ function getElementHeight(node: HTMLDivElement, styles: CSSProperties, numberOfL
       node.parentElement.appendChild(tempElement);
       const height = tempElement.clientHeight;
       node.parentElement.removeChild(tempElement);
-      return `${height}px`;
+      return height ? `${height}px` : 'auto';
     }
   }
-  return `${styles.height}px` || 'auto';
+  return styles.height ? `${styles.height}px` : 'auto';
 }
 
 const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
