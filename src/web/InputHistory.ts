@@ -16,7 +16,7 @@ export default class InputHistory {
 
   debounceTime: number;
 
-  constructor(depth: number, debounceTime = 200) {
+  constructor(depth: number, debounceTime = 150) {
     this.depth = depth;
     this.history = [];
     this.historyIndex = 0;
