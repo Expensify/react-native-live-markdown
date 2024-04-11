@@ -5,6 +5,7 @@ on:
       - .github/workflows/build-ios.yml
       - RNLiveMarkdown.podspec
       - ios/**
+      - cpp/**
       - example/package.json
       - example/ios/**
   merge_group:
@@ -17,6 +18,7 @@ on:
       - .github/workflows/build-ios.yml
       - RNLiveMarkdown.podspec
       - ios/**
+      - cpp/**
       - example/package.json
       - example/ios/**
 
