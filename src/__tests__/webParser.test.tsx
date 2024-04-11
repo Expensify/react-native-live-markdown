@@ -186,7 +186,7 @@ test('separate blockquotes', () => {
 
 test('nested blockquotes', () => {
   expect('>>>> Lorem ipsum dolor sit amet').toBeParsedAsHTML(
-    '<span class="blockquote"><span class="blockquote"><span class="blockquote"><span class="blockquote"><span class="syntax">&gt;</span><span class="syntax">&gt;</span><span class="syntax">&gt;</span><span class="syntax">&gt;</span> Lorem ipsum dolor sit amet</span></span></span></span>',
+    '<span class="blockquote"><span class="blockquote"><span class="blockquote"><span class="syntax">&gt;</span><span class="syntax">&gt;</span><span class="syntax">&gt;</span>&gt; Lorem ipsum dolor sit amet</span></span></span>',
   );
 });
 
