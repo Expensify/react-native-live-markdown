@@ -8,6 +8,7 @@ import type {
   TextInputProps,
   TextInputKeyPressEventData,
   TextInputFocusEventData,
+  TextInputContentSizeChangeEventData,
 } from 'react-native';
 import React, {useEffect, useRef, useCallback, useMemo, useLayoutEffect} from 'react';
 import type {CSSProperties, MutableRefObject, ReactEventHandler, FocusEventHandler, MouseEvent, KeyboardEvent, SyntheticEvent} from 'react';
@@ -66,6 +67,11 @@ interface MarkdownNativeEvent extends Event {
 type Selection = {
   start: number;
   end: number;
+};
+
+type Dimensions = {
+  height: number | null;
+  width: number | null;
 };
 
 let focusTimeout: NodeJS.Timeout | null = null;
@@ -154,6 +160,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       style = {},
       value,
       autoFocus = false,
+      onContentSizeChange,
     },
     ref,
   ) => {
@@ -164,6 +171,8 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     const contentSelection = useRef<Selection | null>(null);
     const className = `react-native-live-markdown-input-${multiline ? 'multiline' : 'singleline'}`;
     const history = useRef<InputHistory>();
+    const dimensions = React.useRef<Dimensions>({height: null, width: null});
+
     if (!history.current) {
       history.current = new InputHistory(100);
     }
@@ -296,6 +305,30 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       [handleSelectionChange, updateRefSelectionVariables],
     );
 
+    const handleContentSizeChange = useCallback(() => {
+      if (!divRef.current || !multiline || !onContentSizeChange) {
+        return;
+      }
+
+      const hostNode = (divRef.current.firstChild as HTMLElement) ?? divRef.current;
+      const newHeight = hostNode.offsetHeight;
+      const newWidth = hostNode.offsetWidth;
+
+      if (newHeight !== dimensions.current.height || newWidth !== dimensions.current.width) {
+        dimensions.current.height = newHeight;
+        dimensions.current.width = newWidth;
+
+        onContentSizeChange({
+          nativeEvent: {
+            contentSize: {
+              height: dimensions.current.height,
+              width: dimensions.current.width,
+            },
+          },
+        } as NativeSyntheticEvent<TextInputContentSizeChangeEventData>);
+      }
+    }, [multiline, onContentSizeChange]);
+
     const handleOnChangeText = useCallback(
       (e: SyntheticEvent<HTMLDivElement>) => {
         if (!divRef.current || !(e.target instanceof HTMLElement)) {
@@ -336,8 +369,10 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           const normalizedText = normalizeValue(text);
           onChangeText(normalizedText);
         }
+
+        handleContentSizeChange();
       },
-      [updateSelection, updateTextColor, onChange, onChangeText, undo, redo, parseText, processedMarkdownStyle, setEventProps],
+      [updateTextColor, handleContentSizeChange, onChange, onChangeText, undo, redo, parseText, processedMarkdownStyle, updateSelection, setEventProps],
     );
 
     const handleKeyPress = useCallback(
