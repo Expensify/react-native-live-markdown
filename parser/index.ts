@@ -38,7 +38,7 @@ function parseHTMLToTokens(html: string): Token[] {
     }
     const close = html.indexOf('>', open);
     if (close === -1) {
-      throw new Error('[react-native-live-markdown] Invalid HTML: no matching ">"');
+      throw new Error('[react-native-live-markdown] Error in function parseHTMLToTokens: Invalid HTML: no matching ">"');
     }
     tokens.push(['HTML', html.substring(open, close + 1)]);
     left = close + 1;
@@ -245,9 +245,9 @@ function parseExpensiMarkToRanges(markdown: string): Range[] {
     const [text, ranges] = parseTreeToTextAndRanges(tree);
     if (text !== markdown) {
       throw new Error(
-        `[react-native-live-markdown] Parsing error: the processed text does not match the original markdown input. This may be caused by incorrect parsing functions or invalid input markdown.\nProcessed text: '${JSON.stringify(
+        `[react-native-live-markdown] Parsing error: the processed text does not match the original Markdown input. This may be caused by incorrect parsing functions or invalid input Markdown.\nProcessed input: '${JSON.stringify(
           text,
-        )}'\nOriginal markdown: '${JSON.stringify(markdown)}'`,
+        )}'\nOriginal input: '${JSON.stringify(markdown)}'`,
       );
     }
     const sortedRanges = sortRanges(ranges);
