@@ -245,7 +245,9 @@ function parseExpensiMarkToRanges(markdown: string): Range[] {
     const [text, ranges] = parseTreeToTextAndRanges(tree);
     if (text !== markdown) {
       throw new Error(
-        `[react-native-live-markdown] Parsing error: the processed text does not match the original markdown input. This may be caused by incorrect parsing functions or invalid input markdown.`,
+        `[react-native-live-markdown] Parsing error: the processed text does not match the original markdown input. This may be caused by incorrect parsing functions or invalid input markdown.\nProcessed text: '${JSON.stringify(
+          text,
+        )}'\nOriginal markdown: '${JSON.stringify(markdown)}'`,
       );
     }
     const sortedRanges = sortRanges(ranges);
