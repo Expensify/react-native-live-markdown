@@ -38,7 +38,7 @@ function parseHTMLToTokens(html: string): Token[] {
     }
     const close = html.indexOf('>', open);
     if (close === -1) {
-      throw new Error('Invalid HTML: no matching ">"');
+      throw new Error('[react-native-live-markdown] Error in function parseHTMLToTokens: Invalid HTML: no matching ">"');
     }
     tokens.push(['HTML', html.substring(open, close + 1)]);
     left = close + 1;
@@ -68,11 +68,22 @@ function parseTokensToTree(tokens: Token[]): StackItem {
         stack.push({tag: payload, children: []});
       }
     } else {
-      throw new Error(`Unknown token type: ${type as string}`);
+      throw new Error(
+        `[react-native-live-markdown] Error in function parseTokensToTree: Unknown token type: ${type as string}. Expected 'TEXT' or 'HTML'. Please ensure tokens only contain these types.`,
+      );
     }
   });
   if (stack.length !== 1) {
-    throw new Error('Invalid HTML: unclosed tags');
+    const unclosedTags =
+      stack.length > 0
+        ? stack
+            .slice(1)
+            .map((item) => item.tag)
+            .join(', ')
+        : '';
+    throw new Error(
+      `[react-native-live-markdown] Invalid HTML structure: the following tags are not properly closed: ${unclosedTags}. Ensure each opening tag has a corresponding closing tag.`,
+    );
   }
   return stack[0]!;
 }
@@ -179,7 +190,7 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
         addChildrenWithStyle(linkString, 'link');
         appendSyntax(')');
       } else {
-        throw new Error(`Unknown tag: ${node.tag}`);
+        throw new Error(`[react-native-live-markdown] Error in function parseTreeToTextAndRanges: Unknown tag '${node.tag}'. This tag is not supported in this function's logic.`);
       }
     }
   }
@@ -227,17 +238,26 @@ function groupRanges(ranges: Range[]) {
 }
 
 function parseExpensiMarkToRanges(markdown: string): Range[] {
-  const html = parseMarkdownToHTML(markdown);
-  const tokens = parseHTMLToTokens(html);
-  const tree = parseTokensToTree(tokens);
-  const [text, ranges] = parseTreeToTextAndRanges(tree);
-  if (text !== markdown) {
-    // text mismatch, don't return any ranges
+  try {
+    const html = parseMarkdownToHTML(markdown);
+    const tokens = parseHTMLToTokens(html);
+    const tree = parseTokensToTree(tokens);
+    const [text, ranges] = parseTreeToTextAndRanges(tree);
+    if (text !== markdown) {
+      throw new Error(
+        `[react-native-live-markdown] Parsing error: the processed text does not match the original Markdown input. This may be caused by incorrect parsing functions or invalid input Markdown.\nProcessed input: '${JSON.stringify(
+          text,
+        )}'\nOriginal input: '${JSON.stringify(markdown)}'`,
+      );
+    }
+    const sortedRanges = sortRanges(ranges);
+    const groupedRanges = groupRanges(sortedRanges);
+    return groupedRanges;
+  } catch (error) {
+    console.error(error);
+    // returning an empty array in case of error
     return [];
   }
-  const sortedRanges = sortRanges(ranges);
-  const groupedRanges = groupRanges(sortedRanges);
-  return groupedRanges;
 }
 
 globalThis.parseExpensiMarkToRanges = parseExpensiMarkToRanges;
