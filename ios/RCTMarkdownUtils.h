@@ -9,6 +9,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) NSMutableArray<NSDictionary *> *blockquoteRangesAndLevels;
 @property (weak, nonatomic) UIView<RCTBackedTextInputViewProtocol> *backedTextInputView;
 
+- (instancetype)initWithBackedTextInputView:(UIView<RCTBackedTextInputViewProtocol> *)backedTextInputView;
+
 - (NSAttributedString *)parseMarkdown:(nullable NSAttributedString *)input withAttributes:(nullable NSDictionary<NSAttributedStringKey, id>*)attributes;
 
 @end

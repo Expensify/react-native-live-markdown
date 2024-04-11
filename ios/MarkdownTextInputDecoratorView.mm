@@ -58,7 +58,7 @@
   UIView<RCTBackedTextInputViewProtocol> *backedTextInputView = _textInput.backedTextInputView;
 #endif /* RCT_NEW_ARCH_ENABLED */
 
-  _markdownUtils = [[RCTMarkdownUtils alloc] init];
+  _markdownUtils = [[RCTMarkdownUtils alloc] initWithBackedTextInputView:backedTextInputView];
   react_native_assert(_markdownStyle != nil);
   [_markdownUtils setMarkdownStyle:_markdownStyle];
 

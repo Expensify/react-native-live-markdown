@@ -11,6 +11,14 @@
   __weak RCTMarkdownStyle *_prevMarkdownStyle;
 }
 
+- (instancetype)initWithBackedTextInputView:(UIView<RCTBackedTextInputViewProtocol> *)backedTextInputView
+{
+  if (self = [super init]) {
+    _backedTextInputView = backedTextInputView;
+  }
+  return self;
+}
+
 - (NSAttributedString *)parseMarkdown:(nullable NSAttributedString *)input withAttributes:(nullable NSDictionary<NSAttributedStringKey,id> *)attributes
 {
     @synchronized (self) {
