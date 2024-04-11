@@ -9,6 +9,11 @@ buildscript {
   }
 }
 
+def reactNativeArchitectures() {
+  def value = project.getProperties().get("reactNativeArchitectures")
+  return value ? value.split(",") : ["armeabi-v7a", "x86", "x86_64", "arm64-v8a"]
+}
+
 def isNewArchitectureEnabled() {
   return rootProject.hasProperty("newArchEnabled") && rootProject.getProperty("newArchEnabled") == "true"
 }
@@ -53,12 +58,13 @@ android {
     minSdkVersion getExtOrIntegerDefault("minSdkVersion")
     targetSdkVersion getExtOrIntegerDefault("targetSdkVersion")
     buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
-    
+
     consumerProguardFiles "proguard-rules.pro"
-    
+
     externalNativeBuild {
       cmake {
         arguments "-DANDROID_STL=c++_shared", "-DANDROID_TOOLCHAIN=clang"
+        abiFilters (*reactNativeArchitectures())
       }
     }
   }
