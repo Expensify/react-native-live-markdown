@@ -1,0 +1,39 @@
+name: Test web build
+on:
+  pull_request:
+    paths:
+      - .github/workflows/build-web.yml
+      - src/**
+      - WebExample/**
+  merge_group:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/build-web.yml
+      - src/**
+      - WebExample/**
+
+jobs:
+  build:
+    if: github.repository == 'Expensify/react-native-live-markdown'
+    runs-on: ubuntu-latest
+    concurrency:
+      group: build-web-${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v4
+
+      - name: Install node_modules
+        run: yarn install --immutable
+
+      - name: Install WebExample node_modules
+        working-directory: WebExample
+        run: npm ci
+
+      - name: Build app
+        working-directory: WebExample
+        run: npx expo export:web
