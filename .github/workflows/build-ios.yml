@@ -26,8 +26,12 @@ jobs:
   build:
     if: github.repository == 'Expensify/react-native-live-markdown'
     runs-on: macos-13
+    strategy:
+      matrix:
+        react-native-architecture: ['Paper', 'Fabric']
+      fail-fast: false
     concurrency:
-      group: build-ios-${{ github.ref }}
+      group: build-ios-${{ github.ref }}-${{ matrix.react-native-architecture }}
       cancel-in-progress: true
     steps:
       - name: Check out Git repository
@@ -57,6 +61,8 @@ jobs:
 
       - name: Install Pods
         working-directory: example/ios
+        env:
+          RCT_NEW_ARCH_ENABLED: ${{ matrix.react-native-architecture == 'Fabric' && '1' || '0' }}
         run: |
           bundler install
           bundler exec pod install
