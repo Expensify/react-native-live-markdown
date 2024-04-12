@@ -57,6 +57,11 @@ It is also possible to customize the styling of the formatted contents of `Markd
 ```tsx
 import type {MarkdownStyle} from '@expensify/react-native-live-markdown';
 
+const FONT_FAMILY_MONOSPACE = Platform.select({
+  ios: 'Courier',
+  default: 'monospace',
+});
+
 const markdownStyle: MarkdownStyle = {
   syntax: {
     color: 'gray',
