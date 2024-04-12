@@ -1,0 +1,56 @@
+name: Typecheck, lint and test
+on:
+  pull_request:
+  merge_group:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  check:
+    if: github.repository == 'Expensify/react-native-live-markdown'
+    runs-on: ubuntu-latest
+    concurrency:
+      group: check-root-${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install node_modules
+        run: yarn install --immutable
+
+      - name: Verify there's no parser diff
+        working-directory: parser
+        run: |
+          yarn build
+          if ! git diff --name-only --exit-code; then
+            # shellcheck disable=SC2016
+            echo 'Error: Parser diff detected! Please run `cd parser && yarn build` and commit the changes.'
+            exit 1
+          fi
+
+      - name: Typecheck library
+        run: yarn tsc --project tsconfig.json --noEmit
+
+      - name: Typecheck parser
+        run: yarn tsc --project parser/tsconfig.json --noEmit
+
+      - name: Typecheck example app
+        run: yarn tsc --project example/tsconfig.json --noEmit
+
+      - name: Typecheck WebExample app
+        run: yarn tsc --project WebExample/tsconfig.json --noEmit
+
+      - name: Lint
+        run: yarn lint
+
+      - name: Test
+        run: yarn test

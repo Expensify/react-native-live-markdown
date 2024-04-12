@@ -1,6 +1,6 @@
 {
   "name": "@expensify/react-native-live-markdown",
-  "version": "0.1.43",
+  "version": "0.1.54",
   "description": "Drop-in replacement for React Native's TextInput component with Markdown formatting.",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -15,6 +15,7 @@
     "ios",
     "cpp",
     "*.podspec",
+    "react-native.config.js",
     "!ios/build",
     "!android/build",
     "!android/gradle",
@@ -31,10 +32,10 @@
     "test": "jest",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --ext .js,.ts,.tsx",
-    "lint:root": "eslint . --ext .js,.ts,.tsx --ignore-pattern '/example/**/*' --ignore-pattern '/WebExample/**/*' --ignore-pattern '/parser/**/*'",
-    "lint:example": "eslint example --ext .js,.ts,.tsx",
+    "lint:root": "eslint . --ext .js,.ts,.tsx --ignore-pattern '/parser/**/*' --ignore-pattern '/example/**/*' --ignore-pattern '/WebExample/**/*'",
     "lint:parser": "eslint parser --ext .js,.ts,.tsx",
-    "lint:web": "eslint WebExample --ext .js,.ts,.tsx",
+    "lint:example": "eslint example --ext .js,.ts,.tsx",
+    "lint:WebExample": "eslint WebExample --ext .js,.ts,.tsx",
     "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
     "prepare": "bob build && mkdir -p lib/parser && cp parser/react-native-live-markdown-parser.js lib/parser/react-native-live-markdown-parser.js",
     "release": "release-it"
@@ -68,6 +69,7 @@
     "@types/jest": "^28.1.2",
     "@types/react": "~17.0.21",
     "@types/react-native": "0.70.0",
+    "@types/underscore": "^1.11.15",
     "@typescript-eslint/eslint-plugin": "^6.15.0",
     "@typescript-eslint/parser": "^6.15.0",
     "del-cli": "^5.0.0",
@@ -104,7 +106,9 @@
     "react-native": "*"
   },
   "workspaces": [
-    "example"
+    "parser",
+    "example",
+    "WebExample"
   ],
   "packageManager": "yarn@3.6.1",
   "engines": {
@@ -156,7 +160,7 @@
   },
   "codegenConfig": {
     "name": "RNLiveMarkdownSpec",
-    "type": "components",
+    "type": "all",
     "jsSrcsDir": "src"
   }
 }

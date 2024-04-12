@@ -8,6 +8,7 @@ import type {
   TextInputProps,
   TextInputKeyPressEventData,
   TextInputFocusEventData,
+  TextInputContentSizeChangeEventData,
 } from 'react-native';
 import React, {useEffect, useRef, useCallback, useMemo, useLayoutEffect} from 'react';
 import type {CSSProperties, MutableRefObject, ReactEventHandler, FocusEventHandler, MouseEvent, KeyboardEvent, SyntheticEvent} from 'react';
@@ -68,6 +69,11 @@ type Selection = {
   end: number;
 };
 
+type Dimensions = {
+  width: number;
+  height: number;
+};
+
 let focusTimeout: NodeJS.Timeout | null = null;
 
 // Removes one '\n' from the end of the string that were added by contentEditable div
@@ -117,10 +123,10 @@ function getElementHeight(node: HTMLDivElement, styles: CSSProperties, numberOfL
       node.parentElement.appendChild(tempElement);
       const height = tempElement.clientHeight;
       node.parentElement.removeChild(tempElement);
-      return `${height}px`;
+      return height ? `${height}px` : 'auto';
     }
   }
-  return `${styles.height}px` || 'auto';
+  return styles.height ? `${styles.height}px` : 'auto';
 }
 
 const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
@@ -154,6 +160,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       style = {},
       value,
       autoFocus = false,
+      onContentSizeChange,
     },
     ref,
   ) => {
@@ -164,6 +171,8 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     const contentSelection = useRef<Selection | null>(null);
     const className = `react-native-live-markdown-input-${multiline ? 'multiline' : 'singleline'}`;
     const history = useRef<InputHistory>();
+    const dimensions = React.useRef<Dimensions | null>(null);
+
     if (!history.current) {
       history.current = new InputHistory(100);
     }
@@ -296,6 +305,26 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       [handleSelectionChange, updateRefSelectionVariables],
     );
 
+    const handleContentSizeChange = useCallback(() => {
+      if (!divRef.current || !multiline || !onContentSizeChange) {
+        return;
+      }
+
+      const hostNode = (divRef.current.firstChild as HTMLElement) ?? divRef.current;
+      const newWidth = hostNode.offsetWidth;
+      const newHeight = hostNode.offsetHeight;
+
+      if (newHeight !== dimensions.current?.height || newWidth !== dimensions.current.width) {
+        dimensions.current = {height: newHeight, width: newWidth};
+
+        onContentSizeChange({
+          nativeEvent: {
+            contentSize: dimensions.current,
+          },
+        } as NativeSyntheticEvent<TextInputContentSizeChangeEventData>);
+      }
+    }, [multiline, onContentSizeChange]);
+
     const handleOnChangeText = useCallback(
       (e: SyntheticEvent<HTMLDivElement>) => {
         if (!divRef.current || !(e.target instanceof HTMLElement)) {
@@ -336,8 +365,10 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           const normalizedText = normalizeValue(text);
           onChangeText(normalizedText);
         }
+
+        handleContentSizeChange();
       },
-      [updateSelection, updateTextColor, onChange, onChangeText, undo, redo, parseText, processedMarkdownStyle, setEventProps],
+      [updateTextColor, handleContentSizeChange, onChange, onChangeText, undo, redo, parseText, processedMarkdownStyle, updateSelection, setEventProps],
     );
 
     const handleKeyPress = useCallback(
@@ -552,6 +583,8 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       }
       const currentValue = value ?? '';
       history.current.add(currentValue, currentValue.length);
+
+      handleContentSizeChange();
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
