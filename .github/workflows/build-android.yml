@@ -31,7 +31,7 @@ jobs:
         react-native-architecture: ['Paper', 'Fabric']
       fail-fast: false
     concurrency:
-      group: build-android-${{ github.ref }}-${{ matrix.react-native-architecture }}
+      group: build-android-${{ matrix.react-native-architecture }}-${{ github.ref }}
       cancel-in-progress: true
     steps:
       - name: Check out Git repository

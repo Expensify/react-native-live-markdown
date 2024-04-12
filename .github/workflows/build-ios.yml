@@ -31,7 +31,7 @@ jobs:
         react-native-architecture: ['Paper', 'Fabric']
       fail-fast: false
     concurrency:
-      group: build-ios-${{ github.ref }}-${{ matrix.react-native-architecture }}
+      group: build-ios-${{ matrix.react-native-architecture }}-${{ github.ref }}
       cancel-in-progress: true
     steps:
       - name: Check out Git repository
@@ -56,8 +56,8 @@ jobs:
             example/ios/Pods
             ~/Library/Caches/CocoaPods
             ~/.cocoapods
-          key: build-ios-pods-${{ hashFiles('example/node_modules/react-native/package.json') }}
-          restore-keys: build-ios-pods-
+          key: build-ios-pods-${{ matrix.react-native-architecture }}-${{ hashFiles('example/node_modules/react-native/package.json') }}
+          restore-keys: build-ios-pods-${{ matrix.react-native-architecture }}-
 
       - name: Install Pods
         working-directory: example/ios
@@ -75,8 +75,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/Library/Developer/Xcode/DerivedData
-          key: build-ios-derived-data-${{ hashFiles('example/node_modules/react-native/package.json') }}
-          restore-keys: build-ios-derived-data-
+          key: build-ios-derived-data-${{ matrix.react-native-architecture }}-${{ hashFiles('example/node_modules/react-native/package.json') }}
+          restore-keys: build-ios-derived-data-${{ matrix.react-native-architecture }}-
 
       - name: Build app
         working-directory: example
