@@ -70,8 +70,8 @@ type Selection = {
 };
 
 type Dimensions = {
-  height: number | null;
-  width: number | null;
+  width: number;
+  height: number;
 };
 
 let focusTimeout: NodeJS.Timeout | null = null;
@@ -171,7 +171,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     const contentSelection = useRef<Selection | null>(null);
     const className = `react-native-live-markdown-input-${multiline ? 'multiline' : 'singleline'}`;
     const history = useRef<InputHistory>();
-    const dimensions = React.useRef<Dimensions>({height: null, width: null});
+    const dimensions = React.useRef<Dimensions | null>(null);
 
     if (!history.current) {
       history.current = new InputHistory(100);
@@ -311,19 +311,15 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       }
 
       const hostNode = (divRef.current.firstChild as HTMLElement) ?? divRef.current;
-      const newHeight = hostNode.offsetHeight;
       const newWidth = hostNode.offsetWidth;
+      const newHeight = hostNode.offsetHeight;
 
-      if (newHeight !== dimensions.current.height || newWidth !== dimensions.current.width) {
-        dimensions.current.height = newHeight;
-        dimensions.current.width = newWidth;
+      if (newHeight !== dimensions.current?.height || newWidth !== dimensions.current.width) {
+        dimensions.current = {height: newHeight, width: newWidth};
 
         onContentSizeChange({
           nativeEvent: {
-            contentSize: {
-              height: dimensions.current.height,
-              width: dimensions.current.width,
-            },
+            contentSize: dimensions.current,
           },
         } as NativeSyntheticEvent<TextInputContentSizeChangeEventData>);
       }
