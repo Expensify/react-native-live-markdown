@@ -22,12 +22,8 @@ jobs:
               with:
                   node-version: "16.x"
 
-            - name: Setup web example
-              run: npm ci
-              working-directory: ./WebExample
-
-            - run: yarn install --immutable
-
+            - name: Install node_modules
+              run: yarn install --immutable
 
             - name: Verify there's no Prettier diff
               run: |
