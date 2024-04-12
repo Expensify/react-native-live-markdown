@@ -47,6 +47,8 @@
         [attributedString addAttribute:NSUnderlineStyleAttributeName value:[NSNumber numberWithInteger:NSUnderlineStyleNone] range:NSMakeRange(0, attributedString.length)];
 
         _blockquoteRangesAndLevels = [NSMutableArray new];
+        _codeRanges = [NSMutableArray new];
+        _preRanges = [NSMutableArray new];
 
         [ranges enumerateObjectsUsingBlock:^(id _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
             NSDictionary *item = obj;
@@ -100,7 +102,7 @@
                 [attributedString addAttribute:NSStrikethroughStyleAttributeName value:[NSNumber numberWithInteger:NSUnderlineStyleSingle] range:range];
             } else if ([type isEqualToString:@"code"]) {
                 [attributedString addAttribute:NSForegroundColorAttributeName value:_markdownStyle.codeColor range:range];
-                [attributedString addAttribute:NSBackgroundColorAttributeName value:_markdownStyle.codeBackgroundColor range:range];
+                [_codeRanges addObject:[NSValue valueWithRange:range]];
             } else if ([type isEqualToString:@"mention-here"]) {
                 [attributedString addAttribute:NSForegroundColorAttributeName value:_markdownStyle.mentionHereColor range:range];
                 [attributedString addAttribute:NSBackgroundColorAttributeName value:_markdownStyle.mentionHereBackgroundColor range:range];
@@ -123,9 +125,7 @@
                 }];
             } else if ([type isEqualToString:@"pre"]) {
                 [attributedString addAttribute:NSForegroundColorAttributeName value:_markdownStyle.preColor range:range];
-                NSRange rangeForBackground = [inputString characterAtIndex:range.location] == '\n' ? NSMakeRange(range.location + 1, range.length - 1) : range;
-                [attributedString addAttribute:NSBackgroundColorAttributeName value:_markdownStyle.preBackgroundColor range:rangeForBackground];
-                // TODO: pass background color and ranges to layout manager
+                [_preRanges addObject:[NSValue valueWithRange:range]];
             } else if ([type isEqualToString:@"h1"]) {
                 NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
                 NSRange rangeWithHashAndSpace = NSMakeRange(range.location - 2, range.length + 2); // we also need to include prepending "# "
@@ -141,7 +141,6 @@
         _prevMarkdownStyle = _markdownStyle;
 
         return attributedString;
-
     }
 }
 
