@@ -27,21 +27,13 @@ jobs:
       - name: Install node_modules
         run: yarn install --immutable
 
-      - name: Install parser node_modules
-        working-directory: parser
-        run: npm ci
-
-      - name: Install WebExample node_modules
-        working-directory: WebExample
-        run: npm ci
-
       - name: Verify there's no parser diff
         working-directory: parser
         run: |
-          npm run build
+          yarn build
           if ! git diff --name-only --exit-code; then
             # shellcheck disable=SC2016
-            echo 'Error: Parser diff detected! Please run `cd parser && npm run build` and commit the changes.'
+            echo 'Error: Parser diff detected! Please run `cd parser && yarn build` and commit the changes.'
             exit 1
           fi
 
