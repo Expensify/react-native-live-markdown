@@ -16,7 +16,7 @@ export default class InputHistory {
 
   debounceTime: number;
 
-  constructor(depth: number, debounceTime = 200) {
+  constructor(depth: number, debounceTime = 150) {
     this.depth = depth;
     this.history = [];
     this.historyIndex = 0;
@@ -61,6 +61,7 @@ export default class InputHistory {
     if (this.history.length > 0) {
       const lastItem = this.history[this.history.length - 1];
       if (lastItem && text === lastItem.text) {
+        this.historyIndex = this.history.length - 1;
         return;
       }
     }
@@ -80,7 +81,8 @@ export default class InputHistory {
   undo(): HistoryItem | null {
     if (this.currentText !== null && this.timeout) {
       clearTimeout(this.timeout);
-      return this.history[this.history.length - 1] || null;
+      this.timeout = null;
+      return this.history[this.historyIndex] || null;
     }
 
     if (this.history.length === 0 || this.historyIndex - 1 < 0) {
