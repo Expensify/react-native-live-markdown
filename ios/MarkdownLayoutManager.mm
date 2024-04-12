@@ -21,8 +21,8 @@
       }
     }];
     if (isBlockquote) {
-      CGFloat paddingLeft = markdownUtils.backedTextInputView.textContainerInset.left;
-      CGFloat paddingTop = markdownUtils.backedTextInputView.textContainerInset.top;
+      CGFloat paddingLeft = origin.x;
+      CGFloat paddingTop = origin.y;
       CGFloat y = paddingTop + rect.origin.y;
       CGFloat width = markdownUtils.markdownStyle.blockquoteBorderWidth;
       CGFloat height = rect.size.height;
