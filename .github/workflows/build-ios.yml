@@ -52,7 +52,7 @@ jobs:
             example/ios/Pods
             ~/Library/Caches/CocoaPods
             ~/.cocoapods
-          key: build-ios-pods-${{ hashFiles('example/ios/Podfile.lock') }}
+          key: build-ios-pods-${{ hashFiles('example/node_modules/react-native/package.json') }}
           restore-keys: build-ios-pods-
 
       - name: Install Pods
@@ -69,7 +69,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/Library/Developer/Xcode/DerivedData
-          key: build-ios-derived-data-${{ hashFiles('example/ios/Podfile.lock') }}
+          key: build-ios-derived-data-${{ hashFiles('example/node_modules/react-native/package.json') }}
           restore-keys: build-ios-derived-data-
 
       - name: Build app

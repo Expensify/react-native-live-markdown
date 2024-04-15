@@ -19,8 +19,7 @@
     "@babel/runtime": "^7.20.0",
     "@react-native/babel-preset": "0.73.21",
     "@react-native/metro-config": "0.73.5",
-    "babel-plugin-module-resolver": "^5.0.0",
-    "pod-install": "^0.1.0"
+    "babel-plugin-module-resolver": "^5.0.0"
   },
   "engines": {
     "node": ">=18"
