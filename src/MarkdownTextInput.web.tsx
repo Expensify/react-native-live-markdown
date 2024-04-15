@@ -310,8 +310,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         return;
       }
 
-      const newWidth = divRef.current.offsetWidth;
-      const newHeight = divRef.current.offsetHeight;
+      const {offsetWidth: newWidth, offsetHeight: newHeight} = divRef.current;
 
       if (newHeight !== dimensions.current?.height || newWidth !== dimensions.current.width) {
         dimensions.current = {height: newHeight, width: newWidth};
