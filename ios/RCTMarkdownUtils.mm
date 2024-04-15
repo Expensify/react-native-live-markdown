@@ -109,7 +109,6 @@
                 [attributedString addAttribute:NSForegroundColorAttributeName value:_markdownStyle.mentionUserColor range:range];
                 [attributedString addAttribute:NSBackgroundColorAttributeName value:_markdownStyle.mentionUserBackgroundColor range:range];
             } else if ([type isEqualToString:@"mention-report"]) {
-                // TODO: change mention color when it mentions current user
                 [attributedString addAttribute:NSForegroundColorAttributeName value:_markdownStyle.mentionReportColor range:range];
                 [attributedString addAttribute:NSBackgroundColorAttributeName value:_markdownStyle.mentionReportBackgroundColor range:range];
             } else if ([type isEqualToString:@"link"]) {
