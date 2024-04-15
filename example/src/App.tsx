@@ -5,7 +5,7 @@ import {Button, Platform, StyleSheet, Text, View} from 'react-native';
 import {MarkdownTextInput} from '@expensify/react-native-live-markdown';
 import type {TextInput} from 'react-native';
 
-const DEFAULT_TEXT = ['Hello, *world*!', 'https://expensify.com', '# Lorem ipsum', '> Hello world', '`foo`', '```\nbar\n```', '@here', '@someone@swmansion.com'].join('\n');
+const DEFAULT_TEXT = ['Hello, *world*!', 'https://expensify.com', '# Lorem ipsum', '> Hello world', '`foo`', '```\nbar\n```', '@here', '@someone@swmansion.com', '#room-mention'].join('\n');
 
 function isWeb() {
   return Platform.OS === 'web';
