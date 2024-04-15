@@ -43,8 +43,8 @@ jobs:
           path: |
             node_modules
             example/node_modules
-          key: build-ios-node-modules-${{ hashFiles('yarn.lock') }}
-          restore-keys: build-ios-node-modules-
+          key: build-ios-node-modules-${{ matrix.react-native-architecture }}-${{ hashFiles('yarn.lock') }}
+          restore-keys: build-ios-node-modules-${{ matrix.react-native-architecture }}-
 
       - name: Install node_modules
         run: yarn install --immutable
