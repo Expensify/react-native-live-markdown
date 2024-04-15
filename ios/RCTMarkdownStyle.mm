@@ -41,9 +41,9 @@
 
     _mentionUserColor = RCTUIColorFromSharedColor(style.mentionUser.color);
     _mentionUserBackgroundColor = RCTUIColorFromSharedColor(style.mentionUser.backgroundColor);
-      
-  _mentionReportColor = RCTUIColorFromSharedColor(style.mentionReport.color);
-  _mentionReportBackgroundColor = RCTUIColorFromSharedColor(style.mentionReport.backgroundColor);
+
+    _mentionReportColor = RCTUIColorFromSharedColor(style.mentionReport.color);
+    _mentionReportBackgroundColor = RCTUIColorFromSharedColor(style.mentionReport.backgroundColor);
   }
 
   return self;
