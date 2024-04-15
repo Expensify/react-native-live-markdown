@@ -53,7 +53,7 @@ function makeDefaultMarkdownStyle(): MarkdownStyle {
       backgroundColor: 'cyan',
     },
     mentionReport: {
-      color: 'MediumVioletRed',
+      color: 'red',
       backgroundColor: 'pink',
     },
   };
