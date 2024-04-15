@@ -3,6 +3,6 @@
   "compilerOptions": {
     "strict": true
   },
-  "include": ["App.tsx"],
+  "include": ["App.tsx", "tests/**/*.ts", "tests-examples"],
   "exclude": ["node_modules"]
 }
