@@ -100,11 +100,14 @@
 {
   _markdownStyle = markdownStyle;
   [_markdownUtils setMarkdownStyle:markdownStyle];
+
+  // apply new styles
+  NSAttributedString *attributedText = _textView.attributedText;
 #ifdef RCT_NEW_ARCH_ENABLED
-  [_textInput textInputDidChange]; // apply new styles
+  [_textInput _setAttributedString:attributedText];
 #else
-  [_textInput setAttributedText:_textInput.attributedText]; // apply new styles
-#endif
+  [_textInput setAttributedText:attributedText];
+#endif /* RCT_NEW_ARCH_ENABLED */
 }
 
 @end
