@@ -553,6 +553,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         const elementHeight = getElementHeight(divRef.current, inputStyles, numberOfLines);
         divRef.current.style.height = elementHeight;
         divRef.current.style.maxHeight = elementHeight;
+        CursorUtils.scrollCursorIntoView(divRef.current as HTMLInputElement);
       },
       [numberOfLines],
     );
