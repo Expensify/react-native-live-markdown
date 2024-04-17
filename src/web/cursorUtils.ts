@@ -28,6 +28,9 @@ function setPrevText(target: HTMLElement) {
 }
 
 function setCursorPosition(target: HTMLElement, start: number, end: number | null = null) {
+  if (target !== document.activeElement) {
+    return;
+  }
   const range = document.createRange();
   range.selectNodeContents(target);
 
