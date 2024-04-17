@@ -591,6 +591,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     return (
       // eslint-disable-next-line jsx-a11y/no-static-element-interactions
       <div
+        id="MarkdownInput_Example"
         ref={setRef}
         contentEditable={!disabled}
         style={inputStyles}

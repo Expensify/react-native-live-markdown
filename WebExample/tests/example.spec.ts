@@ -1,18 +1,23 @@
 import {test, expect} from '@playwright/test';
+import type {Page} from '@playwright/test';
+import * as CONSTANTS from '../../constants';
 
-test('has title', async ({page}) => {
-  await page.goto('https://playwright.dev/');
-
-  // Expect a title "to contain" a substring.
-  await expect(page).toHaveTitle(/Playwright/);
+test.beforeEach(async ({page}) => {
+  await page.goto('http://localhost:19006/', {waitUntil: 'load'});
 });
 
-test('get started link', async ({page}) => {
-  await page.goto('https://playwright.dev/');
+const setupInput = async (page: Page) => {
+  const inputLocator = await page.locator(`div#MarkdownInput_Example`);
 
-  // Click the get started link.
-  await page.getByRole('link', {name: 'Get started'}).click();
+  await inputLocator.fill('');
 
-  // Expects page to have a heading with the name of Installation.
-  await expect(page.getByRole('heading', {name: 'Installation'})).toBeVisible();
+  return inputLocator;
+};
+
+test('standard input results', async ({page}) => {
+  const inputLocator = await setupInput(page);
+
+  await inputLocator.pressSequentially(CONSTANTS.EXAMPLE_CONTENT);
+  const value = await inputLocator.innerText();
+  expect(value).toEqual(CONSTANTS.EXAMPLE_CONTENT);
 });

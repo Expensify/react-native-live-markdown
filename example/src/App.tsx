@@ -4,8 +4,7 @@ import {Button, Platform, StyleSheet, Text, View} from 'react-native';
 
 import {MarkdownTextInput} from '@expensify/react-native-live-markdown';
 import type {TextInput} from 'react-native';
-
-const DEFAULT_TEXT = ['Hello, *world*!', 'https://expensify.com', '# Lorem ipsum', '> Hello world', '`foo`', '```\nbar\n```', '@here', '@someone@swmansion.com'].join('\n');
+import * as CONSTANTS from '../../constants';
 
 function isWeb() {
   return Platform.OS === 'web';
@@ -60,7 +59,7 @@ function getRandomColor() {
 }
 
 export default function App() {
-  const [value, setValue] = React.useState(DEFAULT_TEXT);
+  const [value, setValue] = React.useState(CONSTANTS.EXAMPLE_CONTENT);
   const [markdownStyle, setMarkdownStyle] = React.useState({});
   const [selection, setSelection] = React.useState({start: 0, end: 0});
 
@@ -137,9 +136,10 @@ export default function App() {
         }}
       />
       <Button
+        testID="reset"
         title="Reset"
         onPress={() => {
-          setValue(DEFAULT_TEXT);
+          setValue(CONSTANTS.EXAMPLE_CONTENT);
           setMarkdownStyle({});
         }}
       />
