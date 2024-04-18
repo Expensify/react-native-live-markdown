@@ -437,14 +437,12 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         currentlyFocusedField.current = hostNode;
         setEventProps(e);
         if (divRef.current) {
-          const valueLength = value ? value.length : 0;
-          let startPosition = valueLength;
-          let endPosition = null;
           if (contentSelection.current) {
-            startPosition = contentSelection.current.start;
-            endPosition = contentSelection.current.end;
+            CursorUtils.setCursorPosition(divRef.current, contentSelection.current.start, contentSelection.current.end);
+          } else {
+            const valueLength = value ? value.length : divRef.current.innerText.length;
+            CursorUtils.setCursorPosition(divRef.current, valueLength, null);
           }
-          CursorUtils.setCursorPosition(divRef.current, startPosition, endPosition);
           updateSelection(event, contentSelection.current);
         }
 

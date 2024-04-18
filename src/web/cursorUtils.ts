@@ -28,9 +28,11 @@ function setPrevText(target: HTMLElement) {
 }
 
 function setCursorPosition(target: HTMLElement, start: number, end: number | null = null) {
+  // We don't want to move the cursor if the target is not focused
   if (target !== document.activeElement) {
     return;
   }
+
   const range = document.createRange();
   range.selectNodeContents(target);
 
