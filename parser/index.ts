@@ -3,7 +3,7 @@
 import {ExpensiMark} from 'expensify-common/lib/ExpensiMark';
 import _ from 'underscore';
 
-type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'emoji' | 'mention-here' | 'mention-user' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax';
+type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'emoji' | 'mention-here' | 'mention-user' | 'mention-report' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax';
 type Range = {
   type: MarkdownType;
   start: number;
@@ -140,6 +140,8 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
         addChildrenWithStyle(node, 'mention-here');
       } else if (node.tag === '<mention-user>') {
         addChildrenWithStyle(node, 'mention-user');
+      } else if (node.tag === '<mention-report>') {
+        addChildrenWithStyle(node, 'mention-report');
       } else if (node.tag === '<blockquote>') {
         appendSyntax('>');
         addChildrenWithStyle(node, 'blockquote');

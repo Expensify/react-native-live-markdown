@@ -26,6 +26,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) UIColor *mentionHereBackgroundColor;
 @property (nonatomic) UIColor *mentionUserColor;
 @property (nonatomic) UIColor *mentionUserBackgroundColor;
+@property (nonatomic) UIColor *mentionReportColor;
+@property (nonatomic) UIColor *mentionReportBackgroundColor;
 
 #ifdef RCT_NEW_ARCH_ENABLED
 - (instancetype)initWithStruct:(const facebook::react::MarkdownTextInputDecoratorViewMarkdownStyleStruct &)style;

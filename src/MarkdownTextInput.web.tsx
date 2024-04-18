@@ -310,9 +310,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         return;
       }
 
-      const hostNode = (divRef.current.firstChild as HTMLElement) ?? divRef.current;
-      const newWidth = hostNode.offsetWidth;
-      const newHeight = hostNode.offsetHeight;
+      const {offsetWidth: newWidth, offsetHeight: newHeight} = divRef.current;
 
       if (newHeight !== dimensions.current?.height || newWidth !== dimensions.current.width) {
         dimensions.current = {height: newHeight, width: newWidth};
@@ -568,6 +566,11 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         divRef.current.focus();
       }
     }, [autoFocus]);
+
+    useEffect(() => {
+      // update content size when the input styles change
+      handleContentSizeChange();
+    }, [handleContentSizeChange, inputStyles]);
 
     useEffect(() => {
       if (!divRef.current || !selection || (contentSelection.current && selection.start === contentSelection.current.start && selection.end === contentSelection.current.end)) {

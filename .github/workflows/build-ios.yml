@@ -26,8 +26,12 @@ jobs:
   build:
     if: github.repository == 'Expensify/react-native-live-markdown'
     runs-on: macos-13
+    strategy:
+      matrix:
+        react-native-architecture: ['Paper', 'Fabric']
+      fail-fast: false
     concurrency:
-      group: build-ios-${{ github.ref }}
+      group: build-ios-${{ matrix.react-native-architecture }}-${{ github.ref }}
       cancel-in-progress: true
     steps:
       - name: Check out Git repository
@@ -39,8 +43,8 @@ jobs:
           path: |
             node_modules
             example/node_modules
-          key: build-ios-node-modules-${{ hashFiles('yarn.lock') }}
-          restore-keys: build-ios-node-modules-
+          key: build-ios-node-modules-${{ matrix.react-native-architecture }}-${{ hashFiles('yarn.lock') }}
+          restore-keys: build-ios-node-modules-${{ matrix.react-native-architecture }}-
 
       - name: Install node_modules
         run: yarn install --immutable
@@ -52,11 +56,13 @@ jobs:
             example/ios/Pods
             ~/Library/Caches/CocoaPods
             ~/.cocoapods
-          key: build-ios-pods-${{ hashFiles('example/node_modules/react-native/package.json') }}
-          restore-keys: build-ios-pods-
+          key: build-ios-pods-${{ matrix.react-native-architecture }}-${{ hashFiles('example/node_modules/react-native/package.json') }}
+          restore-keys: build-ios-pods-${{ matrix.react-native-architecture }}-
 
       - name: Install Pods
         working-directory: example/ios
+        env:
+          RCT_NEW_ARCH_ENABLED: ${{ matrix.react-native-architecture == 'Fabric' && '1' || '0' }}
         run: |
           bundler install
           bundler exec pod install
@@ -69,8 +75,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/Library/Developer/Xcode/DerivedData
-          key: build-ios-derived-data-${{ hashFiles('example/node_modules/react-native/package.json') }}
-          restore-keys: build-ios-derived-data-
+          key: build-ios-derived-data-${{ matrix.react-native-architecture }}-${{ hashFiles('example/node_modules/react-native/package.json') }}
+          restore-keys: build-ios-derived-data-${{ matrix.react-native-architecture }}-
 
       - name: Build app
         working-directory: example
