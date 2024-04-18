@@ -31,46 +31,12 @@ test.beforeEach(async ({page}) => {
 //   //   await copyText({inputLocator, text: 'COPY'});
 // });
 
-// const pasteText = async (text: string, inputLocator: Locator) => {
-//   await inputLocator.evaluate((locatorElement) => {
-//     const clipboardData = new DataTransfer();
-//     clipboardData.setData('text/plain', text);
-//     const clipboardEvent = new ClipboardEvent('paste', {
-//       clipboardData,
-//     });
-//     locatorElement.dispatchEvent(clipboardEvent);
-//   }, text);
-// };
-
-// const pasteText = async (text: string, inputLocator: Locator) => {
-//   console.log('text ', text);
-//   await clipboardy.write('*bold*');
-
-//      inputLocator.focus();
-//     await inputLocator.keyboard.down('Control');
-//     await inputLocator.keyboard.press('v');
-
-//   await inputLocator.evaluate(async async (locatorElement, textToPaste) => {
-//     const clipboardData = new DataTransfer();
-//     clipboardData.setData('text/plain', textToPaste);
-//     const clipboardEvent = new ClipboardEvent('paste', {
-//       clipboardData,
-//     });
-//     console.log('clipboarddata ', clipboardData);
-//     locatorElement.focus();
-//     await locatorElement.keyboard.down('Control');
-//     await locatorElement.keyboard.press('v');
-//     // locatorElement.dispatchEvent(clipboardEvent);
-//   }, text);
-// };
-
-// const pasteText = async ({text, page, inputLocator}: {text: string; page: Page; inputLocator: Locator}) => {
-//   await page.evaluate(async () => navigator.clipboard.writeText(text));
-
-//   await inputLocator.focus();
-//   const modifier = process.platform === 'darwin' ? 'Meta' : 'Control';
-//   await page.keyboard.press(`${modifier}+v`);
-// };
+const pasteContent = async ({text, page, inputLocator}: {text: string; page: Page; inputLocator: Locator}) => {
+  await page.evaluate(async (pasteText) => navigator.clipboard.writeText(pasteText), text);
+  await inputLocator.focus();
+  const modifier = process.platform === 'darwin' ? 'Meta' : 'Control';
+  await page.keyboard.press(`${modifier}+v`);
+};
 
 test('paste', async ({page}) => {
   const PASTE_TEXT = 'bold';
@@ -79,10 +45,7 @@ test('paste', async ({page}) => {
   const inputLocator = await setupInput(page);
 
   const wrappedText = boldStyleDefinition.wrapContent(PASTE_TEXT);
-  await page.evaluate(async (pasteText) => navigator.clipboard.writeText(pasteText), wrappedText);
-  await inputLocator.focus();
-  const modifier = process.platform === 'darwin' ? 'Meta' : 'Control';
-  await page.keyboard.press(`${modifier}+v`);
+  await pasteContent({text: wrappedText, page, inputLocator});
 
   const elementHandle = await inputLocator.locator('span', {hasText: PASTE_TEXT}).last();
   let elementStyle;
