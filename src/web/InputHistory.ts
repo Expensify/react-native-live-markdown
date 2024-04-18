@@ -42,17 +42,22 @@ export default class InputHistory {
   }
 
   debouncedAdd(text: string, cursorPosition: number): void {
-    this.currentText = text;
-
     if (this.timeout) {
       clearTimeout(this.timeout);
     }
+
+    if (this.currentText === null) {
+      this.add(text, cursorPosition);
+    } else {
+      this.history[this.historyIndex] = {text, cursorPosition};
+    }
+    this.currentText = text;
 
     this.timeout = setTimeout(() => {
       if (this.currentText == null) {
         return;
       }
-      this.add(this.currentText, cursorPosition);
+
       this.currentText = null;
     }, this.debounceTime);
   }
@@ -79,10 +84,21 @@ export default class InputHistory {
   }
 
   undo(): HistoryItem | null {
+    const currentHistoryItem = this.history[this.historyIndex];
+    const previousHistoryItem = this.history[this.historyIndex - 1];
+
+    const undoCursorPosition = Math.min(
+      (currentHistoryItem?.cursorPosition ?? 0) - ((currentHistoryItem?.text ?? '').replaceAll('\n', '').length - (previousHistoryItem?.text ?? '').replaceAll('\n', '').length),
+      (previousHistoryItem?.text ?? '').length,
+    );
+
+    const undoItem = previousHistoryItem ? {text: previousHistoryItem.text, cursorPosition: undoCursorPosition} : null;
+
     if (this.currentText !== null && this.timeout) {
       clearTimeout(this.timeout);
       this.timeout = null;
-      return this.history[this.historyIndex] || null;
+
+      return undoItem;
     }
 
     if (this.history.length === 0 || this.historyIndex - 1 < 0) {
@@ -92,7 +108,8 @@ export default class InputHistory {
     if (this.historyIndex > 0) {
       this.historyIndex -= 1;
     }
-    return this.history[this.historyIndex] || null;
+
+    return undoItem;
   }
 
   redo(): HistoryItem | null {
