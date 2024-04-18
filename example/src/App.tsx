@@ -118,6 +118,7 @@ export default function App() {
       /> */}
       <Text style={styles.text}>{JSON.stringify(value)}</Text>
       <Button
+        testID="focus"
         title="Focus"
         onPress={() => {
           if (!ref.current) {
@@ -127,6 +128,7 @@ export default function App() {
         }}
       />
       <Button
+        testID="blur"
         title="Blur"
         onPress={() => {
           if (!ref.current) {
@@ -144,6 +146,7 @@ export default function App() {
         }}
       />
       <Button
+        testID="clear"
         title="Clear"
         onPress={() => setValue('')}
       />

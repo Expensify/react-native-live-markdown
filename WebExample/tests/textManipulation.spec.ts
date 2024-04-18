@@ -9,12 +9,6 @@ const setupInput = async (page: Page, mode: 'clear' | 'reset') => {
   return inputLocator;
 };
 
-const copyText = async ({inputLocator, text}: {inputLocator: Locator; text: string}) => {
-  await inputLocator.evaluate(() => {
-    navigator.clipboard.writeText(text);
-  }, text);
-};
-
 test.beforeEach(async ({page}) => {
   await page.goto('http://localhost:19006/', {waitUntil: 'load'});
   //   await page.click('[data-testid="clear"]');
@@ -27,11 +21,12 @@ const pasteContent = async ({text, page, inputLocator}: {text: string; page: Pag
   await page.keyboard.press(`${modifier}+v`);
 };
 
-test('paste', async ({page}) => {
+test('paste', async ({page, context}) => {
   const PASTE_TEXT = 'bold';
   const boldStyleDefinition = CONSTANTS.MARKDOWN_STYLE_DEFINITIONS.bold;
 
   const inputLocator = await setupInput(page, 'clear');
+  await context.grantPermissions(['clipboard-write']);
 
   const wrappedText = boldStyleDefinition.wrapContent(PASTE_TEXT);
   await pasteContent({text: wrappedText, page, inputLocator});
@@ -64,10 +59,11 @@ test('select', async ({page}) => {
   expect(cursorPosition).toBe(CONSTANTS.EXAMPLE_CONTENT.length);
 });
 
-test('paste replace', async ({page}) => {
+test('paste replace', async ({page, context}) => {
   const modifier = process.platform === 'darwin' ? 'Meta' : 'Control';
 
   const inputLocator = await setupInput(page, 'reset');
+  await context.grantPermissions(['clipboard-write']);
 
   await inputLocator.focus();
   await page.keyboard.down(modifier);
