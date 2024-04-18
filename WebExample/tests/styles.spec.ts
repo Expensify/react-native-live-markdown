@@ -29,29 +29,29 @@ const testMarkdownContentStyle = async ({styleName, style, page}: {styleName: st
 };
 
 test('bold', async ({page}) => {
-  await testMarkdownContentStyle({styleName: 'bold', style: CONSTANTS.MARKDOWN_STYLES.bold.style, page});
+  await testMarkdownContentStyle({styleName: 'bold', style: CONSTANTS.MARKDOWN_STYLE_DEFINITIONS.bold.style, page});
 });
 
 test('link', async ({page}) => {
-  await testMarkdownContentStyle({styleName: 'link', style: CONSTANTS.MARKDOWN_STYLES.link.style, page});
+  await testMarkdownContentStyle({styleName: 'link', style: CONSTANTS.MARKDOWN_STYLE_DEFINITIONS.link.style, page});
 });
 
 test('title', async ({page}) => {
-  await testMarkdownContentStyle({styleName: 'title', style: CONSTANTS.MARKDOWN_STYLES.title.style, page});
+  await testMarkdownContentStyle({styleName: 'title', style: CONSTANTS.MARKDOWN_STYLE_DEFINITIONS.title.style, page});
 });
 
 test('code', async ({page}) => {
-  await testMarkdownContentStyle({styleName: 'code', style: CONSTANTS.MARKDOWN_STYLES.code.style, page});
+  await testMarkdownContentStyle({styleName: 'code', style: CONSTANTS.MARKDOWN_STYLE_DEFINITIONS.code.style, page});
 });
 
 test('codeBlock', async ({page}) => {
-  await testMarkdownContentStyle({styleName: 'codeBlock', style: CONSTANTS.MARKDOWN_STYLES.codeBlock.style, page});
+  await testMarkdownContentStyle({styleName: 'codeBlock', style: CONSTANTS.MARKDOWN_STYLE_DEFINITIONS.codeBlock.style, page});
 });
 
 test('hereMention', async ({page}) => {
-  await testMarkdownContentStyle({styleName: 'here', style: CONSTANTS.MARKDOWN_STYLES.here.style, page});
+  await testMarkdownContentStyle({styleName: 'here', style: CONSTANTS.MARKDOWN_STYLE_DEFINITIONS.here.style, page});
 });
 
 test('mentionUser', async ({page}) => {
-  await testMarkdownContentStyle({styleName: 'mentionUser', style: CONSTANTS.MARKDOWN_STYLES.mentionUser.style, page});
+  await testMarkdownContentStyle({styleName: 'mentionUser', style: CONSTANTS.MARKDOWN_STYLE_DEFINITIONS.mentionUser.style, page});
 });
