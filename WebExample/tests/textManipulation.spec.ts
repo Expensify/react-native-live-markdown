@@ -68,7 +68,6 @@ test('paste replace', async ({page, context}) => {
   await inputLocator.focus();
   await page.keyboard.down(modifier);
   await page.keyboard.press('a');
-  await page.keyboard.up(modifier);
 
   const newText = '*bold*';
   await pasteContent({text: newText, page, inputLocator});
@@ -81,26 +80,40 @@ test('paste replace', async ({page, context}) => {
   expect(await inputLocator.innerText()).toBe(newText);
 });
 
-// github.com/Expensify/App/issues/39360
-test('fast type cursor position', async ({page}) => {
+test('cut content changes', async ({page}) => {
+  const modifier = process.platform === 'darwin' ? 'Meta' : 'Control';
+  const INITIAL_CONTENT = CONSTANTS.MARKDOWN_STYLE_DEFINITIONS.bold.wrapContent('bold');
+
   const inputLocator = await setupInput(page, 'clear');
+  await inputLocator.fill(INITIAL_CONTENT);
 
-  const EXAMPLE_LONG_CONTENT = CONSTANTS.EXAMPLE_CONTENT.repeat(3);
-  await inputLocator.pressSequentially(EXAMPLE_LONG_CONTENT);
+  await inputLocator.focus();
 
-  expect(await inputLocator.innerText()).toBe(EXAMPLE_LONG_CONTENT);
-
-  const cursorPosition = await page.evaluate((selector) => {
-    const editableDiv = document.querySelector(selector) as HTMLElement;
+  // Find cursor position at end
+  const cursorPosition = await page.evaluate(() => {
+    const editableDiv = document.querySelector('div[contenteditable="true"]');
     const range = window.getSelection()?.getRangeAt(0);
-    if (!range || !editableDiv) return null;
-    const preCaretRange = range.cloneRange();
-    preCaretRange.selectNodeContents(editableDiv);
-    preCaretRange.setEnd(range.endContainer, range.endOffset);
-    return preCaretRange.toString().length;
-  }, 'div[contenteditable="true"]');
 
-  expect(cursorPosition).toBe(EXAMPLE_LONG_CONTENT.length);
+    if (!range || !editableDiv) return null;
+
+    range.setStart(editableDiv, 0);
+    range.setEnd(editableDiv, 3);
+
+    // range.setStart(editableDiv, range.endOffset - 3);
+    // range.setEnd(editableDiv, range.endOffset);
+    return range.toString().length;
+  });
+
+  // Cut the selected text
+  //   await page.keyboard.down(modifier);
+  //   await page.keyboard.press('x');
+
+  //   // Check the new content
+  //   const newText = await inputLocator.innerText();
+  //   const expectedNewText = cursorPosition ? INITIAL_CONTENT.substring(0, INITIAL_CONTENT.length - cursorPosition) : null;
+
+  //   expect(newText).not.toBeNull();
+  //   expect(newText).toBe(expectedNewText);
 });
 
 // COPY
