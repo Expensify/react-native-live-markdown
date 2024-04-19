@@ -580,11 +580,12 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       if (!divRef.current || !selection || (contentSelection.current && selection.start === contentSelection.current.start && selection.end === contentSelection.current.end)) {
         return;
       }
-      updateSelection(null, {start: selection.start, end: selection.end || selection.start});
-      CursorUtils.setCursorPosition(divRef.current, selection.start, selection.end);
-      // we need to update the selection only when the selection prop changes, so it won't interfere with updating cursor position when typing
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [selection]);
+
+      const newSelection: Selection = {start: selection.start, end: selection.end ?? selection.start};
+      contentSelection.current = newSelection;
+      updateRefSelectionVariables(newSelection);
+      CursorUtils.setCursorPosition(divRef.current, newSelection.start, newSelection.end);
+    }, [selection, updateRefSelectionVariables]);
 
     useEffect(() => {
       if (history.current?.history.length !== 0) {
