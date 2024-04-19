@@ -60,21 +60,18 @@ function setCursorPosition(target: HTMLElement, start: number, end: number | nul
       if (!startNode && start >= charCount && (start <= nextCharCount || (start === nextCharCount && i < n - 1))) {
         startNode = textNode;
 
-        // There are 4(/5) cases to consider here:
+        // There are 4 cases to consider here:
         // 1. Caret in front of a character, when pressing enter
         // 2. Caret at the end of a line (not last one)
-        // 3a. Caret at the end of whole input, when pressing enter - On firefox
-        // 3b. Caret at the end of whole input, when pressing enter - On other browsers
+        // 3. Caret at the end of whole input, when pressing enter - On
         // 4. All other placements
         if (prevChar === '\n' && prevTextLength !== undefined && prevTextLength < textCharacters.length) {
           if (nextChar !== '\n') {
             range.setStart(textNodes[i + 1] as Node, 0);
           } else if (i !== textNodes.length - 1) {
             range.setStart(textNodes[i] as Node, 1);
-          } else if (BrowserUtils.isFirefox) {
-            range.setStart(textNode, start - charCount);
           } else {
-            range.setStart(textNodes[i] as Node, 2);
+            range.setStart(textNode, start - charCount);
           }
         } else {
           range.setStart(textNode, start - charCount);
