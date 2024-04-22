@@ -11,8 +11,9 @@ const setupInput = async (page: Page, mode: 'clear' | 'reset') => {
 
 const OPERATION_MODIFIER = process.platform === 'darwin' ? 'Meta' : 'Control';
 
-test.beforeEach(async ({page}) => {
+test.beforeEach(async ({page, context, browserName}) => {
   await page.goto('http://localhost:19006/', {waitUntil: 'load'});
+  if (browserName === 'chromium') await context.grantPermissions(['clipboard-write', 'clipboard-read']);
 
   //   await page.click('[data-testid="clear"]');
 });
@@ -23,12 +24,11 @@ const pasteContent = async ({text, page, inputLocator}: {text: string; page: Pag
   await page.keyboard.press(`${OPERATION_MODIFIER}+v`);
 };
 
-test('paste', async ({page, context}) => {
+test('paste', async ({page}) => {
   const PASTE_TEXT = 'bold';
   const boldStyleDefinition = CONSTANTS.MARKDOWN_STYLE_DEFINITIONS.bold;
 
   const inputLocator = await setupInput(page, 'clear');
-  await context.grantPermissions(['clipboard-write']);
 
   const wrappedText = boldStyleDefinition.wrapContent(PASTE_TEXT);
   await pasteContent({text: wrappedText, page, inputLocator});
@@ -61,9 +61,8 @@ test('select', async ({page}) => {
   expect(cursorPosition).toBe(CONSTANTS.EXAMPLE_CONTENT.length);
 });
 
-test('paste replace', async ({page, context}) => {
+test('paste replace', async ({page}) => {
   const inputLocator = await setupInput(page, 'reset');
-  await context.grantPermissions(['clipboard-write']);
 
   await inputLocator.focus();
   await page.keyboard.down(OPERATION_MODIFIER);
@@ -80,8 +79,7 @@ test('paste replace', async ({page, context}) => {
   expect(await inputLocator.innerText()).toBe(newText);
 });
 
-test('cut content changes', async ({page, context}) => {
-  await context.grantPermissions(['clipboard-write', 'clipboard-read']);
+test('cut content changes', async ({page}) => {
   const INITIAL_CONTENT = 'bold';
   const WRAPPED_CONTENT = CONSTANTS.MARKDOWN_STYLE_DEFINITIONS.bold.wrapContent(INITIAL_CONTENT);
   const EXPECTED_CONTENT = CONSTANTS.MARKDOWN_STYLE_DEFINITIONS.bold.wrapContent(INITIAL_CONTENT).slice(0, 3);
@@ -103,7 +101,6 @@ test('cut content changes', async ({page, context}) => {
       range.setStart(startNode.firstChild, 2);
       range.setEnd(endNode.lastChild, endNode.lastChild.textContent?.length ?? 0);
 
-      // Select the range, then cut the selected content
       const selection = window.getSelection();
       selection?.removeAllRanges();
       selection?.addRange(range);
