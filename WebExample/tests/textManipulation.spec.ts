@@ -9,16 +9,18 @@ const setupInput = async (page: Page, mode: 'clear' | 'reset') => {
   return inputLocator;
 };
 
+const OPERATION_MODIFIER = process.platform === 'darwin' ? 'Meta' : 'Control';
+
 test.beforeEach(async ({page}) => {
   await page.goto('http://localhost:19006/', {waitUntil: 'load'});
+
   //   await page.click('[data-testid="clear"]');
 });
 
 const pasteContent = async ({text, page, inputLocator}: {text: string; page: Page; inputLocator: Locator}) => {
   await page.evaluate(async (pasteText) => navigator.clipboard.writeText(pasteText), text);
   await inputLocator.focus();
-  const modifier = process.platform === 'darwin' ? 'Meta' : 'Control';
-  await page.keyboard.press(`${modifier}+v`);
+  await page.keyboard.press(`${OPERATION_MODIFIER}+v`);
 };
 
 test('paste', async ({page, context}) => {
@@ -60,13 +62,11 @@ test('select', async ({page}) => {
 });
 
 test('paste replace', async ({page, context}) => {
-  const modifier = process.platform === 'darwin' ? 'Meta' : 'Control';
-
   const inputLocator = await setupInput(page, 'reset');
   await context.grantPermissions(['clipboard-write']);
 
   await inputLocator.focus();
-  await page.keyboard.down(modifier);
+  await page.keyboard.down(OPERATION_MODIFIER);
   await page.keyboard.press('a');
 
   const newText = '*bold*';
@@ -80,40 +80,41 @@ test('paste replace', async ({page, context}) => {
   expect(await inputLocator.innerText()).toBe(newText);
 });
 
-test('cut content changes', async ({page}) => {
-  const modifier = process.platform === 'darwin' ? 'Meta' : 'Control';
-  const INITIAL_CONTENT = CONSTANTS.MARKDOWN_STYLE_DEFINITIONS.bold.wrapContent('bold');
+test('cut content changes', async ({page, context}) => {
+  await context.grantPermissions(['clipboard-write', 'clipboard-read']);
+  const INITIAL_CONTENT = 'bold';
+  const WRAPPED_CONTENT = CONSTANTS.MARKDOWN_STYLE_DEFINITIONS.bold.wrapContent(INITIAL_CONTENT);
+  const EXPECTED_CONTENT = CONSTANTS.MARKDOWN_STYLE_DEFINITIONS.bold.wrapContent(INITIAL_CONTENT).slice(0, 3);
 
   const inputLocator = await setupInput(page, 'clear');
-  await inputLocator.fill(INITIAL_CONTENT);
+  await pasteContent({text: WRAPPED_CONTENT, page, inputLocator});
+  const rootHandle = await inputLocator.locator('span.root').first();
+
+  await page.evaluate(async (initialContent) => {
+    const filteredNode = Array.from(document.querySelectorAll('div[contenteditable="true"] > span.root span')).find((node) => {
+      return node.textContent?.includes(initialContent) && node.nextElementSibling && node.nextElementSibling.textContent?.includes('*');
+    });
+
+    const startNode = filteredNode;
+    const endNode = filteredNode?.nextElementSibling;
+
+    if (startNode?.firstChild && endNode?.lastChild) {
+      const range = new Range();
+      range.setStart(startNode.firstChild, 2);
+      range.setEnd(endNode.lastChild, endNode.lastChild.textContent?.length ?? 0);
+
+      // Select the range, then cut the selected content
+      const selection = window.getSelection();
+      selection?.removeAllRanges();
+      selection?.addRange(range);
+    }
+  }, INITIAL_CONTENT);
 
   await inputLocator.focus();
+  await page.keyboard.down(OPERATION_MODIFIER);
+  await page.keyboard.press('x');
 
-  // Find cursor position at end
-  const cursorPosition = await page.evaluate(() => {
-    const editableDiv = document.querySelector('div[contenteditable="true"]');
-    const range = window.getSelection()?.getRangeAt(0);
-
-    if (!range || !editableDiv) return null;
-
-    range.setStart(editableDiv, 0);
-    range.setEnd(editableDiv, 3);
-
-    // range.setStart(editableDiv, range.endOffset - 3);
-    // range.setEnd(editableDiv, range.endOffset);
-    return range.toString().length;
-  });
-
-  // Cut the selected text
-  //   await page.keyboard.down(modifier);
-  //   await page.keyboard.press('x');
-
-  //   // Check the new content
-  //   const newText = await inputLocator.innerText();
-  //   const expectedNewText = cursorPosition ? INITIAL_CONTENT.substring(0, INITIAL_CONTENT.length - cursorPosition) : null;
-
-  //   expect(newText).not.toBeNull();
-  //   expect(newText).toBe(expectedNewText);
+  expect(await rootHandle.innerHTML()).toBe(EXPECTED_CONTENT);
 });
 
 // COPY
