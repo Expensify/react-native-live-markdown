@@ -1,3 +1,5 @@
+import * as CONSTANTS from '../../constants';
+
 type HistoryItem = {
   text: string;
   cursorPosition: number | null;
@@ -16,7 +18,7 @@ export default class InputHistory {
 
   debounceTime: number;
 
-  constructor(depth: number, debounceTime = 150) {
+  constructor(depth: number, debounceTime = CONSTANTS.INPUT_HISTORY_DEBOUNCE_TIME_MS) {
     this.depth = depth;
     this.history = [];
     this.historyIndex = 0;
