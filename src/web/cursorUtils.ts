@@ -63,7 +63,7 @@ function setCursorPosition(target: HTMLElement, start: number, end: number | nul
         // There are 4 cases to consider here:
         // 1. Caret in front of a character, when pressing enter
         // 2. Caret at the end of a line (not last one)
-        // 3. Caret at the end of whole input, when pressing enter - On
+        // 3. Caret at the end of whole input, when pressing enter
         // 4. All other placements
         if (prevChar === '\n' && prevTextLength !== undefined && prevTextLength < textCharacters.length) {
           if (nextChar !== '\n') {
