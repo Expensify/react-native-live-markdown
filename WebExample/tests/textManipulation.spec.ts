@@ -11,41 +11,91 @@ const setupInput = async (page: Page, mode: 'clear' | 'reset') => {
 
 const OPERATION_MODIFIER = process.platform === 'darwin' ? 'Meta' : 'Control';
 
-test.beforeEach(async ({page, context, browserName}) => {
-  await page.goto('http://localhost:19006/', {waitUntil: 'load'});
-  if (browserName === 'chromium') await context.grantPermissions(['clipboard-write', 'clipboard-read']);
-
-  //   await page.click('[data-testid="clear"]');
-});
-
 const pasteContent = async ({text, page, inputLocator}: {text: string; page: Page; inputLocator: Locator}) => {
   await page.evaluate(async (pasteText) => navigator.clipboard.writeText(pasteText), text);
   await inputLocator.focus();
   await inputLocator.press(`${OPERATION_MODIFIER}+v`);
 };
 
-test('paste', async ({page}) => {
-  const PASTE_TEXT = 'bold';
-  const boldStyleDefinition = CONSTANTS.MARKDOWN_STYLE_DEFINITIONS.bold;
+test.beforeEach(async ({page, context, browserName}) => {
+  await page.goto('http://localhost:19006/', {waitUntil: 'load'});
+  if (browserName === 'chromium') await context.grantPermissions(['clipboard-write', 'clipboard-read']);
+});
 
-  const inputLocator = await setupInput(page, 'clear');
+test.describe('paste content', () => {
+  test('paste', async ({page}) => {
+    const PASTE_TEXT = 'bold';
+    const boldStyleDefinition = CONSTANTS.MARKDOWN_STYLE_DEFINITIONS.bold;
 
-  const wrappedText = boldStyleDefinition.wrapContent(PASTE_TEXT);
-  await pasteContent({text: wrappedText, page, inputLocator});
+    const inputLocator = await setupInput(page, 'clear');
 
-  const elementHandle = await inputLocator.locator('span', {hasText: PASTE_TEXT}).last();
-  let elementStyle;
-  if (elementHandle) {
-    await elementHandle.waitFor({state: 'attached'});
+    const wrappedText = boldStyleDefinition.wrapContent(PASTE_TEXT);
+    await pasteContent({text: wrappedText, page, inputLocator});
 
-    elementStyle = await elementHandle.getAttribute('style');
-  }
-  expect(elementStyle).toEqual(boldStyleDefinition.style);
+    const elementHandle = await inputLocator.locator('span', {hasText: PASTE_TEXT}).last();
+    let elementStyle;
+    if (elementHandle) {
+      await elementHandle.waitFor({state: 'attached'});
+
+      elementStyle = await elementHandle.getAttribute('style');
+    }
+    expect(elementStyle).toEqual(boldStyleDefinition.style);
+  });
+
+  test('paste replace', async ({page}) => {
+    const inputLocator = await setupInput(page, 'reset');
+
+    await inputLocator.focus();
+    await inputLocator.press(`${OPERATION_MODIFIER}+a`);
+
+    const newText = '*bold*';
+    await pasteContent({text: newText, page, inputLocator});
+
+    expect(await inputLocator.innerText()).toBe(newText);
+  });
+
+  test('paste undo', async ({page}) => {
+    const PASTE_TEXT_FIRST = '*bold*';
+    const PASTE_TEXT_SECOND = '@here';
+
+    const inputLocator = await setupInput(page, 'clear');
+
+    await page.evaluate(async (pasteText) => navigator.clipboard.writeText(pasteText), PASTE_TEXT_FIRST);
+
+    await inputLocator.press(`${OPERATION_MODIFIER}+v`);
+    await page.waitForTimeout(CONSTANTS.INPUT_HISTORY_DEBOUNCE_TIME_MS);
+    await page.evaluate(async (pasteText) => navigator.clipboard.writeText(pasteText), PASTE_TEXT_SECOND);
+    await inputLocator.press(`${OPERATION_MODIFIER}+v`);
+    await page.waitForTimeout(CONSTANTS.INPUT_HISTORY_DEBOUNCE_TIME_MS);
+
+    await inputLocator.press(`${OPERATION_MODIFIER}+z`);
+
+    expect(await inputLocator.innerText()).toBe(PASTE_TEXT_FIRST);
+  });
+
+  test('paste redo', async ({page}) => {
+    const PASTE_TEXT_FIRST = '*bold*';
+    const PASTE_TEXT_SECOND = '@here';
+
+    const inputLocator = await setupInput(page, 'clear');
+
+    await page.evaluate(async (pasteText) => navigator.clipboard.writeText(pasteText), PASTE_TEXT_FIRST);
+    await inputLocator.press(`${OPERATION_MODIFIER}+v`);
+    await page.waitForTimeout(CONSTANTS.INPUT_HISTORY_DEBOUNCE_TIME_MS);
+    await page.evaluate(async (pasteText) => navigator.clipboard.writeText(pasteText), PASTE_TEXT_SECOND);
+    await page.waitForTimeout(CONSTANTS.INPUT_HISTORY_DEBOUNCE_TIME_MS);
+    await inputLocator.press(`${OPERATION_MODIFIER}+v`);
+    await page.waitForTimeout(CONSTANTS.INPUT_HISTORY_DEBOUNCE_TIME_MS);
+
+    await inputLocator.press(`${OPERATION_MODIFIER}+z`);
+    await inputLocator.press(`${OPERATION_MODIFIER}+Shift+z`);
+
+    expect(await inputLocator.innerText()).toBe(`${PASTE_TEXT_FIRST}${PASTE_TEXT_SECOND}`);
+  });
 });
 
 test('select', async ({page}) => {
   const inputLocator = await setupInput(page, 'reset');
-  //   await pasteContent({text: SELECTION_TEXT, page, inputLocator});
   await inputLocator.focus();
 
   const cursorPosition = await page.evaluate(() => {
@@ -59,57 +109,6 @@ test('select', async ({page}) => {
   });
 
   expect(cursorPosition).toBe(CONSTANTS.EXAMPLE_CONTENT.length);
-});
-
-test('paste replace', async ({page}) => {
-  const inputLocator = await setupInput(page, 'reset');
-
-  await inputLocator.focus();
-  await inputLocator.press(`${OPERATION_MODIFIER}+a`);
-
-  const newText = '*bold*';
-  await pasteContent({text: newText, page, inputLocator});
-
-  expect(await inputLocator.innerText()).toBe(newText);
-});
-
-test('paste undo', async ({page}) => {
-  const PASTE_TEXT_FIRST = '*bold*';
-  const PASTE_TEXT_SECOND = '@here';
-
-  const inputLocator = await setupInput(page, 'clear');
-
-  await page.evaluate(async (pasteText) => navigator.clipboard.writeText(pasteText), PASTE_TEXT_FIRST);
-
-  await inputLocator.press(`${OPERATION_MODIFIER}+v`);
-  await page.waitForTimeout(CONSTANTS.INPUT_HISTORY_DEBOUNCE_TIME_MS);
-  await page.evaluate(async (pasteText) => navigator.clipboard.writeText(pasteText), PASTE_TEXT_SECOND);
-  await inputLocator.press(`${OPERATION_MODIFIER}+v`);
-  await page.waitForTimeout(CONSTANTS.INPUT_HISTORY_DEBOUNCE_TIME_MS);
-
-  await inputLocator.press(`${OPERATION_MODIFIER}+z`);
-
-  expect(await inputLocator.innerText()).toBe(PASTE_TEXT_FIRST);
-});
-
-test('paste redo', async ({page}) => {
-  const PASTE_TEXT_FIRST = '*bold*';
-  const PASTE_TEXT_SECOND = '@here';
-
-  const inputLocator = await setupInput(page, 'clear');
-
-  await page.evaluate(async (pasteText) => navigator.clipboard.writeText(pasteText), PASTE_TEXT_FIRST);
-  await inputLocator.press(`${OPERATION_MODIFIER}+v`);
-  await page.waitForTimeout(CONSTANTS.INPUT_HISTORY_DEBOUNCE_TIME_MS);
-  await page.evaluate(async (pasteText) => navigator.clipboard.writeText(pasteText), PASTE_TEXT_SECOND);
-  await page.waitForTimeout(CONSTANTS.INPUT_HISTORY_DEBOUNCE_TIME_MS);
-  await inputLocator.press(`${OPERATION_MODIFIER}+v`);
-  await page.waitForTimeout(CONSTANTS.INPUT_HISTORY_DEBOUNCE_TIME_MS);
-
-  await inputLocator.press(`${OPERATION_MODIFIER}+z`);
-  await inputLocator.press(`${OPERATION_MODIFIER}+Shift+z`);
-
-  expect(await inputLocator.innerText()).toBe(`${PASTE_TEXT_FIRST}${PASTE_TEXT_SECOND}`);
 });
 
 test('cut content changes', async ({page}) => {
