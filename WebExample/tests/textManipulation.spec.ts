@@ -110,7 +110,7 @@ test('paste redo', async ({page}) => {
   await inputLocator.press(`${OPERATION_MODIFIER}+z`);
   await inputLocator.press(`${OPERATION_MODIFIER}+Shift+z`);
 
-  expect(await inputLocator.innerText()).toBe(PASTE_TEXT_SECOND);
+  expect(await inputLocator.innerText()).toBe(`${PASTE_TEXT_FIRST}${PASTE_TEXT_SECOND}`);
 });
 
 test('cut content changes', async ({page}) => {
@@ -147,6 +147,3 @@ test('cut content changes', async ({page}) => {
 
   expect(await rootHandle.innerHTML()).toBe(EXPECTED_CONTENT);
 });
-
-// COPY
-// CLEAR
