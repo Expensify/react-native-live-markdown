@@ -21,7 +21,7 @@ test.beforeEach(async ({page, context, browserName}) => {
 const pasteContent = async ({text, page, inputLocator}: {text: string; page: Page; inputLocator: Locator}) => {
   await page.evaluate(async (pasteText) => navigator.clipboard.writeText(pasteText), text);
   await inputLocator.focus();
-  await page.keyboard.press(`${OPERATION_MODIFIER}+v`);
+  await inputLocator.press(`${OPERATION_MODIFIER}+v`);
 };
 
 test('paste', async ({page}) => {
@@ -65,8 +65,7 @@ test('paste replace', async ({page}) => {
   const inputLocator = await setupInput(page, 'reset');
 
   await inputLocator.focus();
-  await page.keyboard.down(OPERATION_MODIFIER);
-  await page.keyboard.press('a');
+  await inputLocator.press(`${OPERATION_MODIFIER}+a`);
 
   const newText = '*bold*';
   await pasteContent({text: newText, page, inputLocator});
@@ -142,8 +141,7 @@ test('cut content changes', async ({page}) => {
   }, INITIAL_CONTENT);
 
   await inputLocator.focus();
-  await page.keyboard.down(OPERATION_MODIFIER);
-  await page.keyboard.press('x');
+  await inputLocator.press(`${OPERATION_MODIFIER}+x`);
 
   expect(await rootHandle.innerHTML()).toBe(EXPECTED_CONTENT);
 });
