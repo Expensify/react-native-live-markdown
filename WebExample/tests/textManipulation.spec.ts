@@ -85,13 +85,32 @@ test('paste undo', async ({page}) => {
   await inputLocator.press(`${OPERATION_MODIFIER}+v`);
   await page.waitForTimeout(CONSTANTS.INPUT_HISTORY_DEBOUNCE_TIME_MS);
   await page.evaluate(async (pasteText) => navigator.clipboard.writeText(pasteText), PASTE_TEXT_SECOND);
-  await page.waitForTimeout(CONSTANTS.INPUT_HISTORY_DEBOUNCE_TIME_MS);
   await inputLocator.press(`${OPERATION_MODIFIER}+v`);
   await page.waitForTimeout(CONSTANTS.INPUT_HISTORY_DEBOUNCE_TIME_MS);
 
   await inputLocator.press(`${OPERATION_MODIFIER}+z`);
 
   expect(await inputLocator.innerText()).toBe(PASTE_TEXT_FIRST);
+});
+
+test('paste redo', async ({page}) => {
+  const PASTE_TEXT_FIRST = '*bold*';
+  const PASTE_TEXT_SECOND = '@here';
+
+  const inputLocator = await setupInput(page, 'clear');
+
+  await page.evaluate(async (pasteText) => navigator.clipboard.writeText(pasteText), PASTE_TEXT_FIRST);
+  await inputLocator.press(`${OPERATION_MODIFIER}+v`);
+  await page.waitForTimeout(CONSTANTS.INPUT_HISTORY_DEBOUNCE_TIME_MS);
+  await page.evaluate(async (pasteText) => navigator.clipboard.writeText(pasteText), PASTE_TEXT_SECOND);
+  await page.waitForTimeout(CONSTANTS.INPUT_HISTORY_DEBOUNCE_TIME_MS);
+  await inputLocator.press(`${OPERATION_MODIFIER}+v`);
+  await page.waitForTimeout(CONSTANTS.INPUT_HISTORY_DEBOUNCE_TIME_MS);
+
+  await inputLocator.press(`${OPERATION_MODIFIER}+z`);
+  await inputLocator.press(`${OPERATION_MODIFIER}+Shift+z`);
+
+  expect(await inputLocator.innerText()).toBe(PASTE_TEXT_SECOND);
 });
 
 test('cut content changes', async ({page}) => {
