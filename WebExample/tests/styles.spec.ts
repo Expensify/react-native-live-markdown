@@ -56,7 +56,11 @@ test.describe('markdown content styling', () => {
     await testMarkdownContentStyle({styleName: 'mentionUser', style: CONSTANTS.MARKDOWN_STYLE_DEFINITIONS.mentionUser.style, page});
   });
 
-  test('blockquote', async ({page}) => {
-    await testMarkdownContentStyle({styleName: 'blockquote', style: CONSTANTS.MARKDOWN_STYLE_DEFINITIONS.blockquote.style, page});
+  test('blockquote', async ({page, browserName}) => {
+    const blockquoteStyle = CONSTANTS.MARKDOWN_STYLE_DEFINITIONS.blockquote.style;
+    // Firefox border properties are serialized slightly differently
+    const browserStyle = browserName === 'firefox' ? blockquoteStyle.replace(' border-left-style: solid', ' border-left: 6px solid gray') : blockquoteStyle;
+
+    await testMarkdownContentStyle({styleName: 'blockquote', style: browserStyle, page});
   });
 });
