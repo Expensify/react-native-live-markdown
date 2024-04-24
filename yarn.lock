@@ -2388,7 +2388,7 @@ __metadata:
     "@types/underscore": ^1.11.15
     esbuild: 0.19.4
     esbuild-plugin-tsc: ^0.4.0
-    expensify-common: "Expensify/expensify-common#0b1275e1f0809a5a2365b92d9fa92b11654b164f"
+    expensify-common: "Expensify/expensify-common#9a68635cdcef4c81593c0f816a007bc9c707d46a"
     jest: ^29.7.0
     patch-package: ^8.0.0
     typescript: ^5.3.3
@@ -9669,9 +9669,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expensify-common@Expensify/expensify-common#0b1275e1f0809a5a2365b92d9fa92b11654b164f":
+"expensify-common@Expensify/expensify-common#9a68635cdcef4c81593c0f816a007bc9c707d46a":
   version: 1.0.0
-  resolution: "expensify-common@https://github.com/Expensify/expensify-common.git#commit=0b1275e1f0809a5a2365b92d9fa92b11654b164f"
+  resolution: "expensify-common@https://github.com/Expensify/expensify-common.git#commit=9a68635cdcef4c81593c0f816a007bc9c707d46a"
   dependencies:
     classnames: 2.5.0
     clipboard: 2.0.11
@@ -9686,7 +9686,7 @@ __metadata:
     simply-deferred: "git+https://github.com/Expensify/simply-deferred.git#77a08a95754660c7bd6e0b6979fdf84e8e831bf5"
     ua-parser-js: ^1.0.37
     underscore: 1.13.6
-  checksum: 3fdd8678f719775459444b3d702b5c6d90f4a575e46b94cd8c899a57bf6b54ffc347f0df2445bf9a2df3bb12cc803a4cca973f5868541bbcc7e52e5c6034f4e5
+  checksum: 3fb01f9ab7983811d500d29c35a9f6751a65b3156d22796c567f471f8e3154d3d28a3e5327eaafb606ce50201910c5d705eb4cbdddf730851ec2e8fb94a3575b
   languageName: node
   linkType: hard
 
