@@ -55,4 +55,8 @@ test.describe('markdown content styling', () => {
   test('mentionUser', async ({page}) => {
     await testMarkdownContentStyle({styleName: 'mentionUser', style: CONSTANTS.MARKDOWN_STYLE_DEFINITIONS.mentionUser.style, page});
   });
+
+  test('blockquote', async ({page}) => {
+    await testMarkdownContentStyle({styleName: 'blockquote', style: CONSTANTS.MARKDOWN_STYLE_DEFINITIONS.blockquote.style, page});
+  });
 });

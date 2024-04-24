@@ -1,5 +1,4 @@
 const LOCAL_URL = 'http://localhost:19006/';
-// const EXAMPLE_CONTENT = ['Hello, *world*!', 'https://expensify.com', '# Lorem ipsum', '> Blockquote test', '`foo`', '```\nbar\n```', '@here', '@someone@swmansion.com'].join('\n');
 
 const EXAMPLE_CONTENT_STYLES = [
   {content: 'Hello', style: null},
@@ -7,7 +6,6 @@ const EXAMPLE_CONTENT_STYLES = [
   {content: 'https://expensify.com', style: 'color: blue; text-decoration: underline;'},
   {content: '# Lorem ipsum', style: 'font-size: 25px; font-weight: bold;'},
   {content: '`foo`', style: 'font-family: monospace; font-size: 20px; color: black; background-color: lightgray;'},
-  //   {content: '```\nbar\n```', style: ''},
   {content: '@here', style: 'color: green; background-color: lime;'},
   {content: '@someone@swmansion.com', style: 'color: blue; background-color: cyan;'},
 ];
@@ -22,13 +20,15 @@ const MARKDOWN_STYLE_DEFINITIONS = {
   codeBlock: {wrapContent: (content: string) => `\`\`\`\n${content}\n\`\`\``, style: 'font-family: monospace; font-size: 20px; color: black; background-color: lightgray;'},
   here: {wrapContent: (content: string) => `@${content}`, style: 'color: green; background-color: lime;'},
   mentionUser: {wrapContent: (content: string) => `@${content}@swmansion.com`, style: 'color: blue; background-color: cyan;'},
+  blockquote: {
+    wrapContent: (content: string) => `> ${content}`,
+    style: 'border-color: gray; border-width: 6px; margin-left: 6px; padding-left: 6px; border-left-style: solid; display: inline-block; max-width: 100%; box-sizing: border-box;',
+  },
 } as const satisfies Record<string, MarkdownStyleDefiniton>;
 
 const EXAMPLE_CONTENT = Object.entries(MARKDOWN_STYLE_DEFINITIONS)
   .map(([styleName, style]) => style.wrapContent(styleName))
   .join('\n');
-
-//   {content: '> Hello world', style: ''},
 
 const INPUT_ID = 'MarkdownInput_Example';
 const INPUT_HISTORY_DEBOUNCE_TIME_MS = 150;
