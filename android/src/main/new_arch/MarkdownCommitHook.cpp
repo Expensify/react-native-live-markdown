@@ -111,6 +111,9 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
               std::make_shared<AndroidTextInputState>(stateData);
           // force measurement of a map buffer
           newStateData->cachedAttributedStringId = 0;
+          // setting -1 as the event counter makes sure that the update will be ignored by the java
+          // part of the code, which is what we want as we don't change the attributed string here
+          newStateData->mostRecentEventCount = -1;
 
           // clone the text input with the new state
           auto newNode = node.clone({
