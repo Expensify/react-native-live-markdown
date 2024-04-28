@@ -14,6 +14,10 @@ const MARKDOWN_STYLE_DEFINITIONS = {
     wrapContent: (content: string) => `> ${content}`,
     style: 'border-color: gray; border-width: 6px; margin-left: 6px; padding-left: 6px; border-left-style: solid; display: inline-block; max-width: 100%; box-sizing: border-box;',
   },
+  roomMention: {
+    wrapContent: (content: string) => `#${content}`,
+    style: 'color: red; background-color: pink;',
+  },
 } as const satisfies Record<string, MarkdownStyleDefiniton>;
 
 const EXAMPLE_CONTENT = Object.entries(MARKDOWN_STYLE_DEFINITIONS)

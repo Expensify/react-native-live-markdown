@@ -4,7 +4,7 @@ import * as BrowserUtils from './browserUtils';
 
 type PartialMarkdownStyle = StyleUtilsTypes.PartialMarkdownStyle;
 
-type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'emoji' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax' | 'mention-here' | 'mention-user';
+type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'emoji' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax' | 'mention-here' | 'mention-user' | 'mention-report';
 
 type MarkdownRange = {
   type: MarkdownType;
@@ -41,6 +41,9 @@ function addStyling(targetElement: HTMLElement, type: MarkdownType, markdownStyl
       break;
     case 'mention-user':
       Object.assign(node.style, markdownStyle.mentionUser);
+      break;
+    case 'mention-report':
+      Object.assign(node.style, markdownStyle.mentionReport);
       break;
     case 'link':
       Object.assign(node.style, {

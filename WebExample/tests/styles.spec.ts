@@ -56,6 +56,10 @@ test.describe('markdown content styling', () => {
     await testMarkdownContentStyle({styleName: 'mentionUser', style: CONSTANTS.MARKDOWN_STYLE_DEFINITIONS.mentionUser.style, page});
   });
 
+  test('roomMention', async ({page}) => {
+    await testMarkdownContentStyle({styleName: 'roomMention', style: CONSTANTS.MARKDOWN_STYLE_DEFINITIONS.roomMention.style, page});
+  });
+
   test('blockquote', async ({page, browserName}) => {
     const blockquoteStyle = CONSTANTS.MARKDOWN_STYLE_DEFINITIONS.blockquote.style;
     // Firefox border properties are serialized slightly differently

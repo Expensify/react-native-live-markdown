@@ -516,3 +516,25 @@ describe('inline image', () => {
     ]);
   });
 });
+
+describe('report mentions', () => {
+  test('simple report mention', () => {
+    expect('#report-name').toBeParsedAs([{type: 'mention-report', start: 0, length: 12}]);
+  });
+
+  test('report mention in tense', () => {
+    expect('reported #report-name should be highlighted').toBeParsedAs([{type: 'mention-report', start: 9, length: 12}]);
+  });
+
+  test('report mention with markdown', () => {
+    expect('reported #`report-name` should be highlighted').toBeParsedAs([
+      {type: 'syntax', start: 10, length: 1},
+      {type: 'code', start: 11, length: 11},
+      {type: 'syntax', start: 22, length: 1},
+    ]);
+  });
+
+  test('report mention with punctuation', () => {
+    expect('reported #report-name!').toBeParsedAs([{type: 'mention-report', start: 9, length: 12}]);
+  });
+});

@@ -310,9 +310,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         return;
       }
 
-      const hostNode = (divRef.current.firstChild as HTMLElement) ?? divRef.current;
-      const newWidth = hostNode.offsetWidth;
-      const newHeight = hostNode.offsetHeight;
+      const {offsetWidth: newWidth, offsetHeight: newHeight} = divRef.current;
 
       if (newHeight !== dimensions.current?.height || newWidth !== dimensions.current.width) {
         dimensions.current = {height: newHeight, width: newWidth};
@@ -439,9 +437,13 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         currentlyFocusedField.current = hostNode;
         setEventProps(e);
         if (divRef.current) {
-          const valueLength = value ? value.length : 0;
-          CursorUtils.setCursorPosition(divRef.current, contentSelection.current ? contentSelection.current.end : valueLength);
-          updateSelection(event);
+          if (contentSelection.current) {
+            CursorUtils.setCursorPosition(divRef.current, contentSelection.current.start, contentSelection.current.end);
+          } else {
+            const valueLength = value ? value.length : divRef.current.innerText.length;
+            CursorUtils.setCursorPosition(divRef.current, valueLength, null);
+          }
+          updateSelection(event, contentSelection.current);
         }
 
         if (onFocus) {
@@ -570,12 +572,20 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     }, [autoFocus]);
 
     useEffect(() => {
+      // update content size when the input styles change
+      handleContentSizeChange();
+    }, [handleContentSizeChange, inputStyles]);
+
+    useEffect(() => {
       if (!divRef.current || !selection || (contentSelection.current && selection.start === contentSelection.current.start && selection.end === contentSelection.current.end)) {
         return;
       }
-      CursorUtils.setCursorPosition(divRef.current, selection.start, selection.end);
-      updateSelection(null, {start: selection.start, end: selection.end || selection.start});
-    }, [selection, updateSelection]);
+
+      const newSelection: Selection = {start: selection.start, end: selection.end ?? selection.start};
+      contentSelection.current = newSelection;
+      updateRefSelectionVariables(newSelection);
+      CursorUtils.setCursorPosition(divRef.current, newSelection.start, newSelection.end);
+    }, [selection, updateRefSelectionVariables]);
 
     useEffect(() => {
       if (history.current?.history.length !== 0) {
