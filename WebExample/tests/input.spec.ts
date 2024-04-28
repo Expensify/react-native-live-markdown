@@ -31,15 +31,15 @@ test.describe('standard input behaviour', () => {
 
     expect(await inputLocator.innerText()).toBe(EXAMPLE_LONG_CONTENT);
 
-    const cursorPosition = await page.evaluate((selector) => {
-      const editableDiv = document.querySelector(selector) as HTMLElement;
+    const cursorPosition = await page.evaluate(() => {
+      const editableDiv = document.querySelector('div[contenteditable="true"]') as HTMLElement;
       const range = window.getSelection()?.getRangeAt(0);
       if (!range || !editableDiv) return null;
       const preCaretRange = range.cloneRange();
       preCaretRange.selectNodeContents(editableDiv);
       preCaretRange.setEnd(range.endContainer, range.endOffset);
       return preCaretRange.toString().length;
-    }, 'div[contenteditable="true"]');
+    });
 
     expect(cursorPosition).toBe(EXAMPLE_LONG_CONTENT.length);
   });

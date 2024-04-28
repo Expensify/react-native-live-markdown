@@ -97,6 +97,7 @@ test.describe('paste content', () => {
 test('select', async ({page}) => {
   const inputLocator = await setupInput(page, 'reset');
   await inputLocator.focus();
+  await inputLocator.press(`${OPERATION_MODIFIER}+a`);
 
   const cursorPosition = await page.evaluate(() => {
     const editableDiv = document.querySelector('div[contenteditable="true"]');
@@ -105,6 +106,7 @@ test('select', async ({page}) => {
     const preCaretRange = range.cloneRange();
     preCaretRange.selectNodeContents(editableDiv);
     preCaretRange.setEnd(range.endContainer, range.endOffset);
+
     return preCaretRange.toString().length;
   });
 
