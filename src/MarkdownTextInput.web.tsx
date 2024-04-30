@@ -123,6 +123,29 @@ function getElementHeight(node: HTMLDivElement, styles: CSSProperties, numberOfL
   return `${styles.height}px` || 'auto';
 }
 
+function displaySpan() {
+  const selection = window.getSelection();
+  const caretRect = selection.getRangeAt(0).getClientRects()[0];
+
+  if (!caretRect) return;
+  const {height, top, left} = caretRect;
+  const span = document.createElement('span');
+  const body = document.querySelector('#root');
+  span.classList.add('test');
+  span.style.width = '1px';
+  span.style.position = 'fixed';
+  span.style.backgroundColor = 'orangered';
+  span.style.height = `${height}px`;
+  span.style.top = `${top}px`;
+  span.style.left = `${left}px`;
+  body.appendChild(span);
+}
+
+function hideSpan() {
+  const span = document.querySelector('.test');
+  span?.remove();
+}
+
 const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
   (
     {
@@ -268,6 +291,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
         let text = '';
         const nativeEvent = e.nativeEvent as MarkdownNativeEvent;
+        console.log('%%%%%\n', 'e.target.innerText', JSON.stringify(e.target.innerText));
         switch (nativeEvent.inputType) {
           case 'historyUndo':
             text = undo(divRef.current);
@@ -276,7 +300,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
             text = redo(divRef.current);
             break;
           default:
-            text = parseText(divRef.current, e.target.innerText, processedMarkdownStyle).text;
+            text = parseText(divRef.current, e.target.innerText.replaceAll('\n\n', '\n'), processedMarkdownStyle).text;
         }
         updateSelection(e);
         updateTextColor(divRef.current, e.target.innerText);
@@ -328,6 +352,9 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           handleSelectionChange(e);
         }
       }
+
+      hideSpan();
+      displaySpan();
     }, []);
 
     const handleKeyPress = useCallback(

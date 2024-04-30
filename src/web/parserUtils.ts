@@ -4,7 +4,7 @@ import * as BrowserUtils from './browserUtils';
 
 type PartialMarkdownStyle = StyleUtilsTypes.PartialMarkdownStyle;
 
-type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'emoji' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax' | 'mention-here' | 'mention-user';
+type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax' | 'mention-here' | 'mention-user' | 'emoji' | 'p';
 
 type MarkdownRange = {
   type: MarkdownType;
@@ -75,11 +75,21 @@ function addStyling(targetElement: HTMLElement, type: MarkdownType, markdownStyl
   }
 }
 
-function addSubstringAsTextNode(root: HTMLElement, text: string, startIndex: number, endIndex: number) {
-  const substring = text.substring(startIndex, endIndex);
-  if (substring.length > 0) {
-    root.appendChild(document.createTextNode(substring));
+function addSubstringAsTextNode(root: HTMLElement, text: string, startIndex: number, endIndex: number, rawText = true) {
+  let substring = text.substring(startIndex, endIndex);
+  substring = substring.replaceAll('\n', '');
+  // console.log('%%%%%\n', 'root', root);
+  // console.log('%%%%%\n', 'substring', JSON.stringify(substring));
+  if (substring !== '') {
+    if (rawText) {
+      const span = document.createElement('span');
+      span.textContent = substring;
+      root.appendChild(span);
+    } else {
+      root.appendChild(document.createTextNode(substring));
+    }
   }
+  // console.log('%%%%%\n', 'root', JSON.stringify(root.innerHTML));
 }
 
 function ungroupRanges(ranges: MarkdownRange[]): MarkdownRange[] {
@@ -108,7 +118,9 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
   const stack = ungroupRanges(ranges);
   const nestedStack: NestedNode[] = [{node: root, endIndex: textLength}];
   let lastRangeEndIndex = 0;
+  console.log('%%%%%\n', JSON.stringify(stack));
   while (stack.length > 0) {
+    console.log('%%%%%\n', JSON.stringify(nestedStack));
     const range = stack.shift();
     if (!range) {
       break;
@@ -121,9 +133,13 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
     const endOfCurrentRange = range.start + range.length;
     const nextRangeStartIndex = stack.length > 0 && !!stack[0] ? stack[0].start || 0 : textLength;
 
-    addSubstringAsTextNode(currentRoot.node, text, lastRangeEndIndex, range.start); // add text with newlines before current range
+    addSubstringAsTextNode(currentRoot.node, text, lastRangeEndIndex, range.start, true); // add text with newlines before current range
 
-    const span = document.createElement('span');
+    let span = document.createElement('span');
+    if (range.type === 'p') {
+      span = document.createElement('p');
+    }
+
     if (disableInlineStyles) {
       span.className = range.type;
     } else {
@@ -131,18 +147,24 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
     }
 
     if (stack.length > 0 && nextRangeStartIndex < endOfCurrentRange && range.type !== 'syntax') {
+      // if (!span.hasChildNodes()) {
+      //   span.appendChild(document.createElement('br'));
+      // }
       // tag nesting
       currentRoot.node.appendChild(span);
       nestedStack.push({node: span, endIndex: endOfCurrentRange});
       lastRangeEndIndex = range.start;
     } else {
       addSubstringAsTextNode(span, text, range.start, endOfCurrentRange);
+      // if (!span.hasChildNodes()) {
+      //   span.appendChild(document.createElement('br'));
+      // }
       currentRoot.node.appendChild(span);
       lastRangeEndIndex = endOfCurrentRange;
 
       // end of tag nesting
       while (nestedStack.length - 1 > 0 && nextRangeStartIndex >= currentRoot.endIndex) {
-        addSubstringAsTextNode(currentRoot.node, text, lastRangeEndIndex, currentRoot.endIndex);
+        addSubstringAsTextNode(currentRoot.node, text, lastRangeEndIndex, currentRoot.endIndex, true);
         const prevRoot = nestedStack.pop();
         if (!prevRoot) {
           break;
@@ -151,16 +173,22 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
         currentRoot = nestedStack[nestedStack.length - 1] || currentRoot;
       }
     }
+
+    // if (!span.hasChildNodes()) {
+    //   span.appendChild(document.createElement('br'));
+    // }
   }
 
   if (nestedStack.length > 1) {
+    console.log('%%%%%\n', 'true-----------------');
     const lastNestedNode = nestedStack[nestedStack.length - 1];
+    console.log('%%%%%\n', 'lastNestedNode', lastNestedNode);
     if (lastNestedNode) {
       root.appendChild(lastNestedNode.node);
     }
   }
 
-  addSubstringAsTextNode(root, text, lastRangeEndIndex, textLength);
+  // console.log('%%%%%\n', 'root.innerText', JSON.stringify(root.innerText));
   return root;
 }
 
@@ -176,8 +204,33 @@ function moveCursor(isFocused: boolean, alwaysMoveCursorToTheEnd: boolean, curso
   }
 }
 
+function parseRanges(ranges: MarkdownRange[], text: string): MarkdownRange[] {
+  const lines = text.split('\n');
+  if (lines.length === 1) {
+    return [{type: 'p', start: 0, length: text.length}, ...ranges];
+  }
+
+  const rangesStack = [...ranges];
+  const res: MarkdownRange[] = [];
+  let currentIndex = 0;
+
+  while (lines.length > 0 && (lines[0] === '' || lines[0])) {
+    res.push({type: 'p', start: currentIndex, length: lines[0].length + 1});
+
+    currentIndex += lines[0].length + 1;
+
+    while (rangesStack[0] && rangesStack[0].start < currentIndex) {
+      res.push(rangesStack.shift() as MarkdownRange);
+    }
+    lines.shift();
+  }
+
+  return res;
+}
+
 function parseText(target: HTMLElement, text: string, curosrPositionIndex: number | null, markdownStyle: PartialMarkdownStyle = {}, alwaysMoveCursorToTheEnd = false) {
   const targetElement = target;
+  console.log('%%%%%\n', 'text', JSON.stringify(text));
 
   let cursorPosition: number | null = curosrPositionIndex;
   const isFocused = document.activeElement === target;
@@ -188,6 +241,8 @@ function parseText(target: HTMLElement, text: string, curosrPositionIndex: numbe
   const ranges = global.parseExpensiMarkToRanges(text);
 
   const markdownRanges: MarkdownRange[] = ranges as MarkdownRange[];
+  console.log('%%%%%\n', 'markdownRanges', markdownRanges);
+  console.log('%%%%%\n', 'parseRanges(markdownRanges, text)', parseRanges(markdownRanges, text));
   const rootSpan = targetElement.firstChild as HTMLElement | null;
 
   if (!text || targetElement.innerHTML === '<br>' || (rootSpan && rootSpan.innerHTML === '\n')) {
@@ -197,11 +252,13 @@ function parseText(target: HTMLElement, text: string, curosrPositionIndex: numbe
 
   // We don't want to parse text with single '\n', because contentEditable represents it as invisible <br />
   if (text) {
-    const dom = parseRangesToHTMLNodes(text, markdownRanges, markdownStyle);
+    const dom = parseRangesToHTMLNodes(text, parseRanges(markdownRanges, text), markdownStyle);
+    // const dom = parseRangesToHTMLNodes(text, markdownRanges, markdownStyle);
 
     if (!rootSpan || rootSpan.innerHTML !== dom.innerHTML) {
       targetElement.innerHTML = '';
       targetElement.innerText = '';
+      console.log('%%%%%\n', 'JSON.stringify(dom.innerText)', JSON.stringify(dom.innerText));
       target.appendChild(dom);
 
       if (BrowserUtils.isChromium) {
@@ -213,6 +270,8 @@ function parseText(target: HTMLElement, text: string, curosrPositionIndex: numbe
       moveCursor(isFocused, alwaysMoveCursorToTheEnd, cursorPosition, target);
     }
   }
+
+  console.log('%%%%%\n', 'target.innerText', JSON.stringify(target.innerText));
 
   return {text: target.innerText, cursorPosition: cursorPosition || 0};
 }
