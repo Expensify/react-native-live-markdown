@@ -30,11 +30,22 @@ jobs:
       group: e2e-test-${{ github.ref }}
       cancel-in-progress: true
     steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
       - name: Install node_modules
         run: yarn install --immutable
 
       - name: Install browsers
         run: npx playwright install --with-deps
+
+      - name: Install dependencies for browsers
+        run: npx playwright install-deps
 
       - name: Run playwright tests
         run: yarn test
