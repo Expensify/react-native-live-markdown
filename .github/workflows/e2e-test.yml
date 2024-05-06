@@ -20,6 +20,12 @@ jobs:
   e2e_test:
     if: github.repository == 'Expensify/react-native-live-markdown'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./WebExample
+
+    container:
+      image: mcr.microsoft.com/playwright:v1.43.1-jammy
     concurrency:
       group: e2e-test-${{ github.ref }}
       cancel-in-progress: true
@@ -33,13 +39,17 @@ jobs:
           node-version: 18
 
       - name: Install node_modules
-        working-directory: WebExample
         run: yarn install --immutable
 
-      - name: Install Playwright Browsers
-        working-directory: WebExample
-        run: yarn playwright install-deps
+      - name: Install browsers
+        run: npx playwright install --with-deps
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+
+      - name: Install dependencies for browsers
+        run: npx playwright install-deps
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
 
       - name: Run playwright tests
-        working-directory: WebExample
         run: yarn test
+        env:
+          HOME: /root
