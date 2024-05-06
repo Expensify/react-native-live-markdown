@@ -1,13 +1,7 @@
 import {test, expect} from '@playwright/test';
 import type {Locator, Page} from '@playwright/test';
 import * as TEST_CONST from '../../testConstants';
-
-const setupInput = async (page: Page, mode: 'clear' | 'reset') => {
-  const inputLocator = await page.locator(`div#MarkdownInput_Example`);
-  await page.click(`[data-testid="${mode}"]`);
-
-  return inputLocator;
-};
+import {checkCursorPosition, setupInput} from './utils';
 
 const OPERATION_MODIFIER = process.platform === 'darwin' ? 'Meta' : 'Control';
 
@@ -99,16 +93,7 @@ test('select', async ({page}) => {
   await inputLocator.focus();
   await inputLocator.press(`${OPERATION_MODIFIER}+a`);
 
-  const cursorPosition = await page.evaluate(() => {
-    const editableDiv = document.querySelector('div[contenteditable="true"]');
-    const range = window.getSelection()?.getRangeAt(0);
-    if (!range || !editableDiv) return null;
-    const preCaretRange = range.cloneRange();
-    preCaretRange.selectNodeContents(editableDiv);
-    preCaretRange.setEnd(range.endContainer, range.endOffset);
-
-    return preCaretRange.toString().length;
-  });
+  const cursorPosition = await page.evaluate(checkCursorPosition);
 
   expect(cursorPosition).toBe(TEST_CONST.EXAMPLE_CONTENT.length);
 });

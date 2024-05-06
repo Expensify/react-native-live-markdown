@@ -1,11 +1,7 @@
 import {test, expect} from '@playwright/test';
 import type {Page} from '@playwright/test';
 import * as TEST_CONST from '../../testConstants';
-
-const setupInput = async (page: Page) => {
-  const inputLocator = await page.locator(`div#MarkdownInput_Example`);
-  return inputLocator;
-};
+import {setupInput} from './utils';
 
 const testMarkdownContentStyle = async ({styleName, style, page}: {styleName: string; style: string; page: Page}) => {
   const inputLocator = await setupInput(page);
