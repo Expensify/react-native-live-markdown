@@ -19,7 +19,7 @@ on:
 jobs:
   e2e_test:
     if: github.repository == 'Expensify/react-native-live-markdown'
-    runs-on: ubuntu-latest
+    runs-on: macOS-latest
     defaults:
       run:
         working-directory: ./WebExample
@@ -43,11 +43,6 @@ jobs:
 
       - name: Install browsers
         run: npx playwright install --with-deps
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-
-      - name: Install dependencies for browsers
-        run: npx playwright install-deps
-        if: steps.playwright-cache.outputs.cache-hit == 'true'
 
       - name: Run playwright tests
         run: yarn test
