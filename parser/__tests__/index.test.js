@@ -75,6 +75,10 @@ describe('mention-user', () => {
   test('with punctation marks', () => {
     expect('@mail@mail.com!').toBeParsedAs([{type: 'mention-user', start: 0, length: 14}]);
   });
+
+  test('with phone number', () => {
+    expect('@+1234567890 Hello!').toBeParsedAs([{type: 'mention-user', start: 0, length: 12}]);
+  });
 });
 
 test('plain link', () => {
