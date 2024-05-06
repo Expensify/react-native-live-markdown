@@ -19,7 +19,7 @@ on:
 jobs:
   e2e_test:
     if: github.repository == 'Expensify/react-native-live-markdown'
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./WebExample
