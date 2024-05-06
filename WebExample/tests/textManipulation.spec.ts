@@ -63,6 +63,7 @@ test.describe('paste content', () => {
     await page.waitForTimeout(TEST_CONST.INPUT_HISTORY_DEBOUNCE_TIME_MS);
 
     await inputLocator.press(`${OPERATION_MODIFIER}+z`);
+    await page.waitForTimeout(TEST_CONST.INPUT_HISTORY_DEBOUNCE_TIME_MS);
 
     expect(await inputLocator.innerText()).toBe(PASTE_TEXT_FIRST);
   });
