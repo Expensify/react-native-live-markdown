@@ -35,6 +35,9 @@ jobs:
       - name: Install node_modules
         run: yarn install --immutable
 
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
       - name: Run playwright tests
         working-directory: WebExample
         run: yarn test
