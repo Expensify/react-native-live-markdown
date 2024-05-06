@@ -1,6 +1,6 @@
 import {test, expect} from '@playwright/test';
 import type {Page} from '@playwright/test';
-import * as CONSTANTS from '../../constants';
+import * as TEST_CONST from '../../testConstants';
 
 const setupInput = async (page: Page, mode: 'clear' | 'reset') => {
   const inputLocator = await page.locator(`div#MarkdownInput_Example`);
@@ -10,20 +10,20 @@ const setupInput = async (page: Page, mode: 'clear' | 'reset') => {
 };
 
 test.beforeEach(async ({page}) => {
-  await page.goto('http://localhost:19006/', {waitUntil: 'load'});
+  await page.goto(TEST_CONST.LOCAL_URL, {waitUntil: 'load'});
 });
 
 test.describe('standard input behaviour', () => {
   test('standard input results', async ({page}) => {
     const inputLocator = await setupInput(page, 'clear');
 
-    await inputLocator.pressSequentially(CONSTANTS.EXAMPLE_CONTENT);
+    await inputLocator.pressSequentially(TEST_CONST.EXAMPLE_CONTENT);
     const value = await inputLocator.innerText();
-    expect(value).toEqual(CONSTANTS.EXAMPLE_CONTENT);
+    expect(value).toEqual(TEST_CONST.EXAMPLE_CONTENT);
   });
 
   test('fast type cursor position', async ({page}) => {
-    const EXAMPLE_LONG_CONTENT = CONSTANTS.EXAMPLE_CONTENT.repeat(3);
+    const EXAMPLE_LONG_CONTENT = TEST_CONST.EXAMPLE_CONTENT.repeat(3);
 
     const inputLocator = await setupInput(page, 'clear');
 

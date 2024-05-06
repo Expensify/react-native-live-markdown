@@ -161,6 +161,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       value,
       autoFocus = false,
       onContentSizeChange,
+      id,
     },
     ref,
   ) => {
@@ -601,7 +602,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     return (
       // eslint-disable-next-line jsx-a11y/no-static-element-interactions
       <div
-        id="MarkdownInput_Example"
+        id={id}
         ref={setRef}
         contentEditable={!disabled}
         style={inputStyles}

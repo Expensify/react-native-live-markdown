@@ -1,6 +1,6 @@
 import {test, expect} from '@playwright/test';
 import type {Locator, Page} from '@playwright/test';
-import * as CONSTANTS from '../../constants';
+import * as TEST_CONST from '../../testConstants';
 
 const setupInput = async (page: Page, mode: 'clear' | 'reset') => {
   const inputLocator = await page.locator(`div#MarkdownInput_Example`);
@@ -18,14 +18,14 @@ const pasteContent = async ({text, page, inputLocator}: {text: string; page: Pag
 };
 
 test.beforeEach(async ({page, context, browserName}) => {
-  await page.goto('http://localhost:19006/', {waitUntil: 'load'});
+  await page.goto(TEST_CONST.LOCAL_URL, {waitUntil: 'load'});
   if (browserName === 'chromium') await context.grantPermissions(['clipboard-write', 'clipboard-read']);
 });
 
 test.describe('paste content', () => {
   test('paste', async ({page}) => {
     const PASTE_TEXT = 'bold';
-    const boldStyleDefinition = CONSTANTS.MARKDOWN_STYLE_DEFINITIONS.bold;
+    const boldStyleDefinition = TEST_CONST.MARKDOWN_STYLE_DEFINITIONS.bold;
 
     const inputLocator = await setupInput(page, 'clear');
 
@@ -63,10 +63,10 @@ test.describe('paste content', () => {
     await page.evaluate(async (pasteText) => navigator.clipboard.writeText(pasteText), PASTE_TEXT_FIRST);
 
     await inputLocator.press(`${OPERATION_MODIFIER}+v`);
-    await page.waitForTimeout(CONSTANTS.INPUT_HISTORY_DEBOUNCE_TIME_MS);
+    await page.waitForTimeout(TEST_CONST.INPUT_HISTORY_DEBOUNCE_TIME_MS);
     await page.evaluate(async (pasteText) => navigator.clipboard.writeText(pasteText), PASTE_TEXT_SECOND);
     await inputLocator.press(`${OPERATION_MODIFIER}+v`);
-    await page.waitForTimeout(CONSTANTS.INPUT_HISTORY_DEBOUNCE_TIME_MS);
+    await page.waitForTimeout(TEST_CONST.INPUT_HISTORY_DEBOUNCE_TIME_MS);
 
     await inputLocator.press(`${OPERATION_MODIFIER}+z`);
 
@@ -81,11 +81,11 @@ test.describe('paste content', () => {
 
     await page.evaluate(async (pasteText) => navigator.clipboard.writeText(pasteText), PASTE_TEXT_FIRST);
     await inputLocator.press(`${OPERATION_MODIFIER}+v`);
-    await page.waitForTimeout(CONSTANTS.INPUT_HISTORY_DEBOUNCE_TIME_MS);
+    await page.waitForTimeout(TEST_CONST.INPUT_HISTORY_DEBOUNCE_TIME_MS);
     await page.evaluate(async (pasteText) => navigator.clipboard.writeText(pasteText), PASTE_TEXT_SECOND);
-    await page.waitForTimeout(CONSTANTS.INPUT_HISTORY_DEBOUNCE_TIME_MS);
+    await page.waitForTimeout(TEST_CONST.INPUT_HISTORY_DEBOUNCE_TIME_MS);
     await inputLocator.press(`${OPERATION_MODIFIER}+v`);
-    await page.waitForTimeout(CONSTANTS.INPUT_HISTORY_DEBOUNCE_TIME_MS);
+    await page.waitForTimeout(TEST_CONST.INPUT_HISTORY_DEBOUNCE_TIME_MS);
 
     await inputLocator.press(`${OPERATION_MODIFIER}+z`);
     await inputLocator.press(`${OPERATION_MODIFIER}+Shift+z`);
@@ -110,13 +110,13 @@ test('select', async ({page}) => {
     return preCaretRange.toString().length;
   });
 
-  expect(cursorPosition).toBe(CONSTANTS.EXAMPLE_CONTENT.length);
+  expect(cursorPosition).toBe(TEST_CONST.EXAMPLE_CONTENT.length);
 });
 
 test('cut content changes', async ({page}) => {
   const INITIAL_CONTENT = 'bold';
-  const WRAPPED_CONTENT = CONSTANTS.MARKDOWN_STYLE_DEFINITIONS.bold.wrapContent(INITIAL_CONTENT);
-  const EXPECTED_CONTENT = CONSTANTS.MARKDOWN_STYLE_DEFINITIONS.bold.wrapContent(INITIAL_CONTENT).slice(0, 3);
+  const WRAPPED_CONTENT = TEST_CONST.MARKDOWN_STYLE_DEFINITIONS.bold.wrapContent(INITIAL_CONTENT);
+  const EXPECTED_CONTENT = TEST_CONST.MARKDOWN_STYLE_DEFINITIONS.bold.wrapContent(INITIAL_CONTENT).slice(0, 3);
 
   const inputLocator = await setupInput(page, 'clear');
   await pasteContent({text: WRAPPED_CONTENT, page, inputLocator});

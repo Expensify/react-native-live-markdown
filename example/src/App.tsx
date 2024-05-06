@@ -4,7 +4,7 @@ import {Button, Platform, StyleSheet, Text, View} from 'react-native';
 
 import {MarkdownTextInput} from '@expensify/react-native-live-markdown';
 import type {TextInput} from 'react-native';
-import * as CONSTANTS from '../../constants';
+import * as TEST_CONST from '../../testConstants';
 
 function isWeb() {
   return Platform.OS === 'web';
@@ -59,7 +59,7 @@ function getRandomColor() {
 }
 
 export default function App() {
-  const [value, setValue] = React.useState(CONSTANTS.EXAMPLE_CONTENT);
+  const [value, setValue] = React.useState(TEST_CONST.EXAMPLE_CONTENT);
   const [markdownStyle, setMarkdownStyle] = React.useState({});
   const [selection, setSelection] = React.useState({start: 0, end: 0});
 
@@ -100,6 +100,7 @@ export default function App() {
         placeholder="Type here..."
         onSelectionChange={(e) => setSelection(e.nativeEvent.selection)}
         selection={selection}
+        id={TEST_CONST.INPUT_ID}
       />
       {/* <Text>TextInput singleline</Text>
       <TextInput
@@ -141,7 +142,7 @@ export default function App() {
         testID="reset"
         title="Reset"
         onPress={() => {
-          setValue(CONSTANTS.EXAMPLE_CONTENT);
+          setValue(TEST_CONST.EXAMPLE_CONTENT);
           setMarkdownStyle({});
         }}
       />

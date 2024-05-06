@@ -1,11 +1,12 @@
 import {defineConfig, devices} from '@playwright/test';
+import * as TEST_CONST from '../testConstants';
 
 export default defineConfig({
   testDir: './tests',
   preserveOutput: 'never',
   webServer: {
     command: 'yarn web',
-    url: 'http://localhost:19006',
+    url: TEST_CONST.LOCAL_URL,
     reuseExistingServer: !process.env.CI,
     stdout: 'pipe',
     stderr: 'pipe',
