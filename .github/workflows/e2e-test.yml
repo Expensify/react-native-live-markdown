@@ -40,3 +40,5 @@ jobs:
       - name: Run playwright tests
         working-directory: WebExample
         run: yarn test
+        env:
+          HOME: /root
