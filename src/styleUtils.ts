@@ -40,6 +40,7 @@ function makeDefaultMarkdownStyle(): MarkdownStyle {
       borderColor: 'gray',
       borderWidth: 1,
       borderRadius: 4,
+      borderStyle: 'solid',
       padding: 0,
     },
     pre: {
@@ -51,6 +52,9 @@ function makeDefaultMarkdownStyle(): MarkdownStyle {
       borderWidth: 1,
       borderRadius: 4,
       padding: 2,
+      borderStyle: 'solid',
+      marginTop: 5,
+      marginBottom: 5,
     },
     mentionHere: {
       color: 'green',

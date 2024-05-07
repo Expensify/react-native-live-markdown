@@ -20,6 +20,9 @@ type NestedNode = {
 
 function addStyling(targetElement: HTMLElement, type: MarkdownType, markdownStyle: PartialMarkdownStyle) {
   const node = targetElement;
+  Object.assign(node.dataset, {
+    type,
+  });
   switch (type) {
     case 'syntax':
       Object.assign(node.style, markdownStyle.syntax);
@@ -49,12 +52,17 @@ function addStyling(targetElement: HTMLElement, type: MarkdownType, markdownStyl
       });
       break;
     case 'code':
-      Object.assign(node.style, markdownStyle.code);
+      Object.assign(node.style, {...markdownStyle.code, lineHeight: 1.4});
       break;
     case 'pre':
-      Object.assign(node.style, markdownStyle.pre);
+      Object.assign(node.style, {
+        ...markdownStyle.pre,
+        display: 'block',
+        maxWidth: '100%',
+        width: 'max-content',
+        boxSizing: 'border-box',
+      });
       break;
-
     case 'blockquote':
       Object.assign(node.style, {
         ...markdownStyle.blockquote,
@@ -77,7 +85,9 @@ function addStyling(targetElement: HTMLElement, type: MarkdownType, markdownStyl
 
 function addSubstringAsTextNode(root: HTMLElement, text: string, startIndex: number, endIndex: number) {
   const substring = text.substring(startIndex, endIndex);
-  if (substring.length > 0) {
+  if (root.dataset.type === 'pre' && (BrowserUtils.isChromium || BrowserUtils.isFirefox)) {
+    root.appendChild(document.createTextNode(substring.replace(/^\n|\n$/g, '')));
+  } else if (substring.length > 0) {
     root.appendChild(document.createTextNode(substring));
   }
 }

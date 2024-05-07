@@ -30,6 +30,7 @@ interface MarkdownStyle {
     borderColor: ColorValue;
     borderWidth: Float;
     borderRadius: Float;
+    borderStyle: string;
     padding: Float;
   };
   pre: {
@@ -40,7 +41,10 @@ interface MarkdownStyle {
     borderColor: ColorValue;
     borderWidth: Float;
     borderRadius: Float;
+    borderStyle: string;
     padding: Float;
+    marginTop: Float;
+    marginBottom: Float;
   };
   mentionHere: {
     color: ColorValue;
