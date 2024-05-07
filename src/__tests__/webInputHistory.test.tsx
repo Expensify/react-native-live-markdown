@@ -15,7 +15,7 @@ test('add history action', () => {
     history.add(item.text, item.cursorPosition);
   });
 
-  expect(history.history).toEqual(testingHistory);
+  expect(history.items).toEqual(testingHistory);
   expect(history.getCurrentItem()).toEqual(testingHistory[testingHistory.length - 1]);
 });
 
@@ -29,7 +29,7 @@ test('history depth', () => {
   const newItem = {text, cursorPosition: text.length};
   const currentHistory = [...testingHistory.slice(1), newItem];
 
-  expect(history.history).toEqual(currentHistory);
+  expect(history.items).toEqual(currentHistory);
   expect(history.getCurrentItem()).toEqual(newItem);
 });
 
@@ -51,11 +51,9 @@ describe('debounce add history action', () => {
   test('should debounce', () => {
     const history = new InputHistory(depth, debounceTime);
     history.debouncedAdd(newItem.text, newItem.cursorPosition);
-    expect(history.history).toEqual([newItem]);
-    history.debouncedAdd(newItem2.text, newItem2.cursorPosition);
-    expect(history.history).toEqual([newItem2]);
+    expect(history.items).toEqual([]);
     jest.advanceTimersByTime(debounceTime);
-    expect(history.history).toEqual([newItem2]);
+    expect(history.items).toEqual([newItem]);
   });
 
   test('should cancel previous invocation', () => {
@@ -64,7 +62,7 @@ describe('debounce add history action', () => {
     jest.advanceTimersByTime(100);
     history.debouncedAdd(newItem2.text, newItem2.cursorPosition);
     jest.advanceTimersByTime(debounceTime);
-    expect(history.history).toEqual([newItem2]);
+    expect(history.items).toEqual([newItem2]);
   });
 
   test('undo before debounce invokes the function', () => {
@@ -72,7 +70,7 @@ describe('debounce add history action', () => {
     history.debouncedAdd(newItem.text, newItem.cursorPosition);
     expect(history.undo()).toEqual(null);
     jest.advanceTimersByTime(debounceTime);
-    expect(history.history).toEqual([]);
+    expect(history.items).toEqual([]);
   });
 
   test('redo before debounce invokes the function', () => {
@@ -80,7 +78,7 @@ describe('debounce add history action', () => {
     history.debouncedAdd(newItem.text, newItem.cursorPosition);
     expect(history.redo()).toEqual(null);
     jest.advanceTimersByTime(debounceTime);
-    expect(history.history).toEqual([]);
+    expect(history.items).toEqual([]);
   });
 });
 
@@ -113,6 +111,6 @@ test('clearing history after adding new text after undo', () => {
 
   history.add(newItem.text, newItem.cursorPosition);
 
-  expect(history.history).toEqual([testingHistory[0], newItem]);
+  expect(history.items).toEqual([testingHistory[0], newItem]);
   expect(history.getCurrentItem()).toEqual(newItem);
 });

@@ -174,7 +174,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     const dimensions = React.useRef<Dimensions | null>(null);
 
     if (!history.current) {
-      history.current = new InputHistory(100);
+      history.current = new InputHistory(100, 150, value || '');
     }
 
     const flattenedStyle = useMemo(() => StyleSheet.flatten(style), [style]);
@@ -203,7 +203,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         }
         const parsedText = ParseUtils.parseText(target, text, cursorPosition, customMarkdownStyles, !multiline);
         if (history.current && shouldAddToHistory) {
-          if (history.current.history.length === 0) {
+          if (history.current.items.length === 0) {
             history.current.add(parsedText.text, parsedText.cursorPosition);
           } else {
             history.current.debouncedAdd(parsedText.text, parsedText.cursorPosition);
@@ -592,12 +592,6 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     }, [selection, updateRefSelectionVariables]);
 
     useEffect(() => {
-      if (history.current?.history.length !== 0) {
-        return;
-      }
-      const currentValue = value ?? '';
-      history.current.add(currentValue, currentValue.length);
-
       handleContentSizeChange();
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);

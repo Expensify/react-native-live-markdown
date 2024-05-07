@@ -6,7 +6,7 @@ type HistoryItem = {
 export default class InputHistory {
   depth: number;
 
-  history: HistoryItem[];
+  items: HistoryItem[];
 
   historyIndex: number;
 
@@ -16,19 +16,20 @@ export default class InputHistory {
 
   debounceTime: number;
 
-  constructor(depth: number, debounceTime = 150) {
+  constructor(depth: number, debounceTime = 150, startingText = '') {
     this.depth = depth;
-    this.history = [];
+    this.items = [];
     this.historyIndex = 0;
     this.debounceTime = debounceTime;
+    this.add(startingText, startingText.length);
   }
 
   getCurrentItem(): HistoryItem | null {
-    return this.history[this.historyIndex] || null;
+    return this.items[this.historyIndex] || null;
   }
 
   setHistory(newHistory: HistoryItem[]): void {
-    this.history = newHistory.slice(newHistory.length - this.depth);
+    this.items = newHistory.slice(newHistory.length - this.depth);
     this.historyIndex = newHistory.length - 1;
   }
 
@@ -37,7 +38,7 @@ export default class InputHistory {
   }
 
   clear(): void {
-    this.history = [];
+    this.items = [];
     this.historyIndex = 0;
   }
 
@@ -50,7 +51,7 @@ export default class InputHistory {
       this.timeout = null;
       this.add(text, cursorPosition);
     } else {
-      this.history[this.historyIndex] = {text, cursorPosition};
+      this.items[this.historyIndex] = {text, cursorPosition};
     }
     this.currentText = text;
 
@@ -68,31 +69,35 @@ export default class InputHistory {
   }
 
   add(text: string, cursorPosition: number): void {
-    if (this.history.length > 0) {
-      const lastItem = this.history[this.history.length - 1];
+    if (this.items.length > 0) {
+      const lastItem = this.items[this.items.length - 1];
       if (lastItem && text === lastItem.text) {
-        this.historyIndex = this.history.length - 1;
+        this.historyIndex = this.items.length - 1;
         return;
       }
     }
 
-    if (this.historyIndex < this.history.length - 1) {
-      this.history.splice(this.historyIndex + 1);
+    if (this.historyIndex < this.items.length - 1) {
+      this.items.splice(this.historyIndex + 1);
     }
 
-    this.history.push({text, cursorPosition});
-    if (this.history.length > this.depth) {
-      this.history.shift();
+    this.items.push({text, cursorPosition});
+    if (this.items.length > this.depth) {
+      this.items.shift();
     }
 
-    this.historyIndex = this.history.length - 1;
+    this.historyIndex = this.items.length - 1;
   }
 
   undo(): HistoryItem | null {
     this.stopTimeout();
 
-    const currentHistoryItem = this.history[this.historyIndex];
-    const previousHistoryItem = this.history[this.historyIndex - 1];
+    if (this.items.length === 0 || this.historyIndex - 1 < 0) {
+      return null;
+    }
+
+    const currentHistoryItem = this.items[this.historyIndex];
+    const previousHistoryItem = this.items[this.historyIndex - 1];
 
     const undoItem = previousHistoryItem
       ? {
@@ -104,10 +109,6 @@ export default class InputHistory {
         }
       : null;
 
-    if (this.history.length === 0 || this.historyIndex - 1 < 0) {
-      return null;
-    }
-
     if (this.historyIndex > 0) {
       this.historyIndex -= 1;
     }
@@ -118,19 +119,19 @@ export default class InputHistory {
   redo(): HistoryItem | null {
     if (this.currentText !== null && this.timeout) {
       this.stopTimeout();
-      return this.history[this.history.length - 1] || null;
+      return this.items[this.items.length - 1] || null;
     }
 
-    if (this.history.length === 0 || this.historyIndex + 1 > this.history.length) {
+    if (this.items.length === 0 || this.historyIndex + 1 > this.items.length) {
       return null;
     }
 
-    if (this.historyIndex < this.history.length - 1) {
+    if (this.historyIndex < this.items.length - 1) {
       this.historyIndex += 1;
     } else {
       return null;
     }
 
-    return this.history[this.historyIndex] || null;
+    return this.items[this.historyIndex] || null;
   }
 }
