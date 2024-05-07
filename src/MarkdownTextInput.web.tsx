@@ -580,9 +580,12 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       if (!divRef.current || !selection || (contentSelection.current && selection.start === contentSelection.current.start && selection.end === contentSelection.current.end)) {
         return;
       }
-      CursorUtils.setCursorPosition(divRef.current, selection.start, selection.end);
-      updateSelection(null, {start: selection.start, end: selection.end || selection.start});
-    }, [selection, updateSelection]);
+
+      const newSelection: Selection = {start: selection.start, end: selection.end ?? selection.start};
+      contentSelection.current = newSelection;
+      updateRefSelectionVariables(newSelection);
+      CursorUtils.setCursorPosition(divRef.current, newSelection.start, newSelection.end);
+    }, [selection, updateRefSelectionVariables]);
 
     useEffect(() => {
       if (history.current?.history.length !== 0) {
