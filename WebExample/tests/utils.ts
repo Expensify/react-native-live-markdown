@@ -1,7 +1,8 @@
 import type {Page} from '@playwright/test';
+import * as TEST_CONST from '../../testConstants';
 
 const setupInput = async (page: Page, action?: 'clear' | 'reset') => {
-  const inputLocator = await page.locator(`div#MarkdownInput_Example`);
+  const inputLocator = await page.locator(`div#${TEST_CONST.INPUT_ID}`);
   if (action) await page.click(`[data-testid="${action}"]`);
 
   return inputLocator;
