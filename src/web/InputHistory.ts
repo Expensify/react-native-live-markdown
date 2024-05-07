@@ -47,19 +47,27 @@ export default class InputHistory {
     }
 
     if (this.currentText === null) {
+      this.timeout = null;
       this.add(text, cursorPosition);
+      if (this.history.length === 1) {
+        return;
+      }
     } else {
       this.history[this.historyIndex] = {text, cursorPosition};
     }
     this.currentText = text;
 
     this.timeout = setTimeout(() => {
-      if (this.currentText == null) {
-        return;
-      }
-
       this.currentText = null;
     }, this.debounceTime);
+  }
+
+  stopTimeout(): void {
+    if (this.timeout) {
+      clearTimeout(this.timeout);
+      this.timeout = null;
+    }
+    this.currentText = null;
   }
 
   add(text: string, cursorPosition: number): void {
@@ -84,22 +92,20 @@ export default class InputHistory {
   }
 
   undo(): HistoryItem | null {
+    this.stopTimeout();
+
     const currentHistoryItem = this.history[this.historyIndex];
     const previousHistoryItem = this.history[this.historyIndex - 1];
 
-    const undoCursorPosition = Math.min(
-      (currentHistoryItem?.cursorPosition ?? 0) - ((currentHistoryItem?.text ?? '').replaceAll('\n', '').length - (previousHistoryItem?.text ?? '').replaceAll('\n', '').length),
-      (previousHistoryItem?.text ?? '').length,
-    );
-
-    const undoItem = previousHistoryItem ? {text: previousHistoryItem.text, cursorPosition: undoCursorPosition} : null;
-
-    if (this.currentText !== null && this.timeout) {
-      clearTimeout(this.timeout);
-      this.timeout = null;
-
-      return undoItem;
-    }
+    const undoItem = previousHistoryItem
+      ? {
+          text: previousHistoryItem.text,
+          cursorPosition: Math.min(
+            (currentHistoryItem?.cursorPosition ?? 0) - ((currentHistoryItem?.text ?? '').replaceAll('\n', '').length - (previousHistoryItem?.text ?? '').replaceAll('\n', '').length),
+            (previousHistoryItem?.text ?? '').length,
+          ),
+        }
+      : null;
 
     if (this.history.length === 0 || this.historyIndex - 1 < 0) {
       return null;
@@ -114,7 +120,7 @@ export default class InputHistory {
 
   redo(): HistoryItem | null {
     if (this.currentText !== null && this.timeout) {
-      clearTimeout(this.timeout);
+      this.stopTimeout();
       return this.history[this.history.length - 1] || null;
     }
 
