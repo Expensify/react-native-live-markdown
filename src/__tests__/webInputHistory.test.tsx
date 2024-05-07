@@ -7,6 +7,7 @@ const testingHistory = [
   {text: 'Hello _*world*_!', cursorPosition: 16},
 ];
 const depth = testingHistory.length;
+const debounceTime = 150;
 
 test('add history action', () => {
   const history = new InputHistory(depth);
@@ -48,35 +49,37 @@ describe('debounce add history action', () => {
   });
 
   test('should debounce', () => {
-    const history = new InputHistory(depth, 300);
+    const history = new InputHistory(depth, debounceTime);
     history.debouncedAdd(newItem.text, newItem.cursorPosition);
-    expect(history.history).toEqual([]);
-    jest.advanceTimersByTime(300);
     expect(history.history).toEqual([newItem]);
+    history.debouncedAdd(newItem2.text, newItem2.cursorPosition);
+    expect(history.history).toEqual([newItem2]);
+    jest.advanceTimersByTime(debounceTime);
+    expect(history.history).toEqual([newItem2]);
   });
 
   test('should cancel previous invocation', () => {
-    const history = new InputHistory(depth, 300);
+    const history = new InputHistory(depth, debounceTime);
     history.debouncedAdd(newItem.text, newItem.cursorPosition);
     jest.advanceTimersByTime(100);
     history.debouncedAdd(newItem2.text, newItem2.cursorPosition);
-    jest.advanceTimersByTime(300);
+    jest.advanceTimersByTime(debounceTime);
     expect(history.history).toEqual([newItem2]);
   });
 
   test('undo before debounce invokes the function', () => {
-    const history = new InputHistory(depth, 300);
+    const history = new InputHistory(depth, debounceTime);
     history.debouncedAdd(newItem.text, newItem.cursorPosition);
     expect(history.undo()).toEqual(null);
-    jest.advanceTimersByTime(300);
+    jest.advanceTimersByTime(debounceTime);
     expect(history.history).toEqual([]);
   });
 
   test('redo before debounce invokes the function', () => {
-    const history = new InputHistory(depth, 300);
+    const history = new InputHistory(depth, debounceTime);
     history.debouncedAdd(newItem.text, newItem.cursorPosition);
     expect(history.redo()).toEqual(null);
-    jest.advanceTimersByTime(300);
+    jest.advanceTimersByTime(debounceTime);
     expect(history.history).toEqual([]);
   });
 });
