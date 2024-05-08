@@ -328,9 +328,10 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         if (!divRef.current || !(e.target instanceof HTMLElement)) {
           return;
         }
+        const changedText = e.target.innerText;
 
         if (compositionRef.current) {
-          updateTextColor(divRef.current, e.target.innerText);
+          updateTextColor(divRef.current, changedText);
           compositionRef.current = false;
           return;
         }
@@ -344,14 +345,22 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           case 'historyRedo':
             text = redo(divRef.current);
             break;
+          case 'insertFromPaste':
+            // if there is no newline at the end of the copied text, contentEditable adds invisible <br> tag at the end of the text, so we need to normalize it
+            if (changedText.length > 2 && changedText[changedText.length - 2] !== '\n' && changedText[changedText.length - 1] === '\n') {
+              text = parseText(divRef.current, normalizeValue(changedText), processedMarkdownStyle).text;
+              break;
+            }
+            text = parseText(divRef.current, changedText, processedMarkdownStyle).text;
+            break;
           default:
-            text = parseText(divRef.current, e.target.innerText, processedMarkdownStyle).text;
+            text = parseText(divRef.current, changedText, processedMarkdownStyle).text;
         }
         if (pasteRef?.current) {
           pasteRef.current = false;
           updateSelection(e);
         }
-        updateTextColor(divRef.current, e.target.innerText);
+        updateTextColor(divRef.current, changedText);
 
         if (onChange) {
           const event = e as unknown as NativeSyntheticEvent<any>;

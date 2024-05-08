@@ -103,7 +103,7 @@ export default class InputHistory {
       ? {
           text: previousHistoryItem.text,
           cursorPosition: Math.min(
-            (currentHistoryItem?.cursorPosition ?? 0) - ((currentHistoryItem?.text ?? '').replaceAll('\n', '').length - (previousHistoryItem?.text ?? '').replaceAll('\n', '').length),
+            (currentHistoryItem?.cursorPosition ?? 0) - ((currentHistoryItem?.text ?? '').length - (previousHistoryItem?.text ?? '').length),
             (previousHistoryItem?.text ?? '').length,
           ),
         }
