@@ -596,11 +596,6 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       CursorUtils.setCursorPosition(divRef.current, newSelection.start, newSelection.end);
     }, [selection, updateRefSelectionVariables]);
 
-    useEffect(() => {
-      handleContentSizeChange();
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
     return (
       // eslint-disable-next-line jsx-a11y/no-static-element-interactions
       <div
