@@ -126,16 +126,13 @@ describe('debounce add history action', () => {
   });
 
   test('redo before debounce ends', () => {
-    const text3 = 'Hello world 3!';
-    const newItem3 = {text: text3, cursorPosition: text3.length};
-
     const history = new InputHistory(depth, debounceTime);
     history.setHistory(testingHistory);
     history.setHistoryIndex(1);
 
-    history.debouncedAdd(newItem3.text, newItem3.cursorPosition);
+    history.debouncedAdd(newItem2.text, newItem2.cursorPosition);
     expect(history.redo()).toEqual(null);
-    expect(history.getCurrentItem()).toEqual(newItem3);
-    expect(history.items).toEqual([testingHistory[0], testingHistory[1], newItem3]);
+    expect(history.getCurrentItem()).toEqual(newItem2);
+    expect(history.items).toEqual([testingHistory[0], testingHistory[1], newItem2]);
   });
 });
