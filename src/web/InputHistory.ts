@@ -119,7 +119,6 @@ export default class InputHistory {
   redo(): HistoryItem | null {
     if (this.currentText !== null && this.timeout) {
       this.stopTimeout();
-      return this.items[this.items.length - 1] || null;
     }
 
     if (this.items.length === 0 || this.historyIndex + 1 > this.items.length) {
