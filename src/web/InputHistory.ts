@@ -42,7 +42,7 @@ export default class InputHistory {
     this.historyIndex = 0;
   }
 
-  debouncedAdd(text: string, cursorPosition: number): void {
+  throttledAdd(text: string, cursorPosition: number): void {
     if (this.timeout) {
       clearTimeout(this.timeout);
     }

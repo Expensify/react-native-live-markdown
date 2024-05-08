@@ -203,11 +203,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         }
         const parsedText = ParseUtils.parseText(target, text, cursorPosition, customMarkdownStyles, !multiline);
         if (history.current && shouldAddToHistory) {
-          if (history.current.items.length === 0) {
-            history.current.add(parsedText.text, parsedText.cursorPosition);
-          } else {
-            history.current.debouncedAdd(parsedText.text, parsedText.cursorPosition);
-          }
+          history.current.throttledAdd(parsedText.text, parsedText.cursorPosition);
         }
 
         return parsedText;

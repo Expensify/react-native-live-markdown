@@ -96,31 +96,31 @@ describe('debounce add history action', () => {
 
   test('should debounce', () => {
     const history = new InputHistory(depth, debounceTime, defaultItemText);
-    history.debouncedAdd(newItem.text, newItem.cursorPosition);
+    history.throttledAdd(newItem.text, newItem.cursorPosition);
     expect(history.items).toEqual([defaultItem, newItem]);
-    history.debouncedAdd(newItem2.text, newItem2.cursorPosition);
+    history.throttledAdd(newItem2.text, newItem2.cursorPosition);
     expect(history.items).toEqual([defaultItem, newItem2]);
 
     jest.advanceTimersByTime(debounceTime);
-    history.debouncedAdd(newItem.text, newItem.cursorPosition);
+    history.throttledAdd(newItem.text, newItem.cursorPosition);
     expect(history.items).toEqual([defaultItem, newItem2, newItem]);
   });
 
   test('should cancel previous invocation', () => {
     const history = new InputHistory(depth, debounceTime);
-    history.debouncedAdd(newItem.text, newItem.cursorPosition);
+    history.throttledAdd(newItem.text, newItem.cursorPosition);
     jest.advanceTimersByTime(debounceTime / 2);
-    history.debouncedAdd(newItem2.text, newItem2.cursorPosition);
+    history.throttledAdd(newItem2.text, newItem2.cursorPosition);
     jest.advanceTimersByTime(debounceTime);
     expect(history.items).toEqual([defaultItem, newItem2]);
   });
 
   test('undo before debounce ends', () => {
     const history = new InputHistory(depth, debounceTime);
-    history.debouncedAdd(newItem.text, newItem.cursorPosition);
+    history.throttledAdd(newItem.text, newItem.cursorPosition);
     expect(history.undo()).toEqual(defaultItem);
     expect(history.getCurrentItem()).toEqual(defaultItem);
-    history.debouncedAdd(newItem2.text, newItem2.cursorPosition);
+    history.throttledAdd(newItem2.text, newItem2.cursorPosition);
     expect(history.items).toEqual([defaultItem, newItem2]);
     expect(history.getCurrentItem()).toEqual(newItem2);
   });
@@ -130,7 +130,7 @@ describe('debounce add history action', () => {
     history.setHistory(testingHistory);
     history.setHistoryIndex(1);
 
-    history.debouncedAdd(newItem2.text, newItem2.cursorPosition);
+    history.throttledAdd(newItem2.text, newItem2.cursorPosition);
     expect(history.redo()).toEqual(null);
     expect(history.getCurrentItem()).toEqual(newItem2);
     expect(history.items).toEqual([testingHistory[0], testingHistory[1], newItem2]);
