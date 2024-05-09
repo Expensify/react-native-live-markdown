@@ -4,6 +4,7 @@ import * as TEST_CONST from '../testConstants';
 export default defineConfig({
   testDir: './tests',
   preserveOutput: 'never',
+  outputDir: undefined,
   webServer: {
     command: 'yarn web',
     url: TEST_CONST.LOCAL_URL,
