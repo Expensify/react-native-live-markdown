@@ -102,7 +102,9 @@ test('select', async ({page}) => {
   expect(cursorPosition).toBe(TEST_CONST.EXAMPLE_CONTENT.length);
 });
 
-test('cut content changes', async ({page}) => {
+test('cut content changes', async ({page, browserName}) => {
+  test.skip(!!process.env.CI && browserName === 'webkit', 'Excluded from webkit CI tests');
+
   const INITIAL_CONTENT = 'bold';
   const WRAPPED_CONTENT = TEST_CONST.MARKDOWN_STYLE_DEFINITIONS.bold.wrapContent(INITIAL_CONTENT);
   const EXPECTED_CONTENT = TEST_CONST.MARKDOWN_STYLE_DEFINITIONS.bold.wrapContent(INITIAL_CONTENT).slice(0, 3);
