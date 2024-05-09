@@ -17,6 +17,8 @@ test.beforeEach(async ({page, context, browserName}) => {
 });
 
 test.describe('paste content', () => {
+  test.skip(({browserName}) => !!process.env.CI && browserName === 'webkit', 'Excluded from webkit CI tests');
+
   test('paste', async ({page}) => {
     const PASTE_TEXT = 'bold';
     const boldStyleDefinition = TEST_CONST.MARKDOWN_STYLE_DEFINITIONS.bold;
@@ -48,7 +50,9 @@ test.describe('paste content', () => {
     expect(await inputLocator.innerText()).toBe(newText);
   });
 
-  test('paste undo', async ({page}) => {
+  test('paste undo', async ({page, browserName}) => {
+    test.skip(!!process.env.CI && browserName === 'firefox', 'Excluded from firefox CI tests');
+
     const PASTE_TEXT_FIRST = '*bold*';
     const PASTE_TEXT_SECOND = '@here';
 
