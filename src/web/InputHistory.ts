@@ -69,9 +69,9 @@ export default class InputHistory {
   }
 
   add(text: string, cursorPosition: number): void {
-    if (this.items.length > 0) {
-      const lastItem = this.items[this.items.length - 1];
-      if (lastItem && text === lastItem.text) {
+    if (this.historyIndex + 1 < this.items.length) {
+      const nextItem = this.items[this.historyIndex + 1];
+      if (nextItem && text === nextItem.text) {
         this.historyIndex = this.items.length - 1;
         return;
       }
