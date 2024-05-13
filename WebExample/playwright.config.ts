@@ -2,7 +2,7 @@ import {defineConfig, devices} from '@playwright/test';
 import * as TEST_CONST from '../testConstants';
 
 export default defineConfig({
-  testDir: './tests',
+  testDir: './__tests__',
   preserveOutput: 'never',
   outputDir: undefined,
   webServer: {
