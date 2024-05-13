@@ -62,5 +62,6 @@ module.exports = {
     '@typescript-eslint/no-non-null-assertion': 'off',
     '@typescript-eslint/array-type': ['error', {default: 'array-simple'}],
     '@typescript-eslint/consistent-type-definitions': 'off',
+    'curly': ['error', 'all'],
   },
 };

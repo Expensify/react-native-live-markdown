@@ -5,9 +5,9 @@ type MarkdownStyleDefiniton = {wrapContent?: (content: string) => string; style:
 const MARKDOWN_STYLE_DEFINITIONS = {
   bold: {wrapContent: (content: string) => `*${content}*`, style: 'font-weight: bold;'},
   link: {wrapContent: (content: string) => `https://${content}.com`, style: 'color: blue; text-decoration: underline;'},
-  title: {wrapContent: (content: string) => `# ${content}`, style: 'font-size: 25px; font-weight: bold;'},
-  code: {wrapContent: (content: string) => `\`${content}\``, style: 'font-family: monospace; font-size: 20px; color: black; background-color: lightgray;'},
-  codeBlock: {wrapContent: (content: string) => `\`\`\`\n${content}\n\`\`\``, style: 'font-family: monospace; font-size: 20px; color: black; background-color: lightgray;'},
+  h1: {wrapContent: (content: string) => `# ${content}`, style: 'font-size: 25px; font-weight: bold;'},
+  inlineCode: {wrapContent: (content: string) => `\`${content}\``, style: 'font-family: monospace; font-size: 20px; color: black; background-color: lightgray;'},
+  codeblock: {wrapContent: (content: string) => `\`\`\`\n${content}\n\`\`\``, style: 'font-family: monospace; font-size: 20px; color: black; background-color: lightgray;'},
   here: {wrapContent: (content: string) => `@${content}`, style: 'color: green; background-color: lime;'},
   mentionUser: {wrapContent: (content: string) => `@${content}@swmansion.com`, style: 'color: blue; background-color: cyan;'},
   blockquote: {

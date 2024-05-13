@@ -1,23 +1,23 @@
 import {test, expect} from '@playwright/test';
 import type {Locator, Page} from '@playwright/test';
 import * as TEST_CONST from '../../testConstants';
-import {checkCursorPosition, setupInput} from './utils';
-
-const OPERATION_MODIFIER = process.platform === 'darwin' ? 'Meta' : 'Control';
+import {checkCursorPosition, setupInput, getElementStyle, pressCmd} from './utils';
 
 const pasteContent = async ({text, page, inputLocator}: {text: string; page: Page; inputLocator: Locator}) => {
   await page.evaluate(async (pasteText) => navigator.clipboard.writeText(pasteText), text);
   await inputLocator.focus();
-  await inputLocator.press(`${OPERATION_MODIFIER}+v`);
+  await pressCmd({inputLocator, command: 'v'});
 };
 
 test.beforeEach(async ({page, context, browserName}) => {
   await page.goto(TEST_CONST.LOCAL_URL, {waitUntil: 'load'});
-  if (browserName === 'chromium') await context.grantPermissions(['clipboard-write', 'clipboard-read']);
+  if (browserName === 'chromium') {
+    await context.grantPermissions(['clipboard-write', 'clipboard-read']);
+  }
 });
 
 test.describe('paste content', () => {
-  test.skip(({browserName}) => !!process.env.CI && browserName === 'webkit', 'Excluded from webkit CI tests');
+  test.skip(({browserName}) => !!process.env.CI && browserName === 'webkit', 'Excluded from WebKit CI tests');
 
   test('paste', async ({page}) => {
     const PASTE_TEXT = 'bold';
@@ -29,12 +29,8 @@ test.describe('paste content', () => {
     await pasteContent({text: wrappedText, page, inputLocator});
 
     const elementHandle = await inputLocator.locator('span', {hasText: PASTE_TEXT}).last();
-    let elementStyle;
-    if (elementHandle) {
-      await elementHandle.waitFor({state: 'attached'});
+    const elementStyle = await getElementStyle(elementHandle);
 
-      elementStyle = await elementHandle.getAttribute('style');
-    }
     expect(elementStyle).toEqual(boldStyleDefinition.style);
   });
 
@@ -42,7 +38,7 @@ test.describe('paste content', () => {
     const inputLocator = await setupInput(page, 'reset');
 
     await inputLocator.focus();
-    await inputLocator.press(`${OPERATION_MODIFIER}+a`);
+    await pressCmd({inputLocator, command: 'a'});
 
     const newText = '*bold*';
     await pasteContent({text: newText, page, inputLocator});
@@ -51,7 +47,7 @@ test.describe('paste content', () => {
   });
 
   test('paste undo', async ({page, browserName}) => {
-    test.skip(!!process.env.CI && browserName === 'firefox', 'Excluded from firefox CI tests');
+    test.skip(!!process.env.CI && browserName === 'firefox', 'Excluded from Firefox CI tests');
 
     const PASTE_TEXT_FIRST = '*bold*';
     const PASTE_TEXT_SECOND = '@here';
@@ -60,13 +56,13 @@ test.describe('paste content', () => {
 
     await page.evaluate(async (pasteText) => navigator.clipboard.writeText(pasteText), PASTE_TEXT_FIRST);
 
-    await inputLocator.press(`${OPERATION_MODIFIER}+v`);
+    await pressCmd({inputLocator, command: 'v'});
     await page.waitForTimeout(TEST_CONST.INPUT_HISTORY_DEBOUNCE_TIME_MS);
     await page.evaluate(async (pasteText) => navigator.clipboard.writeText(pasteText), PASTE_TEXT_SECOND);
-    await inputLocator.press(`${OPERATION_MODIFIER}+v`);
+    await pressCmd({inputLocator, command: 'v'});
     await page.waitForTimeout(TEST_CONST.INPUT_HISTORY_DEBOUNCE_TIME_MS);
 
-    await inputLocator.press(`${OPERATION_MODIFIER}+z`);
+    await pressCmd({inputLocator, command: 'z'});
 
     expect(await inputLocator.innerText()).toBe(PASTE_TEXT_FIRST);
   });
@@ -78,24 +74,24 @@ test.describe('paste content', () => {
     const inputLocator = await setupInput(page, 'clear');
 
     await page.evaluate(async (pasteText) => navigator.clipboard.writeText(pasteText), PASTE_TEXT_FIRST);
-    await inputLocator.press(`${OPERATION_MODIFIER}+v`);
+    await pressCmd({inputLocator, command: 'v'});
     await page.waitForTimeout(TEST_CONST.INPUT_HISTORY_DEBOUNCE_TIME_MS);
     await page.evaluate(async (pasteText) => navigator.clipboard.writeText(pasteText), PASTE_TEXT_SECOND);
     await page.waitForTimeout(TEST_CONST.INPUT_HISTORY_DEBOUNCE_TIME_MS);
-    await inputLocator.press(`${OPERATION_MODIFIER}+v`);
+    await pressCmd({inputLocator, command: 'v'});
     await page.waitForTimeout(TEST_CONST.INPUT_HISTORY_DEBOUNCE_TIME_MS);
 
-    await inputLocator.press(`${OPERATION_MODIFIER}+z`);
-    await inputLocator.press(`${OPERATION_MODIFIER}+Shift+z`);
+    await pressCmd({inputLocator, command: 'z'});
+    await pressCmd({inputLocator, command: 'Shift+z'});
 
     expect(await inputLocator.innerText()).toBe(`${PASTE_TEXT_FIRST}${PASTE_TEXT_SECOND}`);
   });
 });
 
-test('select', async ({page}) => {
+test('select all', async ({page}) => {
   const inputLocator = await setupInput(page, 'reset');
   await inputLocator.focus();
-  await inputLocator.press(`${OPERATION_MODIFIER}+a`);
+  await pressCmd({inputLocator, command: 'a'});
 
   const cursorPosition = await page.evaluate(checkCursorPosition);
 
@@ -103,7 +99,7 @@ test('select', async ({page}) => {
 });
 
 test('cut content changes', async ({page, browserName}) => {
-  test.skip(!!process.env.CI && browserName === 'webkit', 'Excluded from webkit CI tests');
+  test.skip(!!process.env.CI && browserName === 'webkit', 'Excluded from WebKit CI tests');
 
   const INITIAL_CONTENT = 'bold';
   const WRAPPED_CONTENT = TEST_CONST.MARKDOWN_STYLE_DEFINITIONS.bold.wrapContent(INITIAL_CONTENT);
@@ -133,7 +129,7 @@ test('cut content changes', async ({page, browserName}) => {
   }, INITIAL_CONTENT);
 
   await inputLocator.focus();
-  await inputLocator.press(`${OPERATION_MODIFIER}+x`);
+  await pressCmd({inputLocator, command: 'x'});
 
   expect(await rootHandle.innerHTML()).toBe(EXPECTED_CONTENT);
 });

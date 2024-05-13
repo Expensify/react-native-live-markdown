@@ -1,8 +1,8 @@
-name: E2E Test
+name: Test web E2E
 on:
   pull_request:
     paths:
-      - .github/workflows/e2e-test.yml
+      - .github/workflows/web-e2e-test.yml
       - src/**
       - WebExample/**
   merge_group:
@@ -12,12 +12,12 @@ on:
     branches:
       - main
     paths:
-      - .github/workflows/e2e-test.yml
+      - .github/workflows/web-e2e-test.yml
       - src/**
       - WebExample/**
 
 jobs:
-  e2e_test:
+  test:
     if: github.repository == 'Expensify/react-native-live-markdown'
     runs-on: ubuntu-latest
     defaults:
@@ -25,7 +25,7 @@ jobs:
         working-directory: ./WebExample
 
     concurrency:
-      group: e2e-test-${{ github.ref }}
+      group: web-e2e-test-${{ github.ref }}
       cancel-in-progress: true
     steps:
       - name: Check out Git repository
@@ -45,5 +45,5 @@ jobs:
       - name: Install dependencies for browsers
         run: npx playwright install-deps
 
-      - name: Run playwright tests
+      - name: Run Playwright tests
         run: yarn test

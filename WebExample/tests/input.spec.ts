@@ -6,8 +6,8 @@ test.beforeEach(async ({page}) => {
   await page.goto(TEST_CONST.LOCAL_URL, {waitUntil: 'load'});
 });
 
-test.describe('standard input behaviour', () => {
-  test('standard input results', async ({page}) => {
+test.describe('typing', () => {
+  test('short text', async ({page}) => {
     const inputLocator = await setupInput(page, 'clear');
 
     await inputLocator.pressSequentially(TEST_CONST.EXAMPLE_CONTENT);
