@@ -80,6 +80,10 @@ let focusTimeout: NodeJS.Timeout | null = null;
 function normalizeValue(value: string) {
   return value.replace(/\n$/, '');
 }
+// Adds one '\n' at the end of the string if it's missing
+function denormalizeValue(value: string) {
+  return value.endsWith('\n') ? `${value}\n` : value;
+}
 
 // If an Input Method Editor is processing key input, the 'keyCode' is 229.
 // https://www.w3.org/TR/uievents/#determine-keydown-keyup-keyCode
@@ -203,7 +207,8 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         }
         const parsedText = ParseUtils.parseText(target, text, cursorPosition, customMarkdownStyles, !multiline);
         if (history.current && shouldAddToHistory) {
-          history.current.throttledAdd(parsedText.text, parsedText.cursorPosition);
+          // We need to normalize the value before saving it to the history to prevent situations when additional new lines break the cursor position calculation logic
+          history.current.throttledAdd(normalizeValue(parsedText.text), parsedText.cursorPosition);
         }
 
         return parsedText;
@@ -236,7 +241,8 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       (target: HTMLDivElement) => {
         if (!history.current) return '';
         const item = history.current.undo();
-        return parseText(target, item ? item.text : null, processedMarkdownStyle, item ? item.cursorPosition : null, false).text;
+        const undoValue = item ? denormalizeValue(item.text) : null;
+        return parseText(target, undoValue, processedMarkdownStyle, item ? item.cursorPosition : null, false).text;
       },
       [parseText, processedMarkdownStyle],
     );
@@ -245,7 +251,8 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       (target: HTMLDivElement) => {
         if (!history.current) return '';
         const item = history.current.redo();
-        return parseText(target, item ? item.text : null, processedMarkdownStyle, item ? item.cursorPosition : null, false).text;
+        const redoValue = item ? denormalizeValue(item.text) : null;
+        return parseText(target, redoValue, processedMarkdownStyle, item ? item.cursorPosition : null, false).text;
       },
       [parseText, processedMarkdownStyle],
     );
