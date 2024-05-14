@@ -360,7 +360,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           pasteRef.current = false;
           updateSelection(e);
         }
-        updateTextColor(divRef.current, changedText);
+        updateTextColor(divRef.current, text);
 
         if (onChange) {
           const event = e as unknown as NativeSyntheticEvent<any>;
