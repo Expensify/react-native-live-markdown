@@ -32,7 +32,12 @@ test('history depth', () => {
   const history = new InputHistory(depth);
   const text = '> Hello _*world*_!';
 
-  history.setHistory(testingHistory);
+  const nextHistoryIndexes = [1, 2, 2];
+  testingHistory.forEach((item, index) => {
+    history.add(item.text, item.cursorPosition);
+    expect(history.historyIndex).toEqual(nextHistoryIndexes[index]);
+  });
+
   history.add(text, text.length);
 
   const newItem = {text, cursorPosition: text.length};
