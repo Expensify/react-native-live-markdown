@@ -1,5 +1,3 @@
-import * as TEST_CONST from '../../testConstants';
-
 type HistoryItem = {
   text: string;
   cursorPosition: number | null;
@@ -18,7 +16,7 @@ export default class InputHistory {
 
   debounceTime: number;
 
-  constructor(depth: number, debounceTime = TEST_CONST.INPUT_HISTORY_DEBOUNCE_TIME_MS) {
+  constructor(depth: number, debounceTime = 150) {
     this.depth = depth;
     this.history = [];
     this.historyIndex = 0;

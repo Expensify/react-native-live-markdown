@@ -21,17 +21,17 @@ test.describe('paste content', () => {
 
   test('paste', async ({page}) => {
     const PASTE_TEXT = 'bold';
-    const boldStyleDefinition = TEST_CONST.MARKDOWN_STYLE_DEFINITIONS.bold;
+    const BOLD_STYLE = 'font-weight: bold;';
 
     const inputLocator = await setupInput(page, 'clear');
 
-    const wrappedText = boldStyleDefinition.wrapContent(PASTE_TEXT);
+    const wrappedText = '*bold*';
     await pasteContent({text: wrappedText, page, inputLocator});
 
     const elementHandle = await inputLocator.locator('span', {hasText: PASTE_TEXT}).last();
     const elementStyle = await getElementStyle(elementHandle);
 
-    expect(elementStyle).toEqual(boldStyleDefinition.style);
+    expect(elementStyle).toEqual(BOLD_STYLE);
   });
 
   test('paste replace', async ({page}) => {
@@ -102,8 +102,8 @@ test('cut content changes', async ({page, browserName}) => {
   test.skip(!!process.env.CI && browserName === 'webkit', 'Excluded from WebKit CI tests');
 
   const INITIAL_CONTENT = 'bold';
-  const WRAPPED_CONTENT = TEST_CONST.MARKDOWN_STYLE_DEFINITIONS.bold.wrapContent(INITIAL_CONTENT);
-  const EXPECTED_CONTENT = TEST_CONST.MARKDOWN_STYLE_DEFINITIONS.bold.wrapContent(INITIAL_CONTENT).slice(0, 3);
+  const WRAPPED_CONTENT = `*${INITIAL_CONTENT}*`;
+  const EXPECTED_CONTENT = WRAPPED_CONTENT.slice(0, 3);
 
   const inputLocator = await setupInput(page, 'clear');
   await pasteContent({text: WRAPPED_CONTENT, page, inputLocator});

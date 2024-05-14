@@ -10,6 +10,7 @@ test.describe('typing', () => {
   test('short text', async ({page}) => {
     const inputLocator = await setupInput(page, 'clear');
 
+    await inputLocator.focus();
     await inputLocator.pressSequentially(TEST_CONST.EXAMPLE_CONTENT);
     const value = await inputLocator.innerText();
     expect(value).toEqual(TEST_CONST.EXAMPLE_CONTENT);

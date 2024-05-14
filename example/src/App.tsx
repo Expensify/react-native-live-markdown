@@ -149,7 +149,10 @@ export default function App() {
       <Button
         testID="clear"
         title="Clear"
-        onPress={() => setValue('')}
+        onPress={() => {
+          console.log('TEST');
+          setValue('');
+        }}
       />
       <Button
         title="Change style"
