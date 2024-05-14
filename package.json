@@ -120,7 +120,7 @@
     ],
     "testEnvironment": "jsdom",
     "testPathIgnorePatterns": [
-      "/WebExample/tests/"
+      "/WebExample/__tests__/"
     ]
   },
   "commitlint": {
