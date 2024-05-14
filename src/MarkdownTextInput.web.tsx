@@ -235,7 +235,9 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
     const undo = useCallback(
       (target: HTMLDivElement) => {
-        if (!history.current) return '';
+        if (!history.current) {
+          return '';
+        }
         const item = history.current.undo();
         return parseText(target, item ? item.text : null, processedMarkdownStyle, item ? item.cursorPosition : null, false).text;
       },
@@ -244,7 +246,9 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
     const redo = useCallback(
       (target: HTMLDivElement) => {
-        if (!history.current) return '';
+        if (!history.current) {
+          return '';
+        }
         const item = history.current.redo();
         return parseText(target, item ? item.text : null, processedMarkdownStyle, item ? item.cursorPosition : null, false).text;
       },
