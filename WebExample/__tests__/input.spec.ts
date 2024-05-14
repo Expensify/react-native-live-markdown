@@ -1,5 +1,5 @@
 import {test, expect} from '@playwright/test';
-import * as TEST_CONST from '../../testConstants';
+import * as TEST_CONST from './testConstants';
 import {checkCursorPosition, setupInput} from './utils';
 
 test.beforeEach(async ({page}) => {

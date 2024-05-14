@@ -4,7 +4,7 @@ import {Button, Platform, StyleSheet, Text, View} from 'react-native';
 
 import {MarkdownTextInput} from '@expensify/react-native-live-markdown';
 import type {TextInput} from 'react-native';
-import * as TEST_CONST from '../../testConstants';
+import * as TEST_CONST from '../../WebExample/__tests__/testConstants';
 
 function isWeb() {
   return Platform.OS === 'web';
@@ -150,7 +150,6 @@ export default function App() {
         testID="clear"
         title="Clear"
         onPress={() => {
-          console.log('TEST');
           setValue('');
         }}
       />
