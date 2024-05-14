@@ -18,10 +18,9 @@ export default class InputHistory {
 
   constructor(depth: number, debounceTime = 150, startingText = '') {
     this.depth = depth;
-    this.items = [];
+    this.items = [{text: startingText, cursorPosition: startingText.length}];
     this.historyIndex = 0;
     this.debounceTime = debounceTime;
-    this.add(startingText, startingText.length);
   }
 
   getCurrentItem(): HistoryItem | null {
@@ -69,24 +68,24 @@ export default class InputHistory {
   }
 
   add(text: string, cursorPosition: number): void {
-    if (this.historyIndex + 1 < this.items.length) {
-      const nextItem = this.items[this.historyIndex + 1];
-      if (nextItem && text === nextItem.text) {
-        this.historyIndex = this.items.length - 1;
+    if (this.items.length > 0) {
+      const currentItem = this.items[this.historyIndex];
+      if (currentItem && text === currentItem.text) {
         return;
       }
     }
 
     if (this.historyIndex < this.items.length - 1) {
       this.items.splice(this.historyIndex + 1);
+      this.historyIndex = this.items.length - 1;
     }
 
     this.items.push({text, cursorPosition});
     if (this.items.length > this.depth) {
       this.items.shift();
+    } else {
+      this.historyIndex += 1;
     }
-
-    this.historyIndex = this.items.length - 1;
   }
 
   undo(): HistoryItem | null {
