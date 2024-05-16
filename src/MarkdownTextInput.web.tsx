@@ -219,7 +219,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     const processedMarkdownStyle = useMemo(() => {
       const newMarkdownStyle = processMarkdownStyle(markdownStyle);
       if (divRef.current) {
-        parseText(divRef.current, divRef.current.innerText, newMarkdownStyle);
+        parseText(divRef.current, divRef.current.innerText, newMarkdownStyle, null, false);
       }
       return newMarkdownStyle;
     }, [markdownStyle, parseText]);

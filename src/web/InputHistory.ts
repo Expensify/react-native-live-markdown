@@ -68,7 +68,7 @@ export default class InputHistory {
   }
 
   add(text: string, cursorPosition: number): void {
-    if (this.historyIndex > 0 && this.items.length > 0) {
+    if (this.items.length > 0) {
       const currentItem = this.items[this.historyIndex];
       if (currentItem && text === currentItem.text) {
         return;
