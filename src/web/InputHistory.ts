@@ -49,6 +49,9 @@ export default class InputHistory {
     if (this.currentText === null) {
       this.timeout = null;
       this.add(text, cursorPosition);
+      if (this.historyIndex === 0) {
+        return;
+      }
     } else {
       this.items[this.historyIndex] = {text, cursorPosition};
     }
