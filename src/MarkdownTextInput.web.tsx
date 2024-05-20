@@ -15,6 +15,7 @@ import type {CSSProperties, MutableRefObject, ReactEventHandler, FocusEventHandl
 import {StyleSheet} from 'react-native';
 import * as ParseUtils from './web/parserUtils';
 import * as CursorUtils from './web/cursorUtils';
+import * as BrowserUtils from './web/browserUtils';
 import * as StyleUtils from './styleUtils';
 import type * as MarkdownTextInputDecoratorViewNativeComponent from './MarkdownTextInputDecoratorViewNativeComponent';
 import './web/MarkdownTextInput.css';
@@ -291,7 +292,9 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         if (!divRef.current) {
           return;
         }
-        const newSelection = predefinedSelection || CursorUtils.getCurrentCursorPosition(divRef.current);
+
+        const contained = CursorUtils.restrictRanges(divRef.current, value ?? '');
+        const newSelection = predefinedSelection && contained ? predefinedSelection : CursorUtils.getCurrentCursorPosition(divRef.current);
 
         if (newSelection && (!contentSelection.current || contentSelection.current.start !== newSelection.start || contentSelection.current.end !== newSelection.end)) {
           updateRefSelectionVariables(newSelection);
@@ -403,6 +406,23 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         setEventProps(event);
         if (onKeyPress) {
           onKeyPress(event);
+        }
+
+        // Ensure user can't move into background spans with arrow keys
+        const cursorPosition = CursorUtils.getCurrentCursorPosition(divRef.current);
+        if (
+          (e.key === 'ArrowDown' || e.key === 'ArrowRight') &&
+          cursorPosition?.end === (divRef.current as HTMLInputElement).value?.length &&
+          cursorPosition?.end === cursorPosition?.start
+        ) {
+          e.preventDefault();
+          return;
+        }
+
+        // Making sure that CMD + A works on safari - due to contenteditable div containing multiple spans we need to recreate it ourselves
+        if (BrowserUtils.isSafari && e.key === 'a' && e.metaKey) {
+          e.preventDefault();
+          CursorUtils.setCursorPosition(divRef.current, 0, (divRef.current as HTMLInputElement).value?.length, false);
         }
 
         updateSelection(event as unknown as SyntheticEvent<HTMLDivElement, Event>);
@@ -610,6 +630,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         onFocus={handleFocus}
         onBlur={handleBlur}
         onPaste={handlePaste}
+        onScroll={() => ParseUtils.handlePreBlockBackground(divRef.current as HTMLElement)}
         placeholder={heightSafePlaceholder}
         spellCheck={spellCheck}
         dir={dir}
@@ -630,6 +651,8 @@ const styles = StyleSheet.create({
     overflowY: 'auto',
     overflowX: 'auto',
     overflowWrap: 'break-word',
+    position: 'relative',
+    clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)',
   },
   disabledInputStyles: {
     opacity: 0.75,

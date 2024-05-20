@@ -22,3 +22,8 @@
   display: block; /* For Firefox */
   content: attr(placeholder);
 }
+
+*[data-type='pre'] + span[data-type='syntax'],
+span[data-type='syntax']:has(+ span[data-type='pre']) {
+  line-height: 1.6;
+}

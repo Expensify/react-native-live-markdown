@@ -53,8 +53,6 @@ function makeDefaultMarkdownStyle(): MarkdownStyle {
       borderRadius: 4,
       padding: 2,
       borderStyle: 'solid',
-      marginTop: 5,
-      marginBottom: 5,
     },
     mentionHere: {
       color: 'green',

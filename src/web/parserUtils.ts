@@ -56,10 +56,8 @@ function addStyling(targetElement: HTMLElement, type: MarkdownType, markdownStyl
       break;
     case 'pre':
       Object.assign(node.style, {
-        ...markdownStyle.pre,
-        display: 'block',
-        maxWidth: '100%',
-        width: 'max-content',
+        ...{...markdownStyle.pre, borderStyle: undefined, padding: undefined, backgroundColor: undefined},
+        position: 'relative',
         boxSizing: 'border-box',
       });
       break;
@@ -85,9 +83,7 @@ function addStyling(targetElement: HTMLElement, type: MarkdownType, markdownStyl
 
 function addSubstringAsTextNode(root: HTMLElement, text: string, startIndex: number, endIndex: number) {
   const substring = text.substring(startIndex, endIndex);
-  if (root.dataset.type === 'pre' && (BrowserUtils.isChromium || BrowserUtils.isFirefox)) {
-    root.appendChild(document.createTextNode(substring.replace(/^\n|\n$/g, '')));
-  } else if (substring.length > 0) {
+  if (substring.length > 0) {
     root.appendChild(document.createTextNode(substring));
   }
 }
@@ -186,6 +182,66 @@ function moveCursor(isFocused: boolean, alwaysMoveCursorToTheEnd: boolean, curso
   }
 }
 
+function hidePreBlockBackgrounds(target: HTMLElement) {
+  const preBlocks = [...target.querySelectorAll('*[data-type="pre"]')];
+  const preBlockBackgrounds = [...target.querySelectorAll('.pre-block-background')];
+  for (let i = preBlocks.length - 1; i < preBlockBackgrounds.length - 1; i++) {
+    preBlockBackgrounds[i]?.remove();
+  }
+}
+
+function handlePreBlockBackground(target: HTMLElement, markdownStyle: PartialMarkdownStyle = {}) {
+  hidePreBlockBackgrounds(target);
+  const preBlocks = [...target.querySelectorAll('*[data-type="pre"]')];
+  const preBlockBackgrounds = [...target.querySelectorAll('.pre-block-background')];
+  if (!preBlocks) return;
+
+  preBlocks.forEach((pre) => {
+    const preRects = [...pre.getClientRects()];
+    preRects.shift();
+
+    let width = 0;
+    let height = 0;
+    let top = 0;
+    let left = 0;
+    preRects.forEach((preRect) => {
+      if (width < preRect.width) width = preRect.width;
+      height += preRect.height;
+      if (!top || top > preRect.top) top = preRect.top;
+      if (!left || left > preRect.left) left = preRect.left;
+    });
+    const {top: divTop, left: divLeft} = target.getBoundingClientRect();
+
+    const span = (preBlockBackgrounds?.[preBlocks.indexOf(pre)] as HTMLSpanElement | null) ?? document.createElement('span');
+    const {pre: preStyle} = markdownStyle;
+    // eslint-disable-next-line
+    const transform = parseInt((preStyle?.padding?.toString() ?? '2').replace('px', '')) + parseInt((preStyle?.borderWidth?.toString() ?? '1').replace('px', '')) + 'px';
+    span.classList.add('pre-block-background');
+    Object.assign(span.style, {
+      width: `${width}px`,
+      height: `${height}px`,
+      padding: preStyle?.padding ?? '2px',
+      border: `${preStyle?.borderWidth ?? '1px'} solid gray`,
+      borderRadius: '4px',
+      backgroundColor: 'lightgray',
+      display: `block`,
+      position: 'absolute',
+      top: `${top - (divTop - target.scrollTop)}px`,
+      left: `${left - divLeft}px`,
+      transform: `translate(-${transform}, -${transform})`,
+      zIndex: '-1',
+      pointerEvents: 'none',
+      userSelect: 'none',
+      caretColor: 'transparent',
+    });
+    span.contentEditable = 'false';
+    span.spellcheck = false;
+    span.ariaAutoComplete = 'false';
+
+    target.appendChild(span);
+  });
+}
+
 function parseText(target: HTMLElement, text: string, curosrPositionIndex: number | null, markdownStyle: PartialMarkdownStyle = {}, alwaysMoveCursorToTheEnd = false) {
   const targetElement = target;
 
@@ -218,6 +274,8 @@ function parseText(target: HTMLElement, text: string, curosrPositionIndex: numbe
         moveCursor(isFocused, alwaysMoveCursorToTheEnd, cursorPosition, target);
       }
     }
+    // Update pre block backgrounds
+    handlePreBlockBackground(target, markdownStyle);
 
     if (!BrowserUtils.isChromium) {
       moveCursor(isFocused, alwaysMoveCursorToTheEnd, cursorPosition, target);
@@ -229,6 +287,6 @@ function parseText(target: HTMLElement, text: string, curosrPositionIndex: numbe
   return {text: target.innerText, cursorPosition: cursorPosition || 0};
 }
 
-export {parseText, parseRangesToHTMLNodes};
+export {parseText, parseRangesToHTMLNodes, handlePreBlockBackground};
 
 export type {MarkdownRange, MarkdownType};

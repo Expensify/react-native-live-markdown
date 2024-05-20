@@ -27,7 +27,7 @@ function setPrevText(target: HTMLElement) {
   prevTextLength = text.length;
 }
 
-function setCursorPosition(target: HTMLElement, start: number, end: number | null = null) {
+function setCursorPosition(target: HTMLElement, start: number, end: number | null = null, scrollIntoView = true) {
   const range = document.createRange();
   range.selectNodeContents(target);
 
@@ -96,7 +96,7 @@ function setCursorPosition(target: HTMLElement, start: number, end: number | nul
     selection.addRange(range);
   }
 
-  scrollCursorIntoView(target as HTMLInputElement);
+  if (scrollIntoView) scrollCursorIntoView(target as HTMLInputElement);
 }
 
 function moveCursorToEnd(target: HTMLElement) {
@@ -158,4 +158,38 @@ function scrollCursorIntoView(target: HTMLInputElement) {
   }
 }
 
-export {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition, setPrevText, removeSelection, scrollCursorIntoView};
+function restrictRanges(target: HTMLElement, value: string) {
+  const rootSpan = target.querySelector('span.root');
+  let contained = true;
+  if (rootSpan) {
+    let range: Range | null;
+
+    if (window.getSelection() && (window.getSelection() as globalThis.Selection).rangeCount > 0) {
+      range = (window.getSelection() as globalThis.Selection)?.getRangeAt(0);
+    } else {
+      range = document.createRange();
+    }
+
+    if (range && !(range.commonAncestorContainer === rootSpan || rootSpan.contains(range.commonAncestorContainer))) {
+      contained = false;
+      // The caret or selection is outside rootSpan, move it
+      if (range.collapsed) {
+        // The range is a caret
+        setCursorPosition(target, value.length, value.length);
+      } else {
+        // The range is a selection
+        if (!rootSpan.contains(range.startContainer) && !target.contains(range.startContainer)) {
+          setCursorPosition(target, value.length, value.length, false);
+        }
+        if (!rootSpan.contains(range.endContainer)) {
+          const cursorPosition = getCurrentCursorPosition(target);
+          setCursorPosition(target, cursorPosition?.start ?? 0, value.length + 1, false);
+        }
+      }
+    }
+  }
+
+  return contained;
+}
+
+export {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition, setPrevText, removeSelection, scrollCursorIntoView, restrictRanges};
