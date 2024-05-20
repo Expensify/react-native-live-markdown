@@ -118,7 +118,7 @@ function getElementHeight(node: HTMLDivElement, styles: CSSProperties, numberOfL
     const tempElement = document.createElement('div');
     tempElement.setAttribute('contenteditable', 'true');
     Object.assign(tempElement.style, styles);
-    tempElement.innerText = Array(numberOfLines).fill('A').join('\n');
+    tempElement.textContent = Array(numberOfLines).fill('A').join('\n');
     if (node.parentElement) {
       node.parentElement.appendChild(tempElement);
       const height = tempElement.clientHeight;
@@ -184,7 +184,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
     const setEventProps = useCallback((e: NativeSyntheticEvent<any>) => {
       if (divRef.current) {
-        const text = normalizeValue(divRef.current.innerText || '');
+        const text = normalizeValue(divRef.current.textContent || '');
         if (e.target) {
           // TODO: change the logic here so every event have value property
           (e.target as unknown as HTMLInputElement).value = text;
@@ -199,7 +199,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     const parseText = useCallback(
       (target: HTMLDivElement, text: string | null, customMarkdownStyles: MarkdownStyle, cursorPosition: number | null = null, shouldAddToHistory = true) => {
         if (text === null) {
-          return {text: target.innerText, cursorPosition: null};
+          return {text: target.textContent, cursorPosition: null};
         }
         const parsedText = ParseUtils.parseText(target, text, cursorPosition, customMarkdownStyles, !multiline);
         if (history.current && shouldAddToHistory) {
@@ -214,7 +214,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     const processedMarkdownStyle = useMemo(() => {
       const newMarkdownStyle = processMarkdownStyle(markdownStyle);
       if (divRef.current) {
-        parseText(divRef.current, divRef.current.innerText, newMarkdownStyle);
+        parseText(divRef.current, divRef.current.textContent, newMarkdownStyle, null, false);
       }
       return newMarkdownStyle;
     }, [markdownStyle, parseText]);
@@ -330,7 +330,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         }
 
         if (compositionRef.current) {
-          updateTextColor(divRef.current, e.target.innerText);
+          updateTextColor(divRef.current, e.target.textContent);
           compositionRef.current = false;
           return;
         }
@@ -345,13 +345,13 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
             text = redo(divRef.current);
             break;
           default:
-            text = parseText(divRef.current, e.target.innerText, processedMarkdownStyle).text;
+            text = parseText(divRef.current, e.target.textContent, processedMarkdownStyle).text;
         }
         if (pasteRef?.current) {
           pasteRef.current = false;
           updateSelection(e);
         }
-        updateTextColor(divRef.current, e.target.innerText);
+        updateTextColor(divRef.current, e.target.textContent);
 
         if (onChange) {
           const event = e as unknown as NativeSyntheticEvent<any>;
@@ -440,7 +440,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           if (contentSelection.current) {
             CursorUtils.setCursorPosition(divRef.current, contentSelection.current.start, contentSelection.current.end);
           } else {
-            const valueLength = value ? value.length : divRef.current.innerText.length;
+            const valueLength = value ? value.length : divRef.current.textContent.length;
             CursorUtils.setCursorPosition(divRef.current, valueLength, null);
           }
           updateSelection(event, contentSelection.current);
@@ -453,7 +453,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
         if (hostNode !== null) {
           if (clearTextOnFocus && divRef.current) {
-            divRef.current.innerText = '';
+            divRef.current.textContent = '';
           }
           if (selectTextOnFocus) {
             // Safari requires selection to occur in a setTimeout
@@ -491,7 +491,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         if (!onClick || !divRef.current) {
           return;
         }
-        (e.target as HTMLInputElement).value = normalizeValue(divRef.current.innerText || '');
+        (e.target as HTMLInputElement).value = normalizeValue(divRef.current.textContent || '');
         onClick(e);
       },
       [onClick, updateSelection],
@@ -510,13 +510,13 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       if (r) {
         (r as unknown as TextInput).isFocused = () => document.activeElement === r;
         (r as unknown as TextInput).clear = () => {
-          r.innerText = '';
+          r.textContent = '';
           updateTextColor(r, '');
         };
 
         if (value === '' || value === undefined) {
           // update to placeholder color when value is empty
-          updateTextColor(r, r.innerText);
+          updateTextColor(r, r.textContent);
         }
       }
 
@@ -533,17 +533,17 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
     useClientEffect(
       function parseAndStyleValue() {
-        if (!divRef.current || processedValue === divRef.current.innerText) {
+        if (!divRef.current || processedValue === divRef.current.innerText || value === divRef.current.innerText) {
           return;
         }
 
         if (value === undefined) {
-          parseText(divRef.current, divRef.current.innerText, processedMarkdownStyle);
+          parseText(divRef.current, divRef.current.textContent, processedMarkdownStyle);
           return;
         }
 
         const text = processedValue !== undefined ? processedValue : '';
-        parseText(divRef.current, text, processedMarkdownStyle, text.length);
+        parseText(divRef.current, text, processedMarkdownStyle);
         updateTextColor(divRef.current, value);
       },
       [multiline, processedMarkdownStyle, processedValue],

@@ -190,36 +190,68 @@ function parseText(target: HTMLElement, text: string, curosrPositionIndex: numbe
   }
   const ranges = global.parseExpensiMarkToRanges(text);
 
+  console.log(text.replaceAll('\n', '\\n'));
+
   const markdownRanges: MarkdownRange[] = ranges as MarkdownRange[];
   const rootSpan = targetElement.firstChild as HTMLElement | null;
 
-  if (!text || targetElement.innerHTML === '<br>' || (rootSpan && rootSpan.innerHTML === '\n')) {
-    targetElement.innerHTML = '';
-    targetElement.innerText = '';
+  // if (!text || targetElement.innerHTML === '<br>' || (rootSpan && rootSpan.innerHTML === '\n')) {
+  targetElement.innerHTML = '';
+  targetElement.innerText = '';
+  // }
+
+  // // We don't want to parse text with single '\n', because contentEditable represents it as invisible <br />
+  // if (text) {
+  //   const dom = parseRangesToHTMLNodes(text, markdownRanges, markdownStyle);
+
+  //   if (!rootSpan || rootSpan.innerHTML !== dom.innerHTML) {
+  //     targetElement.innerHTML = '';
+  //     targetElement.innerText = '';
+  //     target.appendChild(dom);
+
+  //     if (BrowserUtils.isChromium) {
+  //       moveCursor(isFocused, alwaysMoveCursorToTheEnd, cursorPosition, target);
+  //     }
+  //   }
+
+  //   if (!BrowserUtils.isChromium) {
+  //     moveCursor(isFocused, alwaysMoveCursorToTheEnd, cursorPosition, target);
+  //   }
+  // }
+
+  let textContent = text;
+  if (text[text.length - 1] === '\n') {
+    textContent = text.substring(0, text.length - 1);
   }
 
-  // We don't want to parse text with single '\n', because contentEditable represents it as invisible <br />
-  if (text) {
-    const dom = parseRangesToHTMLNodes(text, markdownRanges, markdownStyle);
+  const lines = textContent.split('\n');
+  console.log(lines);
+  lines.forEach((line, index) => {
+    const p = document.createElement('p');
+    Object.assign(p.style, {
+      margin: '0',
+      padding: '0',
+      display: 'block',
+    });
 
-    if (!rootSpan || rootSpan.innerHTML !== dom.innerHTML) {
-      targetElement.innerHTML = '';
-      targetElement.innerText = '';
-      target.appendChild(dom);
-
-      if (BrowserUtils.isChromium) {
-        moveCursor(isFocused, alwaysMoveCursorToTheEnd, cursorPosition, target);
-      }
+    if (line === '') {
+      p.textContent = '\n';
+    } else if (index === lines.length - 1) {
+      p.textContent = `${line}`;
+    } else {
+      p.textContent = `${line}\n`;
     }
 
-    if (!BrowserUtils.isChromium) {
-      moveCursor(isFocused, alwaysMoveCursorToTheEnd, cursorPosition, target);
-    }
-  }
+    targetElement.appendChild(p);
+  });
+
+  moveCursor(isFocused, alwaysMoveCursorToTheEnd, cursorPosition, target);
+
+  console.log('---', targetElement.textContent?.split('\n'));
 
   CursorUtils.setPrevText(target);
 
-  return {text: target.innerText, cursorPosition: cursorPosition || 0};
+  return {text: target.textContent, cursorPosition: cursorPosition || 0};
 }
 
 export {parseText, parseRangesToHTMLNodes};
