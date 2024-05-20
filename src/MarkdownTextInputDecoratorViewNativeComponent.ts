@@ -52,6 +52,10 @@ interface MarkdownStyle {
     color: ColorValue;
     backgroundColor: ColorValue;
   };
+  mentionReport: {
+    color: ColorValue;
+    backgroundColor: ColorValue;
+  };
 }
 
 interface NativeProps extends ViewProps {

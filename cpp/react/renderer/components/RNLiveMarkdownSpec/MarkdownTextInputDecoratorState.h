@@ -1,4 +1,5 @@
 #pragma once
+#if defined(RCT_NEW_ARCH_ENABLED) || defined(ANDROID)
 
 #include <react/renderer/core/ShadowNodeFamily.h>
 
@@ -32,3 +33,5 @@ public:
 
 } // namespace react
 } // namespace facebook
+
+#endif

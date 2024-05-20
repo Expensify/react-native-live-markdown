@@ -6,7 +6,7 @@ type HistoryItem = {
 export default class InputHistory {
   depth: number;
 
-  history: HistoryItem[];
+  items: HistoryItem[];
 
   historyIndex: number;
 
@@ -16,19 +16,19 @@ export default class InputHistory {
 
   debounceTime: number;
 
-  constructor(depth: number, debounceTime = 150) {
+  constructor(depth: number, debounceTime = 150, startingText = '') {
     this.depth = depth;
-    this.history = [];
+    this.items = [{text: startingText, cursorPosition: startingText.length}];
     this.historyIndex = 0;
     this.debounceTime = debounceTime;
   }
 
   getCurrentItem(): HistoryItem | null {
-    return this.history[this.historyIndex] || null;
+    return this.items[this.historyIndex] || null;
   }
 
   setHistory(newHistory: HistoryItem[]): void {
-    this.history = newHistory.slice(newHistory.length - this.depth);
+    this.items = newHistory.slice(newHistory.length - this.depth);
     this.historyIndex = newHistory.length - 1;
   }
 
@@ -37,80 +37,99 @@ export default class InputHistory {
   }
 
   clear(): void {
-    this.history = [];
+    this.items = [];
     this.historyIndex = 0;
   }
 
-  debouncedAdd(text: string, cursorPosition: number): void {
-    this.currentText = text;
-
+  throttledAdd(text: string, cursorPosition: number): void {
     if (this.timeout) {
       clearTimeout(this.timeout);
     }
 
+    if (this.currentText === null) {
+      this.timeout = null;
+      this.add(text, cursorPosition);
+    } else {
+      this.items[this.historyIndex] = {text, cursorPosition};
+    }
+    this.currentText = text;
+
     this.timeout = setTimeout(() => {
-      if (this.currentText == null) {
-        return;
-      }
-      this.add(this.currentText, cursorPosition);
       this.currentText = null;
     }, this.debounceTime);
   }
 
+  stopTimeout(): void {
+    if (this.timeout) {
+      clearTimeout(this.timeout);
+      this.timeout = null;
+    }
+    this.currentText = null;
+  }
+
   add(text: string, cursorPosition: number): void {
-    if (this.history.length > 0) {
-      const lastItem = this.history[this.history.length - 1];
-      if (lastItem && text === lastItem.text) {
-        this.historyIndex = this.history.length - 1;
+    if (this.items.length > 0) {
+      const currentItem = this.items[this.historyIndex];
+      if (currentItem && text === currentItem.text) {
         return;
       }
     }
 
-    if (this.historyIndex < this.history.length - 1) {
-      this.history.splice(this.historyIndex + 1);
+    if (this.historyIndex < this.items.length - 1) {
+      this.items.splice(this.historyIndex + 1);
+      this.historyIndex = this.items.length - 1;
     }
 
-    this.history.push({text, cursorPosition});
-    if (this.history.length > this.depth) {
-      this.history.shift();
+    this.items.push({text, cursorPosition});
+    if (this.items.length > this.depth) {
+      this.items.shift();
+    } else {
+      this.historyIndex += 1;
     }
-
-    this.historyIndex = this.history.length - 1;
   }
 
   undo(): HistoryItem | null {
-    if (this.currentText !== null && this.timeout) {
-      clearTimeout(this.timeout);
-      this.timeout = null;
-      return this.history[this.historyIndex] || null;
-    }
+    this.stopTimeout();
 
-    if (this.history.length === 0 || this.historyIndex - 1 < 0) {
+    if (this.items.length === 0 || this.historyIndex - 1 < 0) {
       return null;
     }
+
+    const currentHistoryItem = this.items[this.historyIndex];
+    const previousHistoryItem = this.items[this.historyIndex - 1];
+
+    const undoItem = previousHistoryItem
+      ? {
+          text: previousHistoryItem.text,
+          cursorPosition: Math.min(
+            (currentHistoryItem?.cursorPosition ?? 0) - ((currentHistoryItem?.text ?? '').length - (previousHistoryItem?.text ?? '').length),
+            (previousHistoryItem?.text ?? '').length,
+          ),
+        }
+      : null;
 
     if (this.historyIndex > 0) {
       this.historyIndex -= 1;
     }
-    return this.history[this.historyIndex] || null;
+
+    return undoItem;
   }
 
   redo(): HistoryItem | null {
     if (this.currentText !== null && this.timeout) {
-      clearTimeout(this.timeout);
-      return this.history[this.history.length - 1] || null;
+      this.stopTimeout();
     }
 
-    if (this.history.length === 0 || this.historyIndex + 1 > this.history.length) {
+    if (this.items.length === 0 || this.historyIndex + 1 > this.items.length) {
       return null;
     }
 
-    if (this.historyIndex < this.history.length - 1) {
+    if (this.historyIndex < this.items.length - 1) {
       this.historyIndex += 1;
     } else {
       return null;
     }
 
-    return this.history[this.historyIndex] || null;
+    return this.items[this.historyIndex] || null;
   }
 }

@@ -49,6 +49,9 @@
 
     _mentionUserColor = RCTUIColorFromSharedColor(style.mentionUser.color);
     _mentionUserBackgroundColor = RCTUIColorFromSharedColor(style.mentionUser.backgroundColor);
+
+    _mentionReportColor = RCTUIColorFromSharedColor(style.mentionReport.color);
+    _mentionReportBackgroundColor = RCTUIColorFromSharedColor(style.mentionReport.backgroundColor);
   }
 
   return self;
@@ -95,6 +98,9 @@
 
     _mentionUserColor = [RCTConvert UIColor:json[@"mentionUser"][@"color"]];
     _mentionUserBackgroundColor = [RCTConvert UIColor:json[@"mentionUser"][@"backgroundColor"]];
+      
+    _mentionReportColor = [RCTConvert UIColor:json[@"mentionReport"][@"color"]];
+    _mentionReportBackgroundColor = [RCTConvert UIColor:json[@"mentionReport"][@"backgroundColor"]];
   }
 
   return self;

@@ -64,6 +64,12 @@ public class MarkdownStyle {
   @ColorInt
   private final int mMentionUserBackgroundColor;
 
+  @ColorInt
+  private final int mMentionReportColor;
+
+  @ColorInt
+  private final int mMentionReportBackgroundColor;
+
   public MarkdownStyle(@NonNull ReadableMap map, @NonNull Context context) {
     mSyntaxColor = parseColor(map, "syntax", "color", context);
     mLinkColor = parseColor(map, "link", "color", context);
@@ -85,6 +91,8 @@ public class MarkdownStyle {
     mMentionHereBackgroundColor = parseColor(map, "mentionHere", "backgroundColor", context);
     mMentionUserColor = parseColor(map, "mentionUser", "color", context);
     mMentionUserBackgroundColor = parseColor(map, "mentionUser", "backgroundColor", context);
+    mMentionReportColor = parseColor(map, "mentionReport", "color", context);
+    mMentionReportBackgroundColor = parseColor(map, "mentionReport", "backgroundColor", context);
   }
 
   private static int parseColor(@NonNull ReadableMap map, @NonNull String key, @NonNull String prop, @NonNull Context context) {
@@ -203,5 +211,15 @@ public class MarkdownStyle {
   @ColorInt
   public int getMentionUserBackgroundColor() {
     return mMentionUserBackgroundColor;
+  }
+
+  @ColorInt
+  public int getMentionReportColor() {
+    return mMentionReportColor;
+  }
+
+  @ColorInt
+  public int getMentionReportBackgroundColor() {
+    return mMentionReportBackgroundColor;
   }
 }

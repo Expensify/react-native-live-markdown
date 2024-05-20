@@ -110,6 +110,9 @@
                 // TODO: change mention color when it mentions current user
                 [attributedString addAttribute:NSForegroundColorAttributeName value:_markdownStyle.mentionUserColor range:range];
                 [attributedString addAttribute:NSBackgroundColorAttributeName value:_markdownStyle.mentionUserBackgroundColor range:range];
+            } else if ([type isEqualToString:@"mention-report"]) {
+                [attributedString addAttribute:NSForegroundColorAttributeName value:_markdownStyle.mentionReportColor range:range];
+                [attributedString addAttribute:NSBackgroundColorAttributeName value:_markdownStyle.mentionReportBackgroundColor range:range];
             } else if ([type isEqualToString:@"link"]) {
                 [attributedString addAttribute:NSUnderlineStyleAttributeName value:[NSNumber numberWithInteger:NSUnderlineStyleSingle] range:range];
                 [attributedString addAttribute:NSForegroundColorAttributeName value:_markdownStyle.linkColor range:range];

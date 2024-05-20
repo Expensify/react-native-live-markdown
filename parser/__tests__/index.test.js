@@ -75,6 +75,10 @@ describe('mention-user', () => {
   test('with punctation marks', () => {
     expect('@mail@mail.com!').toBeParsedAs([{type: 'mention-user', start: 0, length: 14}]);
   });
+
+  test('with phone number', () => {
+    expect('@+1234567890 Hello!').toBeParsedAs([{type: 'mention-user', start: 0, length: 12}]);
+  });
 });
 
 test('plain link', () => {
@@ -188,13 +192,6 @@ describe('blockquote', () => {
       {type: 'syntax', start: 0, length: 1},
     ]);
   });
-
-  test('without space', () => {
-    expect('>Hello world!').toBeParsedAs([
-      {type: 'blockquote', start: 0, length: 13},
-      {type: 'syntax', start: 0, length: 1},
-    ]);
-  });
 });
 
 test('multiple blockquotes', () => {
@@ -242,15 +239,6 @@ test('nested bold and italic', () => {
 });
 
 describe('nested h1 in blockquote', () => {
-  test('without spaces', () => {
-    expect('># Hello world').toBeParsedAs([
-      {type: 'blockquote', start: 0, length: 14},
-      {type: 'syntax', start: 0, length: 1},
-      {type: 'syntax', start: 1, length: 2},
-      {type: 'h1', start: 3, length: 11},
-    ]);
-  });
-
   test('with single space', () => {
     expect('> # Hello world').toBeParsedAs([
       {type: 'blockquote', start: 0, length: 15},
@@ -261,11 +249,11 @@ describe('nested h1 in blockquote', () => {
   });
 
   test('with multiple spaces after #', () => {
-    expect('>#    Hello world').toBeParsedAs([
-      {type: 'blockquote', start: 0, length: 17},
+    expect('> #    Hello world').toBeParsedAs([
+      {type: 'blockquote', start: 0, length: 18},
       {type: 'syntax', start: 0, length: 1},
-      {type: 'syntax', start: 1, length: 2},
-      {type: 'h1', start: 3, length: 14},
+      {type: 'syntax', start: 2, length: 2},
+      {type: 'h1', start: 4, length: 14},
     ]);
   });
 });
@@ -514,5 +502,27 @@ describe('inline image', () => {
       {type: 'link', start: 6, length: 11},
       {type: 'syntax', start: 17, length: 1},
     ]);
+  });
+});
+
+describe('report mentions', () => {
+  test('simple report mention', () => {
+    expect('#report-name').toBeParsedAs([{type: 'mention-report', start: 0, length: 12}]);
+  });
+
+  test('report mention in tense', () => {
+    expect('reported #report-name should be highlighted').toBeParsedAs([{type: 'mention-report', start: 9, length: 12}]);
+  });
+
+  test('report mention with markdown', () => {
+    expect('reported #`report-name` should be highlighted').toBeParsedAs([
+      {type: 'syntax', start: 10, length: 1},
+      {type: 'code', start: 11, length: 11},
+      {type: 'syntax', start: 22, length: 1},
+    ]);
+  });
+
+  test('report mention with punctuation', () => {
+    expect('reported #report-name!').toBeParsedAs([{type: 'mention-report', start: 9, length: 12}]);
   });
 });

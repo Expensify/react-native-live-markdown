@@ -2375,7 +2375,6 @@ __metadata:
     "@react-native/metro-config": 0.73.5
     babel-plugin-module-resolver: ^5.0.0
     patch-package: ^8.0.0
-    pod-install: ^0.1.0
     postinstall-postinstall: ^2.1.0
     react: 18.2.0
     react-native: 0.73.4
@@ -2389,7 +2388,7 @@ __metadata:
     "@types/underscore": ^1.11.15
     esbuild: 0.19.4
     esbuild-plugin-tsc: ^0.4.0
-    expensify-common: "Expensify/expensify-common#4e020cfa13ffabde14313c92b341285aeb919f29"
+    expensify-common: "Expensify/expensify-common#a018512b1e0fce4d4b5a61c00ca826b8887007ad"
     jest: ^29.7.0
     patch-package: ^8.0.0
     typescript: ^5.3.3
@@ -2429,7 +2428,6 @@ __metadata:
     eslint-plugin-tsdoc: ^0.2.17
     jest: ^29.6.3
     jest-environment-jsdom: ^29.7.0
-    pod-install: ^0.1.0
     prettier: 2.8.8
     react: 18.2.0
     react-native: 0.73.4
@@ -9671,13 +9669,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expensify-common@Expensify/expensify-common#4e020cfa13ffabde14313c92b341285aeb919f29":
+"expensify-common@Expensify/expensify-common#a018512b1e0fce4d4b5a61c00ca826b8887007ad":
   version: 1.0.0
-  resolution: "expensify-common@https://github.com/Expensify/expensify-common.git#commit=4e020cfa13ffabde14313c92b341285aeb919f29"
+  resolution: "expensify-common@https://github.com/Expensify/expensify-common.git#commit=a018512b1e0fce4d4b5a61c00ca826b8887007ad"
   dependencies:
     classnames: 2.5.0
     clipboard: 2.0.11
-    html-entities: ^2.4.0
+    html-entities: ^2.5.2
     jquery: 3.6.0
     localforage: ^1.10.0
     lodash: 4.17.21
@@ -9688,7 +9686,7 @@ __metadata:
     simply-deferred: "git+https://github.com/Expensify/simply-deferred.git#77a08a95754660c7bd6e0b6979fdf84e8e831bf5"
     ua-parser-js: ^1.0.37
     underscore: 1.13.6
-  checksum: 65b8d905005076a99dd98b50b8c424c1708133ee7b855b1071812a542164fc28096bb3bec51ed85623dfa30156fce23d552823386ff2f24a5c5a2fd21ebd9be1
+  checksum: 8f8591db0ff619d68098bd582d9a9242119aefd700b5615a9e7442400c265b3a6f678b92c0735e7297bbef8da9182b8d1d0d1cb4616a23b334f98718aaee88cd
   languageName: node
   linkType: hard
 
@@ -11184,7 +11182,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"html-entities@npm:^2.3.2, html-entities@npm:^2.4.0":
+"html-entities@npm:^2.3.2, html-entities@npm:^2.5.2":
   version: 2.5.2
   resolution: "html-entities@npm:2.5.2"
   checksum: b23f4a07d33d49ade1994069af4e13d31650e3fb62621e92ae10ecdf01d1a98065c78fd20fdc92b4c7881612210b37c275f2c9fba9777650ab0d6f2ceb3b99b6
@@ -15827,15 +15825,6 @@ __metadata:
   version: 3.4.0
   resolution: "pngjs@npm:3.4.0"
   checksum: 8bd40bd698abd16b72c97b85cb858c80894fbedc76277ce72a784aa441e14795d45d9856e97333ca469b34b67528860ffc8a7317ca6beea349b645366df00bcd
-  languageName: node
-  linkType: hard
-
-"pod-install@npm:^0.1.0":
-  version: 0.1.39
-  resolution: "pod-install@npm:0.1.39"
-  bin:
-    pod-install: build/index.js
-  checksum: 200302341847251d4db25f950d15367f6f45f5358d87b18bf01054094f02b2572d007f73c8020b1565dd3e6b23f861965f9bad434873d3c8e834be0e7124fa3e
   languageName: node
   linkType: hard
 
