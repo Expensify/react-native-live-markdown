@@ -103,9 +103,9 @@
 
   // apply new styles
 #ifdef RCT_NEW_ARCH_ENABLED
-  [_textInput _setAttributedString:_textView.attributedText];
+  [_textInput _setAttributedString:_textInput.attributedText];
 #else
-  [_textInput setAttributedText:_textView.attributedText];
+  [_textInput setAttributedText:_textInput.attributedText];
 #endif /* RCT_NEW_ARCH_ENABLED */
 }
 
