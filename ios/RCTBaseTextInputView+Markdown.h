@@ -9,6 +9,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)markdown_setAttributedText:(NSAttributedString *)attributedText;
 
+- (BOOL)markdown_textOf:(NSAttributedString *)newText equals:(NSAttributedString *)oldText;
+
 - (void)markdown_updateLocalData;
 
 @end
