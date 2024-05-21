@@ -80,6 +80,10 @@ let focusTimeout: NodeJS.Timeout | null = null;
 function normalizeValue(value: string) {
   return value.replace(/\n$/, '');
 }
+// Adds one '\n' at the end of the string if it's missing
+function denormalizeValue(value: string) {
+  return value.endsWith('\n') ? `${value}\n` : value;
+}
 
 // If an Input Method Editor is processing key input, the 'keyCode' is 229.
 // https://www.w3.org/TR/uievents/#determine-keydown-keyup-keyCode
@@ -174,7 +178,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     const dimensions = React.useRef<Dimensions | null>(null);
 
     if (!history.current) {
-      history.current = new InputHistory(100);
+      history.current = new InputHistory(100, 150, value || '');
     }
 
     const flattenedStyle = useMemo(() => StyleSheet.flatten(style), [style]);
@@ -203,7 +207,8 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         }
         const parsedText = ParseUtils.parseText(target, text, cursorPosition, customMarkdownStyles, !multiline);
         if (history.current && shouldAddToHistory) {
-          history.current.debouncedAdd(parsedText.text, parsedText.cursorPosition);
+          // We need to normalize the value before saving it to the history to prevent situations when additional new lines break the cursor position calculation logic
+          history.current.throttledAdd(normalizeValue(parsedText.text), parsedText.cursorPosition);
         }
 
         return parsedText;
@@ -214,7 +219,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     const processedMarkdownStyle = useMemo(() => {
       const newMarkdownStyle = processMarkdownStyle(markdownStyle);
       if (divRef.current) {
-        parseText(divRef.current, divRef.current.innerText, newMarkdownStyle);
+        parseText(divRef.current, divRef.current.innerText, newMarkdownStyle, null, false);
       }
       return newMarkdownStyle;
     }, [markdownStyle, parseText]);
@@ -236,7 +241,8 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       (target: HTMLDivElement) => {
         if (!history.current) return '';
         const item = history.current.undo();
-        return parseText(target, item ? item.text : null, processedMarkdownStyle, item ? item.cursorPosition : null, false).text;
+        const undoValue = item ? denormalizeValue(item.text) : null;
+        return parseText(target, undoValue, processedMarkdownStyle, item ? item.cursorPosition : null, false).text;
       },
       [parseText, processedMarkdownStyle],
     );
@@ -245,7 +251,8 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       (target: HTMLDivElement) => {
         if (!history.current) return '';
         const item = history.current.redo();
-        return parseText(target, item ? item.text : null, processedMarkdownStyle, item ? item.cursorPosition : null, false).text;
+        const redoValue = item ? denormalizeValue(item.text) : null;
+        return parseText(target, redoValue, processedMarkdownStyle, item ? item.cursorPosition : null, false).text;
       },
       [parseText, processedMarkdownStyle],
     );
@@ -328,9 +335,10 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         if (!divRef.current || !(e.target instanceof HTMLElement)) {
           return;
         }
+        const changedText = e.target.innerText;
 
         if (compositionRef.current) {
-          updateTextColor(divRef.current, e.target.innerText);
+          updateTextColor(divRef.current, changedText);
           compositionRef.current = false;
           return;
         }
@@ -344,14 +352,22 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           case 'historyRedo':
             text = redo(divRef.current);
             break;
+          case 'insertFromPaste':
+            // if there is no newline at the end of the copied text, contentEditable adds invisible <br> tag at the end of the text, so we need to normalize it
+            if (changedText.length > 2 && changedText[changedText.length - 2] !== '\n' && changedText[changedText.length - 1] === '\n') {
+              text = parseText(divRef.current, normalizeValue(changedText), processedMarkdownStyle).text;
+              break;
+            }
+            text = parseText(divRef.current, changedText, processedMarkdownStyle).text;
+            break;
           default:
-            text = parseText(divRef.current, e.target.innerText, processedMarkdownStyle).text;
+            text = parseText(divRef.current, changedText, processedMarkdownStyle).text;
         }
         if (pasteRef?.current) {
           pasteRef.current = false;
           updateSelection(e);
         }
-        updateTextColor(divRef.current, e.target.innerText);
+        updateTextColor(divRef.current, text);
 
         if (onChange) {
           const event = e as unknown as NativeSyntheticEvent<any>;
@@ -437,9 +453,13 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         currentlyFocusedField.current = hostNode;
         setEventProps(e);
         if (divRef.current) {
-          const valueLength = value ? value.length : 0;
-          CursorUtils.setCursorPosition(divRef.current, contentSelection.current ? contentSelection.current.end : valueLength);
-          updateSelection(event);
+          if (contentSelection.current) {
+            CursorUtils.setCursorPosition(divRef.current, contentSelection.current.start, contentSelection.current.end);
+          } else {
+            const valueLength = value ? value.length : divRef.current.innerText.length;
+            CursorUtils.setCursorPosition(divRef.current, valueLength, null);
+          }
+          updateSelection(event, contentSelection.current);
         }
 
         if (onFocus) {
@@ -576,20 +596,12 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       if (!divRef.current || !selection || (contentSelection.current && selection.start === contentSelection.current.start && selection.end === contentSelection.current.end)) {
         return;
       }
-      CursorUtils.setCursorPosition(divRef.current, selection.start, selection.end);
-      updateSelection(null, {start: selection.start, end: selection.end || selection.start});
-    }, [selection, updateSelection]);
 
-    useEffect(() => {
-      if (history.current?.history.length !== 0) {
-        return;
-      }
-      const currentValue = value ?? '';
-      history.current.add(currentValue, currentValue.length);
-
-      handleContentSizeChange();
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+      const newSelection: Selection = {start: selection.start, end: selection.end ?? selection.start};
+      contentSelection.current = newSelection;
+      updateRefSelectionVariables(newSelection);
+      CursorUtils.setCursorPosition(divRef.current, newSelection.start, newSelection.end);
+    }, [selection, updateRefSelectionVariables]);
 
     return (
       // eslint-disable-next-line jsx-a11y/no-static-element-interactions

@@ -30,6 +30,5 @@ Pod::Spec.new do |s|
   s.subspec "common" do |ss|
     ss.source_files         = "cpp/**/*.{cpp,h}"
     ss.header_dir           = "RNLiveMarkdown"
-    ss.pod_target_xcconfig  = { "HEADER_SEARCH_PATHS" => "\"$(PODS_TARGET_SRCROOT)/cpp\"" }
   end
 end
