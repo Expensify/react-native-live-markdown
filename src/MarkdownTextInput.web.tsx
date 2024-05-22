@@ -172,6 +172,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     const className = `react-native-live-markdown-input-${multiline ? 'multiline' : 'singleline'}`;
     const history = useRef<InputHistory>();
     const dimensions = React.useRef<Dimensions | null>(null);
+    const textContent = useRef<string>('');
 
     if (!history.current) {
       history.current = new InputHistory(100);
@@ -199,7 +200,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     const parseText = useCallback(
       (target: HTMLDivElement, text: string | null, customMarkdownStyles: MarkdownStyle, cursorPosition: number | null = null, shouldAddToHistory = true) => {
         if (text === null) {
-          return {text: target.textContent, cursorPosition: null};
+          return {text: textContent.current, cursorPosition: null};
         }
         const parsedText = ParseUtils.parseText(target, text, cursorPosition, customMarkdownStyles, !multiline);
         if (history.current && shouldAddToHistory) {
@@ -333,13 +334,13 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           nodeCopy.innerHTML = nodeCopy.innerHTML.replaceAll('<br>', '\n');
         }
 
-        let textContent = nodeCopy.textContent ?? '';
+        let nodeText = nodeCopy.textContent ?? '';
 
-        if (textContent.slice(-2) === '\n\n') {
-          textContent = textContent.slice(0, -1);
+        if (nodeText.slice(-2) === '\n\n') {
+          nodeText = nodeText.slice(0, -1);
         }
-        text += textContent;
-        if (/[^\n]/.test(textContent) && index < childNodes.length - 1) {
+        text += nodeText;
+        if (/[^\n]/.test(nodeText) && index < childNodes.length - 1) {
           text += '\n';
         }
       });
@@ -352,8 +353,11 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           return;
         }
 
+        const parsedText = parseInnerHTMLToText(e.target);
+        textContent.current = parsedText;
+
         if (compositionRef.current) {
-          updateTextColor(divRef.current, e.target.textContent);
+          updateTextColor(divRef.current, parsedText);
           compositionRef.current = false;
           return;
         }
@@ -368,13 +372,13 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
             text = redo(divRef.current);
             break;
           default:
-            text = parseText(divRef.current, parseInnerHTMLToText(e.target), processedMarkdownStyle).text;
+            text = parseText(divRef.current, parsedText, processedMarkdownStyle).text;
         }
         if (pasteRef?.current) {
           pasteRef.current = false;
           updateSelection(e);
         }
-        updateTextColor(divRef.current, e.target.textContent);
+        updateTextColor(divRef.current, text);
 
         if (onChange) {
           const event = e as unknown as NativeSyntheticEvent<any>;
@@ -383,8 +387,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         }
 
         if (onChangeText) {
-          const normalizedText = normalizeValue(text);
-          onChangeText(normalizedText);
+          onChangeText(text);
         }
 
         handleContentSizeChange();
@@ -463,7 +466,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           if (contentSelection.current) {
             CursorUtils.setCursorPosition(divRef.current, contentSelection.current.start, contentSelection.current.end);
           } else {
-            const valueLength = value ? value.length : divRef.current.textContent.length;
+            const valueLength = value ? value.length : textContent.current.length;
             CursorUtils.setCursorPosition(divRef.current, valueLength, null);
           }
           updateSelection(event, contentSelection.current);
@@ -539,7 +542,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
         if (value === '' || value === undefined) {
           // update to placeholder color when value is empty
-          updateTextColor(r, r.textContent);
+          updateTextColor(r, r.textContent ?? '');
         }
       }
 
@@ -554,21 +557,23 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       divRef.current = r;
     };
 
-    useClientEffect(function parseAndStyleValue() {
-      if (!divRef.current || processedValue === divRef.current.textContent) {
-        return;
-      }
-      console.log('XA', processedValue?.length, divRef.current.textContent);
+    useClientEffect(
+      function parseAndStyleValue() {
+        if (!divRef.current || processedValue === textContent.current) {
+          return;
+        }
 
-      if (value === undefined) {
-        parseText(divRef.current, divRef.current.textContent, processedMarkdownStyle);
-        return;
-      }
+        if (value === undefined) {
+          parseText(divRef.current, textContent.current, processedMarkdownStyle);
+          return;
+        }
 
-      const text = processedValue !== undefined ? processedValue : '';
-      parseText(divRef.current, text, processedMarkdownStyle);
-      updateTextColor(divRef.current, value);
-    }, []);
+        textContent.current = value;
+        parseText(divRef.current, value, processedMarkdownStyle);
+        updateTextColor(divRef.current, value);
+      },
+      [multiline, processedMarkdownStyle, processedValue],
+    );
 
     useClientEffect(
       function adjustHeight() {
