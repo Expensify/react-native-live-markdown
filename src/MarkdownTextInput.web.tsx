@@ -300,7 +300,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           return;
         }
 
-        const isContained = CursorUtils.restrictRanges(divRef.current, value ?? '');
+        const isContained = CursorUtils.restrictRanges(divRef.current, (divRef.current as HTMLInputElement)?.value ?? '');
         const newSelection = predefinedSelection && isContained ? predefinedSelection : CursorUtils.getCurrentCursorPosition(divRef.current);
 
         if (newSelection && (!contentSelection.current || contentSelection.current.start !== newSelection.start || contentSelection.current.end !== newSelection.end)) {
