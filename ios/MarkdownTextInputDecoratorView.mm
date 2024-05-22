@@ -22,6 +22,7 @@
 #else
   __weak RCTBaseTextInputView *_textInput;
 #endif /* RCT_NEW_ARCH_ENABLED */
+  __weak UIView<RCTBackedTextInputViewProtocol> *_backedTextInputView;
   __weak RCTBackedTextFieldDelegateAdapter *_adapter;
   __weak RCTUITextView *_textView;
 }
@@ -51,11 +52,11 @@
 #ifdef RCT_NEW_ARCH_ENABLED
   react_native_assert([view isKindOfClass:[RCTTextInputComponentView class]] && "Previous sibling component is not an instance of RCTTextInputComponentView.");
   _textInput = (RCTTextInputComponentView *)view;
-  UIView<RCTBackedTextInputViewProtocol> *backedTextInputView = [_textInput valueForKey:@"_backedTextInputView"];
+  _backedTextInputView = [_textInput valueForKey:@"_backedTextInputView"];
 #else
   react_native_assert([view isKindOfClass:[RCTBaseTextInputView class]] && "Previous sibling component is not an instance of RCTBaseTextInputView.");
   _textInput = (RCTBaseTextInputView *)view;
-  UIView<RCTBackedTextInputViewProtocol> *backedTextInputView = _textInput.backedTextInputView;
+  _backedTextInputView = _textInput.backedTextInputView;
 #endif /* RCT_NEW_ARCH_ENABLED */
 
   _markdownUtils = [[RCTMarkdownUtils alloc] init];
@@ -63,12 +64,12 @@
   [_markdownUtils setMarkdownStyle:_markdownStyle];
 
   [_textInput setMarkdownUtils:_markdownUtils];
-  if ([backedTextInputView isKindOfClass:[RCTUITextField class]]) {
-    RCTUITextField *textField = (RCTUITextField *)backedTextInputView;
+  if ([_backedTextInputView isKindOfClass:[RCTUITextField class]]) {
+    RCTUITextField *textField = (RCTUITextField *)_backedTextInputView;
     _adapter = [textField valueForKey:@"textInputDelegateAdapter"];
     [_adapter setMarkdownUtils:_markdownUtils];
-  } else if ([backedTextInputView isKindOfClass:[RCTUITextView class]]) {
-    _textView = (RCTUITextView *)backedTextInputView;
+  } else if ([_backedTextInputView isKindOfClass:[RCTUITextView class]]) {
+    _textView = (RCTUITextView *)_backedTextInputView;
     [_textView setMarkdownUtils:_markdownUtils];
     NSLayoutManager *layoutManager = _textView.layoutManager; // switching to TextKit 1 compatibility mode
     layoutManager.allowsNonContiguousLayout = NO; // workaround for onScroll issue
@@ -100,11 +101,13 @@
 {
   _markdownStyle = markdownStyle;
   [_markdownUtils setMarkdownStyle:markdownStyle];
+
+  // apply new styles
 #ifdef RCT_NEW_ARCH_ENABLED
-  [_textInput textInputDidChange]; // apply new styles
+  [_textInput _setAttributedString:_backedTextInputView.attributedText];
 #else
-  [_textInput setAttributedText:_textInput.attributedText]; // apply new styles
-#endif
+  [_textInput setAttributedText:_textInput.attributedText];
+#endif /* RCT_NEW_ARCH_ENABLED */
 }
 
 @end

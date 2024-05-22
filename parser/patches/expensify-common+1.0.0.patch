@@ -1,8 +1,8 @@
 diff --git a/node_modules/expensify-common/lib/CONST.jsx b/node_modules/expensify-common/lib/CONST.jsx
-index 49cebfb..a086055 100644
+index b68261b..99bd3e3 100644
 --- a/node_modules/expensify-common/lib/CONST.jsx
 +++ b/node_modules/expensify-common/lib/CONST.jsx
-@@ -361,14 +361,14 @@ export const CONST = {
+@@ -361,7 +361,7 @@ export const CONST = {
           *
           * @type RegExp
           */
@@ -11,16 +11,17 @@ index 49cebfb..a086055 100644
  
          /**
           * Regex matching an text containing an Emoji that can be a single emoji or made up by some different emojis
-          *
+@@ -369,7 +369,7 @@ export const CONST = {
           * @type RegExp
           */
--        EMOJI_RULE: /[\p{Extended_Pictographic}](\u200D[\p{Extended_Pictographic}]|[\u{1F3FB}-\u{1F3FF}]|[\u{E0020}-\u{E007F}]|\uFE0F|\u20E3)*|[\u{1F1E6}-\u{1F1FF}]{2}|[#*0-9]\uFE0F?\u20E3/gu,
-+        EMOJI_RULE: /(?:[\xA9\xAE\u203C\u2049\u2122\u2139\u2194-\u2199\u21A9\u21AA\u231A\u231B\u2328\u2388\u23CF\u23E9-\u23F3\u23F8-\u23FA\u24C2\u25AA\u25AB\u25B6\u25C0\u25FB-\u25FE\u2600-\u2605\u2607-\u2612\u2614-\u2685\u2690-\u2705\u2708-\u2712\u2714\u2716\u271D\u2721\u2728\u2733\u2734\u2744\u2747\u274C\u274E\u2753-\u2755\u2757\u2763-\u2767\u2795-\u2797\u27A1\u27B0\u27BF\u2934\u2935\u2B05-\u2B07\u2B1B\u2B1C\u2B50\u2B55\u3030\u303D\u3297\u3299]|\uD83C[\uDC00-\uDCFF\uDD0D-\uDD0F\uDD2F\uDD6C-\uDD71\uDD7E\uDD7F\uDD8E\uDD91-\uDD9A\uDDAD-\uDDE5\uDE01-\uDE0F\uDE1A\uDE2F\uDE32-\uDE3A\uDE3C-\uDE3F\uDE49-\uDFFA]|\uD83D[\uDC00-\uDD3D\uDD46-\uDE4F\uDE80-\uDEFF\uDF74-\uDF7F\uDFD5-\uDFFF]|\uD83E[\uDC0C-\uDC0F\uDC48-\uDC4F\uDC5A-\uDC5F\uDC88-\uDC8F\uDCAE-\uDCFF\uDD0C-\uDD3A\uDD3C-\uDD45\uDD47-\uDEFF]|\uD83F[\uDC00-\uDFFD])(\u200D(?:[\xA9\xAE\u203C\u2049\u2122\u2139\u2194-\u2199\u21A9\u21AA\u231A\u231B\u2328\u2388\u23CF\u23E9-\u23F3\u23F8-\u23FA\u24C2\u25AA\u25AB\u25B6\u25C0\u25FB-\u25FE\u2600-\u2605\u2607-\u2612\u2614-\u2685\u2690-\u2705\u2708-\u2712\u2714\u2716\u271D\u2721\u2728\u2733\u2734\u2744\u2747\u274C\u274E\u2753-\u2755\u2757\u2763-\u2767\u2795-\u2797\u27A1\u27B0\u27BF\u2934\u2935\u2B05-\u2B07\u2B1B\u2B1C\u2B50\u2B55\u3030\u303D\u3297\u3299]|\uD83C[\uDC00-\uDCFF\uDD0D-\uDD0F\uDD2F\uDD6C-\uDD71\uDD7E\uDD7F\uDD8E\uDD91-\uDD9A\uDDAD-\uDDE5\uDE01-\uDE0F\uDE1A\uDE2F\uDE32-\uDE3A\uDE3C-\uDE3F\uDE49-\uDFFA]|\uD83D[\uDC00-\uDD3D\uDD46-\uDE4F\uDE80-\uDEFF\uDF74-\uDF7F\uDFD5-\uDFFF]|\uD83E[\uDC0C-\uDC0F\uDC48-\uDC4F\uDC5A-\uDC5F\uDC88-\uDC8F\uDCAE-\uDCFF\uDD0C-\uDD3A\uDD3C-\uDD45\uDD47-\uDEFF]|\uD83F[\uDC00-\uDFFD])|(?:\uD83C[\uDFFB-\uDFFF])|(?:\uDB40[\uDC20-\uDC7F])|\uFE0F|\u20E3)*|(?:\uD83C[\uDDE6-\uDDFF]){2}|[#\*0-9]\uFE0F?\u20E3/g
+         EMOJI_RULE:
+-            /[\p{Extended_Pictographic}](\u200D[\p{Extended_Pictographic}]|[\u{1F3FB}-\u{1F3FF}]|[\u{E0020}-\u{E007F}]|\uFE0F|\u20E3)*|[\u{1F1E6}-\u{1F1FF}]{2}|[#*0-9]\uFE0F?\u20E3/gu,
++        /(?:[\xA9\xAE\u203C\u2049\u2122\u2139\u2194-\u2199\u21A9\u21AA\u231A\u231B\u2328\u2388\u23CF\u23E9-\u23F3\u23F8-\u23FA\u24C2\u25AA\u25AB\u25B6\u25C0\u25FB-\u25FE\u2600-\u2605\u2607-\u2612\u2614-\u2685\u2690-\u2705\u2708-\u2712\u2714\u2716\u271D\u2721\u2728\u2733\u2734\u2744\u2747\u274C\u274E\u2753-\u2755\u2757\u2763-\u2767\u2795-\u2797\u27A1\u27B0\u27BF\u2934\u2935\u2B05-\u2B07\u2B1B\u2B1C\u2B50\u2B55\u3030\u303D\u3297\u3299]|\uD83C[\uDC00-\uDCFF\uDD0D-\uDD0F\uDD2F\uDD6C-\uDD71\uDD7E\uDD7F\uDD8E\uDD91-\uDD9A\uDDAD-\uDDE5\uDE01-\uDE0F\uDE1A\uDE2F\uDE32-\uDE3A\uDE3C-\uDE3F\uDE49-\uDFFA]|\uD83D[\uDC00-\uDD3D\uDD46-\uDE4F\uDE80-\uDEFF\uDF74-\uDF7F\uDFD5-\uDFFF]|\uD83E[\uDC0C-\uDC0F\uDC48-\uDC4F\uDC5A-\uDC5F\uDC88-\uDC8F\uDCAE-\uDCFF\uDD0C-\uDD3A\uDD3C-\uDD45\uDD47-\uDEFF]|\uD83F[\uDC00-\uDFFD])(\u200D(?:[\xA9\xAE\u203C\u2049\u2122\u2139\u2194-\u2199\u21A9\u21AA\u231A\u231B\u2328\u2388\u23CF\u23E9-\u23F3\u23F8-\u23FA\u24C2\u25AA\u25AB\u25B6\u25C0\u25FB-\u25FE\u2600-\u2605\u2607-\u2612\u2614-\u2685\u2690-\u2705\u2708-\u2712\u2714\u2716\u271D\u2721\u2728\u2733\u2734\u2744\u2747\u274C\u274E\u2753-\u2755\u2757\u2763-\u2767\u2795-\u2797\u27A1\u27B0\u27BF\u2934\u2935\u2B05-\u2B07\u2B1B\u2B1C\u2B50\u2B55\u3030\u303D\u3297\u3299]|\uD83C[\uDC00-\uDCFF\uDD0D-\uDD0F\uDD2F\uDD6C-\uDD71\uDD7E\uDD7F\uDD8E\uDD91-\uDD9A\uDDAD-\uDDE5\uDE01-\uDE0F\uDE1A\uDE2F\uDE32-\uDE3A\uDE3C-\uDE3F\uDE49-\uDFFA]|\uD83D[\uDC00-\uDD3D\uDD46-\uDE4F\uDE80-\uDEFF\uDF74-\uDF7F\uDFD5-\uDFFF]|\uD83E[\uDC0C-\uDC0F\uDC48-\uDC4F\uDC5A-\uDC5F\uDC88-\uDC8F\uDCAE-\uDCFF\uDD0C-\uDD3A\uDD3C-\uDD45\uDD47-\uDEFF]|\uD83F[\uDC00-\uDFFD])|(?:\uD83C[\uDFFB-\uDFFF])|(?:\uDB40[\uDC20-\uDC7F])|\uFE0F|\u20E3)*|(?:\uD83C[\uDDE6-\uDDFF]){2}|[#\*0-9]\uFE0F?\u20E3/g,
      },
  
      REPORT: {
 diff --git a/node_modules/expensify-common/lib/ExpensiMark.js b/node_modules/expensify-common/lib/ExpensiMark.js
-index 5c6a593..e3b304e 100644
+index 4b8a7eb..197842d 100644
 --- a/node_modules/expensify-common/lib/ExpensiMark.js
 +++ b/node_modules/expensify-common/lib/ExpensiMark.js
 @@ -8,8 +8,8 @@ const MARKDOWN_IMAGE_REGEX = new RegExp(`\\!(?:\\[([^\\][]*(?:\\[[^\\][]*][^\\][
@@ -43,7 +44,7 @@ index 5c6a593..e3b304e 100644
                      const group = textWithinFences.replace(/(?:(?![\n\r])\s)/g, '&#32;');
                      return `<pre data-code-raw="${withinFences}">${group}</pre>`;
                  },
-@@ -176,7 +176,7 @@ export default class ExpensiMark {
+@@ -177,7 +177,7 @@ export default class ExpensiMark {
              {
                  name: 'reportMentions',
  
@@ -52,7 +53,7 @@ index 5c6a593..e3b304e 100644
                  replacement: '<mention-report>$1</mention-report>',
              },
  
-@@ -579,7 +579,7 @@ export default class ExpensiMark {
+@@ -595,7 +595,7 @@ export default class ExpensiMark {
           * @type {Number}
           */
          this.currentQuoteDepth = 0;
@@ -61,8 +62,8 @@ index 5c6a593..e3b304e 100644
  
      getHtmlRuleset(filterRules, disabledRules, shouldKeepRawInput) {
          let rules = this.rules;
-@@ -593,7 +593,7 @@ export default class ExpensiMark {
-             rules = _.filter(rules, (rule) => !_.contains(disabledRules, rule.name));
+@@ -611,7 +611,7 @@ export default class ExpensiMark {
+             rules = _.filter(rules, hasDisabledRuleName);
          }
          return rules;
 -    }
@@ -70,7 +71,7 @@ index 5c6a593..e3b304e 100644
  
      /**
       * Replaces markdown with html elements
-@@ -640,7 +640,7 @@ export default class ExpensiMark {
+@@ -659,7 +659,7 @@ export default class ExpensiMark {
          }
  
          return replacedText;
@@ -79,7 +80,7 @@ index 5c6a593..e3b304e 100644
  
      /**
       * Checks matched URLs for validity and replace valid links with html elements
-@@ -749,7 +749,7 @@ export default class ExpensiMark {
+@@ -768,7 +768,7 @@ export default class ExpensiMark {
          }
  
          return replacedText;
@@ -88,7 +89,7 @@ index 5c6a593..e3b304e 100644
  
      /**
       * Checks matched Emails for validity and replace valid links with html elements
-@@ -788,7 +788,7 @@ export default class ExpensiMark {
+@@ -807,7 +807,7 @@ export default class ExpensiMark {
              replacedText = replacedText.concat(textToCheck.substr(startIndex));
          }
          return replacedText;
@@ -97,8 +98,8 @@ index 5c6a593..e3b304e 100644
  
      /**
       * replace block element with '\n' if :
-@@ -830,7 +830,7 @@ export default class ExpensiMark {
-         });
+@@ -852,7 +852,7 @@ export default class ExpensiMark {
+         splitText.forEach(processText);
  
          return joinedText;
 -    }
@@ -106,16 +107,16 @@ index 5c6a593..e3b304e 100644
  
      /**
       * Replaces HTML with markdown
-@@ -861,7 +861,7 @@ export default class ExpensiMark {
-             generatedMarkdown = generatedMarkdown.replace(rule.regex, replacementFunction);
-         });
+@@ -885,7 +885,7 @@ export default class ExpensiMark {
+ 
+         this.htmlToMarkdownRules.forEach(processRule);
          return Str.htmlDecode(this.replaceBlockElementWithNewLine(generatedMarkdown));
 -    }
 +    },
  
      /**
       * Convert HTML to text
-@@ -885,7 +885,7 @@ export default class ExpensiMark {
+@@ -909,7 +909,7 @@ export default class ExpensiMark {
          // We use 'htmlDecode' instead of 'unescape' to replace entities like '&#32;'
          replacedText = Str.htmlDecode(replacedText);
          return replacedText;
@@ -124,7 +125,7 @@ index 5c6a593..e3b304e 100644
  
      /**
       * Modify text for Quotes replacing chevrons with html elements
-@@ -948,7 +948,7 @@ export default class ExpensiMark {
+@@ -972,7 +972,7 @@ export default class ExpensiMark {
              replacedText = textToCheck;
          }
          return replacedText;
@@ -133,7 +134,7 @@ index 5c6a593..e3b304e 100644
  
      /**
       * Format the content of blockquote if the text matches the regex or else just return the original text
-@@ -975,7 +975,7 @@ export default class ExpensiMark {
+@@ -1000,7 +1000,7 @@ export default class ExpensiMark {
              return replacement(textToFormat);
          }
          return textToCheck;
@@ -142,7 +143,7 @@ index 5c6a593..e3b304e 100644
  
      /**
       * Check if the input text includes only the open or the close tag of an element.
-@@ -1014,7 +1014,7 @@ export default class ExpensiMark {
+@@ -1039,7 +1039,7 @@ export default class ExpensiMark {
  
          // If there are any tags left in the stack, they're unclosed
          return tagStack.length !== 0;
@@ -151,7 +152,7 @@ index 5c6a593..e3b304e 100644
  
      /**
       * @param {String} comment
-@@ -1036,7 +1036,7 @@ export default class ExpensiMark {
+@@ -1061,7 +1061,7 @@ export default class ExpensiMark {
              console.warn('Error parsing url in ExpensiMark.extractLinksInMarkdownComment', {error: e});
              return undefined;
          }
@@ -160,7 +161,7 @@ index 5c6a593..e3b304e 100644
  
      /**
       * Compares two markdown comments and returns a list of the links removed in a new comment.
-@@ -1049,7 +1049,7 @@ export default class ExpensiMark {
+@@ -1074,7 +1074,7 @@ export default class ExpensiMark {
          const linksInOld = this.extractLinksInMarkdownComment(oldComment);
          const linksInNew = this.extractLinksInMarkdownComment(newComment);
          return linksInOld === undefined || linksInNew === undefined ? [] : _.difference(linksInOld, linksInNew);
@@ -169,7 +170,7 @@ index 5c6a593..e3b304e 100644
  
      /**
       * Escapes the content of an HTML attribute value
-@@ -1068,3 +1068,5 @@ export default class ExpensiMark {
+@@ -1093,3 +1093,5 @@ export default class ExpensiMark {
          return _.escape(originalContent);
      }
  }

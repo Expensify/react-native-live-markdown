@@ -170,7 +170,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     const textContent = useRef<string>('');
 
     if (!history.current) {
-      history.current = new InputHistory(100);
+      history.current = new InputHistory(100, 150, value || '');
     }
 
     const flattenedStyle = useMemo(() => StyleSheet.flatten(style), [style]);
@@ -199,7 +199,8 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         }
         const parsedText = ParseUtils.parseText(target, text, cursorPosition, customMarkdownStyles, !multiline);
         if (history.current && shouldAddToHistory) {
-          history.current.debouncedAdd(parsedText.text, parsedText.cursorPosition);
+          // We need to normalize the value before saving it to the history to prevent situations when additional new lines break the cursor position calculation logic
+          history.current.throttledAdd(parsedText.text, parsedText.cursorPosition);
         }
 
         return parsedText;
@@ -232,7 +233,8 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       (target: HTMLDivElement) => {
         if (!history.current) return '';
         const item = history.current.undo();
-        return parseText(target, item ? item.text : null, processedMarkdownStyle, item ? item.cursorPosition : null, false).text;
+        const undoValue = item ? item.text : null;
+        return parseText(target, undoValue, processedMarkdownStyle, item ? item.cursorPosition : null, false).text;
       },
       [parseText, processedMarkdownStyle],
     );
@@ -241,7 +243,8 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       (target: HTMLDivElement) => {
         if (!history.current) return '';
         const item = history.current.redo();
-        return parseText(target, item ? item.text : null, processedMarkdownStyle, item ? item.cursorPosition : null, false).text;
+        const redoValue = item ? item.text : null;
+        return parseText(target, redoValue, processedMarkdownStyle, item ? item.cursorPosition : null, false).text;
       },
       [parseText, processedMarkdownStyle],
     );
@@ -607,17 +610,6 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       updateRefSelectionVariables(newSelection);
       CursorUtils.setCursorPosition(divRef.current, newSelection.start, newSelection.end);
     }, [selection, updateRefSelectionVariables]);
-
-    useEffect(() => {
-      if (history.current?.history.length !== 0) {
-        return;
-      }
-      const currentValue = value ?? '';
-      history.current.add(currentValue, currentValue.length);
-
-      handleContentSizeChange();
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
 
     return (
       // eslint-disable-next-line jsx-a11y/no-static-element-interactions

@@ -23,6 +23,16 @@
   [self markdown_setAttributedText:attributedText];
 }
 
+- (BOOL)markdown_textOf:(NSAttributedString *)newText equals:(NSAttributedString *)oldText
+{
+  RCTMarkdownUtils *markdownUtils = [self getMarkdownUtils];
+  if (markdownUtils != nil) {
+    return [newText isEqualToAttributedString:oldText];
+  }
+
+  return [self markdown_textOf:newText equals:oldText];
+}
+
 - (void)markdown_updateLocalData
 {
   RCTMarkdownUtils *markdownUtils = [self getMarkdownUtils];
@@ -65,6 +75,15 @@
       // swizzle updateLocalData
       SEL originalSelector = @selector(updateLocalData);
       SEL swizzledSelector = @selector(markdown_updateLocalData);
+      Method originalMethod = class_getInstanceMethod(cls, originalSelector);
+      Method swizzledMethod = class_getInstanceMethod(cls, swizzledSelector);
+      method_exchangeImplementations(originalMethod, swizzledMethod);
+    }
+
+    {
+      // swizzle textOf
+      SEL originalSelector = @selector(textOf:equals:);
+      SEL swizzledSelector = @selector(markdown_textOf:equals:);
       Method originalMethod = class_getInstanceMethod(cls, originalSelector);
       Method swizzledMethod = class_getInstanceMethod(cls, swizzledSelector);
       method_exchangeImplementations(originalMethod, swizzledMethod);
