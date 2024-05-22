@@ -66,10 +66,10 @@ function setCursorPosition(target: HTMLElement, start: number, end: number | nul
         // 3. Caret at the end of whole input, when pressing enter
         // 4. All other placements
         if (prevChar === '\n' && prevTextLength !== undefined && prevTextLength < textCharacters.length) {
-          if (nextChar !== '\n') {
+          if (nextChar !== '\n' && textNodes?.[i - 1]?.data !== '```') {
             range.setStart(textNodes[i + 1] as Node, 0);
-          } else if (i !== textNodes.length - 1) {
-            range.setStart(textNodes[i] as Node, 1);
+          } else if (i !== textNodes.length - 1 && !(textNodes?.[i + 1]?.data === '```' && nextChar === '`')) {
+            range.setStart(textNode as Node, 1);
           } else {
             range.setStart(textNode, start - charCount);
           }
