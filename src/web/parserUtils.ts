@@ -219,13 +219,7 @@ function parseText(target: HTMLElement, text: string, curosrPositionIndex: numbe
   //   }
   // }
 
-  let textContent = text;
-  if (text[text.length - 1] === '\n') {
-    textContent = text.substring(0, text.length - 1);
-  }
-
-  const lines = textContent.split('\n');
-  console.log(lines);
+  const lines = text.split('\n');
   lines.forEach((line, index) => {
     const p = document.createElement('p');
     Object.assign(p.style, {
@@ -235,11 +229,9 @@ function parseText(target: HTMLElement, text: string, curosrPositionIndex: numbe
     });
 
     if (line === '') {
-      p.textContent = '\n';
-    } else if (index === lines.length - 1) {
-      p.textContent = `${line}`;
+      p.appendChild(document.createElement('br'));
     } else {
-      p.textContent = `${line}\n`;
+      p.textContent = `${line}`;
     }
 
     targetElement.appendChild(p);
@@ -247,11 +239,9 @@ function parseText(target: HTMLElement, text: string, curosrPositionIndex: numbe
 
   moveCursor(isFocused, alwaysMoveCursorToTheEnd, cursorPosition, target);
 
-  console.log('---', targetElement.textContent?.split('\n'));
-
   CursorUtils.setPrevText(target);
 
-  return {text: target.textContent, cursorPosition: cursorPosition || 0};
+  return {text, cursorPosition: cursorPosition || 0};
 }
 
 export {parseText, parseRangesToHTMLNodes};

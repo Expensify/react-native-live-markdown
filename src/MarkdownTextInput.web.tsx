@@ -335,6 +335,19 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           return;
         }
 
+        let test = '';
+        const childNodes = e.target.childNodes ?? [];
+        childNodes.forEach((node, index) => {
+          let textContent = node.textContent ?? '';
+          if (index === childNodes.length - 1 && textContent.slice(-2) === '\n\n') {
+            textContent = textContent.slice(0, -1);
+          }
+          test += textContent;
+          if (index < childNodes.length - 1) {
+            test += '\n';
+          }
+        });
+
         let text = '';
         const nativeEvent = e.nativeEvent as MarkdownNativeEvent;
         switch (nativeEvent.inputType) {
@@ -345,7 +358,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
             text = redo(divRef.current);
             break;
           default:
-            text = parseText(divRef.current, e.target.textContent, processedMarkdownStyle).text;
+            text = parseText(divRef.current, test, processedMarkdownStyle).text;
         }
         if (pasteRef?.current) {
           pasteRef.current = false;
@@ -531,23 +544,21 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       divRef.current = r;
     };
 
-    useClientEffect(
-      function parseAndStyleValue() {
-        if (!divRef.current || processedValue === divRef.current.innerText || value === divRef.current.innerText) {
-          return;
-        }
+    useClientEffect(function parseAndStyleValue() {
+      if (!divRef.current || processedValue === divRef.current.textContent) {
+        return;
+      }
+      console.log('XA', processedValue?.length, divRef.current.textContent);
 
-        if (value === undefined) {
-          parseText(divRef.current, divRef.current.textContent, processedMarkdownStyle);
-          return;
-        }
+      if (value === undefined) {
+        parseText(divRef.current, divRef.current.textContent, processedMarkdownStyle);
+        return;
+      }
 
-        const text = processedValue !== undefined ? processedValue : '';
-        parseText(divRef.current, text, processedMarkdownStyle);
-        updateTextColor(divRef.current, value);
-      },
-      [multiline, processedMarkdownStyle, processedValue],
-    );
+      const text = processedValue !== undefined ? processedValue : '';
+      parseText(divRef.current, text, processedMarkdownStyle);
+      updateTextColor(divRef.current, value);
+    }, []);
 
     useClientEffect(
       function adjustHeight() {
