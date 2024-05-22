@@ -323,6 +323,29 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       }
     }, [multiline, onContentSizeChange]);
 
+    const parseInnerHTMLToText = useCallback((target: HTMLElement): string => {
+      let text = '';
+      const childNodes = target.childNodes ?? [];
+      childNodes.forEach((node, index) => {
+        const nodeCopy = node.cloneNode(true) as HTMLElement;
+
+        if (index < childNodes.length - 1) {
+          nodeCopy.innerHTML = nodeCopy.innerHTML.replaceAll('<br>', '\n');
+        }
+
+        let textContent = nodeCopy.textContent ?? '';
+
+        if (textContent.slice(-2) === '\n\n') {
+          textContent = textContent.slice(0, -1);
+        }
+        text += textContent;
+        if (/[^\n]/.test(textContent) && index < childNodes.length - 1) {
+          text += '\n';
+        }
+      });
+      return text;
+    }, []);
+
     const handleOnChangeText = useCallback(
       (e: SyntheticEvent<HTMLDivElement>) => {
         if (!divRef.current || !(e.target instanceof HTMLElement)) {
@@ -335,19 +358,6 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           return;
         }
 
-        let test = '';
-        const childNodes = e.target.childNodes ?? [];
-        childNodes.forEach((node, index) => {
-          let textContent = node.textContent ?? '';
-          if (index === childNodes.length - 1 && textContent.slice(-2) === '\n\n') {
-            textContent = textContent.slice(0, -1);
-          }
-          test += textContent;
-          if (index < childNodes.length - 1) {
-            test += '\n';
-          }
-        });
-
         let text = '';
         const nativeEvent = e.nativeEvent as MarkdownNativeEvent;
         switch (nativeEvent.inputType) {
@@ -358,7 +368,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
             text = redo(divRef.current);
             break;
           default:
-            text = parseText(divRef.current, test, processedMarkdownStyle).text;
+            text = parseText(divRef.current, parseInnerHTMLToText(e.target), processedMarkdownStyle).text;
         }
         if (pasteRef?.current) {
           pasteRef.current = false;
@@ -379,7 +389,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
         handleContentSizeChange();
       },
-      [updateTextColor, handleContentSizeChange, onChange, onChangeText, undo, redo, parseText, processedMarkdownStyle, updateSelection, setEventProps],
+      [updateTextColor, onChange, onChangeText, handleContentSizeChange, undo, redo, parseText, parseInnerHTMLToText, processedMarkdownStyle, updateSelection, setEventProps],
     );
 
     const handleKeyPress = useCallback(

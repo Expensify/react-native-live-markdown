@@ -231,7 +231,7 @@ function parseText(target: HTMLElement, text: string, curosrPositionIndex: numbe
     if (line === '') {
       p.appendChild(document.createElement('br'));
     } else {
-      p.textContent = `${line}`;
+      p.appendChild(document.createTextNode(line));
     }
 
     targetElement.appendChild(p);
