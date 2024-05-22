@@ -76,11 +76,6 @@ type Dimensions = {
 
 let focusTimeout: NodeJS.Timeout | null = null;
 
-// Removes one '\n' from the end of the string that were added by contentEditable div
-function normalizeValue(value: string) {
-  return value.replace(/\n$/, '');
-}
-
 // If an Input Method Editor is processing key input, the 'keyCode' is 229.
 // https://www.w3.org/TR/uievents/#determine-keydown-keyup-keyCode
 function isEventComposing(nativeEvent: globalThis.KeyboardEvent) {
@@ -185,7 +180,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
     const setEventProps = useCallback((e: NativeSyntheticEvent<any>) => {
       if (divRef.current) {
-        const text = normalizeValue(divRef.current.textContent || '');
+        const text = textContent.current;
         if (e.target) {
           // TODO: change the logic here so every event have value property
           (e.target as unknown as HTMLInputElement).value = text;
@@ -215,7 +210,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     const processedMarkdownStyle = useMemo(() => {
       const newMarkdownStyle = processMarkdownStyle(markdownStyle);
       if (divRef.current) {
-        parseText(divRef.current, divRef.current.textContent, newMarkdownStyle, null, false);
+        parseText(divRef.current, textContent.current, newMarkdownStyle, null, false);
       }
       return newMarkdownStyle;
     }, [markdownStyle, parseText]);
@@ -329,16 +324,16 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       const childNodes = target.childNodes ?? [];
       childNodes.forEach((node, index) => {
         const nodeCopy = node.cloneNode(true) as HTMLElement;
-
         if (index < childNodes.length - 1) {
           nodeCopy.innerHTML = nodeCopy.innerHTML.replaceAll('<br>', '\n');
         }
-
         let nodeText = nodeCopy.textContent ?? '';
 
-        if (nodeText.slice(-2) === '\n\n') {
+        // We want to remove one additional '\n' from the end of the text that is added by contentEditable div when adding newlines at the end of the current content
+        if (nodeText.length > 2 && nodeText[-3] !== '\n' && nodeText.slice(-2) === '\n\n') {
           nodeText = nodeText.slice(0, -1);
         }
+
         text += nodeText;
         if (/[^\n]/.test(nodeText) && index < childNodes.length - 1) {
           text += '\n';
@@ -517,7 +512,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         if (!onClick || !divRef.current) {
           return;
         }
-        (e.target as HTMLInputElement).value = normalizeValue(divRef.current.textContent || '');
+        (e.target as HTMLInputElement).value = textContent.current;
         onClick(e);
       },
       [onClick, updateSelection],
