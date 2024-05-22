@@ -1,5 +1,6 @@
 import * as CursorUtils from './cursorUtils';
 import type * as StyleUtilsTypes from '../styleUtils';
+import * as StyleUtils from '../styleUtils';
 import * as BrowserUtils from './browserUtils';
 
 type PartialMarkdownStyle = StyleUtilsTypes.PartialMarkdownStyle;
@@ -188,15 +189,15 @@ function moveCursor(isFocused: boolean, alwaysMoveCursorToTheEnd: boolean, curso
 function hidePreBlockBackgrounds(target: HTMLElement) {
   const preBlocks = [...target.querySelectorAll('*[data-type="pre"]')];
   const preBlockBackgrounds = [...target.querySelectorAll('.pre-block-background')];
-  for (let i = preBlocks.length - 1; i < preBlockBackgrounds.length - 1; i++) {
+  for (let i = preBlocks.length - 1; i <= preBlockBackgrounds.length - 1; i++) {
     preBlockBackgrounds[i]?.remove();
   }
+
+  return [preBlocks, preBlockBackgrounds] as [Element[], Element[]];
 }
 
 function handlePreBlockBackground(target: HTMLElement, markdownStyle: PartialMarkdownStyle = {}) {
-  hidePreBlockBackgrounds(target);
-  const preBlocks = [...target.querySelectorAll('*[data-type="pre"]')];
-  const preBlockBackgrounds = [...target.querySelectorAll('.pre-block-background')];
+  const [preBlocks, preBlockBackgrounds] = hidePreBlockBackgrounds(target);
   if (!preBlocks) return;
 
   preBlocks.forEach((pre) => {
@@ -218,7 +219,7 @@ function handlePreBlockBackground(target: HTMLElement, markdownStyle: PartialMar
     const span = (preBlockBackgrounds?.[preBlocks.indexOf(pre)] as HTMLSpanElement | null) ?? document.createElement('span');
     const {pre: preStyle} = markdownStyle;
     // eslint-disable-next-line
-    const transform = parseInt((preStyle?.padding?.toString() ?? '2').replace('px', '')) + parseInt((preStyle?.borderWidth?.toString() ?? '1').replace('px', '')) + 'px';
+    const transform = StyleUtils.getStyleNumericValue(preStyle?.padding?.toString() ?? '2') + StyleUtils.getStyleNumericValue(preStyle?.borderWidth?.toString() ?? '1') + 'px';
     span.classList.add('pre-block-background');
     Object.assign(span.style, {
       width: `${width}px`,

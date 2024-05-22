@@ -300,8 +300,8 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           return;
         }
 
-        const contained = CursorUtils.restrictRanges(divRef.current, value ?? '');
-        const newSelection = predefinedSelection && contained ? predefinedSelection : CursorUtils.getCurrentCursorPosition(divRef.current);
+        const isContained = CursorUtils.restrictRanges(divRef.current, value ?? '');
+        const newSelection = predefinedSelection && isContained ? predefinedSelection : CursorUtils.getCurrentCursorPosition(divRef.current);
 
         if (newSelection && (!contentSelection.current || contentSelection.current.start !== newSelection.start || contentSelection.current.end !== newSelection.end)) {
           updateRefSelectionVariables(newSelection);
@@ -423,11 +423,10 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         }
 
         // Ensure user can't move into background spans with arrow keys
-        const cursorPosition = CursorUtils.getCurrentCursorPosition(divRef.current);
         if (
           (e.key === 'ArrowDown' || e.key === 'ArrowRight') &&
-          cursorPosition?.end === (divRef.current as HTMLInputElement).value?.length &&
-          cursorPosition?.end === cursorPosition?.start
+          contentSelection.current?.end === (divRef.current as HTMLInputElement).value?.length &&
+          contentSelection.current?.end === contentSelection.current?.start
         ) {
           e.preventDefault();
           return;

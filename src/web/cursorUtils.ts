@@ -162,7 +162,7 @@ function scrollCursorIntoView(target: HTMLInputElement) {
 
 function restrictRanges(target: HTMLElement, value: string) {
   const rootSpan = target.querySelector('span.root');
-  let contained = true;
+  let isContained = true;
   if (rootSpan) {
     let range: Range | null;
 
@@ -173,7 +173,7 @@ function restrictRanges(target: HTMLElement, value: string) {
     }
 
     if (range && !(range.commonAncestorContainer === rootSpan || rootSpan.contains(range.commonAncestorContainer))) {
-      contained = false;
+      isContained = false;
       // The caret or selection is outside rootSpan, move it
       if (range.collapsed) {
         // The range is a caret
@@ -191,7 +191,7 @@ function restrictRanges(target: HTMLElement, value: string) {
     }
   }
 
-  return contained;
+  return isContained;
 }
 
 export {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition, setPrevText, removeSelection, scrollCursorIntoView, restrictRanges};

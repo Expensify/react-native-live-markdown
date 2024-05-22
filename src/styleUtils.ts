@@ -84,6 +84,10 @@ function mergeMarkdownStyleWithDefault(input: PartialMarkdownStyle | undefined):
   return output;
 }
 
+function getStyleNumericValue(style: string) {
+  return parseInt(style.replace('px', ''), 8);
+}
+
 export type {PartialMarkdownStyle};
 
-export {mergeMarkdownStyleWithDefault};
+export {mergeMarkdownStyleWithDefault, getStyleNumericValue};

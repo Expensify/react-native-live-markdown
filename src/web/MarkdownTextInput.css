@@ -23,7 +23,7 @@
   content: attr(placeholder);
 }
 
-*[data-type='pre'] + span[data-type='syntax'],
-span[data-type='syntax']:has(+ span[data-type='pre']) {
+.react-native-live-markdown-input-multiline *[data-type='pre'] + span[data-type='syntax'],
+.react-native-live-markdown-input-multiline span[data-type='syntax']:has(+ span[data-type='pre']) {
   line-height: 1.6;
 }
