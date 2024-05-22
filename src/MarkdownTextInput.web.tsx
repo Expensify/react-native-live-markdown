@@ -62,6 +62,7 @@ interface MarkdownTextInputProps extends TextInputProps {
 
 interface MarkdownNativeEvent extends Event {
   inputType: string;
+  data: string;
 }
 
 type Selection = {
@@ -337,14 +338,14 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         }
         const changedText = e.target.innerText;
 
-        if (compositionRef.current) {
-          updateTextColor(divRef.current, changedText);
+        const nativeEvent = e.nativeEvent as MarkdownNativeEvent;
+        if (compositionRef.current && (nativeEvent.inputType !== 'insertCompositionText' || nativeEvent.data !== '*')) {
+          updateTextColor(divRef.current, e.target.innerText);
           compositionRef.current = false;
           return;
         }
 
         let text = '';
-        const nativeEvent = e.nativeEvent as MarkdownNativeEvent;
         switch (nativeEvent.inputType) {
           case 'historyUndo':
             text = undo(divRef.current);
