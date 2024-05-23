@@ -4,6 +4,7 @@ import {ExpensiMark} from 'expensify-common/lib/ExpensiMark';
 import _ from 'underscore';
 
 type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'emoji' | 'mention-here' | 'mention-user' | 'mention-report' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax';
+const styleChangingTypes: MarkdownType[] = ['bold', 'italic', 'strikethrough'];
 type Range = {
   type: MarkdownType;
   start: number;
@@ -217,26 +218,77 @@ function sortRanges(ranges: Range[]) {
   return ranges.sort((a, b) => a.start - b.start || b.length - a.length || getTagPriority(b.type) - getTagPriority(a.type) || 0);
 }
 
-function groupRanges(ranges: Range[]) {
+function groupAndSplitRanges(ranges: Range[]) {
   const lastVisibleRangeIndex: {[key in MarkdownType]?: number} = {};
 
   return ranges.reduce((acc, range) => {
-    const start = range.start;
-    const end = range.start + range.length;
-
     const rangeWithSameStyleIndex = lastVisibleRangeIndex[range.type];
     const sameStyleRange = rangeWithSameStyleIndex !== undefined ? acc[rangeWithSameStyleIndex] : undefined;
 
-    if (sameStyleRange && sameStyleRange.start <= start && sameStyleRange.start + sameStyleRange.length >= end && range.length > 1) {
+    if (sameStyleRange && isInRange(sameStyleRange, range) && range.length > 1) {
       // increment depth of overlapping range
       sameStyleRange.depth = (sameStyleRange.depth || 1) + 1;
-    } else {
-      lastVisibleRangeIndex[range.type] = acc.length;
-      acc.push(range);
+      return acc;
     }
+
+    if (range.type === 'emoji') {
+      const splitted: Range[] = [];
+      const indexesToRemove: Array<number | undefined> = [];
+
+      const TypesRange = styleChangingTypes.flatMap((type) => {
+        const index = lastVisibleRangeIndex[type];
+        if (index !== undefined) {
+          return acc[index]!;
+        }
+        return [];
+      });
+
+      sortRanges(TypesRange).forEach((r) => {
+        if (!r || !isInRange(r, range)) {
+          return;
+        }
+        const newRanges = splitRange(r, range);
+        acc.push(newRanges[0]);
+        splitted.push(newRanges[1]);
+
+        // update lastVisibleRangeIndex
+        indexesToRemove.push(lastVisibleRangeIndex[r.type]);
+      });
+
+      const filtered = acc.filter((__, i) => !indexesToRemove.includes(i));
+
+      lastVisibleRangeIndex.emoji = filtered.length;
+      filtered.push(range);
+      // add inverted splitted ranges to acc
+      splitted.reverse().forEach((r) => {
+        lastVisibleRangeIndex[r.type] = filtered.length;
+        filtered.push(r);
+      });
+      return filtered;
+    }
+
+    lastVisibleRangeIndex[range.type] = acc.length;
+    acc.push(range);
 
     return acc;
   }, [] as Range[]);
+}
+
+function isInRange(outer?: Range, range?: Range) {
+  if (!outer || !range) {
+    return false;
+  }
+  return outer.start <= range.start && outer.start + outer.length >= range.start + range.length;
+}
+
+function splitRange(rangeToSplit: Range, range: Range): [Range, Range] {
+  const index = range.start;
+  const splitLength = range.length;
+
+  return [
+    {...rangeToSplit, length: index - rangeToSplit.start},
+    {...rangeToSplit, start: index + splitLength, length: rangeToSplit.start + rangeToSplit.length - index - splitLength},
+  ];
 }
 
 function parseExpensiMarkToRanges(markdown: string): Range[] {
@@ -253,7 +305,7 @@ function parseExpensiMarkToRanges(markdown: string): Range[] {
       );
     }
     const sortedRanges = sortRanges(ranges);
-    const groupedRanges = groupRanges(sortedRanges);
+    const groupedRanges = groupAndSplitRanges(sortedRanges);
     return groupedRanges;
   } catch (error) {
     console.error(error);
