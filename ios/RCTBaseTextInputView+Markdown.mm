@@ -1,3 +1,8 @@
+// This guard prevent this file to be compiled in the new architecture.
+#ifndef RCT_NEW_ARCH_ENABLED
+
+#import <React/RCTUITextField.h>
+#import <RNLiveMarkdown/RCTUITextView+Markdown.h>
 #import <RNLiveMarkdown/RCTBaseTextInputView+Markdown.h>
 #import <RNLiveMarkdown/RCTMarkdownUtils.h>
 #import <objc/message.h>
@@ -14,9 +19,11 @@
 
 - (void)markdown_setAttributedText:(NSAttributedString *)attributedText
 {
-  RCTMarkdownUtils *markdownUtils = [self getMarkdownUtils];
-  if (markdownUtils != nil) {
-    attributedText = [markdownUtils parseMarkdown:attributedText withAttributes:self.backedTextInputView.defaultTextAttributes];
+  if (![self.backedTextInputView isKindOfClass:[RCTUITextView class]]) {
+    RCTMarkdownUtils *markdownUtils = [self getMarkdownUtils];
+    if (markdownUtils != nil) {
+      attributedText = [markdownUtils parseMarkdown:attributedText withAttributes:self.backedTextInputView.defaultTextAttributes];
+    }
   }
 
   // Call the original method
@@ -31,29 +38,6 @@
   }
 
   return [self markdown_textOf:newText equals:oldText];
-}
-
-- (void)markdown_updateLocalData
-{
-  RCTMarkdownUtils *markdownUtils = [self getMarkdownUtils];
-  if (markdownUtils != nil) {
-    id<RCTBackedTextInputViewProtocol> backedTextInputView = self.backedTextInputView;
-    NSAttributedString *oldAttributedText = backedTextInputView.attributedText;
-    NSAttributedString *newAttributedText = [markdownUtils parseMarkdown:oldAttributedText withAttributes:backedTextInputView.defaultTextAttributes];
-    UITextRange *range = backedTextInputView.selectedTextRange;
-
-    // update attributed text without emitting onSelectionChange event
-    id<RCTBackedTextInputDelegate> delegate = backedTextInputView.textInputDelegate;
-    backedTextInputView.textInputDelegate = nil;
-    [backedTextInputView setAttributedText:newAttributedText];
-    backedTextInputView.textInputDelegate = delegate;
-
-    // restore original selection and emit onSelectionChange event
-    [backedTextInputView setSelectedTextRange:range notifyDelegate:YES];
-  }
-
-  // Call the original method
-  [self markdown_updateLocalData];
 }
 
 + (void)load
@@ -72,15 +56,6 @@
     }
 
     {
-      // swizzle updateLocalData
-      SEL originalSelector = @selector(updateLocalData);
-      SEL swizzledSelector = @selector(markdown_updateLocalData);
-      Method originalMethod = class_getInstanceMethod(cls, originalSelector);
-      Method swizzledMethod = class_getInstanceMethod(cls, swizzledSelector);
-      method_exchangeImplementations(originalMethod, swizzledMethod);
-    }
-
-    {
       // swizzle textOf
       SEL originalSelector = @selector(textOf:equals:);
       SEL swizzledSelector = @selector(markdown_textOf:equals:);
@@ -92,3 +67,5 @@
 }
 
 @end
+
+#endif /* RCT_NEW_ARCH_ENABLED */

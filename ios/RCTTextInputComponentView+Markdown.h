@@ -6,6 +6,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@interface RCTTextInputComponentView (Private)
+- (void)_setAttributedString:(NSAttributedString *)attributedString;
+- (BOOL)_textOf:(NSAttributedString *)newText equals:(NSAttributedString *)oldText;
+@end
+
 @interface RCTTextInputComponentView (Markdown)
 
 @property(nonatomic, nullable, getter=getMarkdownUtils) RCTMarkdownUtils *markdownUtils;
@@ -13,8 +18,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)markdown__setAttributedString:(NSAttributedString *)attributedString;
 
 - (BOOL)markdown__textOf:(NSAttributedString *)newText equals:(NSAttributedString *)oldText;
-
-- (void)_setAttributedString:(NSAttributedString *)attributedString;
 
 @end
 

@@ -9,6 +9,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) NSMutableArray<NSDictionary *> *blockquoteRangesAndLevels;
 
 - (NSAttributedString *)parseMarkdown:(nullable NSAttributedString *)input withAttributes:(nullable NSDictionary<NSAttributedStringKey, id>*)attributes;
+- (void)parseMarkdown:(nullable NSMutableAttributedString *)attributedString;
 
 @end
 

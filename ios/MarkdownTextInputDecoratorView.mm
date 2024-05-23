@@ -3,7 +3,6 @@
 
 #import <RNLiveMarkdown/MarkdownLayoutManager.h>
 #import <RNLiveMarkdown/MarkdownTextInputDecoratorView.h>
-#import <RNLiveMarkdown/RCTBackedTextFieldDelegateAdapter+Markdown.h>
 #import <RNLiveMarkdown/RCTUITextView+Markdown.h>
 
 #ifdef RCT_NEW_ARCH_ENABLED
@@ -23,7 +22,6 @@
   __weak RCTBaseTextInputView *_textInput;
 #endif /* RCT_NEW_ARCH_ENABLED */
   __weak UIView<RCTBackedTextInputViewProtocol> *_backedTextInputView;
-  __weak RCTBackedTextFieldDelegateAdapter *_adapter;
   __weak RCTUITextView *_textView;
 }
 
@@ -65,9 +63,7 @@
 
   [_textInput setMarkdownUtils:_markdownUtils];
   if ([_backedTextInputView isKindOfClass:[RCTUITextField class]]) {
-    RCTUITextField *textField = (RCTUITextField *)_backedTextInputView;
-    _adapter = [textField valueForKey:@"textInputDelegateAdapter"];
-    [_adapter setMarkdownUtils:_markdownUtils];
+    // Do nothing
   } else if ([_backedTextInputView isKindOfClass:[RCTUITextView class]]) {
     _textView = (RCTUITextView *)_backedTextInputView;
     [_textView setMarkdownUtils:_markdownUtils];
@@ -85,9 +81,6 @@
   if (_textInput != nil) {
     [_textInput setMarkdownUtils:nil];
   }
-  if (_adapter != nil) {
-    [_adapter setMarkdownUtils:nil];
-  }
   if (_textView != nil) {
     [_textView setMarkdownUtils:nil];
     if (_textView.layoutManager != nil && [object_getClass(_textView.layoutManager) isEqual:[MarkdownLayoutManager class]]) {
@@ -103,11 +96,17 @@
   [_markdownUtils setMarkdownStyle:markdownStyle];
 
   // apply new styles
+  if (_textView != nil) {
+    // We want to use `textStorage` for applying markdown when possible. Currently it's only available for UITextView
+    [_textView textDidChange];
+  } else {
+    // Set attributed string for all other types of views
 #ifdef RCT_NEW_ARCH_ENABLED
-  [_textInput _setAttributedString:_backedTextInputView.attributedText];
+    [_textInput _setAttributedString:_backedTextInputView.attributedText];
 #else
-  [_textInput setAttributedText:_textInput.attributedText];
+    [_textInput setAttributedText:_textInput.attributedText];
 #endif /* RCT_NEW_ARCH_ENABLED */
+  }
 }
 
 @end
