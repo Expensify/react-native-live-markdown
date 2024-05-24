@@ -339,8 +339,8 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         const changedText = e.target.innerText;
 
         const nativeEvent = e.nativeEvent as MarkdownNativeEvent;
-        if (compositionRef.current && (nativeEvent.inputType !== 'insertCompositionText' || nativeEvent.data !== '*')) {
-          updateTextColor(divRef.current, e.target.innerText);
+        if (compositionRef.current && (nativeEvent.inputType === 'insertCompositionText' || nativeEvent.data !== '*')) {
+          updateTextColor(divRef.current, changedText);
           compositionRef.current = false;
           return;
         }
