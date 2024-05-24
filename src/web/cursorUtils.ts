@@ -1,5 +1,7 @@
 import * as BrowserUtils from './browserUtils';
 
+let prevTextLength: number | undefined;
+
 function findTextNodes(textNodes: Text[], node: ChildNode) {
   if (node.nodeType === Node.TEXT_NODE) {
     textNodes.push(node as Text);
@@ -13,12 +15,38 @@ function findTextNodes(textNodes: Text[], node: ChildNode) {
   }
 }
 
+function setPrevText(target: HTMLElement) {
+  let text = [];
+  const textNodes: Text[] = [];
+  findTextNodes(textNodes, target);
+  text = textNodes
+    .map((e) => e.nodeValue ?? '')
+    ?.join('')
+    ?.split('');
+
+  prevTextLength = text.length;
+}
+
 function setCursorPosition(target: HTMLElement, start: number, end: number | null = null) {
+  // We don't want to move the cursor if the target is not focused
+  if (target !== document.activeElement) {
+    return;
+  }
+
   const range = document.createRange();
   range.selectNodeContents(target);
 
   const textNodes: Text[] = [];
   findTextNodes(textNodes, target);
+
+  // These are utilities for handling the boundary cases (especially onEnter)
+  // prevChar & nextChar are characters before & after the target cursor position
+  const textCharacters = textNodes
+    .map((e) => e.nodeValue ?? '')
+    ?.join('')
+    ?.split('');
+  const prevChar = textCharacters?.[start - 1] ?? '';
+  const nextChar = textCharacters?.[start] ?? '';
 
   let charCount = 0;
   let startNode: Text | null = null;
@@ -31,7 +59,23 @@ function setCursorPosition(target: HTMLElement, start: number, end: number | nul
 
       if (!startNode && start >= charCount && (start <= nextCharCount || (start === nextCharCount && i < n - 1))) {
         startNode = textNode;
-        range.setStart(textNode, start - charCount);
+
+        // There are 4 cases to consider here:
+        // 1. Caret in front of a character, when pressing enter
+        // 2. Caret at the end of a line (not last one)
+        // 3. Caret at the end of whole input, when pressing enter
+        // 4. All other placements
+        if (prevChar === '\n' && prevTextLength !== undefined && prevTextLength < textCharacters.length) {
+          if (nextChar !== '\n') {
+            range.setStart(textNodes[i + 1] as Node, 0);
+          } else if (i !== textNodes.length - 1) {
+            range.setStart(textNodes[i] as Node, 1);
+          } else {
+            range.setStart(textNode, start - charCount);
+          }
+        } else {
+          range.setStart(textNode, start - charCount);
+        }
         if (!end) {
           break;
         }
@@ -95,7 +139,7 @@ function scrollCursorIntoView(target: HTMLInputElement) {
   }
 
   const selection = window.getSelection();
-  if (!selection) {
+  if (!selection || (selection && selection.rangeCount === 0)) {
     return;
   }
 
@@ -116,4 +160,4 @@ function scrollCursorIntoView(target: HTMLInputElement) {
   }
 }
 
-export {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition, removeSelection, scrollCursorIntoView};
+export {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition, setPrevText, removeSelection, scrollCursorIntoView};

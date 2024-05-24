@@ -27,9 +27,7 @@ public class MarkdownUtils {
     SoLoader.loadLibrary("livemarkdown");
   }
 
-  @ThreadConfined(UI)
-  private static String parseMarkdown(String input) {
-    UiThreadUtil.assertOnUiThread();
+  private synchronized static String parseMarkdown(String input) {
     return nativeParseMarkdown(input);
   }
 
@@ -105,6 +103,10 @@ public class MarkdownUtils {
         setSpan(ssb, new MarkdownForegroundColorSpan(mMarkdownStyle.getMentionUserColor()), start, end);
         setSpan(ssb, new MarkdownBackgroundColorSpan(mMarkdownStyle.getMentionUserBackgroundColor()), start, end);
         break;
+      case "mention-report":
+        setSpan(ssb, new MarkdownForegroundColorSpan(mMarkdownStyle.getMentionReportColor()), start, end);
+        setSpan(ssb, new MarkdownBackgroundColorSpan(mMarkdownStyle.getMentionReportBackgroundColor()), start, end);
+        break;
       case "syntax":
         setSpan(ssb, new MarkdownForegroundColorSpan(mMarkdownStyle.getSyntaxColor()), start, end);
         break;
@@ -114,11 +116,13 @@ public class MarkdownUtils {
         break;
       case "code":
         setSpan(ssb, new MarkdownFontFamilySpan(mMarkdownStyle.getCodeFontFamily(), mAssetManager), start, end);
+        setSpan(ssb, new MarkdownFontSizeSpan(mMarkdownStyle.getCodeFontSize()), start, end);
         setSpan(ssb, new MarkdownForegroundColorSpan(mMarkdownStyle.getCodeColor()), start, end);
         setSpan(ssb, new MarkdownBackgroundColorSpan(mMarkdownStyle.getCodeBackgroundColor()), start, end);
         break;
       case "pre":
         setSpan(ssb, new MarkdownFontFamilySpan(mMarkdownStyle.getPreFontFamily(), mAssetManager), start, end);
+        setSpan(ssb, new MarkdownFontSizeSpan(mMarkdownStyle.getPreFontSize()), start, end);
         setSpan(ssb, new MarkdownForegroundColorSpan(mMarkdownStyle.getPreColor()), start, end);
         setSpan(ssb, new MarkdownBackgroundColorSpan(mMarkdownStyle.getPreBackgroundColor()), start, end);
         break;

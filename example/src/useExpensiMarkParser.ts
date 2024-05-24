@@ -227,17 +227,22 @@ function groupRanges(ranges: Range[]) {
 function parseExpensiMarkToRanges(markdown: string): Range[] {
   'worklet';
 
-  const html = parseMarkdownToHTML(markdown);
-  const tokens = parseHTMLToTokens(html);
-  const tree = parseTokensToTree(tokens);
-  const [text, ranges] = parseTreeToTextAndRanges(tree);
-  if (text !== markdown) {
-    // text mismatch, don't return any ranges
+  try {
+    const html = parseMarkdownToHTML(markdown);
+    const tokens = parseHTMLToTokens(html);
+    const tree = parseTokensToTree(tokens);
+    const [text, ranges] = parseTreeToTextAndRanges(tree);
+    if (text !== markdown) {
+      // text mismatch, don't return any ranges
+      return [];
+    }
+    const sortedRanges = sortRanges(ranges);
+    const groupedRanges = groupRanges(sortedRanges);
+    return groupedRanges;
+  } catch (e) {
+    console.log(e.message);
     return [];
   }
-  const sortedRanges = sortRanges(ranges);
-  const groupedRanges = groupRanges(sortedRanges);
-  return groupedRanges;
 }
 
 function useExpensiMarkParser() {

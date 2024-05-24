@@ -1,34 +1,37 @@
 package com.expensify.livemarkdown;
 
-import androidx.annotation.NonNull;
-
 import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.UIManager;
+import com.facebook.react.fabric.FabricUIManager;
+import com.facebook.react.uimanager.UIManagerHelper;
+import com.facebook.react.uimanager.common.UIManagerType;
 import com.facebook.soloader.SoLoader;
 
 import java.util.Objects;
 
-public class LiveMarkdownModule extends com.expensify.livemarkdown.LiveMarkdownModuleSpec {
+public class LiveMarkdownModule extends NativeLiveMarkdownModuleSpec {
   static {
     SoLoader.loadLibrary("livemarkdown");
   }
 
-  public static final String NAME = "LiveMarkdownModule";
+  private NativeProxy mNativeProxy;
+  public LiveMarkdownModule(ReactApplicationContext reactContext) {
+    super(reactContext);
 
-  LiveMarkdownModule(ReactApplicationContext context) {
-    super(context);
+    this.mNativeProxy = new NativeProxy();
   }
 
   @Override
-  @NonNull
-  public String getName() {
-    return NAME;
-  }
-
-  @ReactMethod(isBlockingSynchronousMethod = true)
   public boolean install() {
+    if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
+      FabricUIManager uiManager =
+        (FabricUIManager) UIManagerHelper.getUIManager(getReactApplicationContext(), UIManagerType.FABRIC);
+      mNativeProxy.createCommitHook(uiManager);
+    }
+
     long jsiRuntime = Objects.requireNonNull(getReactApplicationContext().getJavaScriptContextHolder()).get();
     injectJSIBindings(jsiRuntime);
+
     return true;
   }
 

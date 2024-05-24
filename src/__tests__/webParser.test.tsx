@@ -166,10 +166,6 @@ describe('quote', () => {
   test('with multiple spaces', () => {
     expect('>      Hello world!').toBeParsedAsHTML('<span class="blockquote"><span class="syntax">&gt;</span>      Hello world!</span>');
   });
-
-  test('without space', () => {
-    expect('>Hello world!').toBeParsedAsHTML('<span class="blockquote"><span class="syntax">&gt;</span>Hello world!</span>');
-  });
 });
 
 test('multiple blockquotes', () => {
@@ -185,8 +181,8 @@ test('separate blockquotes', () => {
 });
 
 test('nested blockquotes', () => {
-  expect('>>>> Lorem ipsum dolor sit amet').toBeParsedAsHTML(
-    '<span class="blockquote"><span class="blockquote"><span class="blockquote"><span class="blockquote"><span class="syntax">&gt;</span><span class="syntax">&gt;</span><span class="syntax">&gt;</span><span class="syntax">&gt;</span> Lorem ipsum dolor sit amet</span></span></span></span>',
+  expect('> > > > Lorem ipsum dolor sit amet').toBeParsedAsHTML(
+    '<span class="blockquote"><span class="blockquote"><span class="blockquote"><span class="blockquote"><span class="syntax">&gt;</span> <span class="syntax">&gt;</span> <span class="syntax">&gt;</span> <span class="syntax">&gt;</span> Lorem ipsum dolor sit amet</span></span></span></span>',
   );
 });
 
@@ -201,16 +197,12 @@ test('nested bold and italic', () => {
 });
 
 describe('nested heading in blockquote', () => {
-  test('without spaces', () => {
-    expect('># Hello world').toBeParsedAsHTML('<span class="blockquote"><span class="syntax">&gt;</span><span class="syntax"># </span><span class="h1">Hello world</span></span>');
-  });
-
   test('with single space', () => {
     expect('> # Hello world').toBeParsedAsHTML('<span class="blockquote"><span class="syntax">&gt;</span> <span class="syntax"># </span><span class="h1">Hello world</span></span>');
   });
 
   test('with multiple spaces after #', () => {
-    expect('>#    Hello world').toBeParsedAsHTML('<span class="blockquote"><span class="syntax">&gt;</span><span class="syntax"># </span><span class="h1">   Hello world</span></span>');
+    expect('> #    Hello world').toBeParsedAsHTML('<span class="blockquote"><span class="syntax">&gt;</span> <span class="syntax"># </span><span class="h1">   Hello world</span></span>');
   });
 });
 

@@ -3,7 +3,7 @@
 import {ExpensiMark} from 'expensify-common/lib/ExpensiMark';
 import _ from 'underscore';
 
-type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'emoji' | 'mention-here' | 'mention-user' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax';
+type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'emoji' | 'mention-here' | 'mention-user' | 'mention-report' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax';
 type Range = {
   type: MarkdownType;
   start: number;
@@ -38,7 +38,7 @@ function parseHTMLToTokens(html: string): Token[] {
     }
     const close = html.indexOf('>', open);
     if (close === -1) {
-      throw new Error('Invalid HTML: no matching ">"');
+      throw new Error('[react-native-live-markdown] Error in function parseHTMLToTokens: Invalid HTML: no matching ">"');
     }
     tokens.push(['HTML', html.substring(open, close + 1)]);
     left = close + 1;
@@ -59,16 +59,31 @@ function parseTokensToTree(tokens: Token[]): StackItem {
         const child = stack.pop();
         const top = stack[stack.length - 1];
         top!.children.push(child!);
+      } else if (payload.endsWith('/>')) {
+        // self-closing tag
+        const top = stack[stack.length - 1];
+        top!.children.push({tag: payload, children: []});
       } else {
         // opening tag
         stack.push({tag: payload, children: []});
       }
     } else {
-      throw new Error(`Unknown token type: ${type as string}`);
+      throw new Error(
+        `[react-native-live-markdown] Error in function parseTokensToTree: Unknown token type: ${type as string}. Expected 'TEXT' or 'HTML'. Please ensure tokens only contain these types.`,
+      );
     }
   });
   if (stack.length !== 1) {
-    throw new Error('Invalid HTML: unclosed tags');
+    const unclosedTags =
+      stack.length > 0
+        ? stack
+            .slice(1)
+            .map((item) => item.tag)
+            .join(', ')
+        : '';
+    throw new Error(
+      `[react-native-live-markdown] Invalid HTML structure: the following tags are not properly closed: ${unclosedTags}. Ensure each opening tag has a corresponding closing tag.`,
+    );
   }
   return stack[0]!;
 }
@@ -125,6 +140,8 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
         addChildrenWithStyle(node, 'mention-here');
       } else if (node.tag === '<mention-user>') {
         addChildrenWithStyle(node, 'mention-user');
+      } else if (node.tag === '<mention-report>') {
+        addChildrenWithStyle(node, 'mention-report');
       } else if (node.tag === '<blockquote>') {
         appendSyntax('>');
         addChildrenWithStyle(node, 'blockquote');
@@ -146,7 +163,7 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
       } else if (node.tag.startsWith('<a href="')) {
         const rawHref = node.tag.match(/href="([^"]*)"/)![1]!; // always present
         const href = _.unescape(rawHref);
-        const isLabeledLink = node.tag.match(/link-variant="([^"]*)"/)![1] === 'labeled';
+        const isLabeledLink = node.tag.match(/data-link-variant="([^"]*)"/)![1] === 'labeled';
         const dataRawHref = node.tag.match(/data-raw-href="([^"]*)"/);
         const matchString = dataRawHref ? _.unescape(dataRawHref[1]!) : href;
         if (!isLabeledLink && node.children.length === 1 && typeof node.children[0] === 'string' && (node.children[0] === matchString || `mailto:${node.children[0]}` === href)) {
@@ -158,8 +175,24 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
           addChildrenWithStyle(matchString, 'link');
           appendSyntax(')');
         }
+      } else if (node.tag.startsWith('<img src="')) {
+        const src = node.tag.match(/src="([^"]*)"/)![1]!; // always present
+        const alt = node.tag.match(/alt="([^"]*)"/);
+        const hasAlt = node.tag.match(/data-link-variant="([^"]*)"/)![1] === 'labeled';
+        const rawLink = node.tag.match(/data-raw-href="([^"]*)"/);
+        const linkString = rawLink ? _.unescape(rawLink[1]!) : src;
+
+        appendSyntax('!');
+        if (hasAlt) {
+          appendSyntax('[');
+          processChildren(_.unescape(alt?.[1] || ''));
+          appendSyntax(']');
+        }
+        appendSyntax('(');
+        addChildrenWithStyle(linkString, 'link');
+        appendSyntax(')');
       } else {
-        throw new Error(`Unknown tag: ${node.tag}`);
+        throw new Error(`[react-native-live-markdown] Error in function parseTreeToTextAndRanges: Unknown tag '${node.tag}'. This tag is not supported in this function's logic.`);
       }
     }
   }
@@ -207,17 +240,26 @@ function groupRanges(ranges: Range[]) {
 }
 
 function parseExpensiMarkToRanges(markdown: string): Range[] {
-  const html = parseMarkdownToHTML(markdown);
-  const tokens = parseHTMLToTokens(html);
-  const tree = parseTokensToTree(tokens);
-  const [text, ranges] = parseTreeToTextAndRanges(tree);
-  if (text !== markdown) {
-    // text mismatch, don't return any ranges
+  try {
+    const html = parseMarkdownToHTML(markdown);
+    const tokens = parseHTMLToTokens(html);
+    const tree = parseTokensToTree(tokens);
+    const [text, ranges] = parseTreeToTextAndRanges(tree);
+    if (text !== markdown) {
+      throw new Error(
+        `[react-native-live-markdown] Parsing error: the processed text does not match the original Markdown input. This may be caused by incorrect parsing functions or invalid input Markdown.\nProcessed input: '${JSON.stringify(
+          text,
+        )}'\nOriginal input: '${JSON.stringify(markdown)}'`,
+      );
+    }
+    const sortedRanges = sortRanges(ranges);
+    const groupedRanges = groupRanges(sortedRanges);
+    return groupedRanges;
+  } catch (error) {
+    console.error(error);
+    // returning an empty array in case of error
     return [];
   }
-  const sortedRanges = sortRanges(ranges);
-  const groupedRanges = groupRanges(sortedRanges);
-  return groupedRanges;
 }
 
 globalThis.parseExpensiMarkToRanges = parseExpensiMarkToRanges;

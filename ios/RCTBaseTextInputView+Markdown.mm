@@ -16,11 +16,21 @@
 {
   RCTMarkdownUtils *markdownUtils = [self getMarkdownUtils];
   if (markdownUtils != nil) {
-    attributedText = [markdownUtils parseMarkdown:attributedText];
+    attributedText = [markdownUtils parseMarkdown:attributedText withAttributes:self.backedTextInputView.defaultTextAttributes];
   }
 
   // Call the original method
   [self markdown_setAttributedText:attributedText];
+}
+
+- (BOOL)markdown_textOf:(NSAttributedString *)newText equals:(NSAttributedString *)oldText
+{
+  RCTMarkdownUtils *markdownUtils = [self getMarkdownUtils];
+  if (markdownUtils != nil) {
+    return [newText isEqualToAttributedString:oldText];
+  }
+
+  return [self markdown_textOf:newText equals:oldText];
 }
 
 - (void)markdown_updateLocalData
@@ -29,7 +39,7 @@
   if (markdownUtils != nil) {
     id<RCTBackedTextInputViewProtocol> backedTextInputView = self.backedTextInputView;
     NSAttributedString *oldAttributedText = backedTextInputView.attributedText;
-    NSAttributedString *newAttributedText = [markdownUtils parseMarkdown:oldAttributedText];
+    NSAttributedString *newAttributedText = [markdownUtils parseMarkdown:oldAttributedText withAttributes:backedTextInputView.defaultTextAttributes];
     UITextRange *range = backedTextInputView.selectedTextRange;
 
     // update attributed text without emitting onSelectionChange event
@@ -65,6 +75,15 @@
       // swizzle updateLocalData
       SEL originalSelector = @selector(updateLocalData);
       SEL swizzledSelector = @selector(markdown_updateLocalData);
+      Method originalMethod = class_getInstanceMethod(cls, originalSelector);
+      Method swizzledMethod = class_getInstanceMethod(cls, swizzledSelector);
+      method_exchangeImplementations(originalMethod, swizzledMethod);
+    }
+
+    {
+      // swizzle textOf
+      SEL originalSelector = @selector(textOf:equals:);
+      SEL swizzledSelector = @selector(markdown_textOf:equals:);
       Method originalMethod = class_getInstanceMethod(cls, originalSelector);
       Method swizzledMethod = class_getInstanceMethod(cls, swizzledSelector);
       method_exchangeImplementations(originalMethod, swizzledMethod);

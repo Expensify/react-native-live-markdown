@@ -78,7 +78,10 @@ public class MarkdownTextInputDecoratorView extends View {
       mMarkdownUtils.setMarkdownStyle(mMarkdownStyle);
     }
     if (mReactEditText != null) {
+      int selectionStart = mReactEditText.getSelectionStart();
+      int selectionEnd = mReactEditText.getSelectionEnd();
       mReactEditText.setText(mReactEditText.getText()); // trigger update
+      mReactEditText.setSelection(selectionStart, selectionEnd);
     }
   }
 }

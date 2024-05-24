@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import {Button, Platform, StyleSheet, Text, View} from 'react-native';
 
-import {MarkdownTextInput} from '@expensify/react-native-live-markdown';
+import {MarkdownTextInput, useMarkdownParser, type Range} from '@expensify/react-native-live-markdown';
 import type {TextInput} from 'react-native';
 import useExpensiMarkParser from './useExpensiMarkParser';
 
@@ -68,7 +68,19 @@ export default function App() {
   // TODO: use MarkdownTextInput ref instead of TextInput ref
   const ref = React.useRef<TextInput>(null);
 
-  const parser = useExpensiMarkParser();
+  const parser = useMarkdownParser((markdown: string) => {
+    'worklet';
+
+    const result = [];
+    for (let i = 0; i < markdown.length; i++) {
+      const type = ['mention-report', 'mention-here', 'mention-user'][i % 3];
+      result.push({type, start: i, length: 1, depth: 0} as Range);
+    }
+
+    return result;
+  }, []);
+
+  // const parser = useExpensiMarkParser();
 
   return (
     <View style={styles.container}>

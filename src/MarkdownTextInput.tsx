@@ -14,6 +14,10 @@ const markdownRuntime = getMarkdownRuntime();
 // @ts-expect-error TODO
 global.setMarkdownRuntime(markdownRuntime);
 
+if (NativeLiveMarkdownModule) {
+  NativeLiveMarkdownModule.install();
+}
+
 type PartialMarkdownStyle = StyleUtilsTypes.PartialMarkdownStyle;
 type MarkdownStyle = MarkdownTextInputDecoratorViewNativeComponentTypes.MarkdownStyle;
 

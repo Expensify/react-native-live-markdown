@@ -34,11 +34,13 @@ function makeDefaultMarkdownStyle(): MarkdownStyle {
     },
     code: {
       fontFamily: FONT_FAMILY_MONOSPACE,
+      fontSize: 20,
       color: 'black',
       backgroundColor: 'lightgray',
     },
     pre: {
       fontFamily: FONT_FAMILY_MONOSPACE,
+      fontSize: 20,
       color: 'black',
       backgroundColor: 'lightgray',
     },
@@ -49,6 +51,10 @@ function makeDefaultMarkdownStyle(): MarkdownStyle {
     mentionUser: {
       color: 'blue',
       backgroundColor: 'cyan',
+    },
+    mentionReport: {
+      color: 'red',
+      backgroundColor: 'pink',
     },
   };
 }

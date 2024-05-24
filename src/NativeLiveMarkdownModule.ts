@@ -5,4 +5,4 @@ interface Spec extends TurboModule {
   install: () => boolean;
 }
 
-export default TurboModuleRegistry.getEnforcing<Spec>('LiveMarkdownModule');
+export default TurboModuleRegistry.get<Spec>('LiveMarkdownModule');
