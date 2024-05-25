@@ -31,15 +31,10 @@
 
         auto text = jsi::String::createFromUtf8(rt, [inputString UTF8String]);
         auto output = markdownRuntime->runGuarded(markdownWorklet, text);
-        react_native_assert(!output.isUndefined());
-
-        auto json = rt.global().getPropertyAsObject(rt, "JSON").getPropertyAsFunction(rt, "stringify").call(rt, output).asString(rt).utf8(rt);
-        NSData *data = [NSData dataWithBytes:json.data() length:json.length()];
-        NSError *error = nil;
-        NSArray *ranges = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
-        if (error != nil) {
+        if (output.isUndefined()) {
           return input;
         }
+        const auto &ranges = output.asObject(rt).asArray(rt);
 
         NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:inputString attributes:attributes];
         [attributedString beginEditing];
@@ -51,42 +46,42 @@
 
         _blockquoteRangesAndLevels = [NSMutableArray new];
 
-        [ranges enumerateObjectsUsingBlock:^(id _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            NSDictionary *item = obj;
-            NSString *type = [item valueForKey:@"type"];
-            NSInteger location = [[item valueForKey:@"start"] unsignedIntegerValue];
-            NSInteger length = [[item valueForKey:@"length"] unsignedIntegerValue];
-            NSInteger depth = [[item valueForKey:@"depth"] unsignedIntegerValue] ?: 1;
-            NSRange range = NSMakeRange(location, length);
+        for (size_t i = 0, n = ranges.size(rt); i < n; ++i) {
+            const auto &item = ranges.getValueAtIndex(rt, i).asObject(rt);
+            const auto &type = item.getProperty(rt, "type").asString(rt).utf8(rt);
+            const auto &location = static_cast<int>(item.getProperty(rt, "start").asNumber());
+            const auto &length = static_cast<int>(item.getProperty(rt, "length").asNumber());
+            const auto &depth = static_cast<int>(item.getProperty(rt, "depth").asNumber());
 
-            if ([type isEqualToString:@"bold"] || [type isEqualToString:@"italic"] || [type isEqualToString:@"code"] || [type isEqualToString:@"pre"] || [type isEqualToString:@"h1"] || [type isEqualToString:@"emoji"]) {
+            NSRange range = NSMakeRange(location, length);
+            if (type == "bold" || type == "italic" || type == "code" || type == "pre" || type == "h1" || type == "emoji") {
                 UIFont *font = [attributedString attribute:NSFontAttributeName atIndex:location effectiveRange:NULL];
-                if ([type isEqualToString:@"bold"]) {
+                if (type == "bold") {
                     font = [RCTFont updateFont:font withWeight:@"bold"];
-                } else if ([type isEqualToString:@"italic"]) {
+                } else if (type == "italic") {
                     font = [RCTFont updateFont:font withStyle:@"italic"];
-                } else if ([type isEqualToString:@"code"]) {
+                } else if (type == "code") {
                     font = [RCTFont updateFont:font withFamily:_markdownStyle.codeFontFamily
                                                           size:[NSNumber numberWithFloat:_markdownStyle.codeFontSize]
                                                         weight:nil
                                                          style:nil
                                                        variant:nil
                                                scaleMultiplier:0];
-                } else if ([type isEqualToString:@"pre"]) {
+                } else if (type == "pre") {
                     font = [RCTFont updateFont:font withFamily:_markdownStyle.preFontFamily
                                                           size:[NSNumber numberWithFloat:_markdownStyle.preFontSize]
                                                         weight:nil
                                                         style:nil
                                                       variant:nil
                                               scaleMultiplier:0];
-                } else if ([type isEqualToString:@"h1"]) {
+                } else if (type == "h1") {
                     font = [RCTFont updateFont:font withFamily:nil
                                                           size:[NSNumber numberWithFloat:_markdownStyle.h1FontSize]
                                                         weight:@"bold"
                                                          style:nil
                                                        variant:nil
                                                scaleMultiplier:0];
-                } else if ([type isEqualToString:@"emoji"]) {
+                } else if (type == "emoji") {
                     font = [RCTFont updateFont:font withFamily:nil
                                                           size:[NSNumber numberWithFloat:_markdownStyle.emojiFontSize]
                                                         weight:nil
@@ -97,27 +92,27 @@
                 [attributedString addAttribute:NSFontAttributeName value:font range:range];
             }
 
-            if ([type isEqualToString:@"syntax"]) {
+            if (type == "syntax") {
                 [attributedString addAttribute:NSForegroundColorAttributeName value:_markdownStyle.syntaxColor range:range];
-            } else if ([type isEqualToString:@"strikethrough"]) {
+            } else if (type == "strikethrough") {
                 [attributedString addAttribute:NSStrikethroughStyleAttributeName value:[NSNumber numberWithInteger:NSUnderlineStyleSingle] range:range];
-            } else if ([type isEqualToString:@"code"]) {
+            } else if (type == "code") {
                 [attributedString addAttribute:NSForegroundColorAttributeName value:_markdownStyle.codeColor range:range];
                 [attributedString addAttribute:NSBackgroundColorAttributeName value:_markdownStyle.codeBackgroundColor range:range];
-            } else if ([type isEqualToString:@"mention-here"]) {
+            } else if (type == "mention-here") {
                 [attributedString addAttribute:NSForegroundColorAttributeName value:_markdownStyle.mentionHereColor range:range];
                 [attributedString addAttribute:NSBackgroundColorAttributeName value:_markdownStyle.mentionHereBackgroundColor range:range];
-            } else if ([type isEqualToString:@"mention-user"]) {
+            } else if (type == "mention-user") {
                 // TODO: change mention color when it mentions current user
                 [attributedString addAttribute:NSForegroundColorAttributeName value:_markdownStyle.mentionUserColor range:range];
                 [attributedString addAttribute:NSBackgroundColorAttributeName value:_markdownStyle.mentionUserBackgroundColor range:range];
-            } else if ([type isEqualToString:@"mention-report"]) {
+            } else if (type == "mention-report") {
                 [attributedString addAttribute:NSForegroundColorAttributeName value:_markdownStyle.mentionReportColor range:range];
                 [attributedString addAttribute:NSBackgroundColorAttributeName value:_markdownStyle.mentionReportBackgroundColor range:range];
-            } else if ([type isEqualToString:@"link"]) {
+            } else if (type == "link") {
                 [attributedString addAttribute:NSUnderlineStyleAttributeName value:[NSNumber numberWithInteger:NSUnderlineStyleSingle] range:range];
                 [attributedString addAttribute:NSForegroundColorAttributeName value:_markdownStyle.linkColor range:range];
-            } else if ([type isEqualToString:@"blockquote"]) {
+            } else if (type == "blockquote") {
                 CGFloat indent = (_markdownStyle.blockquoteMarginLeft + _markdownStyle.blockquoteBorderWidth + _markdownStyle.blockquotePaddingLeft) * depth;
                 NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
                 paragraphStyle.firstLineHeadIndent = indent;
@@ -127,17 +122,17 @@
                     @"range": [NSValue valueWithRange:range],
                     @"depth": @(depth)
                 }];
-            } else if ([type isEqualToString:@"pre"]) {
+            } else if (type == "pre") {
                 [attributedString addAttribute:NSForegroundColorAttributeName value:_markdownStyle.preColor range:range];
                 NSRange rangeForBackground = [inputString characterAtIndex:range.location] == '\n' ? NSMakeRange(range.location + 1, range.length - 1) : range;
                 [attributedString addAttribute:NSBackgroundColorAttributeName value:_markdownStyle.preBackgroundColor range:rangeForBackground];
                 // TODO: pass background color and ranges to layout manager
-            } else if ([type isEqualToString:@"h1"]) {
+            } else if (type == "h1") {
                 NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
                 NSRange rangeWithHashAndSpace = NSMakeRange(range.location - 2, range.length + 2); // we also need to include prepending "# "
                 [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:rangeWithHashAndSpace];
             }
-        }];
+        }
 
         RCTApplyBaselineOffset(attributedString);
 
