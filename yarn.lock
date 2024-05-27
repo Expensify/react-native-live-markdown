@@ -2321,7 +2321,6 @@ __metadata:
     "@react-native/metro-config": 0.73.5
     babel-plugin-module-resolver: ^5.0.0
     expensify-common: "Expensify/expensify-common#f5204cae4e0d039c84e0da2967f9ebe9c4342aba"
-    postinstall-postinstall: ^2.1.0
     react: 18.2.0
     react-native: 0.73.4
     react-native-reanimated: 3.11.0
@@ -15995,13 +15994,6 @@ __metadata:
     picocolors: ^1.0.0
     source-map-js: ^1.2.0
   checksum: 649f9e60a763ca4b5a7bbec446a069edf07f057f6d780a5a0070576b841538d1ecf7dd888f2fbfd1f76200e26c969e405aeeae66332e6927dbdc8bdcb90b9451
-  languageName: node
-  linkType: hard
-
-"postinstall-postinstall@npm:^2.1.0":
-  version: 2.1.0
-  resolution: "postinstall-postinstall@npm:2.1.0"
-  checksum: e1d34252cf8d2c5641c7d2db7426ec96e3d7a975f01c174c68f09ef5b8327bc8d5a9aa2001a45e693db2cdbf69577094d3fe6597b564ad2d2202b65fba76134b
   languageName: node
   linkType: hard
 
