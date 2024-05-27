@@ -648,7 +648,7 @@ const styles = StyleSheet.create({
   },
   disabledInputStyles: {
     opacity: 0.75,
-    cursor: 'default',
+    cursor: 'auto',
   },
 });
 
