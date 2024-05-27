@@ -2474,12 +2474,12 @@ __metadata:
     "@react-native/babel-preset": 0.73.21
     "@react-native/metro-config": 0.73.5
     babel-plugin-module-resolver: ^5.0.0
-    expensify-common: "Expensify/expensify-common#a018512b1e0fce4d4b5a61c00ca826b8887007ad"
+    expensify-common: "Expensify/expensify-common#f5204cae4e0d039c84e0da2967f9ebe9c4342aba"
     patch-package: ^8.0.0
     postinstall-postinstall: ^2.1.0
     react: 18.2.0
     react-native: 0.73.4
-    react-native-reanimated: ^3.8.1
+    react-native-reanimated: 3.11.0
   languageName: unknown
   linkType: soft
 
@@ -2542,7 +2542,7 @@ __metadata:
   peerDependencies:
     react: "*"
     react-native: "*"
-    react-native-reanimated: ">=3.6.0"
+    react-native-reanimated: ">=3.11.0"
   languageName: unknown
   linkType: soft
 
@@ -9794,6 +9794,27 @@ __metadata:
   languageName: node
   linkType: hard
 
+"expensify-common@Expensify/expensify-common#f5204cae4e0d039c84e0da2967f9ebe9c4342aba":
+  version: 1.0.0
+  resolution: "expensify-common@https://github.com/Expensify/expensify-common.git#commit=f5204cae4e0d039c84e0da2967f9ebe9c4342aba"
+  dependencies:
+    classnames: 2.5.0
+    clipboard: 2.0.11
+    html-entities: ^2.5.2
+    jquery: 3.6.0
+    localforage: ^1.10.0
+    lodash: 4.17.21
+    prop-types: 15.8.1
+    react: 16.12.0
+    react-dom: 16.12.0
+    semver: ^7.6.0
+    simply-deferred: "git+https://github.com/Expensify/simply-deferred.git#77a08a95754660c7bd6e0b6979fdf84e8e831bf5"
+    ua-parser-js: ^1.0.37
+    underscore: 1.13.6
+  checksum: 41afe321a99f8d5a5739247061732954bff67311c8f6d9e43f1edd77935f0488ac8863d468c1db934a54f4338ec7e8aa9640b9e432b894788303f2330276ceb0
+  languageName: node
+  linkType: hard
+
 "expo-asset@npm:~9.0.2":
   version: 9.0.2
   resolution: "expo-asset@npm:9.0.2"
@@ -16779,7 +16800,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-reanimated@npm:^3.11.0":
+"react-native-reanimated@npm:3.11.0, react-native-reanimated@npm:^3.11.0":
   version: 3.11.0
   resolution: "react-native-reanimated@npm:3.11.0"
   dependencies:
@@ -16796,26 +16817,6 @@ __metadata:
     react: "*"
     react-native: "*"
   checksum: 5d0c6be5c9b6d933755e50895a1ec903100800a83b7b48fbc6a4242063f0de52a78f5af69d39da4241f6071a4416602f150c3a53e9a97d20880edb3612ffadbd
-  languageName: node
-  linkType: hard
-
-"react-native-reanimated@npm:^3.8.1":
-  version: 3.8.1
-  resolution: "react-native-reanimated@npm:3.8.1"
-  dependencies:
-    "@babel/plugin-transform-arrow-functions": ^7.0.0-0
-    "@babel/plugin-transform-nullish-coalescing-operator": ^7.0.0-0
-    "@babel/plugin-transform-optional-chaining": ^7.0.0-0
-    "@babel/plugin-transform-shorthand-properties": ^7.0.0-0
-    "@babel/plugin-transform-template-literals": ^7.0.0-0
-    "@babel/preset-typescript": ^7.16.7
-    convert-source-map: ^2.0.0
-    invariant: ^2.2.4
-  peerDependencies:
-    "@babel/core": ^7.0.0-0
-    react: "*"
-    react-native: "*"
-  checksum: 078a1e32ce1ca11488862db90663fd5cacb61aea65dc540c90cd5346d97e63cc6836f25cfc48b7acefd301fda414f05329a92ae5cb28fb83b94c571e66f147e3
   languageName: node
   linkType: hard
 

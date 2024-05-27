@@ -1,4 +1,4 @@
-import {makeExpensiMark} from 'expensify-common/lib/ExpensiMark';
+import makeExpensiMark from 'expensify-common/lib/ExpensiMark';
 import {useMarkdownParser} from '@expensify/react-native-live-markdown';
 
 type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'emoji' | 'mention-here' | 'mention-user' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax';

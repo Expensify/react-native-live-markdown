@@ -8,12 +8,12 @@
     "start": "react-native start"
   },
   "dependencies": {
-    "expensify-common": "Expensify/expensify-common#a018512b1e0fce4d4b5a61c00ca826b8887007ad",
+    "expensify-common": "Expensify/expensify-common#f5204cae4e0d039c84e0da2967f9ebe9c4342aba",
     "patch-package": "^8.0.0",
     "postinstall-postinstall": "^2.1.0",
     "react": "18.2.0",
     "react-native": "0.73.4",
-    "react-native-reanimated": "^3.8.1"
+    "react-native-reanimated": "3.11.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
