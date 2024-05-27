@@ -89,7 +89,7 @@
     "jest-environment-jsdom": "^29.7.0",
     "prettier": "2.8.8",
     "react": "18.2.0",
-    "react-native": "0.73.4",
+    "react-native": "0.74.1",
     "react-native-builder-bob": "^0.20.0",
     "react-native-web": "^0.19.10",
     "release-it": "^15.0.0",
@@ -108,7 +108,7 @@
     "example",
     "WebExample"
   ],
-  "packageManager": "yarn@3.6.1",
+  "packageManager": "yarn@3.6.4",
   "engines": {
     "node": ">= 18.0.0"
   },
