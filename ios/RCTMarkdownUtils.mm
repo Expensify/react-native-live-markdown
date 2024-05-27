@@ -51,7 +51,7 @@
             const auto &type = item.getProperty(rt, "type").asString(rt).utf8(rt);
             const auto &location = static_cast<int>(item.getProperty(rt, "start").asNumber());
             const auto &length = static_cast<int>(item.getProperty(rt, "length").asNumber());
-            const auto &depth = static_cast<int>(item.getProperty(rt, "depth").asNumber());
+            const auto &depth = item.hasProperty(rt, "depth") ? static_cast<int>(item.getProperty(rt, "depth").asNumber()) : 1;
 
             NSRange range = NSMakeRange(location, length);
             if (type == "bold" || type == "italic" || type == "code" || type == "pre" || type == "h1" || type == "emoji") {
