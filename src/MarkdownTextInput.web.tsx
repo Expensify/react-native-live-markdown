@@ -560,8 +560,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
         const text = processedValue !== undefined ? processedValue : '';
 
-        const currentCursorPostion = contentSelection?.current && contentSelection?.current.end <= text.length ? contentSelection.current.end : text.length;
-        parseText(divRef.current, text, processedMarkdownStyle, currentCursorPostion);
+        parseText(divRef.current, text, processedMarkdownStyle, contentSelection.current?.end);
         updateTextColor(divRef.current, value);
       },
       [multiline, processedMarkdownStyle, processedValue],
