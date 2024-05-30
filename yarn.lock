@@ -2388,7 +2388,7 @@ __metadata:
     "@types/underscore": ^1.11.15
     esbuild: 0.19.4
     esbuild-plugin-tsc: ^0.4.0
-    expensify-common: "Expensify/expensify-common#a018512b1e0fce4d4b5a61c00ca826b8887007ad"
+    expensify-common: "Expensify/expensify-common#a451327f6c0f516463d9da7c6aaa1c1c63b1a960"
     jest: ^29.7.0
     patch-package: ^8.0.0
     typescript: ^5.3.3
@@ -5783,6 +5783,13 @@ __metadata:
   dependencies:
     possible-typed-array-names: ^1.0.0
   checksum: 1aa3ffbfe6578276996de660848b6e95669d9a95ad149e3dd0c0cda77db6ee1dbd9d1dd723b65b6d277b882dd0c4b91a654ae9d3cf9e1254b7e93e4908d78fd3
+  languageName: node
+  linkType: hard
+
+"awesome-phonenumber@npm:^5.4.0":
+  version: 5.11.0
+  resolution: "awesome-phonenumber@npm:5.11.0"
+  checksum: de727b1a9a956adeca17162e59fc0e549281a19a38ca94988d42e68822148a6302c37de67baea4b382955dd5fe6434babf16d80afa09c2167ccf855bb225bd4b
   languageName: node
   linkType: hard
 
@@ -9293,6 +9300,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"eslint-plugin-you-dont-need-lodash-underscore@npm:^6.14.0":
+  version: 6.14.0
+  resolution: "eslint-plugin-you-dont-need-lodash-underscore@npm:6.14.0"
+  dependencies:
+    kebab-case: ^1.0.0
+  checksum: 325c251a00b72d7de6f8df92d94481e79bbca59965316ddfd50e70177114019b6cfd1afb4a7b940b690cb217bcb92ef36b59914776c1cf70ef44e12d9e549af8
+  languageName: node
+  linkType: hard
+
 "eslint-scope@npm:5.1.1, eslint-scope@npm:^5.0.0, eslint-scope@npm:^5.1.1":
   version: 5.1.1
   resolution: "eslint-scope@npm:5.1.1"
@@ -9669,12 +9685,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expensify-common@Expensify/expensify-common#a018512b1e0fce4d4b5a61c00ca826b8887007ad":
-  version: 1.0.0
-  resolution: "expensify-common@https://github.com/Expensify/expensify-common.git#commit=a018512b1e0fce4d4b5a61c00ca826b8887007ad"
+"expensify-common@Expensify/expensify-common#a451327f6c0f516463d9da7c6aaa1c1c63b1a960":
+  version: 2.0.3
+  resolution: "expensify-common@https://github.com/Expensify/expensify-common.git#commit=a451327f6c0f516463d9da7c6aaa1c1c63b1a960"
   dependencies:
+    awesome-phonenumber: ^5.4.0
     classnames: 2.5.0
     clipboard: 2.0.11
+    eslint-plugin-you-dont-need-lodash-underscore: ^6.14.0
     html-entities: ^2.5.2
     jquery: 3.6.0
     localforage: ^1.10.0
@@ -9686,7 +9704,7 @@ __metadata:
     simply-deferred: "git+https://github.com/Expensify/simply-deferred.git#77a08a95754660c7bd6e0b6979fdf84e8e831bf5"
     ua-parser-js: ^1.0.37
     underscore: 1.13.6
-  checksum: 8f8591db0ff619d68098bd582d9a9242119aefd700b5615a9e7442400c265b3a6f678b92c0735e7297bbef8da9182b8d1d0d1cb4616a23b334f98718aaee88cd
+  checksum: 329548993f94130752a22d0420e79ecb2aa3e9e64763b1bbc6517b69c6542ff63efb3d5227303ad61e47a01d1d1e88123d9e46febb14482675c329b3eb924cf7
   languageName: node
   linkType: hard
 
@@ -13395,6 +13413,13 @@ __metadata:
     object.assign: ^4.1.4
     object.values: ^1.1.6
   checksum: f4b05fa4d7b5234230c905cfa88d36dc8a58a6666975a3891429b1a8cdc8a140bca76c297225cb7a499fad25a2c052ac93934449a2c31a44fc9edd06c773780a
+  languageName: node
+  linkType: hard
+
+"kebab-case@npm:^1.0.0":
+  version: 1.0.2
+  resolution: "kebab-case@npm:1.0.2"
+  checksum: bf01164e11c544ee9b3aa1a91c2e7d6aa6b3356b834a5e885d43f36db14aae5d347cd4a298a566133321b82fde6bac6b597f148ac19bfd3d3fc81e1034a79729
   languageName: node
   linkType: hard
 
