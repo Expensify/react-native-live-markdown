@@ -12,7 +12,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)markdown__setAttributedString:(NSAttributedString *)attributedString;
 
-- (void)textInputDidChange;
+- (BOOL)markdown__textOf:(NSAttributedString *)newText equals:(NSAttributedString *)oldText;
+
+- (void)_setAttributedString:(NSAttributedString *)attributedString;
 
 @end
 

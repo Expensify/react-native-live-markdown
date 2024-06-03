@@ -94,8 +94,7 @@ function setCursorPosition(target: HTMLElement, start: number, end: number | nul
 
   const selection = window.getSelection();
   if (selection) {
-    selection.removeAllRanges();
-    selection.addRange(range);
+    selection.setBaseAndExtent(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
   }
 
   if (scrollIntoView) scrollCursorIntoView(target as HTMLInputElement);
@@ -107,8 +106,7 @@ function moveCursorToEnd(target: HTMLElement) {
   if (selection) {
     range.setStart(target, target.childNodes.length);
     range.collapse(true);
-    selection.removeAllRanges();
-    selection.addRange(range);
+    selection.setBaseAndExtent(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
   }
 }
 
