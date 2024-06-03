@@ -210,8 +210,8 @@ function handlePreBlockBackground(target: HTMLElement, markdownStyle: PartialMar
     let left = 0;
     preRects.forEach((preRect) => {
       if (width < preRect.width) width = preRect.width;
-      height += preRect.height;
       if (!top || top > preRect.top) top = preRect.top;
+      height = preRect.bottom - top;
       if (!left || left > preRect.left) left = preRect.left;
     });
     const {top: divTop, left: divLeft} = target.getBoundingClientRect();
