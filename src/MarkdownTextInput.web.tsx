@@ -559,7 +559,8 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         }
 
         const text = processedValue !== undefined ? processedValue : '';
-        parseText(divRef.current, text, processedMarkdownStyle, text.length);
+
+        parseText(divRef.current, text, processedMarkdownStyle, contentSelection.current?.end);
         updateTextColor(divRef.current, value);
       },
       [multiline, processedMarkdownStyle, processedValue],
@@ -585,7 +586,8 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       if (autoFocus) {
         divRef.current.focus();
       }
-    }, [autoFocus]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     useEffect(() => {
       // update content size when the input styles change
