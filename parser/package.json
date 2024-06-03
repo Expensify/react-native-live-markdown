@@ -20,7 +20,7 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "expensify-common": "Expensify/expensify-common#a451327f6c0f516463d9da7c6aaa1c1c63b1a960",
+    "expensify-common": "2.0.4",
     "patch-package": "^8.0.0",
     "underscore": "^1.13.6"
   }

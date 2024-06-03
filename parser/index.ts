@@ -1,6 +1,5 @@
-// @ts-expect-error - to review how it's implemented in ExpensiMark
 // eslint-disable-next-line import/no-unresolved
-import {ExpensiMark} from 'expensify-common/lib/ExpensiMark';
+import {ExpensiMark} from 'expensify-common';
 import _ from 'underscore';
 
 type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'emoji' | 'mention-here' | 'mention-user' | 'mention-report' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax';
@@ -14,7 +13,7 @@ type Token = ['TEXT' | 'HTML', string];
 type StackItem = {tag: string; children: Array<StackItem | string>};
 
 function parseMarkdownToHTML(markdown: string): string {
-  const parser = ExpensiMark;
+  const parser = new ExpensiMark();
   const html = parser.replace(markdown, {
     shouldKeepRawInput: true,
   });
