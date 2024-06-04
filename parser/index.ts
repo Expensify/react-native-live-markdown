@@ -13,7 +13,7 @@ type Token = ['TEXT' | 'HTML', string];
 type StackItem = {tag: string; children: Array<StackItem | string>};
 
 function parseMarkdownToHTML(markdown: string): string {
-  const parser = new ExpensiMark();
+  const parser = ExpensiMark;
   const html = parser.replace(markdown, {
     shouldKeepRawInput: true,
   });
