@@ -6,13 +6,16 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "build": "esbuild index.ts --bundle --minify --outfile=react-native-live-markdown-parser.js",
+    "build": "patch-package && esbuild index.ts --bundle --outfile=build/index.esbuild.js && babel build/index.esbuild.js --out-file build/index.babel.js && esbuild build/index.babel.js --bundle --outfile=react-native-live-markdown-parser.js",
     "run": "node react-native-live-markdown-parser.js",
     "postinstall": "patch-package"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@babel/cli": "^7.24.7",
+    "@babel/core": "^7.24.7",
+    "@react-native/babel-preset": "0.73.21",
     "@types/underscore": "^1.11.15",
     "esbuild": "0.19.4",
     "esbuild-plugin-tsc": "^0.4.0",
