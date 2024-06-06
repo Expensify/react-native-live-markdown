@@ -120,6 +120,94 @@
     }
   });
 
+  // ../node_modules/@babel/runtime/helpers/classCallCheck.js
+  var require_classCallCheck = __commonJS({
+    "../node_modules/@babel/runtime/helpers/classCallCheck.js"(exports, module) {
+      function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+          throw new TypeError("Cannot call a class as a function");
+        }
+      }
+      module.exports = _classCallCheck, module.exports.__esModule = true, module.exports["default"] = module.exports;
+    }
+  });
+
+  // ../node_modules/@babel/runtime/helpers/typeof.js
+  var require_typeof = __commonJS({
+    "../node_modules/@babel/runtime/helpers/typeof.js"(exports, module) {
+      function _typeof(o) {
+        "@babel/helpers - typeof";
+        return module.exports = _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function(o2) {
+          return typeof o2;
+        } : function(o2) {
+          return o2 && "function" == typeof Symbol && o2.constructor === Symbol && o2 !== Symbol.prototype ? "symbol" : typeof o2;
+        }, module.exports.__esModule = true, module.exports["default"] = module.exports, _typeof(o);
+      }
+      module.exports = _typeof, module.exports.__esModule = true, module.exports["default"] = module.exports;
+    }
+  });
+
+  // ../node_modules/@babel/runtime/helpers/toPrimitive.js
+  var require_toPrimitive = __commonJS({
+    "../node_modules/@babel/runtime/helpers/toPrimitive.js"(exports, module) {
+      var _typeof = require_typeof()["default"];
+      function toPrimitive(t, r) {
+        if ("object" != _typeof(t) || !t)
+          return t;
+        var e = t[Symbol.toPrimitive];
+        if (void 0 !== e) {
+          var i = e.call(t, r || "default");
+          if ("object" != _typeof(i))
+            return i;
+          throw new TypeError("@@toPrimitive must return a primitive value.");
+        }
+        return ("string" === r ? String : Number)(t);
+      }
+      module.exports = toPrimitive, module.exports.__esModule = true, module.exports["default"] = module.exports;
+    }
+  });
+
+  // ../node_modules/@babel/runtime/helpers/toPropertyKey.js
+  var require_toPropertyKey = __commonJS({
+    "../node_modules/@babel/runtime/helpers/toPropertyKey.js"(exports, module) {
+      var _typeof = require_typeof()["default"];
+      var toPrimitive = require_toPrimitive();
+      function toPropertyKey(t) {
+        var i = toPrimitive(t, "string");
+        return "symbol" == _typeof(i) ? i : String(i);
+      }
+      module.exports = toPropertyKey, module.exports.__esModule = true, module.exports["default"] = module.exports;
+    }
+  });
+
+  // ../node_modules/@babel/runtime/helpers/createClass.js
+  var require_createClass = __commonJS({
+    "../node_modules/@babel/runtime/helpers/createClass.js"(exports, module) {
+      var toPropertyKey = require_toPropertyKey();
+      function _defineProperties(target, props) {
+        for (var i = 0; i < props.length; i++) {
+          var descriptor = props[i];
+          descriptor.enumerable = descriptor.enumerable || false;
+          descriptor.configurable = true;
+          if ("value" in descriptor)
+            descriptor.writable = true;
+          Object.defineProperty(target, toPropertyKey(descriptor.key), descriptor);
+        }
+      }
+      function _createClass(Constructor, protoProps, staticProps) {
+        if (protoProps)
+          _defineProperties(Constructor.prototype, protoProps);
+        if (staticProps)
+          _defineProperties(Constructor, staticProps);
+        Object.defineProperty(Constructor, "prototype", {
+          writable: false
+        });
+        return Constructor;
+      }
+      module.exports = _createClass, module.exports.__esModule = true, module.exports["default"] = module.exports;
+    }
+  });
+
   // ../node_modules/@babel/runtime/helpers/arrayWithoutHoles.js
   var require_arrayWithoutHoles = __commonJS({
     "../node_modules/@babel/runtime/helpers/arrayWithoutHoles.js"(exports, module) {
@@ -170,6 +258,8 @@
   // build/index.babel.js
   var _interopRequireDefault = require_interopRequireDefault();
   var _slicedToArray2 = _interopRequireDefault(require_slicedToArray());
+  var _classCallCheck2 = _interopRequireDefault(require_classCallCheck());
+  var _createClass2 = _interopRequireDefault(require_createClass());
   var _toConsumableArray2 = _interopRequireDefault(require_toConsumableArray());
   (function() {
     var __create = Object.create;
@@ -4968,6 +5058,88 @@
       } };
       exports.default = Str;
     } });
+    var require_Logger = __commonJS2({ "node_modules/expensify-common/dist/Logger.js": function node_modulesExpensifyCommonDistLoggerJs(exports) {
+      "use strict";
+      Object.defineProperty(exports, "__esModule", { value: true });
+      var MAX_LOG_LINES_BEFORE_FLUSH = 50;
+      var Logger = function() {
+        function Logger2(_ref) {
+          var serverLoggingCallback = _ref.serverLoggingCallback, isDebug = _ref.isDebug, clientLoggingCallback = _ref.clientLoggingCallback;
+          (0, _classCallCheck2.default)(this, Logger2);
+          this.logLines = [];
+          this.serverLoggingCallback = serverLoggingCallback;
+          this.clientLoggingCallback = clientLoggingCallback;
+          this.isDebug = isDebug;
+          this.info = this.info.bind(this);
+          this.alert = this.alert.bind(this);
+          this.warn = this.warn.bind(this);
+          this.hmmm = this.hmmm.bind(this);
+          this.client = this.client.bind(this);
+        }
+        (0, _createClass2.default)(Logger2, [{ key: "logToServer", value: function logToServer() {
+          var _this3 = this;
+          var _a, _b;
+          if (!this.logLines.length || ((_a = this.logLines) === null || _a === void 0 ? void 0 : _a.every(function(l) {
+            return l.onlyFlushWithOthers;
+          }))) {
+            return;
+          }
+          var linesToLog = (_b = this.logLines) === null || _b === void 0 ? void 0 : _b.map(function(l) {
+            delete l.onlyFlushWithOthers;
+            return l;
+          });
+          this.logLines = [];
+          var promise = this.serverLoggingCallback(this, { api_setCookie: false, logPacket: JSON.stringify(linesToLog) });
+          if (!promise) {
+            return;
+          }
+          promise.then(function(response) {
+            if (response.requestID) {
+              _this3.info("Previous log requestID", false, { requestID: response.requestID }, true);
+            }
+          });
+        } }, { key: "add", value: function add(message, parameters, forceFlushToServer) {
+          var onlyFlushWithOthers = arguments.length > 3 && arguments[3] !== void 0 ? arguments[3] : false;
+          var length = this.logLines.push({ message, parameters, onlyFlushWithOthers, timestamp: /* @__PURE__ */ new Date() });
+          if (this.isDebug) {
+            this.client(`${message} - ${JSON.stringify(parameters)}`);
+          }
+          if (length > MAX_LOG_LINES_BEFORE_FLUSH || forceFlushToServer) {
+            this.logToServer();
+          }
+        } }, { key: "info", value: function info(message) {
+          var sendNow = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : false;
+          var parameters = arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : "";
+          var onlyFlushWithOthers = arguments.length > 3 && arguments[3] !== void 0 ? arguments[3] : false;
+          var msg = `[info] ${message}`;
+          this.add(msg, parameters, sendNow, onlyFlushWithOthers);
+        } }, { key: "alert", value: function alert(message) {
+          var parameters = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : {};
+          var includeStackTrace = arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : true;
+          var msg = `[alrt] ${message}`;
+          var params = parameters;
+          if (includeStackTrace && typeof params === "object" && !Array.isArray(params)) {
+            params.stack = JSON.stringify(new Error().stack);
+          }
+          this.add(msg, params, true);
+        } }, { key: "warn", value: function warn(message) {
+          var parameters = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : "";
+          var msg = `[warn] ${message}`;
+          this.add(msg, parameters, true);
+        } }, { key: "hmmm", value: function hmmm(message) {
+          var parameters = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : "";
+          var msg = `[hmmm] ${message}`;
+          this.add(msg, parameters, false);
+        } }, { key: "client", value: function client(message) {
+          if (!this.clientLoggingCallback) {
+            return;
+          }
+          this.clientLoggingCallback(message);
+        } }]);
+        return Logger2;
+      }();
+      exports.default = Logger;
+    } });
     var require_ExpensiMark = __commonJS2({ "node_modules/expensify-common/dist/ExpensiMark.js": function node_modulesExpensifyCommonDistExpensiMarkJs(exports) {
       "use strict";
       var __createBinding = exports && exports.__createBinding || (Object.create ? function(o, m, k, k2) {
@@ -5010,496 +5182,504 @@
       var str_1 = __importDefault(require_str());
       var Constants = __importStar(require_CONST());
       var UrlPatterns = __importStar(require_Url());
+      var Logger_1 = __importDefault(require_Logger());
       var MARKDOWN_LINK_REGEX = new RegExp(`\\[([^\\][]*(?:\\[[^\\][]*][^\\][]*)*)]\\(${UrlPatterns.MARKDOWN_URL_REGEX}\\)(?![^<]*(<\\/pre>|<\\/code>))`, "gi");
       var MARKDOWN_IMAGE_REGEX = new RegExp(`\\!(?:\\[([^\\][]*(?:\\[[^\\][]*][^\\][]*)*)])?\\(${UrlPatterns.MARKDOWN_URL_REGEX}\\)(?![^<]*(<\\/pre>|<\\/code>))`, "gi");
       var SLACK_SPAN_NEW_LINE_TAG = '<span class="c-mrkdwn__br" data-stringify-type="paragraph-break" style="box-sizing: inherit; display: block; height: unset;"></span>';
-      var ExpensiMark2 = { setLogger: function setLogger(logger) {
-        ExpensiMark2.Log = logger;
-      }, initializer: function initializer() {
-        var _this3 = this;
-        this.rules = [{ name: "emoji", regex: Constants.CONST.REG_EXP.EMOJI_RULE, replacement: function replacement(match) {
-          return `<emoji>${match}</emoji>`;
-        } }, { name: "codeFence", regex: /(&#x60;&#x60;&#x60;(?:\r\n|\n))((?:\s*?(?!(?:\r\n|\n)?&#x60;&#x60;&#x60;(?!&#x60;))[\S])+\s*?(?:\r\n|\n))(&#x60;&#x60;&#x60;)/g, replacement: function replacement(match, __, textWithinFences) {
-          var group2 = textWithinFences.replace(/(?:(?![\n\r])\s)/g, "&#32;");
-          return `<pre>${group2}</pre>`;
-        }, rawInputReplacement: function rawInputReplacement(match, __, textWithinFences) {
-          var group2 = textWithinFences.replace(/(?:(?![\n\r])\s)/g, "&#32;").replace(/<emoji>|<\/emoji>/g, "");
-          return `<pre>${group2}</pre>`;
-        } }, { name: "inlineCodeBlock", regex: /(\B|_|)&#x60;(.*?(?![&#x60;])\S.*?)&#x60;(\B|_|)(?!&#x60;|[^<]*<\/pre>)/gm, replacement: "$1<code>$2</code>$3" }, { name: "email", process: function process(textToProcess, replacement, shouldKeepRawInput) {
-          var regex = new RegExp(`(?!\\[\\s*\\])\\[([^[\\]]*)]\\((mailto:)?${Constants.CONST.REG_EXP.MARKDOWN_EMAIL}\\)`, "gim");
-          return _this3.modifyTextForEmailLinks(regex, textToProcess, replacement, shouldKeepRawInput);
-        }, replacement: function replacement(match, g1, g2) {
-          if (g1.match(Constants.CONST.REG_EXP.EMOJIS) || !g1.trim()) {
-            return match;
-          }
-          var label = g1.trim();
-          var href = `mailto:${g2}`;
-          var formattedLabel = label === href ? g2 : label;
-          return `<a href="${href}">${formattedLabel}</a>`;
-        }, rawInputReplacement: function rawInputReplacement(match, g1, g2, g3) {
-          if (g1.match(Constants.CONST.REG_EXP.EMOJIS) || !g1.trim()) {
-            return match;
-          }
-          var dataRawHref = g2 ? g2 + g3 : g3;
-          var href = `mailto:${g3}`;
-          return `<a href="${href}" data-raw-href="${dataRawHref}" data-link-variant="labeled">${g1}</a>`;
-        } }, { name: "heading1", process: function process(textToProcess, replacement) {
-          var shouldKeepRawInput = arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : false;
-          var regexp = shouldKeepRawInput ? /^# ( *(?! )(?:(?!<pre>|\n|\r\n).)+)/gm : /^# +(?! )((?:(?!<pre>|\n|\r\n).)+)/gm;
-          return textToProcess.replace(regexp, replacement);
-        }, replacement: "<h1>$1</h1>" }, { name: "image", regex: MARKDOWN_IMAGE_REGEX, replacement: function replacement(match, g1, g2) {
-          return `<img src="${str_1.default.sanitizeURL(g2)}"${g1 ? ` alt="${_this3.escapeAttributeContent(g1)}"` : ""} />`;
-        }, rawInputReplacement: function rawInputReplacement(match, g1, g2) {
-          return `<img src="${str_1.default.sanitizeURL(g2)}"${g1 ? ` alt="${_this3.escapeAttributeContent(g1)}"` : ""} data-raw-href="${g2}" data-link-variant="${typeof g1 === "string" ? "labeled" : "auto"}" />`;
-        } }, { name: "link", process: function process(textToProcess, replacement) {
-          return _this3.modifyTextForUrlLinks(MARKDOWN_LINK_REGEX, textToProcess, replacement);
-        }, replacement: function replacement(match, g1, g2) {
-          if (g1.match(Constants.CONST.REG_EXP.EMOJIS) || !g1.trim()) {
-            return match;
-          }
-          return `<a href="${str_1.default.sanitizeURL(g2)}" target="_blank" rel="noreferrer noopener">${g1.trim()}</a>`;
-        }, rawInputReplacement: function rawInputReplacement(match, g1, g2) {
-          if (g1.match(Constants.CONST.REG_EXP.EMOJIS) || !g1.trim()) {
-            return match;
-          }
-          return `<a href="${str_1.default.sanitizeURL(g2)}" data-raw-href="${g2}" data-link-variant="labeled" target="_blank" rel="noreferrer noopener">${g1.trim()}</a>`;
-        } }, { name: "hereMentions", regex: /([a-zA-Z0-9.!$%&+/=?^`{|}_-]?)(@here)([.!$%&+/=?^`{|}_-]?)(?=\b)(?!([\w'#%+-]*@(?:[a-z\d-]+\.)+[a-z]{2,}(?:\s|$|@here))|((?:(?!<a).)+)?<\/a>|[^<]*(<\/pre>|<\/code>))/gm, replacement: function replacement(match, g1, g2, g3) {
-          if (!str_1.default.isValidMention(match)) {
-            return match;
-          }
-          return `${g1}<mention-here>${g2}</mention-here>${g3}`;
-        } }, { name: "reportMentions", regex: /(?<!(?:(?![\n \*_~\uD800-\uDFFF])[\s\S]|[\uD800-\uDBFF][\uDC00-\uDFFF]))(#(?:[\x2D0-9a-z\xB5\xDF-\xF6\xF8-\xFF\u0101\u0103\u0105\u0107\u0109\u010B\u010D\u010F\u0111\u0113\u0115\u0117\u0119\u011B\u011D\u011F\u0121\u0123\u0125\u0127\u0129\u012B\u012D\u012F\u0131\u0133\u0135\u0137\u0138\u013A\u013C\u013E\u0140\u0142\u0144\u0146\u0148\u0149\u014B\u014D\u014F\u0151\u0153\u0155\u0157\u0159\u015B\u015D\u015F\u0161\u0163\u0165\u0167\u0169\u016B\u016D\u016F\u0171\u0173\u0175\u0177\u017A\u017C\u017E-\u0180\u0183\u0185\u0188\u018C\u018D\u0192\u0195\u0199-\u019B\u019E\u01A1\u01A3\u01A5\u01A8\u01AA\u01AB\u01AD\u01B0\u01B4\u01B6\u01B9\u01BA\u01BD-\u01BF\u01C6\u01C9\u01CC\u01CE\u01D0\u01D2\u01D4\u01D6\u01D8\u01DA\u01DC\u01DD\u01DF\u01E1\u01E3\u01E5\u01E7\u01E9\u01EB\u01ED\u01EF\u01F0\u01F3\u01F5\u01F9\u01FB\u01FD\u01FF\u0201\u0203\u0205\u0207\u0209\u020B\u020D\u020F\u0211\u0213\u0215\u0217\u0219\u021B\u021D\u021F\u0221\u0223\u0225\u0227\u0229\u022B\u022D\u022F\u0231\u0233-\u0239\u023C\u023F\u0240\u0242\u0247\u0249\u024B\u024D\u024F-\u0293\u0295-\u02AF\u0371\u0373\u0377\u037B-\u037D\u0390\u03AC-\u03CE\u03D0\u03D1\u03D5-\u03D7\u03D9\u03DB\u03DD\u03DF\u03E1\u03E3\u03E5\u03E7\u03E9\u03EB\u03ED\u03EF-\u03F3\u03F5\u03F8\u03FB\u03FC\u0430-\u045F\u0461\u0463\u0465\u0467\u0469\u046B\u046D\u046F\u0471\u0473\u0475\u0477\u0479\u047B\u047D\u047F\u0481\u048B\u048D\u048F\u0491\u0493\u0495\u0497\u0499\u049B\u049D\u049F\u04A1\u04A3\u04A5\u04A7\u04A9\u04AB\u04AD\u04AF\u04B1\u04B3\u04B5\u04B7\u04B9\u04BB\u04BD\u04BF\u04C2\u04C4\u04C6\u04C8\u04CA\u04CC\u04CE\u04CF\u04D1\u04D3\u04D5\u04D7\u04D9\u04DB\u04DD\u04DF\u04E1\u04E3\u04E5\u04E7\u04E9\u04EB\u04ED\u04EF\u04F1\u04F3\u04F5\u04F7\u04F9\u04FB\u04FD\u04FF\u0501\u0503\u0505\u0507\u0509\u050B\u050D\u050F\u0511\u0513\u0515\u0517\u0519\u051B\u051D\u051F\u0521\u0523\u0525\u0527\u0529\u052B\u052D\u052F\u0560-\u0588\u10D0-\u10FA\u10FD-\u10FF\u13F8-\u13FD\u1C80-\u1C88\u1D00-\u1D2B\u1D6B-\u1D77\u1D79-\u1D9A\u1E01\u1E03\u1E05\u1E07\u1E09\u1E0B\u1E0D\u1E0F\u1E11\u1E13\u1E15\u1E17\u1E19\u1E1B\u1E1D\u1E1F\u1E21\u1E23\u1E25\u1E27\u1E29\u1E2B\u1E2D\u1E2F\u1E31\u1E33\u1E35\u1E37\u1E39\u1E3B\u1E3D\u1E3F\u1E41\u1E43\u1E45\u1E47\u1E49\u1E4B\u1E4D\u1E4F\u1E51\u1E53\u1E55\u1E57\u1E59\u1E5B\u1E5D\u1E5F\u1E61\u1E63\u1E65\u1E67\u1E69\u1E6B\u1E6D\u1E6F\u1E71\u1E73\u1E75\u1E77\u1E79\u1E7B\u1E7D\u1E7F\u1E81\u1E83\u1E85\u1E87\u1E89\u1E8B\u1E8D\u1E8F\u1E91\u1E93\u1E95-\u1E9D\u1E9F\u1EA1\u1EA3\u1EA5\u1EA7\u1EA9\u1EAB\u1EAD\u1EAF\u1EB1\u1EB3\u1EB5\u1EB7\u1EB9\u1EBB\u1EBD\u1EBF\u1EC1\u1EC3\u1EC5\u1EC7\u1EC9\u1ECB\u1ECD\u1ECF\u1ED1\u1ED3\u1ED5\u1ED7\u1ED9\u1EDB\u1EDD\u1EDF\u1EE1\u1EE3\u1EE5\u1EE7\u1EE9\u1EEB\u1EED\u1EEF\u1EF1\u1EF3\u1EF5\u1EF7\u1EF9\u1EFB\u1EFD\u1EFF-\u1F07\u1F10-\u1F15\u1F20-\u1F27\u1F30-\u1F37\u1F40-\u1F45\u1F50-\u1F57\u1F60-\u1F67\u1F70-\u1F7D\u1F80-\u1F87\u1F90-\u1F97\u1FA0-\u1FA7\u1FB0-\u1FB4\u1FB6\u1FB7\u1FBE\u1FC2-\u1FC4\u1FC6\u1FC7\u1FD0-\u1FD3\u1FD6\u1FD7\u1FE0-\u1FE7\u1FF2-\u1FF4\u1FF6\u1FF7\u210A\u210E\u210F\u2113\u212F\u2134\u2139\u213C\u213D\u2146-\u2149\u214E\u2184\u2C30-\u2C5F\u2C61\u2C65\u2C66\u2C68\u2C6A\u2C6C\u2C71\u2C73\u2C74\u2C76-\u2C7B\u2C81\u2C83\u2C85\u2C87\u2C89\u2C8B\u2C8D\u2C8F\u2C91\u2C93\u2C95\u2C97\u2C99\u2C9B\u2C9D\u2C9F\u2CA1\u2CA3\u2CA5\u2CA7\u2CA9\u2CAB\u2CAD\u2CAF\u2CB1\u2CB3\u2CB5\u2CB7\u2CB9\u2CBB\u2CBD\u2CBF\u2CC1\u2CC3\u2CC5\u2CC7\u2CC9\u2CCB\u2CCD\u2CCF\u2CD1\u2CD3\u2CD5\u2CD7\u2CD9\u2CDB\u2CDD\u2CDF\u2CE1\u2CE3\u2CE4\u2CEC\u2CEE\u2CF3\u2D00-\u2D25\u2D27\u2D2D\uA641\uA643\uA645\uA647\uA649\uA64B\uA64D\uA64F\uA651\uA653\uA655\uA657\uA659\uA65B\uA65D\uA65F\uA661\uA663\uA665\uA667\uA669\uA66B\uA66D\uA681\uA683\uA685\uA687\uA689\uA68B\uA68D\uA68F\uA691\uA693\uA695\uA697\uA699\uA69B\uA723\uA725\uA727\uA729\uA72B\uA72D\uA72F-\uA731\uA733\uA735\uA737\uA739\uA73B\uA73D\uA73F\uA741\uA743\uA745\uA747\uA749\uA74B\uA74D\uA74F\uA751\uA753\uA755\uA757\uA759\uA75B\uA75D\uA75F\uA761\uA763\uA765\uA767\uA769\uA76B\uA76D\uA76F\uA771-\uA778\uA77A\uA77C\uA77F\uA781\uA783\uA785\uA787\uA78C\uA78E\uA791\uA793-\uA795\uA797\uA799\uA79B\uA79D\uA79F\uA7A1\uA7A3\uA7A5\uA7A7\uA7A9\uA7AF\uA7B5\uA7B7\uA7B9\uA7BB\uA7BD\uA7BF\uA7C1\uA7C3\uA7C8\uA7CA\uA7D1\uA7D3\uA7D5\uA7D7\uA7D9\uA7F6\uA7FA\uAB30-\uAB5A\uAB60-\uAB68\uAB70-\uABBF\uFB00-\uFB06\uFB13-\uFB17\uFF41-\uFF5A]|\uD801[\uDC28-\uDC4F\uDCD8-\uDCFB\uDD97-\uDDA1\uDDA3-\uDDB1\uDDB3-\uDDB9\uDDBB\uDDBC]|\uD803[\uDCC0-\uDCF2]|\uD806[\uDCC0-\uDCDF]|\uD81B[\uDE60-\uDE7F]|\uD835[\uDC1A-\uDC33\uDC4E-\uDC54\uDC56-\uDC67\uDC82-\uDC9B\uDCB6-\uDCB9\uDCBB\uDCBD-\uDCC3\uDCC5-\uDCCF\uDCEA-\uDD03\uDD1E-\uDD37\uDD52-\uDD6B\uDD86-\uDD9F\uDDBA-\uDDD3\uDDEE-\uDE07\uDE22-\uDE3B\uDE56-\uDE6F\uDE8A-\uDEA5\uDEC2-\uDEDA\uDEDC-\uDEE1\uDEFC-\uDF14\uDF16-\uDF1B\uDF36-\uDF4E\uDF50-\uDF55\uDF70-\uDF88\uDF8A-\uDF8F\uDFAA-\uDFC2\uDFC4-\uDFC9\uDFCB]|\uD837[\uDF00-\uDF09\uDF0B-\uDF1E\uDF25-\uDF2A]|\uD83A[\uDD22-\uDD43]){1,80})(?!(?:(?![<\uD800-\uDFFF])[\s\S]|[\uD800-\uDBFF][\uDC00-\uDFFF])*(?:<\/pre>|<\/code>))/gim, replacement: "<mention-report>$1</mention-report>" }, { name: "userMentions", regex: new RegExp(`(@here|[a-zA-Z0-9.!$%&+=?^\`{|}-]?)(@${Constants.CONST.REG_EXP.EMAIL_PART}|@${Constants.CONST.REG_EXP.PHONE_PART})(?!((?:(?!<a).)+)?<\\/a>|[^<]*(<\\/pre>|<\\/code>))`, "gim"), replacement: function replacement(match, g1, g2) {
-          var phoneNumberRegex = new RegExp(`^${Constants.CONST.REG_EXP.PHONE_PART}$`);
-          var mention = g2.slice(1);
-          var mentionWithoutSMSDomain = str_1.default.removeSMSDomain(mention);
-          if (!str_1.default.isValidMention(match) || phoneNumberRegex.test(mentionWithoutSMSDomain) && !str_1.default.isValidPhoneNumber(mentionWithoutSMSDomain)) {
-            return match;
-          }
-          var phoneRegex = new RegExp(`^@${Constants.CONST.REG_EXP.PHONE_PART}$`);
-          return `${g1}<mention-user>${g2}${phoneRegex.test(g2) ? `@${Constants.CONST.SMS.DOMAIN}` : ""}</mention-user>`;
-        }, rawInputReplacement: function rawInputReplacement(match, g1, g2) {
-          if (!str_1.default.isValidMention(match)) {
-            return match;
-          }
-          return `${g1}<mention-user>${g2}</mention-user>`;
-        } }, { name: "hereMentionAfterUserMentions", regex: /(<\/mention-user>)(@here)(?=\b)/gm, replacement: "$1<mention-here>$2</mention-here>" }, { name: "autolink", process: function process(textToProcess, replacement) {
-          var regex = new RegExp(`(?![^<]*>|[^<>]*<\\/(?!h1>))([_*~]*?)${UrlPatterns.MARKDOWN_URL_REGEX}\\1(?!((?:(?!<a).)+)?<\\/a>|[^<]*(<\\/pre>|<\\/code>|.+\\/>))`, "gi");
-          return _this3.modifyTextForUrlLinks(regex, textToProcess, replacement);
-        }, replacement: function replacement(match, g1, g2) {
-          var href = str_1.default.sanitizeURL(g2);
-          return `${g1}<a href="${href}" target="_blank" rel="noreferrer noopener">${g2}</a>${g1}`;
-        }, rawInputReplacement: function rawInputReplacement(_match, g1, g2) {
-          var href = str_1.default.sanitizeURL(g2);
-          return `${g1}<a href="${href}" data-raw-href="${g2}" data-link-variant="auto" target="_blank" rel="noreferrer noopener">${g2}</a>${g1}`;
-        } }, { name: "quote", process: function process(textToProcess, replacement) {
-          var shouldKeepRawInput = arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : false;
-          var regex = /^(?:&gt;)+ +(?! )(?![^<]*(?:<\/pre>|<\/code>))([^\v\n\r]+)/gm;
-          var replaceFunction = function replaceFunction2(g1) {
-            return replacement(g1, shouldKeepRawInput);
-          };
-          if (shouldKeepRawInput) {
-            var rawInputRegex = /^(?:&gt;)+ +(?! )(?![^<]*(?:<\/pre>|<\/code>))([^\v\n\r]*)/gm;
-            return textToProcess.replace(rawInputRegex, replaceFunction);
-          }
-          return _this3.modifyTextForQuote(regex, textToProcess, replacement);
-        }, replacement: function replacement(g1) {
-          var shouldKeepRawInput = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : false;
-          var isStartingWithSpace = false;
-          var handleMatch = function handleMatch2(match, g2) {
+      var ExpensiMark2 = function() {
+        function _ExpensiMark() {
+          var _this4 = this;
+          (0, _classCallCheck2.default)(this, _ExpensiMark);
+          this.rules = [{ name: "emoji", regex: Constants.CONST.REG_EXP.EMOJI_RULE, replacement: function replacement(match) {
+            return `<emoji>${match}</emoji>`;
+          } }, { name: "codeFence", regex: /(&#x60;&#x60;&#x60;(?:\r\n|\n))((?:\s*?(?!(?:\r\n|\n)?&#x60;&#x60;&#x60;(?!&#x60;))[\S])+\s*?(?:\r\n|\n))(&#x60;&#x60;&#x60;)/g, replacement: function replacement(match, __, textWithinFences) {
+            var group2 = textWithinFences.replace(/(?:(?![\n\r])\s)/g, "&#32;");
+            return `<pre>${group2}</pre>`;
+          }, rawInputReplacement: function rawInputReplacement(match, __, textWithinFences) {
+            var group2 = textWithinFences.replace(/(?:(?![\n\r])\s)/g, "&#32;").replace(/<emoji>|<\/emoji>/g, "");
+            return `<pre>${group2}</pre>`;
+          } }, { name: "inlineCodeBlock", regex: /(\B|_|)&#x60;(.*?(?![&#x60;])\S.*?)&#x60;(\B|_|)(?!&#x60;|[^<]*<\/pre>)/gm, replacement: "$1<code>$2</code>$3" }, { name: "email", process: function process(textToProcess, replacement, shouldKeepRawInput) {
+            var regex = new RegExp(`(?!\\[\\s*\\])\\[([^[\\]]*)]\\((mailto:)?${Constants.CONST.REG_EXP.MARKDOWN_EMAIL}\\)`, "gim");
+            return _this4.modifyTextForEmailLinks(regex, textToProcess, replacement, shouldKeepRawInput);
+          }, replacement: function replacement(match, g1, g2) {
+            if (g1.match(Constants.CONST.REG_EXP.EMOJIS) || !g1.trim()) {
+              return match;
+            }
+            var label = g1.trim();
+            var href = `mailto:${g2}`;
+            var formattedLabel = label === href ? g2 : label;
+            return `<a href="${href}">${formattedLabel}</a>`;
+          }, rawInputReplacement: function rawInputReplacement(match, g1, g2, g3) {
+            if (g1.match(Constants.CONST.REG_EXP.EMOJIS) || !g1.trim()) {
+              return match;
+            }
+            var dataRawHref = g2 ? g2 + g3 : g3;
+            var href = `mailto:${g3}`;
+            return `<a href="${href}" data-raw-href="${dataRawHref}" data-link-variant="labeled">${g1}</a>`;
+          } }, { name: "heading1", process: function process(textToProcess, replacement) {
+            var shouldKeepRawInput = arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : false;
+            var regexp = shouldKeepRawInput ? /^# ( *(?! )(?:(?!<pre>|\n|\r\n).)+)/gm : /^# +(?! )((?:(?!<pre>|\n|\r\n).)+)/gm;
+            return textToProcess.replace(regexp, replacement);
+          }, replacement: "<h1>$1</h1>" }, { name: "image", regex: MARKDOWN_IMAGE_REGEX, replacement: function replacement(match, g1, g2) {
+            return `<img src="${str_1.default.sanitizeURL(g2)}"${g1 ? ` alt="${_this4.escapeAttributeContent(g1)}"` : ""} />`;
+          }, rawInputReplacement: function rawInputReplacement(match, g1, g2) {
+            return `<img src="${str_1.default.sanitizeURL(g2)}"${g1 ? ` alt="${_this4.escapeAttributeContent(g1)}"` : ""} data-raw-href="${g2}" data-link-variant="${typeof g1 === "string" ? "labeled" : "auto"}" />`;
+          } }, { name: "link", process: function process(textToProcess, replacement) {
+            return _this4.modifyTextForUrlLinks(MARKDOWN_LINK_REGEX, textToProcess, replacement);
+          }, replacement: function replacement(match, g1, g2) {
+            if (g1.match(Constants.CONST.REG_EXP.EMOJIS) || !g1.trim()) {
+              return match;
+            }
+            return `<a href="${str_1.default.sanitizeURL(g2)}" target="_blank" rel="noreferrer noopener">${g1.trim()}</a>`;
+          }, rawInputReplacement: function rawInputReplacement(match, g1, g2) {
+            if (g1.match(Constants.CONST.REG_EXP.EMOJIS) || !g1.trim()) {
+              return match;
+            }
+            return `<a href="${str_1.default.sanitizeURL(g2)}" data-raw-href="${g2}" data-link-variant="labeled" target="_blank" rel="noreferrer noopener">${g1.trim()}</a>`;
+          } }, { name: "hereMentions", regex: /([a-zA-Z0-9.!$%&+/=?^`{|}_-]?)(@here)([.!$%&+/=?^`{|}_-]?)(?=\b)(?!([\w'#%+-]*@(?:[a-z\d-]+\.)+[a-z]{2,}(?:\s|$|@here))|((?:(?!<a).)+)?<\/a>|[^<]*(<\/pre>|<\/code>))/gm, replacement: function replacement(match, g1, g2, g3) {
+            if (!str_1.default.isValidMention(match)) {
+              return match;
+            }
+            return `${g1}<mention-here>${g2}</mention-here>${g3}`;
+          } }, { name: "reportMentions", regex: /(?<!(?:(?![\n \*_~\uD800-\uDFFF])[\s\S]|[\uD800-\uDBFF][\uDC00-\uDFFF]))(#(?:[\x2D0-9a-z\xB5\xDF-\xF6\xF8-\xFF\u0101\u0103\u0105\u0107\u0109\u010B\u010D\u010F\u0111\u0113\u0115\u0117\u0119\u011B\u011D\u011F\u0121\u0123\u0125\u0127\u0129\u012B\u012D\u012F\u0131\u0133\u0135\u0137\u0138\u013A\u013C\u013E\u0140\u0142\u0144\u0146\u0148\u0149\u014B\u014D\u014F\u0151\u0153\u0155\u0157\u0159\u015B\u015D\u015F\u0161\u0163\u0165\u0167\u0169\u016B\u016D\u016F\u0171\u0173\u0175\u0177\u017A\u017C\u017E-\u0180\u0183\u0185\u0188\u018C\u018D\u0192\u0195\u0199-\u019B\u019E\u01A1\u01A3\u01A5\u01A8\u01AA\u01AB\u01AD\u01B0\u01B4\u01B6\u01B9\u01BA\u01BD-\u01BF\u01C6\u01C9\u01CC\u01CE\u01D0\u01D2\u01D4\u01D6\u01D8\u01DA\u01DC\u01DD\u01DF\u01E1\u01E3\u01E5\u01E7\u01E9\u01EB\u01ED\u01EF\u01F0\u01F3\u01F5\u01F9\u01FB\u01FD\u01FF\u0201\u0203\u0205\u0207\u0209\u020B\u020D\u020F\u0211\u0213\u0215\u0217\u0219\u021B\u021D\u021F\u0221\u0223\u0225\u0227\u0229\u022B\u022D\u022F\u0231\u0233-\u0239\u023C\u023F\u0240\u0242\u0247\u0249\u024B\u024D\u024F-\u0293\u0295-\u02AF\u0371\u0373\u0377\u037B-\u037D\u0390\u03AC-\u03CE\u03D0\u03D1\u03D5-\u03D7\u03D9\u03DB\u03DD\u03DF\u03E1\u03E3\u03E5\u03E7\u03E9\u03EB\u03ED\u03EF-\u03F3\u03F5\u03F8\u03FB\u03FC\u0430-\u045F\u0461\u0463\u0465\u0467\u0469\u046B\u046D\u046F\u0471\u0473\u0475\u0477\u0479\u047B\u047D\u047F\u0481\u048B\u048D\u048F\u0491\u0493\u0495\u0497\u0499\u049B\u049D\u049F\u04A1\u04A3\u04A5\u04A7\u04A9\u04AB\u04AD\u04AF\u04B1\u04B3\u04B5\u04B7\u04B9\u04BB\u04BD\u04BF\u04C2\u04C4\u04C6\u04C8\u04CA\u04CC\u04CE\u04CF\u04D1\u04D3\u04D5\u04D7\u04D9\u04DB\u04DD\u04DF\u04E1\u04E3\u04E5\u04E7\u04E9\u04EB\u04ED\u04EF\u04F1\u04F3\u04F5\u04F7\u04F9\u04FB\u04FD\u04FF\u0501\u0503\u0505\u0507\u0509\u050B\u050D\u050F\u0511\u0513\u0515\u0517\u0519\u051B\u051D\u051F\u0521\u0523\u0525\u0527\u0529\u052B\u052D\u052F\u0560-\u0588\u10D0-\u10FA\u10FD-\u10FF\u13F8-\u13FD\u1C80-\u1C88\u1D00-\u1D2B\u1D6B-\u1D77\u1D79-\u1D9A\u1E01\u1E03\u1E05\u1E07\u1E09\u1E0B\u1E0D\u1E0F\u1E11\u1E13\u1E15\u1E17\u1E19\u1E1B\u1E1D\u1E1F\u1E21\u1E23\u1E25\u1E27\u1E29\u1E2B\u1E2D\u1E2F\u1E31\u1E33\u1E35\u1E37\u1E39\u1E3B\u1E3D\u1E3F\u1E41\u1E43\u1E45\u1E47\u1E49\u1E4B\u1E4D\u1E4F\u1E51\u1E53\u1E55\u1E57\u1E59\u1E5B\u1E5D\u1E5F\u1E61\u1E63\u1E65\u1E67\u1E69\u1E6B\u1E6D\u1E6F\u1E71\u1E73\u1E75\u1E77\u1E79\u1E7B\u1E7D\u1E7F\u1E81\u1E83\u1E85\u1E87\u1E89\u1E8B\u1E8D\u1E8F\u1E91\u1E93\u1E95-\u1E9D\u1E9F\u1EA1\u1EA3\u1EA5\u1EA7\u1EA9\u1EAB\u1EAD\u1EAF\u1EB1\u1EB3\u1EB5\u1EB7\u1EB9\u1EBB\u1EBD\u1EBF\u1EC1\u1EC3\u1EC5\u1EC7\u1EC9\u1ECB\u1ECD\u1ECF\u1ED1\u1ED3\u1ED5\u1ED7\u1ED9\u1EDB\u1EDD\u1EDF\u1EE1\u1EE3\u1EE5\u1EE7\u1EE9\u1EEB\u1EED\u1EEF\u1EF1\u1EF3\u1EF5\u1EF7\u1EF9\u1EFB\u1EFD\u1EFF-\u1F07\u1F10-\u1F15\u1F20-\u1F27\u1F30-\u1F37\u1F40-\u1F45\u1F50-\u1F57\u1F60-\u1F67\u1F70-\u1F7D\u1F80-\u1F87\u1F90-\u1F97\u1FA0-\u1FA7\u1FB0-\u1FB4\u1FB6\u1FB7\u1FBE\u1FC2-\u1FC4\u1FC6\u1FC7\u1FD0-\u1FD3\u1FD6\u1FD7\u1FE0-\u1FE7\u1FF2-\u1FF4\u1FF6\u1FF7\u210A\u210E\u210F\u2113\u212F\u2134\u2139\u213C\u213D\u2146-\u2149\u214E\u2184\u2C30-\u2C5F\u2C61\u2C65\u2C66\u2C68\u2C6A\u2C6C\u2C71\u2C73\u2C74\u2C76-\u2C7B\u2C81\u2C83\u2C85\u2C87\u2C89\u2C8B\u2C8D\u2C8F\u2C91\u2C93\u2C95\u2C97\u2C99\u2C9B\u2C9D\u2C9F\u2CA1\u2CA3\u2CA5\u2CA7\u2CA9\u2CAB\u2CAD\u2CAF\u2CB1\u2CB3\u2CB5\u2CB7\u2CB9\u2CBB\u2CBD\u2CBF\u2CC1\u2CC3\u2CC5\u2CC7\u2CC9\u2CCB\u2CCD\u2CCF\u2CD1\u2CD3\u2CD5\u2CD7\u2CD9\u2CDB\u2CDD\u2CDF\u2CE1\u2CE3\u2CE4\u2CEC\u2CEE\u2CF3\u2D00-\u2D25\u2D27\u2D2D\uA641\uA643\uA645\uA647\uA649\uA64B\uA64D\uA64F\uA651\uA653\uA655\uA657\uA659\uA65B\uA65D\uA65F\uA661\uA663\uA665\uA667\uA669\uA66B\uA66D\uA681\uA683\uA685\uA687\uA689\uA68B\uA68D\uA68F\uA691\uA693\uA695\uA697\uA699\uA69B\uA723\uA725\uA727\uA729\uA72B\uA72D\uA72F-\uA731\uA733\uA735\uA737\uA739\uA73B\uA73D\uA73F\uA741\uA743\uA745\uA747\uA749\uA74B\uA74D\uA74F\uA751\uA753\uA755\uA757\uA759\uA75B\uA75D\uA75F\uA761\uA763\uA765\uA767\uA769\uA76B\uA76D\uA76F\uA771-\uA778\uA77A\uA77C\uA77F\uA781\uA783\uA785\uA787\uA78C\uA78E\uA791\uA793-\uA795\uA797\uA799\uA79B\uA79D\uA79F\uA7A1\uA7A3\uA7A5\uA7A7\uA7A9\uA7AF\uA7B5\uA7B7\uA7B9\uA7BB\uA7BD\uA7BF\uA7C1\uA7C3\uA7C8\uA7CA\uA7D1\uA7D3\uA7D5\uA7D7\uA7D9\uA7F6\uA7FA\uAB30-\uAB5A\uAB60-\uAB68\uAB70-\uABBF\uFB00-\uFB06\uFB13-\uFB17\uFF41-\uFF5A]|\uD801[\uDC28-\uDC4F\uDCD8-\uDCFB\uDD97-\uDDA1\uDDA3-\uDDB1\uDDB3-\uDDB9\uDDBB\uDDBC]|\uD803[\uDCC0-\uDCF2]|\uD806[\uDCC0-\uDCDF]|\uD81B[\uDE60-\uDE7F]|\uD835[\uDC1A-\uDC33\uDC4E-\uDC54\uDC56-\uDC67\uDC82-\uDC9B\uDCB6-\uDCB9\uDCBB\uDCBD-\uDCC3\uDCC5-\uDCCF\uDCEA-\uDD03\uDD1E-\uDD37\uDD52-\uDD6B\uDD86-\uDD9F\uDDBA-\uDDD3\uDDEE-\uDE07\uDE22-\uDE3B\uDE56-\uDE6F\uDE8A-\uDEA5\uDEC2-\uDEDA\uDEDC-\uDEE1\uDEFC-\uDF14\uDF16-\uDF1B\uDF36-\uDF4E\uDF50-\uDF55\uDF70-\uDF88\uDF8A-\uDF8F\uDFAA-\uDFC2\uDFC4-\uDFC9\uDFCB]|\uD837[\uDF00-\uDF09\uDF0B-\uDF1E\uDF25-\uDF2A]|\uD83A[\uDD22-\uDD43]){1,80})(?!(?:(?![<\uD800-\uDFFF])[\s\S]|[\uD800-\uDBFF][\uDC00-\uDFFF])*(?:<\/pre>|<\/code>))/gim, replacement: "<mention-report>$1</mention-report>" }, { name: "userMentions", regex: new RegExp(`(@here|[a-zA-Z0-9.!$%&+=?^\`{|}-]?)(@${Constants.CONST.REG_EXP.EMAIL_PART}|@${Constants.CONST.REG_EXP.PHONE_PART})(?!((?:(?!<a).)+)?<\\/a>|[^<]*(<\\/pre>|<\\/code>))`, "gim"), replacement: function replacement(match, g1, g2) {
+            var phoneNumberRegex = new RegExp(`^${Constants.CONST.REG_EXP.PHONE_PART}$`);
+            var mention = g2.slice(1);
+            var mentionWithoutSMSDomain = str_1.default.removeSMSDomain(mention);
+            if (!str_1.default.isValidMention(match) || phoneNumberRegex.test(mentionWithoutSMSDomain) && !str_1.default.isValidPhoneNumber(mentionWithoutSMSDomain)) {
+              return match;
+            }
+            var phoneRegex = new RegExp(`^@${Constants.CONST.REG_EXP.PHONE_PART}$`);
+            return `${g1}<mention-user>${g2}${phoneRegex.test(g2) ? `@${Constants.CONST.SMS.DOMAIN}` : ""}</mention-user>`;
+          }, rawInputReplacement: function rawInputReplacement(match, g1, g2) {
+            if (!str_1.default.isValidMention(match)) {
+              return match;
+            }
+            return `${g1}<mention-user>${g2}</mention-user>`;
+          } }, { name: "hereMentionAfterUserMentions", regex: /(<\/mention-user>)(@here)(?=\b)/gm, replacement: "$1<mention-here>$2</mention-here>" }, { name: "autolink", process: function process(textToProcess, replacement) {
+            var regex = new RegExp(`(?![^<]*>|[^<>]*<\\/(?!h1>))([_*~]*?)${UrlPatterns.MARKDOWN_URL_REGEX}\\1(?!((?:(?!<a).)+)?<\\/a>|[^<]*(<\\/pre>|<\\/code>|.+\\/>))`, "gi");
+            return _this4.modifyTextForUrlLinks(regex, textToProcess, replacement);
+          }, replacement: function replacement(match, g1, g2) {
+            var href = str_1.default.sanitizeURL(g2);
+            return `${g1}<a href="${href}" target="_blank" rel="noreferrer noopener">${g2}</a>${g1}`;
+          }, rawInputReplacement: function rawInputReplacement(_match, g1, g2) {
+            var href = str_1.default.sanitizeURL(g2);
+            return `${g1}<a href="${href}" data-raw-href="${g2}" data-link-variant="auto" target="_blank" rel="noreferrer noopener">${g2}</a>${g1}`;
+          } }, { name: "quote", process: function process(textToProcess, replacement) {
+            var shouldKeepRawInput = arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : false;
+            var regex = /^(?:&gt;)+ +(?! )(?![^<]*(?:<\/pre>|<\/code>))([^\v\n\r]+)/gm;
+            var replaceFunction = function replaceFunction2(g1) {
+              return replacement(g1, shouldKeepRawInput);
+            };
             if (shouldKeepRawInput) {
-              isStartingWithSpace = !!g2;
-              return "";
+              var rawInputRegex = /^(?:&gt;)+ +(?! )(?![^<]*(?:<\/pre>|<\/code>))([^\v\n\r]*)/gm;
+              return textToProcess.replace(rawInputRegex, replaceFunction);
             }
-            return match;
-          };
-          var textToReplace = g1.replace(/^&gt;( )?/gm, handleMatch);
-          var filterRules = ["heading1"];
-          if (_this3.currentQuoteDepth < _this3.maxQuoteDepth - 1 || isStartingWithSpace) {
-            filterRules.push("quote");
-            _this3.currentQuoteDepth++;
-          }
-          var replacedText = _this3.replace(textToReplace, { filterRules, shouldEscapeText: false, shouldKeepRawInput });
-          _this3.currentQuoteDepth = 0;
-          return `<blockquote>${isStartingWithSpace ? " " : ""}${replacedText}</blockquote>`;
-        } }, { name: "italic", regex: /(<(pre|code|a|mention-user)[^>]*>(.*?)<\/\2>)|((\b_+|\b)_((?![\s_])[\s\S]*?[^\s_](?<!\s))_(?![^\W_])(?![^<]*>)(?![^<]*(<\/pre>|<\/code>|<\/a>|<\/mention-user>)))/g, replacement: function replacement(match, html, tag, content, text, extraLeadingUnderscores, textWithinUnderscores) {
-          if (html) {
-            return html;
-          }
-          if (textWithinUnderscores.includes("</pre>") || _this3.containsNonPairTag(textWithinUnderscores)) {
-            return match;
-          }
-          if (String(textWithinUnderscores).match(`^${Constants.CONST.REG_EXP.MARKDOWN_EMAIL}`)) {
-            return `<em>${extraLeadingUnderscores}${textWithinUnderscores}</em>`;
-          }
-          return `${extraLeadingUnderscores}<em>${textWithinUnderscores}</em>`;
-        } }, { name: "autoEmail", regex: new RegExp(`([^\\w'#%+-]|^)${Constants.CONST.REG_EXP.MARKDOWN_EMAIL}(?!((?:(?!<a).)+)?<\\/a>|[^<>]*<\\/(?!em|h1|blockquote))`, "gim"), replacement: '$1<a href="mailto:$2">$2</a>', rawInputReplacement: '$1<a href="mailto:$2" data-raw-href="$2" data-link-variant="auto">$2</a>' }, { name: "bold", regex: /(?<!<[^>]*)\B\*(?![^<]*(?:<\/pre>|<\/code>|<\/a>))((?![\s*])[\s\S]*?[^\s*](?<!\s))\*\B(?![^<]*>)(?![^<]*(<\/pre>|<\/code>|<\/a>))/g, replacement: function replacement(match, g1) {
-          return g1.includes("</pre>") || _this3.containsNonPairTag(g1) ? match : `<strong>${g1}</strong>`;
-        } }, { name: "strikethrough", regex: /(?<!<[^>]*)\B~((?![\s~])[\s\S]*?[^\s~](?<!\s))~\B(?![^<]*>)(?![^<]*(<\/pre>|<\/code>|<\/a>))/g, replacement: function replacement(match, g1) {
-          return g1.includes("</pre>") || _this3.containsNonPairTag(g1) ? match : `<del>${g1}</del>`;
-        } }, { name: "newline", regex: /\r?\n/g, replacement: "<br />" }, { name: "replacepre", regex: /<\/pre>\s*<br\s*[/]?>/gi, replacement: "</pre>" }, { name: "replaceh1br", regex: /<\/h1><br\s*[/]?>/gi, replacement: "</h1>" }];
-        this.htmlToMarkdownRules = [{ name: "replacepre", regex: /<\/pre>(.)/gi, replacement: "</pre><br />$1" }, { name: "exclude", regex: new RegExp([`<(script|style)(?:"[^"]*"|'[^']*'|[^'">])*>([\\s\\S]*?)<\\/\\1>`, "(?![^<]*(<\\/pre>|<\\/code>))(\n|\r\n)?"].join(""), "gim"), replacement: "" }, { name: "nested", regex: /<(pre)(?:"[^"]*"|'[^']*'|[^'">])*><(div|code)(?:"[^"]*"|'[^']*'|[^'">])*>([\s\S]*?)<\/\2><\/pre>/gi, replacement: "<pre>$3</pre>" }, { name: "newline", pre: function pre(inputString) {
-          return inputString.replace("<br></br>", "<br/>").replace("<br><br/>", "<br/>").replace(/(<tr.*?<\/tr>)/g, "$1<br/>").replace("<br/></tbody>", "").replace(SLACK_SPAN_NEW_LINE_TAG + SLACK_SPAN_NEW_LINE_TAG, "<br/><br/><br/>").replace(SLACK_SPAN_NEW_LINE_TAG, "<br/><br/>");
-        }, regex: /<br(?:"[^"]*"|'[^']*'|[^'"><])*>\n?/gi, replacement: "\n" }, { name: "heading1", regex: /[^\S\r\n]*<(h1)(?:"[^"]*"|'[^']*'|[^'">])*>(.*?)<\/\1>(?![^<]*(<\/pre>|<\/code>))/gi, replacement: "<h1># $2</h1>" }, { name: "listItem", regex: /\s*<(li)(?:"[^"]*"|'[^']*'|[^'">])*>(.*?)<\/\1>(?![^<]*(<\/pre>|<\/code>))\s*/gi, replacement: "<li>  $2</li>" }, { name: "italic", regex: /<(em|i)(?:"[^"]*"|'[^']*'|[^'">])*>([\s\S]*?)<\/\1>(?![^<]*(<\/pre>|<\/code>))/gi, replacement: "_$2_" }, { name: "bold", regex: /<(b|strong)(?:"[^"]*"|'[^']*'|[^'">])*>([\s\S]*?)<\/\1>(?![^<]*(<\/pre>|<\/code>))/gi, replacement: "*$2*" }, { name: "strikethrough", regex: /<(del|s)(?:"[^"]*"|'[^']*'|[^'">])*>([\s\S]*?)<\/\1>(?![^<]*(<\/pre>|<\/code>))/gi, replacement: "~$2~" }, { name: "quote", regex: /<(blockquote|q)(?:"[^"]*"|'[^']*'|[^'">])*>([\s\S]*?)<\/\1>(?![^<]*(<\/pre>|<\/code>))/gi, replacement: function replacement(match, g1, g2) {
-          var resultString = g2.replace(/\n?(<h1># )/g, "$1").replace(/(<h1>|<\/h1>)+/g, "\n").trim().split("\n");
-          function wrapWithBlockquote(line) {
-            return `<blockquote>${line}</blockquote>`;
-          }
-          resultString = _3.map(resultString, wrapWithBlockquote);
-          function processString(m) {
-            function replaceBlockquotes(text) {
-              var modifiedText = text;
-              var depth;
-              do {
-                depth = (modifiedText.match(/<blockquote>/gi) || []).length;
-                modifiedText = modifiedText.replace(/<blockquote>/gi, "");
-                modifiedText = modifiedText.replace(/<\/blockquote>/gi, "");
-              } while (/<blockquote>/i.test(modifiedText));
-              return `${">".repeat(depth)} ${modifiedText}`;
+            return _this4.modifyTextForQuote(regex, textToProcess, replacement);
+          }, replacement: function replacement(g1) {
+            var shouldKeepRawInput = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : false;
+            var isStartingWithSpace = false;
+            var handleMatch = function handleMatch2(match, g2) {
+              if (shouldKeepRawInput) {
+                isStartingWithSpace = !!g2;
+                return "";
+              }
+              return match;
+            };
+            var textToReplace = g1.replace(/^&gt;( )?/gm, handleMatch);
+            var filterRules = ["heading1"];
+            if (_this4.currentQuoteDepth < _this4.maxQuoteDepth - 1 || isStartingWithSpace) {
+              filterRules.push("quote");
+              _this4.currentQuoteDepth++;
             }
-            return replaceBlockquotes(m);
-          }
-          resultString = _3.map(resultString, processString).join("\n");
-          return `<blockquote>${resultString}</blockquote>`;
-        } }, { name: "inlineCodeBlock", regex: /<(code)(?:"[^"]*"|'[^']*'|[^'">])*>(.*?)<\/\1>(?![^<]*(<\/pre>|<\/code>))/gi, replacement: "`$2`" }, { name: "codeFence", regex: /<(pre)(?:"[^"]*"|'[^']*'|[^'">])*>([\s\S]*?)(\n?)<\/\1>(?![^<]*(<\/pre>|<\/code>))/gi, replacement: function replacement(match, g1, g2) {
-          return `\`\`\`
+            var replacedText = _this4.replace(textToReplace, { filterRules, shouldEscapeText: false, shouldKeepRawInput });
+            _this4.currentQuoteDepth = 0;
+            return `<blockquote>${isStartingWithSpace ? " " : ""}${replacedText}</blockquote>`;
+          } }, { name: "italic", regex: /(<(pre|code|a|mention-user)[^>]*>(.*?)<\/\2>)|((\b_+|\b)_((?![\s_])[\s\S]*?[^\s_](?<!\s))_(?![^\W_])(?![^<]*>)(?![^<]*(<\/pre>|<\/code>|<\/a>|<\/mention-user>)))/g, replacement: function replacement(match, html, tag, content, text, extraLeadingUnderscores, textWithinUnderscores) {
+            if (html) {
+              return html;
+            }
+            if (textWithinUnderscores.includes("</pre>") || _this4.containsNonPairTag(textWithinUnderscores)) {
+              return match;
+            }
+            if (String(textWithinUnderscores).match(`^${Constants.CONST.REG_EXP.MARKDOWN_EMAIL}`)) {
+              return `<em>${extraLeadingUnderscores}${textWithinUnderscores}</em>`;
+            }
+            return `${extraLeadingUnderscores}<em>${textWithinUnderscores}</em>`;
+          } }, { name: "autoEmail", regex: new RegExp(`([^\\w'#%+-]|^)${Constants.CONST.REG_EXP.MARKDOWN_EMAIL}(?!((?:(?!<a).)+)?<\\/a>|[^<>]*<\\/(?!em|h1|blockquote))`, "gim"), replacement: '$1<a href="mailto:$2">$2</a>', rawInputReplacement: '$1<a href="mailto:$2" data-raw-href="$2" data-link-variant="auto">$2</a>' }, { name: "bold", regex: /(?<!<[^>]*)\B\*(?![^<]*(?:<\/pre>|<\/code>|<\/a>))((?![\s*])[\s\S]*?[^\s*](?<!\s))\*\B(?![^<]*>)(?![^<]*(<\/pre>|<\/code>|<\/a>))/g, replacement: function replacement(match, g1) {
+            return g1.includes("</pre>") || _this4.containsNonPairTag(g1) ? match : `<strong>${g1}</strong>`;
+          } }, { name: "strikethrough", regex: /(?<!<[^>]*)\B~((?![\s~])[\s\S]*?[^\s~](?<!\s))~\B(?![^<]*>)(?![^<]*(<\/pre>|<\/code>|<\/a>))/g, replacement: function replacement(match, g1) {
+            return g1.includes("</pre>") || _this4.containsNonPairTag(g1) ? match : `<del>${g1}</del>`;
+          } }, { name: "newline", regex: /\r?\n/g, replacement: "<br />" }, { name: "replacepre", regex: /<\/pre>\s*<br\s*[/]?>/gi, replacement: "</pre>" }, { name: "replaceh1br", regex: /<\/h1><br\s*[/]?>/gi, replacement: "</h1>" }];
+          this.htmlToMarkdownRules = [{ name: "replacepre", regex: /<\/pre>(.)/gi, replacement: "</pre><br />$1" }, { name: "exclude", regex: new RegExp([`<(script|style)(?:"[^"]*"|'[^']*'|[^'">])*>([\\s\\S]*?)<\\/\\1>`, "(?![^<]*(<\\/pre>|<\\/code>))(\n|\r\n)?"].join(""), "gim"), replacement: "" }, { name: "nested", regex: /<(pre)(?:"[^"]*"|'[^']*'|[^'">])*><(div|code)(?:"[^"]*"|'[^']*'|[^'">])*>([\s\S]*?)<\/\2><\/pre>/gi, replacement: "<pre>$3</pre>" }, { name: "newline", pre: function pre(inputString) {
+            return inputString.replace("<br></br>", "<br/>").replace("<br><br/>", "<br/>").replace(/(<tr.*?<\/tr>)/g, "$1<br/>").replace("<br/></tbody>", "").replace(SLACK_SPAN_NEW_LINE_TAG + SLACK_SPAN_NEW_LINE_TAG, "<br/><br/><br/>").replace(SLACK_SPAN_NEW_LINE_TAG, "<br/><br/>");
+          }, regex: /<br(?:"[^"]*"|'[^']*'|[^'"><])*>\n?/gi, replacement: "\n" }, { name: "heading1", regex: /[^\S\r\n]*<(h1)(?:"[^"]*"|'[^']*'|[^'">])*>(.*?)<\/\1>(?![^<]*(<\/pre>|<\/code>))/gi, replacement: "<h1># $2</h1>" }, { name: "listItem", regex: /\s*<(li)(?:"[^"]*"|'[^']*'|[^'">])*>(.*?)<\/\1>(?![^<]*(<\/pre>|<\/code>))\s*/gi, replacement: "<li>  $2</li>" }, { name: "italic", regex: /<(em|i)(?:"[^"]*"|'[^']*'|[^'">])*>([\s\S]*?)<\/\1>(?![^<]*(<\/pre>|<\/code>))/gi, replacement: "_$2_" }, { name: "bold", regex: /<(b|strong)(?:"[^"]*"|'[^']*'|[^'">])*>([\s\S]*?)<\/\1>(?![^<]*(<\/pre>|<\/code>))/gi, replacement: "*$2*" }, { name: "strikethrough", regex: /<(del|s)(?:"[^"]*"|'[^']*'|[^'">])*>([\s\S]*?)<\/\1>(?![^<]*(<\/pre>|<\/code>))/gi, replacement: "~$2~" }, { name: "quote", regex: /<(blockquote|q)(?:"[^"]*"|'[^']*'|[^'">])*>([\s\S]*?)<\/\1>(?![^<]*(<\/pre>|<\/code>))/gi, replacement: function replacement(match, g1, g2) {
+            var resultString = g2.replace(/\n?(<h1># )/g, "$1").replace(/(<h1>|<\/h1>)+/g, "\n").trim().split("\n");
+            function wrapWithBlockquote(line) {
+              return `<blockquote>${line}</blockquote>`;
+            }
+            resultString = _3.map(resultString, wrapWithBlockquote);
+            function processString(m) {
+              function replaceBlockquotes(text) {
+                var modifiedText = text;
+                var depth;
+                do {
+                  depth = (modifiedText.match(/<blockquote>/gi) || []).length;
+                  modifiedText = modifiedText.replace(/<blockquote>/gi, "");
+                  modifiedText = modifiedText.replace(/<\/blockquote>/gi, "");
+                } while (/<blockquote>/i.test(modifiedText));
+                return `${">".repeat(depth)} ${modifiedText}`;
+              }
+              return replaceBlockquotes(m);
+            }
+            resultString = _3.map(resultString, processString).join("\n");
+            return `<blockquote>${resultString}</blockquote>`;
+          } }, { name: "inlineCodeBlock", regex: /<(code)(?:"[^"]*"|'[^']*'|[^'">])*>(.*?)<\/\1>(?![^<]*(<\/pre>|<\/code>))/gi, replacement: "`$2`" }, { name: "codeFence", regex: /<(pre)(?:"[^"]*"|'[^']*'|[^'">])*>([\s\S]*?)(\n?)<\/\1>(?![^<]*(<\/pre>|<\/code>))/gi, replacement: function replacement(match, g1, g2) {
+            return `\`\`\`
 ${g2}
 \`\`\``;
-        } }, { name: "anchor", regex: /<(a)[^><]*href\s*=\s*(['"])(.*?)\2(?:".*?"|'.*?'|[^'"><])*>([\s\S]*?)<\/\1>(?![^<]*(<\/pre>|<\/code>))/gi, replacement: function replacement(match, g1, g2, g3, g4) {
-          var email = g3.startsWith("mailto:") ? g3.slice(7) : "";
-          if (email === g4) {
-            return email;
-          }
-          return `[${g4}](${email || g3})`;
-        } }, { name: "image", regex: /<img[^><]*src\s*=\s*(['"])(.*?)\1(?:[^><]*alt\s*=\s*(['"])(.*?)\3)?[^><]*>*(?![^<][\s\S]*?(<\/pre>|<\/code>))/gi, replacement: function replacement(match, g1, g2, g3, g4) {
-          if (g4) {
-            return `![${g4}](${g2})`;
-          }
-          return `!(${g2})`;
-        } }, { name: "reportMentions", regex: /<mention-report reportID="(\d+)" *\/>/gi, replacement: function replacement(match, g1, offset, string, extras) {
-          var reportToNameMap = extras.reportIDToName;
-          if (!reportToNameMap || !reportToNameMap[g1]) {
-            ExpensiMark2.Log.alert("[ExpensiMark] Missing report name", { reportID: g1 });
-            return "#Hidden";
-          }
-          return reportToNameMap[g1];
-        } }, { name: "userMention", regex: /(?:<mention-user accountID="(\d+)" *\/>)|(?:<mention-user>(.*?)<\/mention-user>)/gi, replacement: function replacement(match, g1, g2, offset, string, extras) {
-          if (g1) {
+          } }, { name: "anchor", regex: /<(a)[^><]*href\s*=\s*(['"])(.*?)\2(?:".*?"|'.*?'|[^'"><])*>([\s\S]*?)<\/\1>(?![^<]*(<\/pre>|<\/code>))/gi, replacement: function replacement(match, g1, g2, g3, g4) {
+            var email = g3.startsWith("mailto:") ? g3.slice(7) : "";
+            if (email === g4) {
+              return email;
+            }
+            return `[${g4}](${email || g3})`;
+          } }, { name: "image", regex: /<img[^><]*src\s*=\s*(['"])(.*?)\1(?:[^><]*alt\s*=\s*(['"])(.*?)\3)?[^><]*>*(?![^<][\s\S]*?(<\/pre>|<\/code>))/gi, replacement: function replacement(match, g1, g2, g3, g4) {
+            if (g4) {
+              return `![${g4}](${g2})`;
+            }
+            return `!(${g2})`;
+          } }, { name: "reportMentions", regex: /<mention-report reportID="(\d+)" *\/>/gi, replacement: function replacement(match, g1, offset, string, extras) {
+            var reportToNameMap = extras.reportIDToName;
+            if (!reportToNameMap || !reportToNameMap[g1]) {
+              _ExpensiMark.Log.alert("[ExpensiMark] Missing report name", { reportID: g1 });
+              return "#Hidden";
+            }
+            return reportToNameMap[g1];
+          } }, { name: "userMention", regex: /(?:<mention-user accountID="(\d+)" *\/>)|(?:<mention-user>(.*?)<\/mention-user>)/gi, replacement: function replacement(match, g1, g2, offset, string, extras) {
+            if (g1) {
+              var accountToNameMap = extras.accountIDToName;
+              if (!accountToNameMap || !accountToNameMap[g1]) {
+                _ExpensiMark.Log.alert("[ExpensiMark] Missing account name", { accountID: g1 });
+                return "@Hidden";
+              }
+              return `@${extras.accountIDToName[g1]}`;
+            }
+            return str_1.default.removeSMSDomain(g2);
+          } }];
+          this.htmlToTextRules = [{ name: "breakline", regex: /<br[^>]*>/gi, replacement: "\n" }, { name: "blockquoteWrapHeadingOpen", regex: /<blockquote><h1>/gi, replacement: "<blockquote>" }, { name: "blockquoteWrapHeadingClose", regex: /<\/h1><\/blockquote>/gi, replacement: "</blockquote>" }, { name: "blockElementOpen", regex: /(.|\s)<(blockquote|h1|pre)>/gi, replacement: "$1\n" }, { name: "blockElementClose", regex: /<\/(blockquote|h1|pre)>(.|\s)/gm, replacement: "\n$2" }, { name: "removeStyle", regex: /<style>.*?<\/style>/gi, replacement: "" }, { name: "image", regex: /<img[^><]*src\s*=\s*(['"])(.*?)\1(?:[^><]*alt\s*=\s*(['"])(.*?)\3)?[^><]*>*(?![^<][\s\S]*?(<\/pre>|<\/code>))/gi, replacement: "[Attachment]" }, { name: "reportMentions", regex: /<mention-report reportID="(\d+)" *\/>/gi, replacement: function replacement(match, g1, offset, string, extras) {
+            var reportToNameMap = extras.reportIDToName;
+            if (!reportToNameMap || !reportToNameMap[g1]) {
+              _ExpensiMark.Log.alert("[ExpensiMark] Missing report name", { reportID: g1 });
+              return "#Hidden";
+            }
+            return reportToNameMap[g1];
+          } }, { name: "userMention", regex: /<mention-user accountID="(\d+)" *\/>/gi, replacement: function replacement(match, g1, offset, string, extras) {
             var accountToNameMap = extras.accountIDToName;
             if (!accountToNameMap || !accountToNameMap[g1]) {
-              ExpensiMark2.Log.alert("[ExpensiMark] Missing account name", { accountID: g1 });
+              _ExpensiMark.Log.alert("[ExpensiMark] Missing account name", { accountID: g1 });
               return "@Hidden";
             }
             return `@${extras.accountIDToName[g1]}`;
-          }
-          return str_1.default.removeSMSDomain(g2);
-        } }];
-        this.htmlToTextRules = [{ name: "breakline", regex: /<br[^>]*>/gi, replacement: "\n" }, { name: "blockquoteWrapHeadingOpen", regex: /<blockquote><h1>/gi, replacement: "<blockquote>" }, { name: "blockquoteWrapHeadingClose", regex: /<\/h1><\/blockquote>/gi, replacement: "</blockquote>" }, { name: "blockElementOpen", regex: /(.|\s)<(blockquote|h1|pre)>/gi, replacement: "$1\n" }, { name: "blockElementClose", regex: /<\/(blockquote|h1|pre)>(.|\s)/gm, replacement: "\n$2" }, { name: "removeStyle", regex: /<style>.*?<\/style>/gi, replacement: "" }, { name: "image", regex: /<img[^><]*src\s*=\s*(['"])(.*?)\1(?:[^><]*alt\s*=\s*(['"])(.*?)\3)?[^><]*>*(?![^<][\s\S]*?(<\/pre>|<\/code>))/gi, replacement: "[Attachment]" }, { name: "reportMentions", regex: /<mention-report reportID="(\d+)" *\/>/gi, replacement: function replacement(match, g1, offset, string, extras) {
-          var reportToNameMap = extras.reportIDToName;
-          if (!reportToNameMap || !reportToNameMap[g1]) {
-            ExpensiMark2.Log.alert("[ExpensiMark] Missing report name", { reportID: g1 });
-            return "#Hidden";
-          }
-          return reportToNameMap[g1];
-        } }, { name: "userMention", regex: /<mention-user accountID="(\d+)" *\/>/gi, replacement: function replacement(match, g1, offset, string, extras) {
-          var accountToNameMap = extras.accountIDToName;
-          if (!accountToNameMap || !accountToNameMap[g1]) {
-            ExpensiMark2.Log.alert("[ExpensiMark] Missing account name", { accountID: g1 });
-            return "@Hidden";
-          }
-          return `@${extras.accountIDToName[g1]}`;
-        } }, { name: "stripTag", regex: /(<([^>]+)>)/gi, replacement: "" }];
-        this.whitespaceRulesToDisable = ["newline", "replacepre", "replacebr", "replaceh1br"];
-        this.filterRules = function(rule) {
-          return !_3.includes(_this3.whitespaceRulesToDisable, rule.name);
-        };
-        this.shouldKeepWhitespaceRules = _3.filter(this.rules, this.filterRules);
-        this.maxQuoteDepth = 3;
-        this.currentQuoteDepth = 0;
-      }, getHtmlRuleset: function getHtmlRuleset(filterRules, disabledRules, shouldKeepRawInput) {
-        var rules = this.rules;
-        var hasRuleName = function hasRuleName2(rule) {
-          return _3.contains(filterRules, rule.name);
-        };
-        var hasDisabledRuleName = function hasDisabledRuleName2(rule) {
-          return !_3.contains(disabledRules, rule.name);
-        };
-        if (shouldKeepRawInput) {
-          rules = this.shouldKeepWhitespaceRules;
+          } }, { name: "stripTag", regex: /(<([^>]+)>)/gi, replacement: "" }];
+          this.whitespaceRulesToDisable = ["newline", "replacepre", "replacebr", "replaceh1br"];
+          this.filterRules = function(rule) {
+            return !_3.includes(_this4.whitespaceRulesToDisable, rule.name);
+          };
+          this.shouldKeepWhitespaceRules = _3.filter(this.rules, this.filterRules);
+          this.maxQuoteDepth = 3;
+          this.currentQuoteDepth = 0;
         }
-        if (!_3.isEmpty(filterRules)) {
-          rules = _3.filter(this.rules, hasRuleName);
-        }
-        if (!_3.isEmpty(disabledRules)) {
-          rules = _3.filter(rules, hasDisabledRuleName);
-        }
-        return rules;
-      }, replace: function replace(text) {
-        var _ref = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : {}, _ref$filterRules = _ref.filterRules, filterRules = _ref$filterRules === void 0 ? [] : _ref$filterRules, _ref$shouldEscapeText = _ref.shouldEscapeText, shouldEscapeText = _ref$shouldEscapeText === void 0 ? true : _ref$shouldEscapeText, _ref$shouldKeepRawInp = _ref.shouldKeepRawInput, shouldKeepRawInput = _ref$shouldKeepRawInp === void 0 ? false : _ref$shouldKeepRawInp, _ref$disabledRules = _ref.disabledRules, disabledRules = _ref$disabledRules === void 0 ? [] : _ref$disabledRules;
-        var replacedText = shouldEscapeText ? _3.escape(text) : text;
-        var rules = this.getHtmlRuleset(filterRules, disabledRules, shouldKeepRawInput);
-        var processRule = function processRule2(rule) {
-          if (rule.pre) {
-            replacedText = rule.pre(replacedText);
+        (0, _createClass2.default)(_ExpensiMark, [{ key: "getHtmlRuleset", value: function getHtmlRuleset(filterRules, disabledRules, shouldKeepRawInput) {
+          var rules = this.rules;
+          var hasRuleName = function hasRuleName2(rule) {
+            return _3.contains(filterRules, rule.name);
+          };
+          var hasDisabledRuleName = function hasDisabledRuleName2(rule) {
+            return !_3.contains(disabledRules, rule.name);
+          };
+          if (shouldKeepRawInput) {
+            rules = this.shouldKeepWhitespaceRules;
           }
-          var replacementFunction = shouldKeepRawInput && rule.rawInputReplacement ? rule.rawInputReplacement : rule.replacement;
-          if (rule.process) {
-            replacedText = rule.process(replacedText, replacementFunction, shouldKeepRawInput);
-          } else {
+          if (!_3.isEmpty(filterRules)) {
+            rules = _3.filter(this.rules, hasRuleName);
+          }
+          if (!_3.isEmpty(disabledRules)) {
+            rules = _3.filter(rules, hasDisabledRuleName);
+          }
+          return rules;
+        } }, { key: "replace", value: function replace(text) {
+          var _ref2 = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : {}, _ref2$filterRules = _ref2.filterRules, filterRules = _ref2$filterRules === void 0 ? [] : _ref2$filterRules, _ref2$shouldEscapeTex = _ref2.shouldEscapeText, shouldEscapeText = _ref2$shouldEscapeTex === void 0 ? true : _ref2$shouldEscapeTex, _ref2$shouldKeepRawIn = _ref2.shouldKeepRawInput, shouldKeepRawInput = _ref2$shouldKeepRawIn === void 0 ? false : _ref2$shouldKeepRawIn, _ref2$disabledRules = _ref2.disabledRules, disabledRules = _ref2$disabledRules === void 0 ? [] : _ref2$disabledRules;
+          var replacedText = shouldEscapeText ? _3.escape(text) : text;
+          var rules = this.getHtmlRuleset(filterRules, disabledRules, shouldKeepRawInput);
+          var processRule = function processRule2(rule) {
+            if (rule.pre) {
+              replacedText = rule.pre(replacedText);
+            }
+            var replacementFunction = shouldKeepRawInput && rule.rawInputReplacement ? rule.rawInputReplacement : rule.replacement;
+            if (rule.process) {
+              replacedText = rule.process(replacedText, replacementFunction, shouldKeepRawInput);
+            } else {
+              replacedText = replacedText.replace(rule.regex, replacementFunction);
+            }
+            if (rule.post) {
+              replacedText = rule.post(replacedText);
+            }
+          };
+          try {
+            rules.forEach(processRule);
+          } catch (e) {
+            console.warn("Error replacing text with html in ExpensiMark.replace", { error: e });
+            return shouldEscapeText ? _3.escape(text) : text;
+          }
+          return replacedText;
+        } }, { key: "modifyTextForUrlLinks", value: function modifyTextForUrlLinks(regex, textToCheck, replacement) {
+          var match = regex.exec(textToCheck);
+          var replacedText = "";
+          var startIndex = 0;
+          while (match !== null) {
+            var unmatchedOpenParentheses = 0;
+            var url = match[2];
+            for (var i = 0; i < url.length; i++) {
+              if (url[i] === "(") {
+                unmatchedOpenParentheses++;
+              } else if (url[i] === ")") {
+                if (unmatchedOpenParentheses <= 0) {
+                  var numberOfCharsToRemove = url.length - i;
+                  match[0] = match[0].substr(0, match[0].length - numberOfCharsToRemove);
+                  url = url.substr(0, url.length - numberOfCharsToRemove);
+                  break;
+                }
+                unmatchedOpenParentheses--;
+              }
+            }
+            if (!url.includes("?") && !url.includes("#")) {
+              var _numberOfCharsToRemove = 0;
+              for (var _i = url.length - 1; _i >= 0; _i--) {
+                if (Constants.CONST.SPECIAL_CHARS_TO_REMOVE.includes(url[_i])) {
+                  _numberOfCharsToRemove++;
+                } else {
+                  break;
+                }
+              }
+              if (_numberOfCharsToRemove) {
+                match[0] = match[0].substring(0, match[0].length - _numberOfCharsToRemove);
+                url = url.substring(0, url.length - _numberOfCharsToRemove);
+              }
+            }
+            replacedText = replacedText.concat(textToCheck.substr(startIndex, match.index - startIndex));
+            var isDoneMatching = false;
+            var shouldApplyAutoLinkAgain = true;
+            if (match.index !== 0 && textToCheck[match.index - 1] === "@") {
+              var domainRegex = /^(([a-z-0-9]+\.)+[a-z]{2,})(\S*)/i;
+              var domainMatch = domainRegex.exec(url);
+              if (domainMatch !== null && domainMatch[3] !== "") {
+                replacedText = replacedText.concat(domainMatch[1] + this.replace(domainMatch[3], { filterRules: ["autolink"] }));
+                shouldApplyAutoLinkAgain = false;
+              } else {
+                isDoneMatching = true;
+              }
+            }
+            if (isDoneMatching || match[1].includes("</pre>") || match[1].includes("</h1>")) {
+              replacedText = replacedText.concat(textToCheck.substr(match.index, match[0].length));
+            } else if (shouldApplyAutoLinkAgain) {
+              var urlRegex = new RegExp(`^${UrlPatterns.LOOSE_URL_REGEX}$|^${UrlPatterns.URL_REGEX}$`, "i");
+              var linkText = urlRegex.test(match[1]) ? match[1] : this.replace(match[1], { filterRules: ["bold", "strikethrough", "italic"], shouldEscapeText: false });
+              replacedText = replacedText.concat(replacement(match[0], linkText, url));
+            }
+            startIndex = match.index + match[0].length;
+            match = regex.exec(textToCheck);
+          }
+          if (startIndex < textToCheck.length) {
+            replacedText = replacedText.concat(textToCheck.substr(startIndex));
+          }
+          return replacedText;
+        } }, { key: "modifyTextForEmailLinks", value: function modifyTextForEmailLinks(regex, textToCheck, replacement, shouldKeepRawInput) {
+          var match = regex.exec(textToCheck);
+          var replacedText = "";
+          var startIndex = 0;
+          while (match !== null) {
+            replacedText = replacedText.concat(textToCheck.substr(startIndex, match.index - startIndex));
+            var linkText = this.replace(match[1], { filterRules: ["bold", "strikethrough", "italic"], shouldEscapeText: false });
+            var replacedMatch = shouldKeepRawInput ? replacement(match[0], linkText, match[2], match[3]) : replacement(match[0], linkText, match[3]);
+            replacedText = replacedText.concat(replacedMatch);
+            startIndex = match.index + match[0].length;
+            match = regex.exec(textToCheck);
+          }
+          if (startIndex < textToCheck.length) {
+            replacedText = replacedText.concat(textToCheck.substr(startIndex));
+          }
+          return replacedText;
+        } }, { key: "replaceBlockElementWithNewLine", value: function replaceBlockElementWithNewLine(htmlString) {
+          var splitText = htmlString.split(/<div.*?>|<\/div>|<comment.*?>|\n<\/comment>|<\/comment>|<h1>|<\/h1>|<h2>|<\/h2>|<h3>|<\/h3>|<h4>|<\/h4>|<h5>|<\/h5>|<h6>|<\/h6>|<p>|<\/p>|<li>|<\/li>|<blockquote>|<\/blockquote>/);
+          var stripHTML = function stripHTML2(text) {
+            return str_1.default.stripHTML(text);
+          };
+          splitText = _3.map(splitText, stripHTML);
+          var joinedText = "";
+          while (splitText.length) {
+            if (splitText[splitText.length - 1].trim().length > 0 || splitText[splitText.length - 1].match(/\n/)) {
+              break;
+            }
+            splitText.pop();
+          }
+          var processText = function processText2(text, index) {
+            if (text.trim().length === 0 && !text.match(/\n/)) {
+              return;
+            }
+            if (text.match(/[\n|>][>]?[\s]?$/) || index === splitText.length - 1) {
+              joinedText += text;
+            } else {
+              joinedText += `${text}
+`;
+            }
+          };
+          splitText.forEach(processText);
+          return joinedText;
+        } }, { key: "htmlToMarkdown", value: function htmlToMarkdown(htmlString) {
+          var extras = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : {};
+          var generatedMarkdown = htmlString;
+          var body = /<(body)(?:"[^"]*"|'[^']*'|[^'"><])*>(?:\n|\r\n)?([\s\S]*?)(?:\n|\r\n)?<\/\1>(?![^<]*(<\/pre>|<\/code>))/im;
+          var parseBodyTag = generatedMarkdown.match(body);
+          if (parseBodyTag) {
+            generatedMarkdown = parseBodyTag[2];
+          }
+          var processRule = function processRule2(rule) {
+            if (rule.pre) {
+              generatedMarkdown = rule.pre(generatedMarkdown);
+            }
+            var replacementFunction = typeof rule.replacement === "function" ? function() {
+              for (var _len3 = arguments.length, args = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+                args[_key3] = arguments[_key3];
+              }
+              return rule.replacement.apply(rule, args.concat([extras]));
+            } : rule.replacement;
+            generatedMarkdown = generatedMarkdown.replace(rule.regex, replacementFunction);
+          };
+          this.htmlToMarkdownRules.forEach(processRule);
+          return str_1.default.htmlDecode(this.replaceBlockElementWithNewLine(generatedMarkdown));
+        } }, { key: "htmlToText", value: function htmlToText(htmlString) {
+          var extras = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : {};
+          var replacedText = htmlString;
+          var processRule = function processRule2(rule) {
+            var replacementFunction = typeof rule.replacement === "function" ? function() {
+              for (var _len4 = arguments.length, args = new Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+                args[_key4] = arguments[_key4];
+              }
+              return rule.replacement.apply(rule, args.concat([extras]));
+            } : rule.replacement;
             replacedText = replacedText.replace(rule.regex, replacementFunction);
-          }
-          if (rule.post) {
-            replacedText = rule.post(replacedText);
-          }
-        };
-        try {
-          rules.forEach(processRule);
-        } catch (e) {
-          console.warn("Error replacing text with html in ExpensiMark.replace", { error: e });
-          return shouldEscapeText ? _3.escape(text) : text;
-        }
-        return replacedText;
-      }, modifyTextForUrlLinks: function modifyTextForUrlLinks(regex, textToCheck, replacement) {
-        var match = regex.exec(textToCheck);
-        var replacedText = "";
-        var startIndex = 0;
-        while (match !== null) {
-          var unmatchedOpenParentheses = 0;
-          var url = match[2];
-          for (var i = 0; i < url.length; i++) {
-            if (url[i] === "(") {
-              unmatchedOpenParentheses++;
-            } else if (url[i] === ")") {
-              if (unmatchedOpenParentheses <= 0) {
-                var numberOfCharsToRemove = url.length - i;
-                match[0] = match[0].substr(0, match[0].length - numberOfCharsToRemove);
-                url = url.substr(0, url.length - numberOfCharsToRemove);
-                break;
+          };
+          this.htmlToTextRules.forEach(processRule);
+          replacedText = str_1.default.htmlDecode(replacedText);
+          return replacedText;
+        } }, { key: "modifyTextForQuote", value: function modifyTextForQuote(regex, textToCheck, replacement) {
+          var replacedText = "";
+          var textToFormat = "";
+          var match = textToCheck.match(regex);
+          if (match !== null) {
+            var insideCodefence = false;
+            var textSplitted = textToCheck.split("\n");
+            for (var i = 0; i < textSplitted.length; i++) {
+              if (!insideCodefence) {
+                insideCodefence = str_1.default.contains(textSplitted[i], "<pre>");
               }
-              unmatchedOpenParentheses--;
-            }
-          }
-          if (!url.includes("?") && !url.includes("#")) {
-            var _numberOfCharsToRemove = 0;
-            for (var _i = url.length - 1; _i >= 0; _i--) {
-              if (Constants.CONST.SPECIAL_CHARS_TO_REMOVE.includes(url[_i])) {
-                _numberOfCharsToRemove++;
+              if (str_1.default.startsWith(textSplitted[i], "&gt;") && !insideCodefence) {
+                textToFormat += `${textSplitted[i]}
+`;
               } else {
-                break;
+                if (textToFormat !== "") {
+                  replacedText += this.formatTextForQuote(regex, textToFormat, replacement);
+                  textToFormat = "";
+                }
+                if (i === textSplitted.length - 1) {
+                  replacedText += `${textSplitted[i]}`;
+                } else {
+                  replacedText += `${textSplitted[i]}
+`;
+                }
+                if (insideCodefence) {
+                  insideCodefence = !str_1.default.contains(textSplitted[i], "</pre>");
+                }
               }
             }
-            if (_numberOfCharsToRemove) {
-              match[0] = match[0].substring(0, match[0].length - _numberOfCharsToRemove);
-              url = url.substring(0, url.length - _numberOfCharsToRemove);
+            if (textToFormat !== "") {
+              replacedText += this.formatTextForQuote(regex, textToFormat, replacement);
             }
-          }
-          replacedText = replacedText.concat(textToCheck.substr(startIndex, match.index - startIndex));
-          var isDoneMatching = false;
-          var shouldApplyAutoLinkAgain = true;
-          if (match.index !== 0 && textToCheck[match.index - 1] === "@") {
-            var domainRegex = /^(([a-z-0-9]+\.)+[a-z]{2,})(\S*)/i;
-            var domainMatch = domainRegex.exec(url);
-            if (domainMatch !== null && domainMatch[3] !== "") {
-              replacedText = replacedText.concat(domainMatch[1] + this.replace(domainMatch[3], { filterRules: ["autolink"] }));
-              shouldApplyAutoLinkAgain = false;
-            } else {
-              isDoneMatching = true;
-            }
-          }
-          if (isDoneMatching || match[1].includes("</pre>") || match[1].includes("</h1>")) {
-            replacedText = replacedText.concat(textToCheck.substr(match.index, match[0].length));
-          } else if (shouldApplyAutoLinkAgain) {
-            var urlRegex = new RegExp(`^${UrlPatterns.LOOSE_URL_REGEX}$|^${UrlPatterns.URL_REGEX}$`, "i");
-            var linkText = urlRegex.test(match[1]) ? match[1] : this.replace(match[1], { filterRules: ["bold", "strikethrough", "italic"], shouldEscapeText: false });
-            replacedText = replacedText.concat(replacement(match[0], linkText, url));
-          }
-          startIndex = match.index + match[0].length;
-          match = regex.exec(textToCheck);
-        }
-        if (startIndex < textToCheck.length) {
-          replacedText = replacedText.concat(textToCheck.substr(startIndex));
-        }
-        return replacedText;
-      }, modifyTextForEmailLinks: function modifyTextForEmailLinks(regex, textToCheck, replacement, shouldKeepRawInput) {
-        var match = regex.exec(textToCheck);
-        var replacedText = "";
-        var startIndex = 0;
-        while (match !== null) {
-          replacedText = replacedText.concat(textToCheck.substr(startIndex, match.index - startIndex));
-          var linkText = this.replace(match[1], { filterRules: ["bold", "strikethrough", "italic"], shouldEscapeText: false });
-          var replacedMatch = shouldKeepRawInput ? replacement(match[0], linkText, match[2], match[3]) : replacement(match[0], linkText, match[3]);
-          replacedText = replacedText.concat(replacedMatch);
-          startIndex = match.index + match[0].length;
-          match = regex.exec(textToCheck);
-        }
-        if (startIndex < textToCheck.length) {
-          replacedText = replacedText.concat(textToCheck.substr(startIndex));
-        }
-        return replacedText;
-      }, replaceBlockElementWithNewLine: function replaceBlockElementWithNewLine(htmlString) {
-        var splitText = htmlString.split(/<div.*?>|<\/div>|<comment.*?>|\n<\/comment>|<\/comment>|<h1>|<\/h1>|<h2>|<\/h2>|<h3>|<\/h3>|<h4>|<\/h4>|<h5>|<\/h5>|<h6>|<\/h6>|<p>|<\/p>|<li>|<\/li>|<blockquote>|<\/blockquote>/);
-        var stripHTML = function stripHTML2(text) {
-          return str_1.default.stripHTML(text);
-        };
-        splitText = _3.map(splitText, stripHTML);
-        var joinedText = "";
-        while (splitText.length) {
-          if (splitText[splitText.length - 1].trim().length > 0 || splitText[splitText.length - 1].match(/\n/)) {
-            break;
-          }
-          splitText.pop();
-        }
-        var processText = function processText2(text, index) {
-          if (text.trim().length === 0 && !text.match(/\n/)) {
-            return;
-          }
-          if (text.match(/[\n|>][>]?[\s]?$/) || index === splitText.length - 1) {
-            joinedText += text;
           } else {
-            joinedText += `${text}
-`;
+            replacedText = textToCheck;
           }
-        };
-        splitText.forEach(processText);
-        return joinedText;
-      }, htmlToMarkdown: function htmlToMarkdown(htmlString) {
-        var extras = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : {};
-        var generatedMarkdown = htmlString;
-        var body = /<(body)(?:"[^"]*"|'[^']*'|[^'"><])*>(?:\n|\r\n)?([\s\S]*?)(?:\n|\r\n)?<\/\1>(?![^<]*(<\/pre>|<\/code>))/im;
-        var parseBodyTag = generatedMarkdown.match(body);
-        if (parseBodyTag) {
-          generatedMarkdown = parseBodyTag[2];
-        }
-        var processRule = function processRule2(rule) {
-          if (rule.pre) {
-            generatedMarkdown = rule.pre(generatedMarkdown);
+          return replacedText;
+        } }, { key: "formatTextForQuote", value: function formatTextForQuote(regex, textToCheck, replacement) {
+          if (textToCheck.match(regex)) {
+            var formatRow = function formatRow2(row) {
+              var quoteContent = row[4] === " " ? row.substr(5) : row.substr(4);
+              if (quoteContent.trimStart().startsWith("&gt;")) {
+                return quoteContent.trimStart();
+              }
+              return quoteContent;
+            };
+            var textToFormat = _3.map(textToCheck.split("\n"), formatRow).join("\n");
+            textToFormat = textToFormat.replace(/^\n+|\n+$/g, "");
+            return replacement(textToFormat);
           }
-          var replacementFunction = typeof rule.replacement === "function" ? function() {
-            for (var _len3 = arguments.length, args = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-              args[_key3] = arguments[_key3];
-            }
-            return rule.replacement.apply(rule, args.concat([extras]));
-          } : rule.replacement;
-          generatedMarkdown = generatedMarkdown.replace(rule.regex, replacementFunction);
-        };
-        this.htmlToMarkdownRules.forEach(processRule);
-        return str_1.default.htmlDecode(this.replaceBlockElementWithNewLine(generatedMarkdown));
-      }, htmlToText: function htmlToText(htmlString) {
-        var extras = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : {};
-        var replacedText = htmlString;
-        var processRule = function processRule2(rule) {
-          var replacementFunction = typeof rule.replacement === "function" ? function() {
-            for (var _len4 = arguments.length, args = new Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-              args[_key4] = arguments[_key4];
-            }
-            return rule.replacement.apply(rule, args.concat([extras]));
-          } : rule.replacement;
-          replacedText = replacedText.replace(rule.regex, replacementFunction);
-        };
-        this.htmlToTextRules.forEach(processRule);
-        replacedText = str_1.default.htmlDecode(replacedText);
-        return replacedText;
-      }, modifyTextForQuote: function modifyTextForQuote(regex, textToCheck, replacement) {
-        var replacedText = "";
-        var textToFormat = "";
-        var match = textToCheck.match(regex);
-        if (match !== null) {
-          var insideCodefence = false;
-          var textSplitted = textToCheck.split("\n");
-          for (var i = 0; i < textSplitted.length; i++) {
-            if (!insideCodefence) {
-              insideCodefence = str_1.default.contains(textSplitted[i], "<pre>");
-            }
-            if (str_1.default.startsWith(textSplitted[i], "&gt;") && !insideCodefence) {
-              textToFormat += `${textSplitted[i]}
-`;
-            } else {
-              if (textToFormat !== "") {
-                replacedText += this.formatTextForQuote(regex, textToFormat, replacement);
-                textToFormat = "";
-              }
-              if (i === textSplitted.length - 1) {
-                replacedText += `${textSplitted[i]}`;
-              } else {
-                replacedText += `${textSplitted[i]}
-`;
-              }
-              if (insideCodefence) {
-                insideCodefence = !str_1.default.contains(textSplitted[i], "</pre>");
+          return textToCheck;
+        } }, { key: "containsNonPairTag", value: function containsNonPairTag(textToCheck) {
+          var tagRegExp = /<([a-z][a-z0-9-]*)\b[^>]*>|<\/([a-z][a-z0-9-]*)\s*>/gi;
+          var tagStack = [];
+          var match = tagRegExp.exec(textToCheck);
+          while (match) {
+            var openingTag = match[1];
+            var closingTag = match[2];
+            if (openingTag && openingTag !== "br") {
+              tagStack.push(openingTag);
+            } else if (closingTag) {
+              var expectedTag = tagStack.pop();
+              if (closingTag !== expectedTag) {
+                return true;
               }
             }
+            match = tagRegExp.exec(textToCheck);
           }
-          if (textToFormat !== "") {
-            replacedText += this.formatTextForQuote(regex, textToFormat, replacement);
+          return tagStack.length !== 0;
+        } }, { key: "extractLinksInMarkdownComment", value: function extractLinksInMarkdownComment(comment) {
+          try {
+            var htmlString = this.replace(comment, { filterRules: ["link"] });
+            var regex = new RegExp(`<a href="${UrlPatterns.MARKDOWN_URL_REGEX}" target="_blank" rel="noreferrer noopener">`, "gi");
+            var matches = (0, _toConsumableArray2.default)(htmlString.matchAll(regex));
+            var sanitizeMatch = function sanitizeMatch2(match) {
+              return str_1.default.sanitizeURL(match[1]);
+            };
+            var links = _3.map(matches, sanitizeMatch);
+            return links;
+          } catch (e) {
+            console.warn("Error parsing url in ExpensiMark.extractLinksInMarkdownComment", { error: e });
+            return void 0;
           }
-        } else {
-          replacedText = textToCheck;
-        }
-        return replacedText;
-      }, formatTextForQuote: function formatTextForQuote(regex, textToCheck, replacement) {
-        if (textToCheck.match(regex)) {
-          var formatRow = function formatRow2(row) {
-            var quoteContent = row[4] === " " ? row.substr(5) : row.substr(4);
-            if (quoteContent.trimStart().startsWith("&gt;")) {
-              return quoteContent.trimStart();
-            }
-            return quoteContent;
-          };
-          var textToFormat = _3.map(textToCheck.split("\n"), formatRow).join("\n");
-          textToFormat = textToFormat.replace(/^\n+|\n+$/g, "");
-          return replacement(textToFormat);
-        }
-        return textToCheck;
-      }, containsNonPairTag: function containsNonPairTag(textToCheck) {
-        var tagRegExp = /<([a-z][a-z0-9-]*)\b[^>]*>|<\/([a-z][a-z0-9-]*)\s*>/gi;
-        var tagStack = [];
-        var match = tagRegExp.exec(textToCheck);
-        while (match) {
-          var openingTag = match[1];
-          var closingTag = match[2];
-          if (openingTag && openingTag !== "br") {
-            tagStack.push(openingTag);
-          } else if (closingTag) {
-            var expectedTag = tagStack.pop();
-            if (closingTag !== expectedTag) {
-              return true;
-            }
+        } }, { key: "getRemovedMarkdownLinks", value: function getRemovedMarkdownLinks(oldComment, newComment) {
+          var linksInOld = this.extractLinksInMarkdownComment(oldComment);
+          var linksInNew = this.extractLinksInMarkdownComment(newComment);
+          return linksInOld === void 0 || linksInNew === void 0 ? [] : _3.difference(linksInOld, linksInNew);
+        } }, { key: "escapeAttributeContent", value: function escapeAttributeContent(content) {
+          var originalContent = this.htmlToMarkdown(content);
+          if (content === originalContent) {
+            return content;
           }
-          match = tagRegExp.exec(textToCheck);
-        }
-        return tagStack.length !== 0;
-      }, extractLinksInMarkdownComment: function extractLinksInMarkdownComment(comment) {
-        try {
-          var htmlString = this.replace(comment, { filterRules: ["link"] });
-          var regex = new RegExp(`<a href="${UrlPatterns.MARKDOWN_URL_REGEX}" target="_blank" rel="noreferrer noopener">`, "gi");
-          var matches = (0, _toConsumableArray2.default)(htmlString.matchAll(regex));
-          var sanitizeMatch = function sanitizeMatch2(match) {
-            return str_1.default.sanitizeURL(match[1]);
-          };
-          var links = _3.map(matches, sanitizeMatch);
-          return links;
-        } catch (e) {
-          console.warn("Error parsing url in ExpensiMark.extractLinksInMarkdownComment", { error: e });
-          return void 0;
-        }
-      }, getRemovedMarkdownLinks: function getRemovedMarkdownLinks(oldComment, newComment) {
-        var linksInOld = this.extractLinksInMarkdownComment(oldComment);
-        var linksInNew = this.extractLinksInMarkdownComment(newComment);
-        return linksInOld === void 0 || linksInNew === void 0 ? [] : _3.difference(linksInOld, linksInNew);
-      }, escapeAttributeContent: function escapeAttributeContent(content) {
-        var originalContent = this.htmlToMarkdown(content);
-        if (content === originalContent) {
-          return content;
-        }
-        originalContent = str_1.default.replaceAll(originalContent, "\n", "");
-        return _3.escape(originalContent);
-      } };
-      ExpensiMark2.initializer();
+          originalContent = str_1.default.replaceAll(originalContent, "\n", "");
+          return _3.escape(originalContent);
+        } }], [{ key: "setLogger", value: function setLogger(logger) {
+          _ExpensiMark.Log = logger;
+        } }]);
+        return _ExpensiMark;
+      }();
+      ExpensiMark2.Log = new Logger_1.default({ serverLoggingCallback: _3.noop, clientLoggingCallback: function clientLoggingCallback(message) {
+        return console.warn(message);
+      }, isDebug: true });
       exports.default = ExpensiMark2;
     } });
     var import_ExpensiMark = __toESM(require_ExpensiMark());
     init_index_all();
     function parseMarkdownToHTML(markdown) {
-      var parser = import_ExpensiMark.default;
+      var parser = new import_ExpensiMark.default();
       var html = parser.replace(markdown, { shouldKeepRawInput: true });
       return html;
     }
@@ -5528,8 +5708,8 @@ ${g2}
     }
     function parseTokensToTree(tokens) {
       var stack = [{ tag: "<>", children: [] }];
-      tokens.forEach(function(_ref2) {
-        var _ref3 = (0, _slicedToArray2.default)(_ref2, 2), type = _ref3[0], payload = _ref3[1];
+      tokens.forEach(function(_ref3) {
+        var _ref4 = (0, _slicedToArray2.default)(_ref3, 2), type = _ref4[0], payload = _ref4[1];
         if (type === "TEXT") {
           var text = index_default_default.unescape(payload);
           var top = stack[stack.length - 1];
