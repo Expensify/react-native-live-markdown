@@ -30,10 +30,11 @@ jobs:
       - name: Verify there's no parser diff
         working-directory: parser
         run: |
+          yarn patch-package
           yarn build
           if ! git diff --name-only --exit-code; then
             # shellcheck disable=SC2016
-            echo 'Error: Parser diff detected! Please run `cd parser && yarn build` and commit the changes.'
+            echo 'Error: Parser diff detected! Please run `cd parser && yarn patch-package && yarn build` and commit the changes.'
             exit 1
           fi
 
