@@ -154,10 +154,9 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
         appendSyntax('# ');
         addChildrenWithStyle(node, 'h1');
       } else if (node.tag.startsWith('<pre')) {
-        const content = _.unescape(node.tag.match(/data-code-raw="([^"]*)"/)![1]!); // always present
-
         appendSyntax('```');
-        addChildrenWithStyle(content, 'pre');
+        const content = node.children.join('').replaceAll('&#32;', ' ');
+        addChildrenWithStyle(`\n${content}`, 'pre');
         appendSyntax('```');
       } else if (node.tag.startsWith('<a href="')) {
         const rawHref = node.tag.match(/href="([^"]*)"/)![1]!; // always present
