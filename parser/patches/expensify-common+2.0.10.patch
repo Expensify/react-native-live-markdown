@@ -46,7 +46,7 @@ index a10aa20..7affd2a 100644
 -export {};
 +export default ExpensiMark;
 diff --git a/node_modules/expensify-common/dist/ExpensiMark.js b/node_modules/expensify-common/dist/ExpensiMark.js
-index 75a355e..9c521f7 100644
+index 75a355e..76a67e8 100644
 --- a/node_modules/expensify-common/dist/ExpensiMark.js
 +++ b/node_modules/expensify-common/dist/ExpensiMark.js
 @@ -34,15 +34,15 @@ const Logger_1 = __importDefault(require("./Logger"));
@@ -69,7 +69,18 @@ index 75a355e..9c521f7 100644
          /**
           * The list of regex replacements to do on a comment. Check the link regex is first so links are processed
           * before other delimiters
-@@ -187,7 +187,7 @@ class ExpensiMark {
+@@ -75,8 +75,9 @@ class ExpensiMark {
+                     return `<pre>${group}</pre>`;
+                 },
+                 rawInputReplacement: (match, __, textWithinFences) => {
++                    const withinFences = match.replace(/(?:&#x60;&#x60;&#x60;)([\s\S]*?)(?:&#x60;&#x60;&#x60;)/g, '$1').replace(/<emoji>|<\/emoji>/g, '');
+                     const group = textWithinFences.replace(/(?:(?![\n\r])\s)/g, '&#32;').replace(/<emoji>|<\/emoji>/g, '');
+-                    return `<pre>${group}</pre>`;
++                    return `<pre data-code-raw="${withinFences}">${group}</pre>`;
+                 },
+             },
+             /**
+@@ -187,7 +188,7 @@ class ExpensiMark {
               */
              {
                  name: 'reportMentions',
@@ -78,7 +89,7 @@ index 75a355e..9c521f7 100644
                  replacement: '<mention-report>$1</mention-report>',
              },
              /**
-@@ -604,7 +604,8 @@ class ExpensiMark {
+@@ -604,7 +605,8 @@ class ExpensiMark {
           * @type {Number}
           */
          this.currentQuoteDepth = 0;
@@ -88,7 +99,7 @@ index 75a355e..9c521f7 100644
      getHtmlRuleset(filterRules, disabledRules, shouldKeepRawInput) {
          let rules = this.rules;
          const hasRuleName = (rule) => _.contains(filterRules, rule.name);
-@@ -619,7 +620,7 @@ class ExpensiMark {
+@@ -619,7 +621,7 @@ class ExpensiMark {
              rules = _.filter(rules, hasDisabledRuleName);
          }
          return rules;
@@ -97,7 +108,7 @@ index 75a355e..9c521f7 100644
      /**
       * Replaces markdown with html elements
       *
-@@ -664,7 +665,7 @@ class ExpensiMark {
+@@ -664,7 +666,7 @@ class ExpensiMark {
              return shouldEscapeText ? _.escape(text) : text;
          }
          return replacedText;
@@ -106,7 +117,7 @@ index 75a355e..9c521f7 100644
      /**
       * Checks matched URLs for validity and replace valid links with html elements
       *
-@@ -765,7 +766,7 @@ class ExpensiMark {
+@@ -765,7 +767,7 @@ class ExpensiMark {
              replacedText = replacedText.concat(textToCheck.substr(startIndex));
          }
          return replacedText;
@@ -115,7 +126,7 @@ index 75a355e..9c521f7 100644
      /**
       * Checks matched Emails for validity and replace valid links with html elements
       *
-@@ -799,7 +800,7 @@ class ExpensiMark {
+@@ -799,7 +801,7 @@ class ExpensiMark {
              replacedText = replacedText.concat(textToCheck.substr(startIndex));
          }
          return replacedText;
@@ -124,7 +135,7 @@ index 75a355e..9c521f7 100644
      /**
       * replace block element with '\n' if :
       * 1. We have text within the element.
-@@ -837,7 +838,7 @@ class ExpensiMark {
+@@ -837,7 +839,7 @@ class ExpensiMark {
          };
          splitText.forEach(processText);
          return joinedText;
@@ -133,7 +144,7 @@ index 75a355e..9c521f7 100644
      /**
       * Replaces HTML with markdown
       *
-@@ -865,7 +866,7 @@ class ExpensiMark {
+@@ -865,7 +867,7 @@ class ExpensiMark {
          };
          this.htmlToMarkdownRules.forEach(processRule);
          return str_1.default.htmlDecode(this.replaceBlockElementWithNewLine(generatedMarkdown));
@@ -142,7 +153,7 @@ index 75a355e..9c521f7 100644
      /**
       * Convert HTML to text
       *
-@@ -886,7 +887,7 @@ class ExpensiMark {
+@@ -886,7 +888,7 @@ class ExpensiMark {
          // We use 'htmlDecode' instead of 'unescape' to replace entities like '&#32;'
          replacedText = str_1.default.htmlDecode(replacedText);
          return replacedText;
@@ -151,7 +162,7 @@ index 75a355e..9c521f7 100644
      /**
       * Modify text for Quotes replacing chevrons with html elements
       *
-@@ -943,7 +944,7 @@ class ExpensiMark {
+@@ -943,7 +945,7 @@ class ExpensiMark {
              replacedText = textToCheck;
          }
          return replacedText;
@@ -160,7 +171,7 @@ index 75a355e..9c521f7 100644
      /**
       * Format the content of blockquote if the text matches the regex or else just return the original text
       *
-@@ -969,7 +970,7 @@ class ExpensiMark {
+@@ -969,7 +971,7 @@ class ExpensiMark {
              return replacement(textToFormat);
          }
          return textToCheck;
@@ -169,7 +180,7 @@ index 75a355e..9c521f7 100644
      /**
       * Check if the input text includes only the open or the close tag of an element.
       *
-@@ -1003,7 +1004,7 @@ class ExpensiMark {
+@@ -1003,7 +1005,7 @@ class ExpensiMark {
          }
          // If there are any tags left in the stack, they're unclosed
          return tagStack.length !== 0;
@@ -178,7 +189,7 @@ index 75a355e..9c521f7 100644
      /**
       * @param {String} comment
       * @returns {Array} or undefined if exception occurs when executing regex matching
-@@ -1024,7 +1025,7 @@ class ExpensiMark {
+@@ -1024,7 +1026,7 @@ class ExpensiMark {
              console.warn('Error parsing url in ExpensiMark.extractLinksInMarkdownComment', { error: e });
              return undefined;
          }
@@ -187,7 +198,7 @@ index 75a355e..9c521f7 100644
      /**
       * Compares two markdown comments and returns a list of the links removed in a new comment.
       *
-@@ -1036,7 +1037,7 @@ class ExpensiMark {
+@@ -1036,7 +1038,7 @@ class ExpensiMark {
          const linksInOld = this.extractLinksInMarkdownComment(oldComment);
          const linksInNew = this.extractLinksInMarkdownComment(newComment);
          return linksInOld === undefined || linksInNew === undefined ? [] : _.difference(linksInOld, linksInNew);
@@ -196,7 +207,7 @@ index 75a355e..9c521f7 100644
      /**
       * Escapes the content of an HTML attribute value
       * @param {String} content - string content that possible contains HTML
-@@ -1059,4 +1060,5 @@ ExpensiMark.Log = new Logger_1.default({
+@@ -1059,4 +1061,5 @@ ExpensiMark.Log = new Logger_1.default({
      clientLoggingCallback: (message) => console.warn(message),
      isDebug: true,
  });
