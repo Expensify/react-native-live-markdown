@@ -1,5 +1,5 @@
 // eslint-disable-next-line import/no-unresolved
-import {ExpensiMark} from 'expensify-common';
+import ExpensiMark from 'expensify-common/dist/ExpensiMark';
 import _ from 'underscore';
 
 type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'emoji' | 'mention-here' | 'mention-user' | 'mention-report' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax';
