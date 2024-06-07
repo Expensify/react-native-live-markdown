@@ -16,6 +16,7 @@ import {StyleSheet} from 'react-native';
 import * as ParseUtils from './web/parserUtils';
 import * as CursorUtils from './web/cursorUtils';
 import * as StyleUtils from './styleUtils';
+import * as BrowserUtils from './web/browserUtils';
 import type * as MarkdownTextInputDecoratorViewNativeComponent from './MarkdownTextInputDecoratorViewNativeComponent';
 import './web/MarkdownTextInput.css';
 import InputHistory from './web/InputHistory';
@@ -336,7 +337,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           return;
         }
         const changedText = e.target.innerText;
-        if (compositionRef.current) {
+        if (compositionRef.current && !BrowserUtils.isMobile) {
           updateTextColor(divRef.current, changedText);
           compositionRef.current = false;
           return;
