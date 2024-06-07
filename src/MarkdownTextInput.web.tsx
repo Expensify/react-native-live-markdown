@@ -332,9 +332,20 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
     const handleOnChangeText = useCallback(
       (e: SyntheticEvent<HTMLDivElement>) => {
-        if (!divRef.current || !(e.target instanceof HTMLElement)) {
+        if (!divRef?.current || !(e.target instanceof HTMLElement)) {
           return;
         }
+        const allElements = divRef.current.querySelectorAll('*');
+        const element = allElements[0];
+        if (element && element.tagName.toLowerCase() !== 'span') {
+          const spanElement = document.createElement('span');
+          spanElement.innerHTML = element.innerHTML;
+          divRef.current.replaceChild(spanElement, element);
+          divRef.current.focus();
+          const selectionInput = window.getSelection();
+          selectionInput?.collapse(divRef.current, divRef.current.childNodes.length);
+        }
+
         const changedText = e.target.innerText;
 
         if (compositionRef.current) {
