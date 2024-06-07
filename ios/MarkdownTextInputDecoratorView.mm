@@ -68,6 +68,14 @@
     _textView = (RCTUITextView *)_backedTextInputView;
     [_textView setMarkdownUtils:_markdownUtils];
     NSLayoutManager *layoutManager = _textView.layoutManager; // switching to TextKit 1 compatibility mode
+
+    // Correct content height in TextKit 1 compatibility mode. (See https://github.com/Expensify/App/issues/41567)
+    // Consider removing this fix if it is no longer needed after migrating to TextKit 2.
+    CGSize contentSize = _textView.contentSize;
+    CGRect textBounds = [layoutManager usedRectForTextContainer:_textView.textContainer];
+    contentSize.height = textBounds.size.height + _textView.textContainerInset.top + _textView.textContainerInset.bottom;
+    [_textView setContentSize:contentSize];
+
     layoutManager.allowsNonContiguousLayout = NO; // workaround for onScroll issue
     object_setClass(layoutManager, [MarkdownLayoutManager class]);
     [layoutManager setValue:_markdownUtils forKey:@"markdownUtils"];

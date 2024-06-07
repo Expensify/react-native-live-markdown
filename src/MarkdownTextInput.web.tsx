@@ -16,6 +16,7 @@ import {StyleSheet} from 'react-native';
 import * as ParseUtils from './web/parserUtils';
 import * as CursorUtils from './web/cursorUtils';
 import * as StyleUtils from './styleUtils';
+import * as BrowserUtils from './web/browserUtils';
 import type * as MarkdownTextInputDecoratorViewNativeComponent from './MarkdownTextInputDecoratorViewNativeComponent';
 import './web/MarkdownTextInput.css';
 import InputHistory from './web/InputHistory';
@@ -336,8 +337,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           return;
         }
         const changedText = e.target.innerText;
-
-        if (compositionRef.current) {
+        if (compositionRef.current && !BrowserUtils.isMobile) {
           updateTextColor(divRef.current, changedText);
           compositionRef.current = false;
           return;
@@ -363,6 +363,12 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           default:
             text = parseText(divRef.current, changedText, processedMarkdownStyle).text;
         }
+
+        const selectionAfterTextChange = CursorUtils.getCurrentCursorPosition(divRef.current);
+        if (selectionAfterTextChange) {
+          contentSelection.current = selectionAfterTextChange;
+        }
+
         if (pasteRef?.current) {
           pasteRef.current = false;
           updateSelection(e);
@@ -559,7 +565,8 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         }
 
         const text = processedValue !== undefined ? processedValue : '';
-        parseText(divRef.current, text, processedMarkdownStyle, text.length);
+
+        parseText(divRef.current, text, processedMarkdownStyle, contentSelection.current?.end);
         updateTextColor(divRef.current, value);
       },
       [multiline, processedMarkdownStyle, processedValue],
@@ -585,7 +592,8 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       if (autoFocus) {
         divRef.current.focus();
       }
-    }, [autoFocus]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     useEffect(() => {
       // update content size when the input styles change
