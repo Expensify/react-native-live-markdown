@@ -1,6 +1,5 @@
-// @ts-expect-error - to review how it's implemented in ExpensiMark
 // eslint-disable-next-line import/no-unresolved
-import {ExpensiMark} from 'expensify-common/lib/ExpensiMark';
+import ExpensiMark from 'expensify-common/dist/ExpensiMark';
 import _ from 'underscore';
 
 type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'emoji' | 'mention-here' | 'mention-user' | 'mention-report' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax';
@@ -14,7 +13,7 @@ type Token = ['TEXT' | 'HTML', string];
 type StackItem = {tag: string; children: Array<StackItem | string>};
 
 function parseMarkdownToHTML(markdown: string): string {
-  const parser = ExpensiMark;
+  const parser = new ExpensiMark();
   const html = parser.replace(markdown, {
     shouldKeepRawInput: true,
   });
@@ -155,10 +154,9 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
         appendSyntax('# ');
         addChildrenWithStyle(node, 'h1');
       } else if (node.tag.startsWith('<pre')) {
-        const content = _.unescape(node.tag.match(/data-code-raw="([^"]*)"/)![1]!); // always present
-
         appendSyntax('```');
-        addChildrenWithStyle(content, 'pre');
+        const content = node.children.join('').replaceAll('&#32;', ' ');
+        addChildrenWithStyle(`\n${content}`, 'pre');
         appendSyntax('```');
       } else if (node.tag.startsWith('<a href="')) {
         const rawHref = node.tag.match(/href="([^"]*)"/)![1]!; // always present
