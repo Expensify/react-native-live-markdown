@@ -331,21 +331,31 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       }
     }, [multiline, onContentSizeChange]);
 
+    const handleInsertSpan = useCallback(() => {
+      if (!divRef?.current) {
+        return;
+      }
+
+      const firstChild = divRef.current.firstElementChild;
+      if (!firstChild || firstChild?.tagName.toLowerCase() === 'span') {
+        return;
+      }
+      // Create a <span> element and replace the first child with it
+      const spanElement = document.createElement('span');
+      spanElement.innerHTML = firstChild.innerHTML;
+      divRef.current.replaceChild(spanElement, firstChild);
+
+      // Move the cursor to the end of the text
+      const selectionInput = window.getSelection();
+      selectionInput?.collapse(divRef.current, divRef.current.childNodes.length);
+    }, []);
+
     const handleOnChangeText = useCallback(
       (e: SyntheticEvent<HTMLDivElement>) => {
         if (!divRef?.current || !(e.target instanceof HTMLElement)) {
           return;
         }
-        const allElements = divRef.current.querySelectorAll('*');
-        const element = allElements[0];
-        if (element && element.tagName.toLowerCase() !== 'span') {
-          const spanElement = document.createElement('span');
-          spanElement.innerHTML = element.innerHTML;
-          divRef.current.replaceChild(spanElement, element);
-          divRef.current.focus();
-          const selectionInput = window.getSelection();
-          selectionInput?.collapse(divRef.current, divRef.current.childNodes.length);
-        }
+        handleInsertSpan();
 
         const changedText = e.target.innerText;
         if (compositionRef.current && !BrowserUtils.isMobile) {
@@ -393,7 +403,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
         handleContentSizeChange();
       },
-      [updateTextColor, handleContentSizeChange, onChange, onChangeText, undo, redo, parseText, processedMarkdownStyle, updateSelection, setEventProps],
+      [updateTextColor, handleContentSizeChange, onChange, onChangeText, undo, redo, parseText, processedMarkdownStyle, updateSelection, setEventProps, handleInsertSpan],
     );
 
     const handleKeyPress = useCallback(
