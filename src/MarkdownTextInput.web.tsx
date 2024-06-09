@@ -364,11 +364,6 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
             text = parseText(divRef.current, changedText, processedMarkdownStyle).text;
         }
 
-        const selectionAfterTextChange = CursorUtils.getCurrentCursorPosition(divRef.current);
-        if (selectionAfterTextChange) {
-          contentSelection.current = selectionAfterTextChange;
-        }
-
         if (pasteRef?.current) {
           pasteRef.current = false;
           updateSelection(e);
