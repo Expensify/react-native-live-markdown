@@ -364,11 +364,6 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
             text = parseText(divRef.current, changedText, processedMarkdownStyle).text;
         }
 
-        const selectionAfterTextChange = CursorUtils.getCurrentCursorPosition(divRef.current);
-        if (selectionAfterTextChange) {
-          contentSelection.current = selectionAfterTextChange;
-        }
-
         if (pasteRef?.current) {
           pasteRef.current = false;
           updateSelection(e);
@@ -536,6 +531,15 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           updateTextColor(r, '');
         };
 
+        (r as any).restoreSelectionPosition = () => {
+          if (contentSelection.current) {
+            CursorUtils.setCursorPosition(r, contentSelection.current.start, contentSelection.current.end);
+          } else {
+            const valueLength = value ? value.length : r.innerText.length;
+            CursorUtils.setCursorPosition(r, valueLength, null);
+          }
+        };
+
         if (value === '' || value === undefined) {
           // update to placeholder color when value is empty
           updateTextColor(r, r.innerText);
@@ -566,7 +570,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
         const text = processedValue !== undefined ? processedValue : '';
 
-        parseText(divRef.current, text, processedMarkdownStyle, contentSelection.current?.end);
+        parseText(divRef.current, text, processedMarkdownStyle, text.length);
         updateTextColor(divRef.current, value);
       },
       [multiline, processedMarkdownStyle, processedValue],
