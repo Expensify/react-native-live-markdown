@@ -134,7 +134,11 @@ function getElementHeight(node: HTMLDivElement, styles: CSSProperties, numberOfL
   return styles.height ? `${styles.height}px` : 'auto';
 }
 
-const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
+type WithRestoreSelectionAbility = {
+  restoreSelectionPosition: () => void;
+};
+
+const MarkdownTextInput = React.forwardRef<TextInput & WithRestoreSelectionAbility, MarkdownTextInputProps>(
   (
     {
       accessibilityLabel,
