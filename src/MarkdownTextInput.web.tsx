@@ -535,7 +535,7 @@ const MarkdownTextInput = React.forwardRef<TextInput & WithRestoreSelectionAbili
           updateTextColor(r, '');
         };
 
-        (r as any).restoreSelectionPosition = () => {
+        (r as unknown as WithRestoreSelectionAbility).restoreSelectionPosition = () => {
           if (contentSelection.current) {
             CursorUtils.setCursorPosition(r, contentSelection.current.start, contentSelection.current.end);
           } else {
