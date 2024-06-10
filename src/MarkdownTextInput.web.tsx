@@ -135,7 +135,7 @@ function getElementHeight(node: HTMLDivElement, styles: CSSProperties, numberOfL
 }
 
 type WithRestoreSelectionAbility = {
-  restoreSelectionPosition: () => void;
+  restoreSelectionPosition?: () => void;
 };
 
 const MarkdownTextInput = React.forwardRef<TextInput & WithRestoreSelectionAbility, MarkdownTextInputProps>(
