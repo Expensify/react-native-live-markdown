@@ -8,6 +8,7 @@ type Range = {
   start: number;
   length: number;
   depth?: number;
+  leadingWhiteSpacesCountInFirstRangeLine?: number;
 };
 type Token = ['TEXT' | 'HTML', string];
 type StackItem = {tag: string; children: Array<StackItem | string>};
@@ -237,22 +238,48 @@ function groupRanges(ranges: Range[]) {
   }, [] as Range[]);
 }
 
+function recoverPositionEffectedByTrim(ranges: Range[], markdown: string): Range[] {
+  const leadingWhiteSpacesAndLineTerminators = markdown.match(/^\s*/g)?.[0] || '';
+  return ranges.map((range, inx) => {
+    const start = range.start + leadingWhiteSpacesAndLineTerminators.length;
+    let leadingWhiteSpacesCountInFirstRangeLine: number | undefined;
+    if (inx === 0) {
+      let tryInx = start - 1;
+      while (tryInx >= 0) {
+        if (markdown[tryInx] === '\n' || markdown[tryInx] === '\r' || markdown[tryInx] === '\u2028' || markdown[tryInx] === '\u2029') {
+          break;
+        } else {
+          tryInx -= 1;
+        }
+      }
+      leadingWhiteSpacesCountInFirstRangeLine = start - tryInx - 1;
+    }
+    return {
+      ...range,
+      start,
+      leadingWhiteSpacesCountInFirstRangeLine,
+    };
+  });
+}
+
 function parseExpensiMarkToRanges(markdown: string): Range[] {
   try {
-    const html = parseMarkdownToHTML(markdown);
+    const trimmedMarkdown = markdown.trim();
+    const html = parseMarkdownToHTML(trimmedMarkdown);
     const tokens = parseHTMLToTokens(html);
     const tree = parseTokensToTree(tokens);
     const [text, ranges] = parseTreeToTextAndRanges(tree);
-    if (text !== markdown) {
+    if (text !== trimmedMarkdown) {
       throw new Error(
         `[react-native-live-markdown] Parsing error: the processed text does not match the original Markdown input. This may be caused by incorrect parsing functions or invalid input Markdown.\nProcessed input: '${JSON.stringify(
           text,
-        )}'\nOriginal input: '${JSON.stringify(markdown)}'`,
+        )}'\nOriginal input: '${JSON.stringify(trimmedMarkdown)}'`,
       );
     }
     const sortedRanges = sortRanges(ranges);
     const groupedRanges = groupRanges(sortedRanges);
-    return groupedRanges;
+    const recoveredRanges = recoverPositionEffectedByTrim(groupedRanges, markdown);
+    return recoveredRanges;
   } catch (error) {
     console.error(error);
     // returning an empty array in case of error

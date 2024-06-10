@@ -159,12 +159,13 @@ public class MarkdownUtils {
         break;
       case "blockquote":
         MarkdownBlockquoteSpan span = new MarkdownBlockquoteSpan(
+          mMarkdownStyle.getSyntaxColor(),
           mMarkdownStyle.getBlockquoteBorderColor(),
           mMarkdownStyle.getBlockquoteBorderWidth(),
           mMarkdownStyle.getBlockquoteMarginLeft(),
           mMarkdownStyle.getBlockquotePaddingLeft(),
           depth);
-        setSpan(ssb, span, start, end);
+        setSpan(ssb, span, start, start + 1);
         break;
       default:
         throw new IllegalStateException("Unsupported type: " + type);
