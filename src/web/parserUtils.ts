@@ -179,13 +179,12 @@ function moveCursor(isFocused: boolean, alwaysMoveCursorToTheEnd: boolean, curso
   }
 }
 
-function parseText(target: HTMLElement, text: string, cursorPositionIndex: number | null, markdownStyle: PartialMarkdownStyle = {}, alwaysMoveCursorToTheEnd = false) {
+function parseText(target: HTMLElement, text: string, curosrPositionIndex: number | null, markdownStyle: PartialMarkdownStyle = {}, alwaysMoveCursorToTheEnd = false) {
   const targetElement = target;
 
-  // in case the cursorPositionIndex is larger than text length, cursorPosition will be null, i.e: move the caret to the end
-  let cursorPosition: number | null = cursorPositionIndex && cursorPositionIndex <= text.length ? cursorPositionIndex : null;
+  let cursorPosition: number | null = curosrPositionIndex;
   const isFocused = document.activeElement === target;
-  if (isFocused && cursorPositionIndex === null) {
+  if (isFocused && curosrPositionIndex === null) {
     const selection = CursorUtils.getCurrentCursorPosition(target);
     cursorPosition = selection ? selection.end : null;
   }
