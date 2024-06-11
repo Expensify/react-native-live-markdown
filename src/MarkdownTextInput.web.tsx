@@ -134,11 +134,7 @@ function getElementHeight(node: HTMLDivElement, styles: CSSProperties, numberOfL
   return styles.height ? `${styles.height}px` : 'auto';
 }
 
-type WithRestoreSelectionAbility = {
-  restoreSelectionPosition?: () => void;
-};
-
-const MarkdownTextInput = React.forwardRef<TextInput & WithRestoreSelectionAbility, MarkdownTextInputProps>(
+const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
   (
     {
       accessibilityLabel,
@@ -533,15 +529,6 @@ const MarkdownTextInput = React.forwardRef<TextInput & WithRestoreSelectionAbili
         (r as unknown as TextInput).clear = () => {
           r.innerText = '';
           updateTextColor(r, '');
-        };
-
-        (r as unknown as WithRestoreSelectionAbility).restoreSelectionPosition = () => {
-          if (contentSelection.current) {
-            CursorUtils.setCursorPosition(r, contentSelection.current.start, contentSelection.current.end);
-          } else {
-            const valueLength = value ? value.length : r.innerText.length;
-            CursorUtils.setCursorPosition(r, valueLength, null);
-          }
         };
 
         if (value === '' || value === undefined) {
