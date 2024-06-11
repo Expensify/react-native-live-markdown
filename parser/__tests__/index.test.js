@@ -526,3 +526,52 @@ describe('report mentions', () => {
     expect('reported #report-name!').toBeParsedAs([{type: 'mention-report', start: 9, length: 12}]);
   });
 });
+
+describe('nested emojis', () => {
+  test('italic text with nested emoji', () => {
+    expect('_Hello 😎 world_').toBeParsedAs([
+      {type: 'syntax', start: 0, length: 1},
+      {type: 'italic', start: 1, length: 6},
+      {type: 'emoji', start: 7, length: 2},
+      {type: 'italic', start: 9, length: 6},
+      {type: 'syntax', start: 15, length: 1},
+    ]);
+  });
+
+  test('emoji with nested bold text', () => {
+    expect('*Hello 😎 world*').toBeParsedAs([
+      {type: 'syntax', start: 0, length: 1},
+      {type: 'bold', start: 1, length: 6},
+      {type: 'emoji', start: 7, length: 2},
+      {type: 'bold', start: 9, length: 6},
+      {type: 'syntax', start: 15, length: 1},
+    ]);
+  });
+
+  test('multiple emojis with nested text', () => {
+    expect('*Hello😎 😎 😎world*').toBeParsedAs([
+      {type: 'syntax', start: 0, length: 1},
+      {type: 'bold', start: 1, length: 5},
+      {type: 'emoji', start: 6, length: 2},
+      {type: 'bold', start: 8, length: 1},
+      {type: 'emoji', start: 9, length: 2},
+      {type: 'bold', start: 11, length: 1},
+      {type: 'emoji', start: 12, length: 2},
+      {type: 'bold', start: 14, length: 5},
+      {type: 'syntax', start: 19, length: 1},
+    ]);
+  });
+  test('nested emoji in bold and italic', () => {
+    expect('*_hello 😎 world_*').toBeParsedAs([
+      {type: 'syntax', start: 0, length: 1},
+      {type: 'syntax', start: 1, length: 1},
+      {type: 'bold', start: 1, length: 7},
+      {type: 'italic', start: 2, length: 6},
+      {type: 'emoji', start: 8, length: 2},
+      {type: 'italic', start: 10, length: 6},
+      {type: 'bold', start: 10, length: 7},
+      {type: 'syntax', start: 16, length: 1},
+      {type: 'syntax', start: 17, length: 1},
+    ]);
+  });
+});
