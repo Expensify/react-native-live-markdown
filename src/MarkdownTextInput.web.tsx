@@ -339,8 +339,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           return;
         }
         const changedText = e.target.innerText;
-
-        if (compositionRef.current) {
+        if (compositionRef.current && !BrowserUtils.isMobile) {
           updateTextColor(divRef.current, changedText);
           compositionRef.current = false;
           return;
@@ -366,6 +365,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           default:
             text = parseText(divRef.current, changedText, processedMarkdownStyle).text;
         }
+
         if (pasteRef?.current) {
           pasteRef.current = false;
           updateSelection(e);
@@ -579,7 +579,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
         const text = processedValue !== undefined ? processedValue : '';
 
-        parseText(divRef.current, text, processedMarkdownStyle, contentSelection.current?.end);
+        parseText(divRef.current, text, processedMarkdownStyle, text.length);
         updateTextColor(divRef.current, value);
       },
       [multiline, processedMarkdownStyle, processedValue],
