@@ -76,8 +76,12 @@ describe('mention-user', () => {
     expect('@mail@mail.com!').toBeParsedAs([{type: 'mention-user', start: 0, length: 14}]);
   });
 
-  test('with phone number', () => {
-    expect('@+1234567890 Hello!').toBeParsedAs([{type: 'mention-user', start: 0, length: 12}]);
+  test('with invalid phone number', () => {
+    expect('@+1234567890 Hello!').toBeParsedAs([]);
+  });
+
+  test('with valid phone number', () => {
+    expect('@+15005550006 Hello!').toBeParsedAs([{type: 'mention-user', start: 0, length: 13}]);
   });
 });
 
