@@ -16,6 +16,7 @@ import {StyleSheet} from 'react-native';
 import * as ParseUtils from './web/parserUtils';
 import * as CursorUtils from './web/cursorUtils';
 import * as StyleUtils from './styleUtils';
+import * as BrowserUtils from './web/browserUtils';
 import type * as MarkdownTextInputDecoratorViewNativeComponent from './MarkdownTextInputDecoratorViewNativeComponent';
 import './web/MarkdownTextInput.css';
 import InputHistory from './web/InputHistory';
@@ -79,6 +80,10 @@ let focusTimeout: NodeJS.Timeout | null = null;
 // Removes one '\n' from the end of the string that were added by contentEditable div
 function normalizeValue(value: string) {
   return value.replace(/\n$/, '');
+}
+// Adds one '\n' at the end of the string if it's missing
+function denormalizeValue(value: string) {
+  return value.endsWith('\n') ? `${value}\n` : value;
 }
 
 // If an Input Method Editor is processing key input, the 'keyCode' is 229.
@@ -175,7 +180,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     const dimensions = React.useRef<Dimensions | null>(null);
 
     if (!history.current) {
-      history.current = new InputHistory(100);
+      history.current = new InputHistory(100, 150, value || '');
     }
 
     const flattenedStyle = useMemo(() => StyleSheet.flatten(style), [style]);
@@ -204,7 +209,8 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         }
         const parsedText = ParseUtils.parseText(target, text, cursorPosition, customMarkdownStyles, !multiline);
         if (history.current && shouldAddToHistory) {
-          history.current.debouncedAdd(parsedText.text, parsedText.cursorPosition);
+          // We need to normalize the value before saving it to the history to prevent situations when additional new lines break the cursor position calculation logic
+          history.current.throttledAdd(normalizeValue(parsedText.text), parsedText.cursorPosition);
         }
 
         return parsedText;
@@ -215,7 +221,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     const processedMarkdownStyle = useMemo(() => {
       const newMarkdownStyle = processMarkdownStyle(markdownStyle);
       if (divRef.current) {
-        parseText(divRef.current, divRef.current.innerText, newMarkdownStyle);
+        parseText(divRef.current, divRef.current.innerText, newMarkdownStyle, null, false);
       }
       return newMarkdownStyle;
     }, [markdownStyle, parseText]);
@@ -239,7 +245,8 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           return '';
         }
         const item = history.current.undo();
-        return parseText(target, item ? item.text : null, processedMarkdownStyle, item ? item.cursorPosition : null, false).text;
+        const undoValue = item ? denormalizeValue(item.text) : null;
+        return parseText(target, undoValue, processedMarkdownStyle, item ? item.cursorPosition : null, false).text;
       },
       [parseText, processedMarkdownStyle],
     );
@@ -250,7 +257,8 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           return '';
         }
         const item = history.current.redo();
-        return parseText(target, item ? item.text : null, processedMarkdownStyle, item ? item.cursorPosition : null, false).text;
+        const redoValue = item ? denormalizeValue(item.text) : null;
+        return parseText(target, redoValue, processedMarkdownStyle, item ? item.cursorPosition : null, false).text;
       },
       [parseText, processedMarkdownStyle],
     );
@@ -333,9 +341,9 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         if (!divRef.current || !(e.target instanceof HTMLElement)) {
           return;
         }
-
-        if (compositionRef.current) {
-          updateTextColor(divRef.current, e.target.innerText);
+        const changedText = e.target.innerText;
+        if (compositionRef.current && !BrowserUtils.isMobile) {
+          updateTextColor(divRef.current, changedText);
           compositionRef.current = false;
           return;
         }
@@ -349,14 +357,23 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           case 'historyRedo':
             text = redo(divRef.current);
             break;
+          case 'insertFromPaste':
+            // if there is no newline at the end of the copied text, contentEditable adds invisible <br> tag at the end of the text, so we need to normalize it
+            if (changedText.length > 2 && changedText[changedText.length - 2] !== '\n' && changedText[changedText.length - 1] === '\n') {
+              text = parseText(divRef.current, normalizeValue(changedText), processedMarkdownStyle).text;
+              break;
+            }
+            text = parseText(divRef.current, changedText, processedMarkdownStyle).text;
+            break;
           default:
-            text = parseText(divRef.current, e.target.innerText, processedMarkdownStyle).text;
+            text = parseText(divRef.current, changedText, processedMarkdownStyle).text;
         }
+
         if (pasteRef?.current) {
           pasteRef.current = false;
           updateSelection(e);
         }
-        updateTextColor(divRef.current, e.target.innerText);
+        updateTextColor(divRef.current, text);
 
         if (onChange) {
           const event = e as unknown as NativeSyntheticEvent<any>;
@@ -548,6 +565,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         }
 
         const text = processedValue !== undefined ? processedValue : '';
+
         parseText(divRef.current, text, processedMarkdownStyle, text.length);
         updateTextColor(divRef.current, value);
       },
@@ -574,7 +592,8 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       if (autoFocus) {
         divRef.current.focus();
       }
-    }, [autoFocus]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     useEffect(() => {
       // update content size when the input styles change
@@ -591,17 +610,6 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       updateRefSelectionVariables(newSelection);
       CursorUtils.setCursorPosition(divRef.current, newSelection.start, newSelection.end);
     }, [selection, updateRefSelectionVariables]);
-
-    useEffect(() => {
-      if (history.current?.history.length !== 0) {
-        return;
-      }
-      const currentValue = value ?? '';
-      history.current.add(currentValue, currentValue.length);
-
-      handleContentSizeChange();
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
 
     return (
       // eslint-disable-next-line jsx-a11y/no-static-element-interactions
