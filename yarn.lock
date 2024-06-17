@@ -5712,6 +5712,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"awesome-phonenumber@npm:^5.4.0":
+  version: 5.11.0
+  resolution: "awesome-phonenumber@npm:5.11.0"
+  checksum: de727b1a9a956adeca17162e59fc0e549281a19a38ca94988d42e68822148a6302c37de67baea4b382955dd5fe6434babf16d80afa09c2167ccf855bb225bd4b
+  languageName: node
+  linkType: hard
+
 "axe-core@npm:=4.7.0":
   version: 4.7.0
   resolution: "axe-core@npm:4.7.0"
@@ -9511,6 +9518,7 @@ __metadata:
   version: 1.0.0
   resolution: "expensify-common@https://github.com/Expensify/expensify-common.git#commit=f5204cae4e0d039c84e0da2967f9ebe9c4342aba"
   dependencies:
+    awesome-phonenumber: ^5.4.0
     classnames: 2.5.0
     clipboard: 2.0.11
     html-entities: ^2.5.2

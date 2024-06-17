@@ -1,4 +1,4 @@
-import makeExpensiMark from 'expensify-common/lib/ExpensiMark';
+import ExpensiMark from 'expensify-common/dist/ExpensiMark';
 import {useMarkdownParser} from '@expensify/react-native-live-markdown';
 
 type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'emoji' | 'mention-here' | 'mention-user' | 'mention-report' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax';
@@ -20,7 +20,7 @@ function unescapeText(text: string): string {
 function parseMarkdownToHTML(markdown: string): string {
   'worklet';
 
-  const parser = makeExpensiMark();
+  const parser = new ExpensiMark();
   const html = parser.replace(markdown, {
     shouldKeepRawInput: true,
   });
@@ -167,10 +167,9 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
         appendSyntax('# ');
         addChildrenWithStyle(node, 'h1');
       } else if (node.tag.startsWith('<pre')) {
-        const content = unescapeText(node.tag.match(/data-code-raw="([^"]*)"/)![1]!); // always present
-
         appendSyntax('```');
-        addChildrenWithStyle(content, 'pre');
+        const content = node.children.join('').replaceAll('&#32;', ' ');
+        addChildrenWithStyle(`\n${content}`, 'pre');
         appendSyntax('```');
       } else if (node.tag.startsWith('<a href="')) {
         const rawHref = node.tag.match(/href="([^"]*)"/)![1]!; // always present
