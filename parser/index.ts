@@ -261,3 +261,4 @@ function parseExpensiMarkToRanges(markdown: string): Range[] {
 }
 
 globalThis.parseExpensiMarkToRanges = parseExpensiMarkToRanges;
+export type {MarkdownType, Range};
