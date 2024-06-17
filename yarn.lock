@@ -2650,7 +2650,6 @@ __metadata:
     expensify-common: 2.0.12
     jest: ^29.7.0
     typescript: ^5.3.3
-    underscore: ^1.13.6
   languageName: unknown
   linkType: soft
 
@@ -19777,7 +19776,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"underscore@npm:1.13.6, underscore@npm:^1.13.1, underscore@npm:^1.13.6":
+"underscore@npm:1.13.6, underscore@npm:^1.13.1":
   version: 1.13.6
   resolution: "underscore@npm:1.13.6"
   checksum: d5cedd14a9d0d91dd38c1ce6169e4455bb931f0aaf354108e47bd46d3f2da7464d49b2171a5cf786d61963204a42d01ea1332a903b7342ad428deaafaf70ec36
