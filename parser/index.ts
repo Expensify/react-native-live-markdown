@@ -49,7 +49,7 @@ function parseTokensToTree(tokens: Token[]): StackItem {
   const stack: StackItem[] = [{tag: '<>', children: []}];
   tokens.forEach(([type, payload]) => {
     if (type === 'TEXT') {
-      const text = Utils.unescape(payload);
+      const text = Utils.unescapeText(payload);
       const top = stack[stack.length - 1];
       top!.children.push(text);
     } else if (type === 'HTML') {
@@ -160,10 +160,10 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
         appendSyntax('```');
       } else if (node.tag.startsWith('<a href="')) {
         const rawHref = node.tag.match(/href="([^"]*)"/)![1]!; // always present
-        const href = Utils.unescape(rawHref);
+        const href = Utils.unescapeText(rawHref);
         const isLabeledLink = node.tag.match(/data-link-variant="([^"]*)"/)![1] === 'labeled';
         const dataRawHref = node.tag.match(/data-raw-href="([^"]*)"/);
-        const matchString = dataRawHref ? Utils.unescape(dataRawHref[1]!) : href;
+        const matchString = dataRawHref ? Utils.unescapeText(dataRawHref[1]!) : href;
         if (!isLabeledLink && node.children.length === 1 && typeof node.children[0] === 'string' && (node.children[0] === matchString || `mailto:${node.children[0]}` === href)) {
           addChildrenWithStyle(node.children[0], 'link');
         } else {
@@ -178,12 +178,12 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
         const alt = node.tag.match(/alt="([^"]*)"/);
         const hasAlt = node.tag.match(/data-link-variant="([^"]*)"/)![1] === 'labeled';
         const rawLink = node.tag.match(/data-raw-href="([^"]*)"/);
-        const linkString = rawLink ? Utils.unescape(rawLink[1]!) : src;
+        const linkString = rawLink ? Utils.unescapeText(rawLink[1]!) : src;
 
         appendSyntax('!');
         if (hasAlt) {
           appendSyntax('[');
-          processChildren(Utils.unescape(alt?.[1] || ''));
+          processChildren(Utils.unescapeText(alt?.[1] || ''));
           appendSyntax(']');
         }
         appendSyntax('(');
