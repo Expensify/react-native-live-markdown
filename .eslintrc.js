@@ -58,6 +58,7 @@ module.exports = {
       'error',
       { fixMixedExportsWithInlineTypeSpecifier: false },
     ],
+    'valid-jsdoc': 'off',
     'tsdoc/syntax': 'error',
     '@typescript-eslint/no-non-null-assertion': 'off',
     '@typescript-eslint/array-type': ['error', {default: 'array-simple'}],
