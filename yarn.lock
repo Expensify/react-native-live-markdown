@@ -2320,7 +2320,7 @@ __metadata:
     "@react-native/babel-preset": 0.73.21
     "@react-native/metro-config": 0.73.5
     babel-plugin-module-resolver: ^5.0.0
-    expensify-common: "Expensify/expensify-common#f5204cae4e0d039c84e0da2967f9ebe9c4342aba"
+    expensify-common: 2.0.15
     react: 18.2.0
     react-native: 0.73.4
     react-native-reanimated: 3.11.0
@@ -9514,9 +9514,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expensify-common@Expensify/expensify-common#f5204cae4e0d039c84e0da2967f9ebe9c4342aba":
-  version: 1.0.0
-  resolution: "expensify-common@https://github.com/Expensify/expensify-common.git#commit=f5204cae4e0d039c84e0da2967f9ebe9c4342aba"
+"expensify-common@npm:2.0.15":
+  version: 2.0.15
+  resolution: "expensify-common@npm:2.0.15"
   dependencies:
     awesome-phonenumber: ^5.4.0
     classnames: 2.5.0
@@ -9531,8 +9531,7 @@ __metadata:
     semver: ^7.6.0
     simply-deferred: "git+https://github.com/Expensify/simply-deferred.git#77a08a95754660c7bd6e0b6979fdf84e8e831bf5"
     ua-parser-js: ^1.0.37
-    underscore: 1.13.6
-  checksum: 41afe321a99f8d5a5739247061732954bff67311c8f6d9e43f1edd77935f0488ac8863d468c1db934a54f4338ec7e8aa9640b9e432b894788303f2330276ceb0
+  checksum: 81597a39c8a62f85d956f4a435828b2c5995d976be3b20925b8c8b568f4785eb0ec0561a40a95efb2360831d146d352a3cee29e7c60a591172f0fd248d494fa1
   languageName: node
   linkType: hard
 
@@ -19332,7 +19331,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"underscore@npm:1.13.6, underscore@npm:^1.13.1":
+"underscore@npm:^1.13.1":
   version: 1.13.6
   resolution: "underscore@npm:1.13.6"
   checksum: d5cedd14a9d0d91dd38c1ce6169e4455bb931f0aaf354108e47bd46d3f2da7464d49b2171a5cf786d61963204a42d01ea1332a903b7342ad428deaafaf70ec36
