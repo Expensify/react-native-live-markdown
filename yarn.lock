@@ -2647,7 +2647,7 @@ __metadata:
     "@types/underscore": ^1.11.15
     esbuild: 0.19.4
     esbuild-plugin-tsc: ^0.4.0
-    expensify-common: 2.0.12
+    expensify-common: 2.0.19
     jest: ^29.7.0
     typescript: ^5.3.3
   languageName: unknown
@@ -9947,9 +9947,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expensify-common@npm:2.0.12":
-  version: 2.0.12
-  resolution: "expensify-common@npm:2.0.12"
+"expensify-common@npm:2.0.19":
+  version: 2.0.19
+  resolution: "expensify-common@npm:2.0.19"
   dependencies:
     awesome-phonenumber: ^5.4.0
     classnames: 2.5.0
@@ -9964,8 +9964,7 @@ __metadata:
     semver: ^7.6.0
     simply-deferred: "git+https://github.com/Expensify/simply-deferred.git#77a08a95754660c7bd6e0b6979fdf84e8e831bf5"
     ua-parser-js: ^1.0.37
-    underscore: 1.13.6
-  checksum: 8c1d112b555ad47271df293679768801657ce95b4dafc5a4e76602e49d5f10ae9dabe06a5150093ef011c3088ae033b402775006764339f282c9868633074b66
+  checksum: 4658c46ad5c8965347c862d65cef827b24b85ba314966db04209fe74a6d4c37f84e42211e80ac4ee8cb625f4a5fed278e2da64114ea652f694d85f4fce75fd1b
   languageName: node
   linkType: hard
 
@@ -19776,7 +19775,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"underscore@npm:1.13.6, underscore@npm:^1.13.1":
+"underscore@npm:^1.13.1":
   version: 1.13.6
   resolution: "underscore@npm:1.13.6"
   checksum: d5cedd14a9d0d91dd38c1ce6169e4455bb931f0aaf354108e47bd46d3f2da7464d49b2171a5cf786d61963204a42d01ea1332a903b7342ad428deaafaf70ec36
