@@ -34,7 +34,7 @@ function addStyling(targetElement: HTMLElement, type: MarkdownType, markdownStyl
       node.style.textDecoration = 'line-through';
       break;
     case 'emoji':
-      Object.assign(node.style, {...markdownStyle.emoji, verticalAlign: 'middle', lineHeight: 'normal'});
+      Object.assign(node.style, {...markdownStyle.emoji, verticalAlign: 'middle'});
       break;
     case 'mention-here':
       Object.assign(node.style, markdownStyle.mentionHere);
