@@ -4,6 +4,7 @@
 #import <RNLiveMarkdown/RCTTextInputComponentView+Markdown.h>
 #import <RNLiveMarkdown/RCTMarkdownUtils.h>
 #import <React/RCTUITextField.h>
+#import <React/RCTUITextView.h>
 #import <objc/message.h>
 
 #import "MarkdownShadowFamilyRegistry.h"
@@ -15,7 +16,7 @@
 
   if (markdownUtils != nil) {
     // force Markdown formatting on first render because `_setAttributedText` is called before `setMarkdownUtils`
-    RCTUITextField *backedTextInputView = [self getBackedTextInputView];
+    auto backedTextInputView = [self getBackedTextInputView];
     backedTextInputView.attributedText = [markdownUtils parseMarkdown:backedTextInputView.attributedText withAttributes:backedTextInputView.defaultTextAttributes];
   }
 }
@@ -24,23 +25,24 @@
   return objc_getAssociatedObject(self, @selector(getMarkdownUtils));
 }
 
-- (RCTUITextField *)getBackedTextInputView {
-  RCTUITextField *backedTextInputView = [self valueForKey:@"_backedTextInputView"];
-  return backedTextInputView;
+- (id<RCTBackedTextInputViewProtocol>)getBackedTextInputView {
+  return [self valueForKey:@"_backedTextInputView"];
 }
 
 - (void)markdown__setAttributedString:(NSAttributedString *)attributedString
 {
-  RCTMarkdownUtils *markdownUtils = [self getMarkdownUtils];
-  RCTUITextField *backedTextInputView = [self getBackedTextInputView];
-  if (markdownUtils != nil && backedTextInputView != nil) {
-    attributedString = [markdownUtils parseMarkdown:attributedString withAttributes:backedTextInputView.defaultTextAttributes];
-  } else {
-    // If markdownUtils is undefined, the text input hasn't been mounted yet. It will
-    // update its state with the unformatted attributed string, we want to prevent displaying
-    // this state by applying markdown in the commit hook where we can read markdown styles
-    // from decorator props.
-    MarkdownShadowFamilyRegistry::forceNextStateUpdate((facebook::react::Tag)self.tag);
+  auto backedTextInputView = [self getBackedTextInputView];
+  if (backedTextInputView != nil && ![backedTextInputView isKindOfClass:[RCTUITextView class]]) {
+    auto markdownUtils = [self getMarkdownUtils];
+    if (markdownUtils != nil) {
+      attributedString = [markdownUtils parseMarkdown:attributedString withAttributes:backedTextInputView.defaultTextAttributes];
+    } else {
+      // If markdownUtils is undefined, the text input hasn't been mounted yet. It will
+      // update its state with the unformatted attributed string, we want to prevent displaying
+      // this state by applying markdown in the commit hook where we can read markdown styles
+      // from decorator props.
+      MarkdownShadowFamilyRegistry::forceNextStateUpdate((facebook::react::Tag)self.tag);
+    }
   }
 
   // Call the original method
