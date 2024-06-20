@@ -118,7 +118,10 @@
       "<rootDir>/example/node_modules",
       "<rootDir>/lib/"
     ],
-    "testEnvironment": "jsdom"
+    "testEnvironment": "jsdom",
+    "testPathIgnorePatterns": [
+      "/WebExample/__tests__/"
+    ]
   },
   "commitlint": {
     "extends": [
