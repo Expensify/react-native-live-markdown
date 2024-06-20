@@ -19,7 +19,7 @@ set(RN_DIR ${LIB_ANDROID_DIR}/../example/node_modules/react-native)
 
 add_library(
   ${LIB_TARGET_NAME}
-  SHARED 
+  SHARED
   ${LIB_MODULE_SRCS}
   ${LIB_CUSTOM_SRCS}
   ${LIB_CODEGEN_SRCS}
@@ -42,6 +42,8 @@ target_link_libraries(
   ReactAndroid::rrc_textinput
   ReactAndroid::react_render_textlayoutmanager
   ReactAndroid::react_render_imagemanager
+  ReactAndroid::reactnativejni
+  ReactAndroid::mapbufferjni
   fabricjni
   fbjni
   folly_runtime
