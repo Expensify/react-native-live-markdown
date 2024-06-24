@@ -2647,7 +2647,7 @@ __metadata:
     "@types/underscore": ^1.11.15
     esbuild: 0.19.4
     esbuild-plugin-tsc: ^0.4.0
-    expensify-common: ^2.0.23
+    expensify-common: 2.0.23
     jest: ^29.7.0
     typescript: ^5.3.3
   languageName: unknown
@@ -9967,7 +9967,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expensify-common@npm:^2.0.23":
+"expensify-common@npm:2.0.23":
   version: 2.0.23
   resolution: "expensify-common@npm:2.0.23"
   dependencies:
