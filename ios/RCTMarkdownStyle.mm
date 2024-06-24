@@ -30,11 +30,19 @@
     _codeFontSize = style.code.fontSize;
     _codeColor = RCTUIColorFromSharedColor(style.code.color);
     _codeBackgroundColor = RCTUIColorFromSharedColor(style.code.backgroundColor);
+    _codeBorderColor = RCTUIColorFromSharedColor(style.code.borderColor);
+    _codeBorderWidth = style.code.borderWidth;
+    _codeBorderRadius = style.code.borderRadius;
+    _codePadding = style.code.padding;
 
     _preFontFamily = RCTNSStringFromString(style.pre.fontFamily);
     _preFontSize = style.pre.fontSize;
     _preColor = RCTUIColorFromSharedColor(style.pre.color);
     _preBackgroundColor = RCTUIColorFromSharedColor(style.pre.backgroundColor);
+    _preBorderColor = RCTUIColorFromSharedColor(style.pre.borderColor);
+    _preBorderWidth = style.pre.borderWidth;
+    _preBorderRadius = style.pre.borderRadius;
+    _prePadding = style.pre.padding;
 
     _mentionHereColor = RCTUIColorFromSharedColor(style.mentionHere.color);
     _mentionHereBackgroundColor = RCTUIColorFromSharedColor(style.mentionHere.backgroundColor);
@@ -71,11 +79,19 @@
     _codeFontSize = [RCTConvert CGFloat:json[@"code"][@"fontSize"]];
     _codeColor = [RCTConvert UIColor:json[@"code"][@"color"]];
     _codeBackgroundColor = [RCTConvert UIColor:json[@"code"][@"backgroundColor"]];
+    _codeBorderColor = [RCTConvert UIColor:json[@"code"][@"borderColor"]];
+    _codeBorderWidth = [RCTConvert CGFloat:json[@"code"][@"borderWidth"]];
+    _codeBorderRadius = [RCTConvert CGFloat:json[@"code"][@"borderRadius"]];
+    _codePadding = [RCTConvert CGFloat:json[@"code"][@"padding"]];
 
     _preFontFamily = [RCTConvert NSString:json[@"pre"][@"fontFamily"]];
     _preFontSize = [RCTConvert CGFloat:json[@"pre"][@"fontSize"]];
     _preColor = [RCTConvert UIColor:json[@"pre"][@"color"]];
     _preBackgroundColor = [RCTConvert UIColor:json[@"pre"][@"backgroundColor"]];
+    _preBorderColor = [RCTConvert UIColor:json[@"pre"][@"borderColor"]];
+    _preBorderWidth = [RCTConvert CGFloat:json[@"pre"][@"borderWidth"]];
+    _preBorderRadius = [RCTConvert CGFloat:json[@"pre"][@"borderRadius"]];
+    _prePadding = [RCTConvert CGFloat:json[@"pre"][@"padding"]];
 
     _mentionHereColor = [RCTConvert UIColor:json[@"mentionHere"][@"color"]];
     _mentionHereBackgroundColor = [RCTConvert UIColor:json[@"mentionHere"][@"backgroundColor"]];

@@ -37,12 +37,22 @@ function makeDefaultMarkdownStyle(): MarkdownStyle {
       fontSize: 20,
       color: 'black',
       backgroundColor: 'lightgray',
+      borderColor: 'gray',
+      borderWidth: 1,
+      borderRadius: 4,
+      borderStyle: 'solid',
+      padding: 0,
     },
     pre: {
       fontFamily: FONT_FAMILY_MONOSPACE,
       fontSize: 20,
       color: 'black',
       backgroundColor: 'lightgray',
+      borderColor: 'gray',
+      borderWidth: 1,
+      borderRadius: 4,
+      padding: 2,
+      borderStyle: 'solid',
     },
     mentionHere: {
       color: 'green',
@@ -74,6 +84,10 @@ function mergeMarkdownStyleWithDefault(input: PartialMarkdownStyle | undefined):
   return output;
 }
 
+function getStyleNumericValue(style: string) {
+  return parseInt(style.replace('px', ''), 8);
+}
+
 export type {PartialMarkdownStyle};
 
-export {mergeMarkdownStyleWithDefault};
+export {mergeMarkdownStyleWithDefault, getStyleNumericValue};

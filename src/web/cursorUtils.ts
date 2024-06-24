@@ -27,7 +27,7 @@ function setPrevText(target: HTMLElement) {
   prevTextLength = text.length;
 }
 
-function setCursorPosition(target: HTMLElement, start: number, end: number | null = null) {
+function setCursorPosition(target: HTMLElement, start: number, end: number | null = null, scrollIntoView = true) {
   // We don't want to move the cursor if the target is not focused
   if (target !== document.activeElement) {
     return;
@@ -66,10 +66,10 @@ function setCursorPosition(target: HTMLElement, start: number, end: number | nul
         // 3. Caret at the end of whole input, when pressing enter
         // 4. All other placements
         if (prevChar === '\n' && prevTextLength !== undefined && prevTextLength < textCharacters.length) {
-          if (nextChar !== '\n') {
+          if (nextChar !== '\n' && textNodes?.[i - 1]?.data !== '```') {
             range.setStart(textNodes[i + 1] as Node, 0);
-          } else if (i !== textNodes.length - 1) {
-            range.setStart(textNodes[i] as Node, 1);
+          } else if (i !== textNodes.length - 1 && !(textNodes?.[i + 1]?.data === '```' && nextChar === '`')) {
+            range.setStart(textNode as Node, 1);
           } else {
             range.setStart(textNode, start - charCount);
           }
@@ -97,7 +97,7 @@ function setCursorPosition(target: HTMLElement, start: number, end: number | nul
     selection.setBaseAndExtent(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
   }
 
-  scrollCursorIntoView(target as HTMLInputElement);
+  if (scrollIntoView) scrollCursorIntoView(target as HTMLInputElement);
 }
 
 function moveCursorToEnd(target: HTMLElement) {
@@ -158,4 +158,38 @@ function scrollCursorIntoView(target: HTMLInputElement) {
   }
 }
 
-export {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition, setPrevText, removeSelection, scrollCursorIntoView};
+function restrictRanges(target: HTMLElement, value: string) {
+  const rootSpan = target.querySelector('span.root');
+  let isContained = true;
+  if (rootSpan) {
+    let range: Range | null;
+
+    if (window.getSelection() && (window.getSelection() as globalThis.Selection).rangeCount > 0) {
+      range = (window.getSelection() as globalThis.Selection)?.getRangeAt(0);
+    } else {
+      range = document.createRange();
+    }
+
+    if (range && !(range.commonAncestorContainer === rootSpan || rootSpan.contains(range.commonAncestorContainer))) {
+      isContained = false;
+      // The caret or selection is outside rootSpan, move it
+      if (range.collapsed) {
+        // The range is a caret
+        setCursorPosition(target, value.length, value.length);
+      } else {
+        // The range is a selection
+        if (!rootSpan.contains(range.startContainer) && !target.contains(range.startContainer)) {
+          setCursorPosition(target, value.length, value.length, false);
+        }
+        if (!rootSpan.contains(range.endContainer)) {
+          const cursorPosition = getCurrentCursorPosition(target);
+          setCursorPosition(target, cursorPosition?.start ?? 0, value.length + 1, false);
+        }
+      }
+    }
+  }
+
+  return isContained;
+}
+
+export {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition, setPrevText, removeSelection, scrollCursorIntoView, restrictRanges};
