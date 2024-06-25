@@ -166,6 +166,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       value,
       autoFocus = false,
       onContentSizeChange,
+      id,
     },
     ref,
   ) => {
@@ -240,7 +241,9 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
     const undo = useCallback(
       (target: HTMLDivElement) => {
-        if (!history.current) return '';
+        if (!history.current) {
+          return '';
+        }
         const item = history.current.undo();
         const undoValue = item ? denormalizeValue(item.text) : null;
         return parseText(target, undoValue, processedMarkdownStyle, item ? item.cursorPosition : null, false).text;
@@ -250,7 +253,9 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
     const redo = useCallback(
       (target: HTMLDivElement) => {
-        if (!history.current) return '';
+        if (!history.current) {
+          return '';
+        }
         const item = history.current.redo();
         const redoValue = item ? denormalizeValue(item.text) : null;
         return parseText(target, redoValue, processedMarkdownStyle, item ? item.cursorPosition : null, false).text;
@@ -331,32 +336,11 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       }
     }, [multiline, onContentSizeChange]);
 
-    const handleInsertSpan = useCallback(() => {
-      if (!divRef?.current) {
-        return;
-      }
-
-      const firstChild = divRef.current.firstElementChild;
-      if (!firstChild || firstChild?.tagName.toLowerCase() === 'span') {
-        return;
-      }
-      // Create a <span> element and replace the first child with it
-      const spanElement = document.createElement('span');
-      spanElement.innerHTML = firstChild.innerHTML;
-      divRef.current.replaceChild(spanElement, firstChild);
-
-      // Move the cursor to the end of the text
-      const selectionInput = window.getSelection();
-      selectionInput?.collapse(divRef.current, divRef.current.childNodes.length);
-    }, []);
-
     const handleOnChangeText = useCallback(
       (e: SyntheticEvent<HTMLDivElement>) => {
-        if (!divRef?.current || !(e.target instanceof HTMLElement)) {
+        if (!divRef.current || !(e.target instanceof HTMLElement)) {
           return;
         }
-        handleInsertSpan();
-
         const changedText = e.target.innerText;
         if (compositionRef.current && !BrowserUtils.isMobile) {
           updateTextColor(divRef.current, changedText);
@@ -404,7 +388,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
         handleContentSizeChange();
       },
-      [updateTextColor, handleContentSizeChange, onChange, onChangeText, undo, redo, parseText, processedMarkdownStyle, updateSelection, setEventProps, handleInsertSpan],
+      [updateTextColor, handleContentSizeChange, onChange, onChangeText, undo, redo, parseText, processedMarkdownStyle, updateSelection, setEventProps],
     );
 
     const handleKeyPress = useCallback(
@@ -535,8 +519,13 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       [onClick, updateSelection],
     );
 
-    const handlePaste = useCallback(() => {
+    const handlePaste = useCallback((e) => {
       pasteRef.current = true;
+      e.preventDefault();
+
+      const clipboardData = e.clipboardData;
+      const text = clipboardData.getData('text/plain');
+      document.execCommand('insertText', false, text);
     }, []);
 
     const startComposition = useCallback(() => {
@@ -582,7 +571,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
         const text = processedValue !== undefined ? processedValue : '';
 
-        parseText(divRef.current, text, processedMarkdownStyle, contentSelection.current?.end);
+        parseText(divRef.current, text, processedMarkdownStyle, text.length);
         updateTextColor(divRef.current, value);
       },
       [multiline, processedMarkdownStyle, processedValue],
@@ -630,6 +619,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     return (
       // eslint-disable-next-line jsx-a11y/no-static-element-interactions
       <div
+        id={id}
         ref={setRef}
         contentEditable={!disabled}
         style={inputStyles}
