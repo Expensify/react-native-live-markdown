@@ -166,6 +166,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       value,
       autoFocus = false,
       onContentSizeChange,
+      id,
     },
     ref,
   ) => {
@@ -240,7 +241,9 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
     const undo = useCallback(
       (target: HTMLDivElement) => {
-        if (!history.current) return '';
+        if (!history.current) {
+          return '';
+        }
         const item = history.current.undo();
         const undoValue = item ? denormalizeValue(item.text) : null;
         return parseText(target, undoValue, processedMarkdownStyle, item ? item.cursorPosition : null, false).text;
@@ -250,7 +253,9 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
     const redo = useCallback(
       (target: HTMLDivElement) => {
-        if (!history.current) return '';
+        if (!history.current) {
+          return '';
+        }
         const item = history.current.redo();
         const redoValue = item ? denormalizeValue(item.text) : null;
         return parseText(target, redoValue, processedMarkdownStyle, item ? item.cursorPosition : null, false).text;
@@ -514,8 +519,13 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       [onClick, updateSelection],
     );
 
-    const handlePaste = useCallback(() => {
+    const handlePaste = useCallback((e) => {
       pasteRef.current = true;
+      e.preventDefault();
+
+      const clipboardData = e.clipboardData;
+      const text = clipboardData.getData('text/plain');
+      document.execCommand('insertText', false, text);
     }, []);
 
     const startComposition = useCallback(() => {
@@ -609,6 +619,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     return (
       // eslint-disable-next-line jsx-a11y/no-static-element-interactions
       <div
+        id={id}
         ref={setRef}
         contentEditable={!disabled}
         style={inputStyles}

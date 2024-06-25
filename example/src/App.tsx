@@ -6,8 +6,6 @@ import {MarkdownTextInput} from '@expensify/react-native-live-markdown';
 import type {TextInput} from 'react-native';
 import useExpensiMarkParser from './useExpensiMarkParser';
 
-const DEFAULT_TEXT = ['Hello, *world*!'].join('\n');
-
 function isWeb() {
   return Platform.OS === 'web';
 }
@@ -61,7 +59,7 @@ function getRandomColor() {
 }
 
 export default function App() {
-  const [value, setValue] = React.useState(DEFAULT_TEXT);
+  const [value, setValue] = React.useState('Hello *world*! @here\nhttps://example.com\n> Lorem ipsum');
   const [markdownStyle, setMarkdownStyle] = React.useState({});
   const [selection, setSelection] = React.useState({start: 0, end: 0});
 
@@ -135,6 +133,7 @@ export default function App() {
       /> */}
       <Text style={styles.text}>{JSON.stringify(value)}</Text>
       <Button
+        testID="focus"
         title="Focus"
         onPress={() => {
           if (!ref.current) {
@@ -144,6 +143,7 @@ export default function App() {
         }}
       />
       <Button
+        testID="blur"
         title="Blur"
         onPress={() => {
           if (!ref.current) {
@@ -153,15 +153,19 @@ export default function App() {
         }}
       />
       <Button
+        testID="reset"
         title="Reset"
         onPress={() => {
-          setValue(DEFAULT_TEXT);
+          setValue(TEST_CONST.EXAMPLE_CONTENT);
           setMarkdownStyle({});
         }}
       />
       <Button
+        testID="clear"
         title="Clear"
-        onPress={() => setValue('')}
+        onPress={() => {
+          setValue('');
+        }}
       />
       <Button
         title="Change style"

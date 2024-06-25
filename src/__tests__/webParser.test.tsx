@@ -1,12 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {expect} from '@jest/globals';
-import type {MatcherFunction} from 'expect';
 import * as ParserUtils from '../web/parserUtils';
 import type * as MarkdownTypes from '../web/parserUtils';
 
 require('../../parser/react-native-live-markdown-parser.js');
 
-const toBeParsedAsHTML: MatcherFunction<[expectedHTML: string]> = function (actual, expectedHTML) {
+declare module 'expect' {
+  interface Matchers<R> {
+    toBeParsedAsHTML(expectedHTML: string): R;
+  }
+}
+
+const toBeParsedAsHTML = function (actual: string, expectedHTML: string) {
   if (typeof actual !== 'string') {
     throw new Error('Actual value must be a string');
   }
@@ -26,21 +31,12 @@ const toBeParsedAsHTML: MatcherFunction<[expectedHTML: string]> = function (actu
       message: () => `Expected:\t${JSON.stringify(expected)},\n got:\t${JSON.stringify(actualHTML)}`,
     };
   }
-  return {message: () => '', pass: true};
+  return {pass: true, message: () => ''};
 };
 
 expect.extend({
   toBeParsedAsHTML,
 });
-
-declare module 'expect' {
-  interface AsymmetricMatchers {
-    toBeParsedAsHTML(expectedHTML: string): void;
-  }
-  interface Matchers<R> {
-    toBeParsedAsHTML(expectedHTML: string): R;
-  }
-}
 
 test('empty string', () => {
   expect('').toBeParsedAsHTML('');
