@@ -384,6 +384,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           default:
             text = parseText(divRef.current, changedText, processedMarkdownStyle).text;
         }
+
         if (pasteRef?.current) {
           pasteRef.current = false;
           updateSelection(e);
