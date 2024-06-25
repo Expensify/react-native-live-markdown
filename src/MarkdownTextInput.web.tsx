@@ -16,6 +16,8 @@ import {StyleSheet} from 'react-native';
 import * as ParseUtils from './web/parserUtils';
 import * as CursorUtils from './web/cursorUtils';
 import * as StyleUtils from './styleUtils';
+import * as TreeUtils from './web/treeUtils';
+import type * as TreeUtilsTypes from './web/treeUtils';
 import * as BrowserUtils from './web/browserUtils';
 import type * as MarkdownTextInputDecoratorViewNativeComponent from './MarkdownTextInputDecoratorViewNativeComponent';
 import './web/MarkdownTextInput.css';
@@ -77,14 +79,10 @@ type Dimensions = {
 
 let focusTimeout: NodeJS.Timeout | null = null;
 
-// Removes one '\n' from the end of the string that were added by contentEditable div
-function normalizeValue(value: string) {
-  return value.replace(/\n$/, '');
-}
-// Adds one '\n' at the end of the string if it's missing
-function denormalizeValue(value: string) {
-  return value.endsWith('\n') ? `${value}\n` : value;
-}
+type MarkdownTextInputElement = HTMLDivElement &
+  HTMLInputElement & {
+    tree: TreeUtilsTypes.TreeNode;
+  };
 
 // If an Input Method Editor is processing key input, the 'keyCode' is 229.
 // https://www.w3.org/TR/uievents/#determine-keydown-keyup-keyCode
@@ -123,7 +121,7 @@ function getElementHeight(node: HTMLDivElement, styles: CSSProperties, numberOfL
     const tempElement = document.createElement('div');
     tempElement.setAttribute('contenteditable', 'true');
     Object.assign(tempElement.style, styles);
-    tempElement.innerText = Array(numberOfLines).fill('A').join('\n');
+    tempElement.textContent = Array(numberOfLines).fill('A').join('\n');
     if (node.parentElement) {
       node.parentElement.appendChild(tempElement);
       const height = tempElement.clientHeight;
@@ -172,12 +170,13 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
   ) => {
     const compositionRef = useRef<boolean>(false);
     const pasteRef = useRef<boolean>(false);
-    const divRef = useRef<HTMLDivElement | null>(null);
+    const divRef = useRef<MarkdownTextInputElement | null>(null);
     const currentlyFocusedField = useRef<HTMLDivElement | null>(null);
     const contentSelection = useRef<Selection | null>(null);
     const className = `react-native-live-markdown-input-${multiline ? 'multiline' : 'singleline'}`;
     const history = useRef<InputHistory>();
     const dimensions = React.useRef<Dimensions | null>(null);
+    const textContent = useRef<string>('');
 
     if (!history.current) {
       history.current = new InputHistory(100, 150, value || '');
@@ -190,7 +189,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
     const setEventProps = useCallback((e: NativeSyntheticEvent<any>) => {
       if (divRef.current) {
-        const text = normalizeValue(divRef.current.innerText || '');
+        const text = textContent.current;
         if (e.target) {
           // TODO: change the logic here so every event have value property
           (e.target as unknown as HTMLInputElement).value = text;
@@ -205,12 +204,16 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     const parseText = useCallback(
       (target: HTMLDivElement, text: string | null, customMarkdownStyles: MarkdownStyle, cursorPosition: number | null = null, shouldAddToHistory = true) => {
         if (text === null) {
-          return {text: target.innerText, cursorPosition: null};
+          return {text: textContent.current, cursorPosition: null};
         }
         const parsedText = ParseUtils.parseText(target, text, cursorPosition, customMarkdownStyles, !multiline);
+
+        if (divRef.current && parsedText.tree) {
+          divRef.current.tree = parsedText.tree;
+        }
         if (history.current && shouldAddToHistory) {
           // We need to normalize the value before saving it to the history to prevent situations when additional new lines break the cursor position calculation logic
-          history.current.throttledAdd(normalizeValue(parsedText.text), parsedText.cursorPosition);
+          history.current.throttledAdd(parsedText.text, parsedText.cursorPosition);
         }
 
         return parsedText;
@@ -221,7 +224,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     const processedMarkdownStyle = useMemo(() => {
       const newMarkdownStyle = processMarkdownStyle(markdownStyle);
       if (divRef.current) {
-        parseText(divRef.current, divRef.current.innerText, newMarkdownStyle, null, false);
+        parseText(divRef.current, textContent.current, newMarkdownStyle, null, false);
       }
       return newMarkdownStyle;
     }, [markdownStyle, parseText]);
@@ -245,7 +248,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           return '';
         }
         const item = history.current.undo();
-        const undoValue = item ? denormalizeValue(item.text) : null;
+        const undoValue = item ? item.text : null;
         return parseText(target, undoValue, processedMarkdownStyle, item ? item.cursorPosition : null, false).text;
       },
       [parseText, processedMarkdownStyle],
@@ -257,19 +260,11 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           return '';
         }
         const item = history.current.redo();
-        const redoValue = item ? denormalizeValue(item.text) : null;
+        const redoValue = item ? item.text : null;
         return parseText(target, redoValue, processedMarkdownStyle, item ? item.cursorPosition : null, false).text;
       },
       [parseText, processedMarkdownStyle],
     );
-
-    // We have to process value property since contentEditable div adds one additional '\n' at the end of the text if we are entering new line
-    const processedValue = useMemo(() => {
-      if (value && value[value.length - 1] === '\n') {
-        return `${value}\n`;
-      }
-      return value;
-    }, [value]);
 
     // Placeholder text color logic
     const updateTextColor = useCallback(
@@ -336,14 +331,60 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       }
     }, [multiline, onContentSizeChange]);
 
+    const parseInnerHTMLToText = useCallback((target: HTMLElement): string => {
+      let text = '';
+      const childNodes = target.childNodes ?? [];
+      childNodes.forEach((node, index) => {
+        const nodeCopy = node.cloneNode(true) as HTMLElement;
+        if (nodeCopy.innerHTML) {
+          // Replace single <br> created by contentEditable with '\n', to enable proper newline deletion on backspace, when next lines also have <br> tags
+          if (nodeCopy.innerHTML === '<br>') {
+            nodeCopy.innerHTML = '\n';
+          }
+          // Replace only br tags with data-id attribute, because we know that were created by the web parser. We need to ignore tags created by contentEditable div
+          nodeCopy.innerHTML = nodeCopy.innerHTML.replaceAll(/<br data-id=.*?>/g, '\n');
+        }
+        let nodeText = nodeCopy.textContent ?? '';
+
+        // Remove unnecessary new lines from the end of the text
+        if (nodeText.length > 2 && nodeText[-3] !== '\n' && nodeText.slice(-2) === '\n\n') {
+          nodeText = nodeText.slice(0, -1);
+        }
+
+        // Last line specific handling
+        if (index === childNodes.length - 1) {
+          if (nodeText === '\n\n') {
+            // New line creation
+            nodeText = '\n';
+          } else if (nodeText === '\n') {
+            // New line deletion on backspace
+            nodeText = '';
+          }
+        }
+
+        text += nodeText;
+        // Split paragraphs with new lines
+        if (/[^\n]/.test(nodeText) && index < childNodes.length - 1) {
+          text += '\n';
+        }
+      });
+      return text;
+    }, []);
+
     const handleOnChangeText = useCallback(
       (e: SyntheticEvent<HTMLDivElement>) => {
         if (!divRef.current || !(e.target instanceof HTMLElement)) {
           return;
         }
-        const changedText = e.target.innerText;
+
+        const parsedText = parseInnerHTMLToText(e.target);
+        textContent.current = parsedText;
+
+        const tree = TreeUtils.buildTree(divRef.current, parsedText);
+        divRef.current.tree = tree;
+
         if (compositionRef.current && !BrowserUtils.isMobile) {
-          updateTextColor(divRef.current, changedText);
+          updateTextColor(divRef.current, parsedText);
           compositionRef.current = false;
           return;
         }
@@ -357,16 +398,8 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           case 'historyRedo':
             text = redo(divRef.current);
             break;
-          case 'insertFromPaste':
-            // if there is no newline at the end of the copied text, contentEditable adds invisible <br> tag at the end of the text, so we need to normalize it
-            if (changedText.length > 2 && changedText[changedText.length - 2] !== '\n' && changedText[changedText.length - 1] === '\n') {
-              text = parseText(divRef.current, normalizeValue(changedText), processedMarkdownStyle).text;
-              break;
-            }
-            text = parseText(divRef.current, changedText, processedMarkdownStyle).text;
-            break;
           default:
-            text = parseText(divRef.current, changedText, processedMarkdownStyle).text;
+            text = parseText(divRef.current, parsedText, processedMarkdownStyle).text;
         }
 
         if (pasteRef?.current) {
@@ -382,13 +415,12 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         }
 
         if (onChangeText) {
-          const normalizedText = normalizeValue(text);
-          onChangeText(normalizedText);
+          onChangeText(text);
         }
 
         handleContentSizeChange();
       },
-      [updateTextColor, handleContentSizeChange, onChange, onChangeText, undo, redo, parseText, processedMarkdownStyle, updateSelection, setEventProps],
+      [updateTextColor, onChange, onChangeText, handleContentSizeChange, undo, redo, parseText, parseInnerHTMLToText, processedMarkdownStyle, updateSelection, setEventProps],
     );
 
     const handleKeyPress = useCallback(
@@ -441,9 +473,10 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
             //   We need to change normal behavior of "Enter" key to insert a line breaks, to prevent wrapping contentEditable text in <div> tags.
             //  Thanks to that in every situation we have proper amount of new lines in our parsed text. Without it pressing enter in empty lines will add 2 more new lines.
             document.execCommand('insertLineBreak');
-            CursorUtils.scrollCursorIntoView(divRef.current as HTMLInputElement);
+            if (contentSelection.current) {
+              CursorUtils.setCursorPosition(divRef.current, contentSelection.current?.start + 1);
+            }
           }
-
           if (!e.shiftKey && ((shouldBlurOnSubmit && hostNode !== null) || !multiline)) {
             setTimeout(() => divRef.current && divRef.current.blur(), 0);
           }
@@ -462,7 +495,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           if (contentSelection.current) {
             CursorUtils.setCursorPosition(divRef.current, contentSelection.current.start, contentSelection.current.end);
           } else {
-            const valueLength = value ? value.length : divRef.current.innerText.length;
+            const valueLength = value ? value.length : textContent.current.length;
             CursorUtils.setCursorPosition(divRef.current, valueLength, null);
           }
           updateSelection(event, contentSelection.current);
@@ -475,7 +508,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
         if (hostNode !== null) {
           if (clearTextOnFocus && divRef.current) {
-            divRef.current.innerText = '';
+            divRef.current.textContent = '';
           }
           if (selectTextOnFocus) {
             // Safari requires selection to occur in a setTimeout
@@ -513,7 +546,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         if (!onClick || !divRef.current) {
           return;
         }
-        (e.target as HTMLInputElement).value = normalizeValue(divRef.current.innerText || '');
+        (e.target as HTMLInputElement).value = textContent.current;
         onClick(e);
       },
       [onClick, updateSelection],
@@ -532,13 +565,13 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       if (r) {
         (r as unknown as TextInput).isFocused = () => document.activeElement === r;
         (r as unknown as TextInput).clear = () => {
-          r.innerText = '';
+          r.textContent = '';
           updateTextColor(r, '');
         };
 
         if (value === '' || value === undefined) {
           // update to placeholder color when value is empty
-          updateTextColor(r, r.innerText);
+          updateTextColor(r, r.textContent ?? '');
         }
       }
 
@@ -550,26 +583,25 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           (ref as (elementRef: HTMLDivElement | null) => void)(r);
         }
       }
-      divRef.current = r;
+      divRef.current = r as MarkdownTextInputElement;
     };
 
     useClientEffect(
       function parseAndStyleValue() {
-        if (!divRef.current || processedValue === divRef.current.innerText) {
+        if (!divRef.current || value === textContent.current) {
           return;
         }
 
         if (value === undefined) {
-          parseText(divRef.current, divRef.current.innerText, processedMarkdownStyle);
+          parseText(divRef.current, textContent.current, processedMarkdownStyle);
           return;
         }
 
-        const text = processedValue !== undefined ? processedValue : '';
-
-        parseText(divRef.current, text, processedMarkdownStyle, text.length);
+        textContent.current = value;
+        parseText(divRef.current, value, processedMarkdownStyle);
         updateTextColor(divRef.current, value);
       },
-      [multiline, processedMarkdownStyle, processedValue],
+      [multiline, processedMarkdownStyle],
     );
 
     useClientEffect(
@@ -604,7 +636,6 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       if (!divRef.current || !selection || (contentSelection.current && selection.start === contentSelection.current.start && selection.end === contentSelection.current.end)) {
         return;
       }
-
       const newSelection: Selection = {start: selection.start, end: selection.end ?? selection.start};
       contentSelection.current = newSelection;
       updateRefSelectionVariables(newSelection);
