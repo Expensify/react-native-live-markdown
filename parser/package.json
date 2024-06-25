@@ -22,7 +22,6 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "expensify-common": "2.0.10",
-    "underscore": "^1.13.6"
+    "expensify-common": "2.0.23"
   }
 }

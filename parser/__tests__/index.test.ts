@@ -1,16 +1,27 @@
+import {expect} from '@jest/globals';
+import type * as ParserTypes from '../index';
+
 require('../react-native-live-markdown-parser.js');
 
+declare module 'expect' {
+  interface Matchers<R> {
+    toBeParsedAs(expectedRanges: ParserTypes.Range[]): R;
+  }
+}
+
+const toBeParsedAs = function (actual: string, expectedRanges: ParserTypes.Range[]) {
+  const actualRanges = global.parseExpensiMarkToRanges(actual);
+  if (JSON.stringify(actualRanges) !== JSON.stringify(expectedRanges)) {
+    return {
+      pass: false,
+      message: () => `Expected ${JSON.stringify(expectedRanges)}, got ${JSON.stringify(actualRanges)}`,
+    };
+  }
+  return {pass: true, message: () => ''};
+};
+
 expect.extend({
-  toBeParsedAs(received, expectedRanges) {
-    const actualRanges = global.parseExpensiMarkToRanges(received);
-    if (JSON.stringify(actualRanges) !== JSON.stringify(expectedRanges)) {
-      return {
-        pass: false,
-        message: () => `Expected ${JSON.stringify(expectedRanges)}, got ${JSON.stringify(actualRanges)}`,
-      };
-    }
-    return {pass: true};
-  },
+  toBeParsedAs,
 });
 
 test('empty string', () => {
@@ -76,8 +87,12 @@ describe('mention-user', () => {
     expect('@mail@mail.com!').toBeParsedAs([{type: 'mention-user', start: 0, length: 14}]);
   });
 
-  test('with phone number', () => {
-    expect('@+1234567890 Hello!').toBeParsedAs([{type: 'mention-user', start: 0, length: 12}]);
+  test('with invalid phone number', () => {
+    expect('@+1234567890 Hello!').toBeParsedAs([]);
+  });
+
+  test('with valid phone number', () => {
+    expect('@+15005550006 Hello!').toBeParsedAs([{type: 'mention-user', start: 0, length: 13}]);
   });
 });
 

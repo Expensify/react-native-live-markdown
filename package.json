@@ -1,6 +1,6 @@
 {
   "name": "@expensify/react-native-live-markdown",
-  "version": "0.1.83",
+  "version": "0.1.92",
   "description": "Drop-in replacement for React Native's TextInput component with Markdown formatting.",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -118,7 +118,10 @@
       "<rootDir>/example/node_modules",
       "<rootDir>/lib/"
     ],
-    "testEnvironment": "jsdom"
+    "testEnvironment": "jsdom",
+    "testPathIgnorePatterns": [
+      "/WebExample/__tests__/"
+    ]
   },
   "commitlint": {
     "extends": [
