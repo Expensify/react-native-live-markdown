@@ -22,6 +22,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
         fbjni::fbjni
         ReactAndroid::jsi
         ReactAndroid::reactnativejni
+        ReactAndroid::runtimeexecutor
         hermes-engine::libhermes
         react-native-reanimated::reanimated
         ReactAndroid::react_nativemodule_core)
