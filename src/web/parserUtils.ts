@@ -20,7 +20,7 @@ type Node = {
   element: HTMLElement;
   start: number;
   length: number;
-  parent: Node | null;
+  parentNode: Node | null;
 };
 
 type Paragraph = {
@@ -207,21 +207,15 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
     element: rootElement,
     start: 0,
     length: textLength,
-    parent: null,
+    parentNode: null,
   };
-
-  let parent: Node = {
-    element: rootElement,
-    start: 0,
-    length: textLength,
-    parent: null,
-  };
+  let currentParentNode: Node = {...rootNode};
 
   const lines = splitTextIntoLines(text);
 
   if (ranges.length === 0) {
     lines.forEach((line) => {
-      parent.element.appendChild(createParagraph(line.text));
+      currentParentNode.element.appendChild(createParagraph(line.text));
     });
     return rootElement;
   }
@@ -241,14 +235,14 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
     // preparing line paragraph element for markdown text
     const p = createParagraph(null);
     rootNode.element.appendChild(p);
-    parent = {
+    currentParentNode = {
       element: p,
       start: line.start,
       length: line.length,
-      parent: rootNode,
+      parentNode: rootNode,
     };
     if (line.markdownRanges.length === 0) {
-      addTextToElement(parent.element, line.text);
+      addTextToElement(currentParentNode.element, line.text);
     }
 
     lastRangeEndIndex = line.start;
@@ -267,7 +261,7 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
       // add text before the markdown range
       const textBeforeRange = line.text.substring(lastRangeEndIndex - line.start, range.start - line.start);
       if (textBeforeRange) {
-        addTextToElement(parent.element, textBeforeRange);
+        addTextToElement(currentParentNode.element, textBeforeRange);
       }
 
       // create markdown span element
@@ -281,27 +275,27 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
 
       if (lineMarkdownRanges.length > 0 && nextRangeStartIndex < endOfCurrentRange && range.type !== 'syntax') {
         // tag nesting
-        parent.element.appendChild(span);
-        parent = {
+        currentParentNode.element.appendChild(span);
+        currentParentNode = {
           element: span,
           start: range.start,
           length: range.length,
-          parent,
+          parentNode: currentParentNode,
         };
         lastRangeEndIndex = range.start;
       } else {
         // adding markdown tag
-        parent.element.appendChild(span);
+        currentParentNode.element.appendChild(span);
         addTextToElement(span, text.substring(range.start, endOfCurrentRange));
         lastRangeEndIndex = endOfCurrentRange;
         // tag unnesting and adding text after the tag
-        while (parent.parent !== null && nextRangeStartIndex >= parent.start + parent.length) {
-          const textAfterRange = line.text.substring(lastRangeEndIndex - line.start, parent.start - line.start + parent.length);
+        while (currentParentNode.parentNode !== null && nextRangeStartIndex >= currentParentNode.start + currentParentNode.length) {
+          const textAfterRange = line.text.substring(lastRangeEndIndex - line.start, currentParentNode.start - line.start + currentParentNode.length);
           if (textAfterRange) {
-            addTextToElement(parent.element, textAfterRange);
+            addTextToElement(currentParentNode.element, textAfterRange);
           }
-          lastRangeEndIndex = parent.start + parent.length;
-          parent = parent.parent || rootNode;
+          lastRangeEndIndex = currentParentNode.start + currentParentNode.length;
+          currentParentNode = currentParentNode.parentNode || rootNode;
         }
       }
     }
