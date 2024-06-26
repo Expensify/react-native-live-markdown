@@ -1,5 +1,5 @@
 import {defineConfig, devices} from '@playwright/test';
-import * as TEST_CONST from './__tests__/testConstants';
+import * as TEST_CONST from '../example/src/testConstants';
 
 export default defineConfig({
   testDir: './__tests__',
