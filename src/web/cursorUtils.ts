@@ -10,10 +10,10 @@ function setCursorPosition(target: HTMLElement, start: number, end: number | nul
   const range = document.createRange();
   range.selectNodeContents(target);
 
-  const startTreeItem = TreeUtils.getElementByIndex(target.tree, start);
+  const startTreeItem = TreeUtils.getTreeNodeByIndex(target.tree, start);
 
   const endTreeItem =
-    end && startTreeItem && (end < startTreeItem.start || end >= startTreeItem.start + startTreeItem.length) ? TreeUtils.getElementByIndex(target.tree, end) : startTreeItem;
+    end && startTreeItem && (end < startTreeItem.start || end >= startTreeItem.start + startTreeItem.length) ? TreeUtils.getTreeNodeByIndex(target.tree, end) : startTreeItem;
 
   if (!startTreeItem || !endTreeItem) {
     throw new Error('Invalid start or end tree item');
@@ -72,8 +72,8 @@ function getCurrentCursorPosition(target: HTMLElement) {
 
   const endElement = range.startContainer === range.endContainer ? startElement : getHTMLElement(range.endContainer);
 
-  const startTreeItem = TreeUtils.findElementInTree(target.tree, startElement);
-  const endTreeItem = TreeUtils.findElementInTree(target.tree, endElement);
+  const startTreeItem = TreeUtils.findHTMLElementInTree(target.tree, startElement);
+  const endTreeItem = TreeUtils.findHTMLElementInTree(target.tree, endElement);
 
   let start = -1;
   let end = -1;

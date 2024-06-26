@@ -6,6 +6,7 @@ import type * as TreeUtilsTypes from './treeUtils';
 
 type PartialMarkdownStyle = StyleUtilsTypes.PartialMarkdownStyle;
 type TreeNode = TreeUtilsTypes.TreeNode;
+type NodeType = TreeUtilsTypes.NodeType;
 
 type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'emoji' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax' | 'mention-here' | 'mention-user' | 'mention-report';
 
@@ -14,14 +15,6 @@ type MarkdownRange = {
   start: number;
   length: number;
   depth?: number;
-};
-
-type Node = {
-  element: HTMLElement;
-  start: number;
-  length: number;
-  parentNode: Node | null;
-  childNodes?: Node[];
 };
 
 type Paragraph = {
@@ -161,8 +154,8 @@ function groupMarkdownRangesByLine(lines: Paragraph[], ranges: MarkdownRange[]) 
   });
 }
 
-function addItemToTree(element: HTMLElement, parentTreeNode: TreeNode, type: 'line' | 'text' | 'br', length: number) {
-  const node = TreeUtils.addItemToTree(element, parentTreeNode, type, length);
+function appendNode(element: HTMLElement, parentTreeNode: TreeNode, type: NodeType, length: number) {
+  const node = TreeUtils.addNodeToTree(element, parentTreeNode, type, length);
   parentTreeNode.element.appendChild(element);
   return node;
 }
@@ -170,8 +163,8 @@ function addItemToTree(element: HTMLElement, parentTreeNode: TreeNode, type: 'li
 function addBrElement(node: TreeNode) {
   const span = document.createElement('span');
   span.setAttribute('data-type', 'br');
-  const spanNode = addItemToTree(span, node, 'br', 1);
-  addItemToTree(document.createElement('br'), spanNode, 'br', 1);
+  const spanNode = appendNode(span, node, 'br', 1);
+  appendNode(document.createElement('br'), spanNode, 'br', 1);
   return spanNode;
 }
 
@@ -181,7 +174,7 @@ function addTextToElement(node: TreeNode, text: string) {
     if (line !== '') {
       const span = document.createElement('span');
       span.innerText = line;
-      addItemToTree(span, node, 'text', line.length);
+      appendNode(span, node, 'text', line.length);
     }
 
     if (index < lines.length - 1 || (index === 0 && line === '')) {
@@ -199,7 +192,7 @@ function addParagraph(node: TreeNode, text: string | null = null, length: number
   });
   p.setAttribute('data-type', 'line');
 
-  const pNode = addItemToTree(p, node, 'line', length);
+  const pNode = appendNode(p, node, 'line', length);
 
   if (text === '') {
     addBrElement(pNode);
@@ -281,7 +274,7 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
         span.setAttribute('data-type', range.type);
       }
 
-      const spanNode = addItemToTree(span, currentParentNode, range.type, range.length);
+      const spanNode = appendNode(span, currentParentNode, range.type, range.length);
 
       if (lineMarkdownRanges.length > 0 && nextRangeStartIndex < endOfCurrentRange && range.type !== 'syntax') {
         // tag nesting

@@ -4,18 +4,18 @@ type MarkdownType = ParserUtilsTypes.MarkdownType;
 
 type MarkdownRange = ParserUtilsTypes.MarkdownRange;
 
-type ElementType = MarkdownType | 'line' | 'text' | 'br';
+type NodeType = MarkdownType | 'line' | 'text' | 'br';
 
 type TreeNode = Omit<MarkdownRange, 'type'> & {
   element: HTMLElement;
   parentNode: TreeNode | null;
   childNodes: TreeNode[];
-  type: ElementType;
+  type: NodeType;
   orderIndex: string;
   isGeneratingNewline: boolean;
 };
 
-function addItemToTree(element: HTMLElement, parentTreeNode: TreeNode, type: ElementType, length: number | null = null) {
+function addNodeToTree(element: HTMLElement, parentTreeNode: TreeNode, type: NodeType, length: number | null = null) {
   const contentLength = length || (element.nodeName === 'BR' || type === 'br' ? 1 : element.innerText.length);
   const isGeneratingNewline = type === 'line' && !(element.childNodes.length === 1 && element.childNodes[0]?.getAttribute('data-type') === 'br');
   const parentChildrenCount = parentTreeNode?.childNodes.length || 0;
@@ -45,7 +45,7 @@ function addItemToTree(element: HTMLElement, parentTreeNode: TreeNode, type: Ele
 }
 
 function buildTree(rootElement: HTMLElement, text: string) {
-  function getElementType(element: HTMLElement): ElementType {
+  function getElementType(element: HTMLElement): NodeType {
     if (element.nodeName === 'BR') {
       return 'br';
     }
@@ -53,7 +53,7 @@ function buildTree(rootElement: HTMLElement, text: string) {
       return 'line';
     }
 
-    return (element.getAttribute('data-type') as ElementType) || 'text';
+    return (element.getAttribute('data-type') as NodeType) || 'text';
   }
   const rootTreeItem: TreeNode = {
     element: rootElement,
@@ -73,7 +73,7 @@ function buildTree(rootElement: HTMLElement, text: string) {
     }
 
     Array.from(treeItem.element.children).forEach((childElement) => {
-      const newTreeItem = addItemToTree(childElement as HTMLElement, treeItem, getElementType(childElement as HTMLElement));
+      const newTreeItem = addNodeToTree(childElement as HTMLElement, treeItem, getElementType(childElement as HTMLElement));
       stack.push(newTreeItem);
     });
   }
@@ -81,13 +81,13 @@ function buildTree(rootElement: HTMLElement, text: string) {
   return rootTreeItem;
 }
 
-function findElementInTree(treeRoot: TreeNode, element: HTMLElement) {
+function findHTMLElementInTree(treeRoot: TreeNode, element: HTMLElement): TreeNode | null {
   if (element.hasAttribute('contenteditable')) {
     return treeRoot;
   }
 
   if (!element || !element.hasAttribute('data-id')) {
-    return;
+    return null;
   }
   const indexes = element.getAttribute('data-id')?.split(',');
   let el: TreeNode | null = treeRoot;
@@ -106,7 +106,7 @@ function findElementInTree(treeRoot: TreeNode, element: HTMLElement) {
   return el;
 }
 
-function getElementByIndex(treeRoot: TreeNode, index: number) {
+function getTreeNodeByIndex(treeRoot: TreeNode, index: number): TreeNode | null {
   let el: TreeNode | null = treeRoot;
 
   let i = 0;
@@ -138,6 +138,6 @@ function getElementByIndex(treeRoot: TreeNode, index: number) {
   return null;
 }
 
-export {addItemToTree, findElementInTree, getElementByIndex, buildTree};
+export {addNodeToTree, findHTMLElementInTree, getTreeNodeByIndex, buildTree};
 
-export type {TreeNode};
+export type {TreeNode, NodeType};
