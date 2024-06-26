@@ -13,13 +13,13 @@ import type {
 import React, {useEffect, useRef, useCallback, useMemo, useLayoutEffect} from 'react';
 import type {CSSProperties, MutableRefObject, ReactEventHandler, FocusEventHandler, MouseEvent, KeyboardEvent, SyntheticEvent} from 'react';
 import {StyleSheet} from 'react-native';
-import {updateInputStructure} from './web/parserUtils';
-import BrowserUtils from './web/browserUtils';
+import {updateInputStructure} from './web/utils/parserUtils';
+import BrowserUtils from './web/utils/browserUtils';
 import InputHistory from './web/InputHistory';
-import {buildTree} from './web/treeUtils';
-import type {TreeNode} from './web/treeUtils';
+import {buildTree} from './web/utils/treeUtils';
+import type {TreeNode} from './web/utils/treeUtils';
 import {mergeMarkdownStyleWithDefault} from './styleUtils';
-import {getCurrentCursorPosition, removeSelection, setCursorPosition} from './web/cursorUtils';
+import {getCurrentCursorPosition, removeSelection, setCursorPosition} from './web/utils/cursorUtils';
 import './web/MarkdownTextInput.css';
 import type {MarkdownStyle} from './MarkdownTextInputDecoratorViewNativeComponent';
 

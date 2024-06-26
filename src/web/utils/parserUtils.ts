@@ -1,8 +1,8 @@
 import BrowserUtils from './browserUtils';
-import type {MarkdownTextInputElement} from '../MarkdownTextInput.web';
+import type {MarkdownTextInputElement} from '../../MarkdownTextInput.web';
 import {addNodeToTree, buildTree} from './treeUtils';
 import type {NodeType, TreeNode} from './treeUtils';
-import type {PartialMarkdownStyle} from '../styleUtils';
+import type {PartialMarkdownStyle} from '../../styleUtils';
 import {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition} from './cursorUtils';
 
 type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'emoji' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax' | 'mention-here' | 'mention-user' | 'mention-report';

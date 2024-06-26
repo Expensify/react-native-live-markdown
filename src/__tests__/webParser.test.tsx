@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {expect} from '@jest/globals';
-import {parseRangesToHTMLNodes} from '../web/parserUtils';
-import type {MarkdownRange} from '../web/parserUtils';
+import {parseRangesToHTMLNodes} from '../web/utils/parserUtils';
+import type {MarkdownRange} from '../web/utils/parserUtils';
 
 require('../../parser/react-native-live-markdown-parser.js');
 
