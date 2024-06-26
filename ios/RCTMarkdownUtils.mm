@@ -2,7 +2,11 @@
 #import "react_native_assert.h"
 #import <React/RCTAssert.h>
 #import <React/RCTFont.h>
-#import <JavaScriptCore/JavaScriptCore.h>
+
+#include <jsi/jsi.h>
+#include <hermes/hermes.h>
+
+using namespace facebook;
 
 @implementation RCTMarkdownUtils {
   NSString *_prevInputString;
@@ -23,20 +27,28 @@
             return _prevAttributedString;
         }
 
-        static JSContext *ctx = nil;
-        static JSValue *function = nil;
-        if (ctx == nil) {
+        static std::shared_ptr<jsi::Runtime> runtime;
+        if (runtime == nullptr) {
             NSString *path = [[NSBundle mainBundle] pathForResource:@"react-native-live-markdown-parser" ofType:@"js"];
             assert(path != nil && "[react-native-live-markdown] Markdown parser bundle not found");
             NSString *content = [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:NULL];
             assert(content != nil && "[react-native-live-markdown] Markdown parser bundle is empty");
-            ctx = [[JSContext alloc] init];
-            [ctx evaluateScript:content];
-            function = ctx[@"parseExpensiMarkToRanges"];
+            runtime = facebook::hermes::makeHermesRuntime();
+            auto codeBuffer = std::make_shared<const jsi::StringBuffer>([content UTF8String]);
+            runtime->evaluateJavaScript(codeBuffer, "nativeInitializeRuntime");
         }
 
-        JSValue *result = [function callWithArguments:@[inputString]];
-        NSArray *ranges = [result toArray];
+        jsi::Runtime &rt = *runtime;
+        auto func = rt.global().getPropertyAsFunction(rt, "parseExpensiMarkToRanges");
+        auto output = func.call(rt, [inputString UTF8String]);
+        auto json = rt.global().getPropertyAsObject(rt, "JSON").getPropertyAsFunction(rt, "stringify").call(rt, output).asString(rt).utf8(rt);
+
+        NSData *data = [NSData dataWithBytes:json.data() length:json.length()];
+        NSError *error = nil;
+        NSArray *ranges = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
+        if (error != nil) {
+          return input;
+        }
 
         NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:inputString attributes:attributes];
         [attributedString beginEditing];

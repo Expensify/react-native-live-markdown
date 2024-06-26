@@ -18,6 +18,8 @@ Pod::Spec.new do |s|
 
   s.resources = "parser/react-native-live-markdown-parser.js"
 
+  s.dependency "hermes-engine"
+
   install_modules_dependencies(s)
 
   if ENV['USE_FRAMEWORKS'] && ENV['RCT_NEW_ARCH_ENABLED']
