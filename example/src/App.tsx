@@ -1,20 +1,10 @@
 import * as React from 'react';
 
-import { Button, Platform, StyleSheet, Text, View } from 'react-native';
+import {Button, Platform, StyleSheet, Text, View} from 'react-native';
 
-import { MarkdownTextInput } from 'react-native-markdown-text-input';
-import type { TextInput } from 'react-native';
-
-const DEFAULT_TEXT = [
-  'Hello, *world*!',
-  'https://expensify.com',
-  '# Lorem ipsum',
-  '> Hello world',
-  '`foo`',
-  '```\nbar\n```',
-  '@here',
-  '@someone@swmansion.com',
-].join('\n');
+import {MarkdownTextInput} from '@expensify/react-native-live-markdown';
+import type {TextInput} from 'react-native';
+import * as TEST_CONST from '../../WebExample/__tests__/testConstants';
 
 function isWeb() {
   return Platform.OS === 'web';
@@ -24,7 +14,7 @@ function getPlatform() {
   if (isWeb()) {
     return 'web';
   }
-  // @ts-ignore it works
+  // @ts-expect-error it works
   return Platform.constants.systemName || Platform.constants.Brand;
 }
 
@@ -39,12 +29,14 @@ function getBundle() {
 function getRuntime() {
   if ('HermesInternal' in global) {
     const version =
-      // @ts-ignore this is fine
+      // @ts-expect-error this is fine
+      // eslint-disable-next-line es/no-optional-chaining
       global.HermesInternal?.getRuntimeProperties?.()['OSS Release Version'];
     return `Hermes (${version})`;
   }
   if ('_v8runtime' in global) {
-    // @ts-ignore this is fine
+    // @ts-expect-error this is fine
+    // eslint-disable-next-line no-underscore-dangle
     const version = global._v8runtime().version;
     return `V8 (${version})`;
   }
@@ -56,12 +48,20 @@ function getArchitecture() {
 }
 
 function getReactNativeVersion() {
-  const { major, minor, patch } = Platform.constants.reactNativeVersion;
+  const {major, minor, patch} = Platform.constants.reactNativeVersion;
   return `${major}.${minor}.${patch}`;
 }
 
+function getRandomColor() {
+  return `#${Math.floor(Math.random() * 16777215)
+    .toString(16)
+    .padStart(6, '0')}`;
+}
+
 export default function App() {
-  const [value, setValue] = React.useState(DEFAULT_TEXT);
+  const [value, setValue] = React.useState(TEST_CONST.EXAMPLE_CONTENT);
+  const [markdownStyle, setMarkdownStyle] = React.useState({});
+  const [selection, setSelection] = React.useState({start: 0, end: 0});
 
   // TODO: use MarkdownTextInput ref instead of TextInput ref
   const ref = React.useRef<TextInput>(null);
@@ -96,6 +96,11 @@ export default function App() {
         onChangeText={setValue}
         style={styles.input}
         ref={ref}
+        markdownStyle={markdownStyle}
+        placeholder="Type here..."
+        onSelectionChange={(e) => setSelection(e.nativeEvent.selection)}
+        selection={selection}
+        id={TEST_CONST.INPUT_ID}
       />
       {/* <Text>TextInput singleline</Text>
       <TextInput
@@ -113,10 +118,61 @@ export default function App() {
         style={styles.input}
       /> */}
       <Text style={styles.text}>{JSON.stringify(value)}</Text>
-      <Button title="Focus" onPress={() => ref.current?.focus()} />
-      <Button title="Blur" onPress={() => ref.current?.blur()} />
-      <Button title="Reset" onPress={() => setValue(DEFAULT_TEXT)} />
-      <Button title="Clear" onPress={() => setValue('')} />
+      <Button
+        testID="focus"
+        title="Focus"
+        onPress={() => {
+          if (!ref.current) {
+            return;
+          }
+          ref.current.focus();
+        }}
+      />
+      <Button
+        testID="blur"
+        title="Blur"
+        onPress={() => {
+          if (!ref.current) {
+            return;
+          }
+          ref.current.blur();
+        }}
+      />
+      <Button
+        testID="reset"
+        title="Reset"
+        onPress={() => {
+          setValue(TEST_CONST.EXAMPLE_CONTENT);
+          setMarkdownStyle({});
+        }}
+      />
+      <Button
+        testID="clear"
+        title="Clear"
+        onPress={() => {
+          setValue('');
+        }}
+      />
+      <Button
+        title="Change style"
+        onPress={() =>
+          setMarkdownStyle({
+            link: {
+              color: getRandomColor(),
+            },
+          })
+        }
+      />
+      <Button
+        title="Change selection"
+        onPress={() => {
+          if (!ref.current) {
+            return;
+          }
+          ref.current.focus();
+          setSelection({start: 0, end: 20});
+        }}
+      />
     </View>
   );
 }

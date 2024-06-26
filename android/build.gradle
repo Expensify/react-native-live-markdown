@@ -9,6 +9,11 @@ buildscript {
   }
 }
 
+def reactNativeArchitectures() {
+  def value = project.getProperties().get("reactNativeArchitectures")
+  return value ? value.split(",") : ["armeabi-v7a", "x86", "x86_64", "arm64-v8a"]
+}
+
 def isNewArchitectureEnabled() {
   return rootProject.hasProperty("newArchEnabled") && rootProject.getProperty("newArchEnabled") == "true"
 }
@@ -20,11 +25,11 @@ if (isNewArchitectureEnabled()) {
 }
 
 def getExtOrDefault(name) {
-  return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties["MarkdownTextInput_" + name]
+  return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties["LiveMarkdown_" + name]
 }
 
 def getExtOrIntegerDefault(name) {
-  return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties["MarkdownTextInput_" + name]).toInteger()
+  return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties["LiveMarkdown_" + name]).toInteger()
 }
 
 def supportsNamespace() {
@@ -38,7 +43,7 @@ def supportsNamespace() {
 
 android {
   if (supportsNamespace()) {
-    namespace "com.markdowntextinput"
+    namespace "com.expensify.livemarkdown"
 
     sourceSets {
       main {
@@ -53,9 +58,13 @@ android {
     minSdkVersion getExtOrIntegerDefault("minSdkVersion")
     targetSdkVersion getExtOrIntegerDefault("targetSdkVersion")
     buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
+    
+    consumerProguardFiles "proguard-rules.pro"
+    
     externalNativeBuild {
       cmake {
         arguments "-DANDROID_STL=c++_shared", "-DANDROID_TOOLCHAIN=clang"
+        abiFilters (*reactNativeArchitectures())
       }
     }
   }
@@ -112,6 +121,15 @@ android {
       "**/libreactnativejni.so",
     ]
   }
+
+  packagingOptions {
+    // For some reason gradle only complains about the duplicated version of librrc_root and libreact_render libraries
+    // while there are more libraries copied in intermediates folder of the lib build directory, we exclude
+    // only the ones that make the build fail (ideally we should only include libreanimated but we
+    // are only allowed to specify exlude patterns)
+    exclude "**/libreact_render*.so"
+    exclude "**/librrc_root.so"
+  }
 }
 
 repositories {
@@ -128,13 +146,13 @@ dependencies {
 if (isNewArchitectureEnabled()) {
   react {
     jsRootDir = file("../src/")
-    libraryName = "MarkdownTextInputView"
-    codegenJavaPackageName = "com.markdowntextinput"
+    libraryName = "LiveMarkdown"
+    codegenJavaPackageName = "com.expensify.livemarkdown"
   }
 }
 
 task copyJS(type: Copy) {
-  from '../parser/out.js'
+  from '../parser/react-native-live-markdown-parser.js'
   into 'src/main/assets'
 }
 

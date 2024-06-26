@@ -1,14 +1,15 @@
 #import <React/RCTBackedTextInputViewProtocol.h>
-#import <react-native-markdown-text-input/RCTMarkdownStyle.h>
+#import <RNLiveMarkdown/RCTMarkdownStyle.h>
+
+NS_ASSUME_NONNULL_BEGIN
 
 @interface RCTMarkdownUtils : NSObject
 
 @property (nonatomic) RCTMarkdownStyle *markdownStyle;
-@property (nonatomic) NSMutableArray<NSValue *> *quoteRanges;
-@property (weak, nonatomic) UIView<RCTBackedTextInputViewProtocol> *backedTextInputView;
+@property (nonatomic) NSMutableArray<NSDictionary *> *blockquoteRangesAndLevels;
 
-- (instancetype)initWithBackedTextInputView:(UIView<RCTBackedTextInputViewProtocol> *)backedTextInputView;
-
-- (NSAttributedString *)parseMarkdown:(NSAttributedString *)input;
+- (NSAttributedString *)parseMarkdown:(nullable NSAttributedString *)input withAttributes:(nullable NSDictionary<NSAttributedStringKey, id>*)attributes;
 
 @end
+
+NS_ASSUME_NONNULL_END

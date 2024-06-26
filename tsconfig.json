@@ -2,14 +2,14 @@
   "compilerOptions": {
     "rootDir": ".",
     "paths": {
-      "react-native-markdown-text-input": ["./src/index"]
+      "@expensify/react-native-live-markdown": ["./src/index"]
     },
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "jsx": "react",
-    "lib": ["esnext"],
+    "lib": ["esnext", "dom"],
     "module": "esnext",
     "moduleResolution": "node",
     "noFallthroughCasesInSwitch": true,
@@ -24,8 +24,8 @@
     "strict": true,
     "target": "esnext",
     "verbatimModuleSyntax": true,
-    "typeRoots": ["node_modules/@types"],
+    "typeRoots": ["node_modules/@types"]
   },
   "include": ["src/**/*", "types/global.d.ts"],
-  "exclude": ["**/node_modules/**/*", "parser/**/*", "**/lib/**/*", "**/__tests__/**/*", "example/src/**/*", "WebExample/**/*"],
+  "exclude": ["**/node_modules/**/*", "parser/**/*", "**/lib/**/*", "example/src/**/*", "WebExample/**/*"]
 }

@@ -1,5 +1,5 @@
-#import <react-native-markdown-text-input/RCTUITextView+Markdown.h>
-#import <react-native-markdown-text-input/RCTMarkdownUtils.h>
+#import <RNLiveMarkdown/RCTUITextView+Markdown.h>
+#import <RNLiveMarkdown/RCTMarkdownUtils.h>
 #import <objc/message.h>
 
 @implementation RCTUITextView (Markdown)
@@ -17,7 +17,7 @@
   RCTMarkdownUtils *markdownUtils = [self getMarkdownUtils];
   if (markdownUtils != nil) {
     UITextRange *range = self.selectedTextRange;
-    super.attributedText = [markdownUtils parseMarkdown:self.attributedText];
+    super.attributedText = [markdownUtils parseMarkdown:self.attributedText withAttributes:self.defaultTextAttributes];
     [super setSelectedTextRange:range]; // prevents cursor from jumping at the end when typing in the middle of the text
     self.typingAttributes = self.defaultTextAttributes; // removes indent in new line when typing after blockquote
   }

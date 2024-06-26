@@ -5,7 +5,8 @@
 
 using namespace facebook;
 
-namespace markdowntextinput {
+namespace expensify {
+namespace livemarkdown {
   std::shared_ptr<jsi::Runtime> MarkdownUtils::runtime_;
 
   void MarkdownUtils::nativeInitializeRuntime(
@@ -39,4 +40,5 @@ namespace markdowntextinput {
         makeNativeMethod("nativeParseMarkdown", MarkdownUtils::nativeParseMarkdown)});
   }
 
-} // namespace markdowntextinput
+} // namespace livemarkdown
+} // namespace expensify

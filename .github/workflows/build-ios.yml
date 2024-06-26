@@ -1,0 +1,83 @@
+name: Test iOS build
+on:
+  pull_request:
+    paths:
+      - .github/workflows/build-ios.yml
+      - RNLiveMarkdown.podspec
+      - ios/**
+      - cpp/**
+      - example/package.json
+      - example/ios/**
+  merge_group:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/build-ios.yml
+      - RNLiveMarkdown.podspec
+      - ios/**
+      - cpp/**
+      - example/package.json
+      - example/ios/**
+
+jobs:
+  build:
+    if: github.repository == 'Expensify/react-native-live-markdown'
+    runs-on: macos-13
+    strategy:
+      matrix:
+        react-native-architecture: ['Paper', 'Fabric']
+      fail-fast: false
+    concurrency:
+      group: build-ios-${{ matrix.react-native-architecture }}-${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v4
+
+      - name: Restore node_modules from cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            example/node_modules
+          key: build-ios-node-modules-${{ matrix.react-native-architecture }}-${{ hashFiles('yarn.lock') }}
+          restore-keys: build-ios-node-modules-${{ matrix.react-native-architecture }}-
+
+      - name: Install node_modules
+        run: yarn install --immutable
+
+      - name: Restore Pods from cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            example/ios/Pods
+            ~/Library/Caches/CocoaPods
+            ~/.cocoapods
+          key: build-ios-pods-${{ matrix.react-native-architecture }}-${{ hashFiles('example/node_modules/react-native/package.json') }}
+          restore-keys: build-ios-pods-${{ matrix.react-native-architecture }}-
+
+      - name: Install Pods
+        working-directory: example/ios
+        env:
+          RCT_NEW_ARCH_ENABLED: ${{ matrix.react-native-architecture == 'Fabric' && '1' || '0' }}
+        run: |
+          bundler install
+          bundler exec pod install
+
+      - name: Remove .xcode.env.local
+        working-directory: example/ios
+        run: rm -rf .xcode.env.local
+
+      - name: Restore build artifacts from cache
+        uses: actions/cache@v4
+        with:
+          path: ~/Library/Developer/Xcode/DerivedData
+          key: build-ios-derived-data-${{ matrix.react-native-architecture }}-${{ hashFiles('example/node_modules/react-native/package.json') }}
+          restore-keys: build-ios-derived-data-${{ matrix.react-native-architecture }}-
+
+      - name: Build app
+        working-directory: example
+        run: npx react-native@latest run-ios --no-packager
