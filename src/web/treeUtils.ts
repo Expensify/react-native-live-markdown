@@ -15,8 +15,8 @@ type TreeNode = Omit<MarkdownRange, 'type'> & {
   isGeneratingNewline: boolean;
 };
 
-function addItemToTree(element: HTMLElement, parentTreeNode: TreeNode, type: ElementType) {
-  const contentLength = element.nodeName === 'BR' ? 1 : element.innerText.length;
+function addItemToTree(element: HTMLElement, parentTreeNode: TreeNode, type: ElementType, length: number | null = null) {
+  const contentLength = length || (element.nodeName === 'BR' || type === 'br' ? 1 : element.innerText.length);
   const isGeneratingNewline = type === 'line' && !(element.childNodes.length === 1 && element.childNodes[0]?.getAttribute('data-type') === 'br');
   const parentChildrenCount = parentTreeNode?.childNodes.length || 0;
   let startIndex = parentTreeNode.start;
