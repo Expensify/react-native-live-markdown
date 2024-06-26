@@ -1,8 +1,4 @@
-import type * as ParserUtilsTypes from './parserUtils';
-
-type MarkdownType = ParserUtilsTypes.MarkdownType;
-
-type MarkdownRange = ParserUtilsTypes.MarkdownRange;
+import type {MarkdownRange, MarkdownType} from './parserUtils';
 
 type NodeType = MarkdownType | 'line' | 'text' | 'br';
 
@@ -17,7 +13,7 @@ type TreeNode = Omit<MarkdownRange, 'type'> & {
 
 function addNodeToTree(element: HTMLElement, parentTreeNode: TreeNode, type: NodeType, length: number | null = null) {
   const contentLength = length || (element.nodeName === 'BR' || type === 'br' ? 1 : element.innerText.length);
-  const isGeneratingNewline = type === 'line' && !(element.childNodes.length === 1 && element.childNodes[0]?.getAttribute('data-type') === 'br');
+  const isGeneratingNewline = type === 'line' && !(element.childNodes.length === 1 && (element.childNodes[0] as HTMLElement)?.getAttribute('data-type') === 'br');
   const parentChildrenCount = parentTreeNode?.childNodes.length || 0;
   let startIndex = parentTreeNode.start;
   if (parentChildrenCount > 0) {

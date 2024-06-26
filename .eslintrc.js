@@ -31,6 +31,7 @@ module.exports = {
   root: true,
   rules: {
     'rulesdir/prefer-underscore-method': 'off',
+    'rulesdir/prefer-import-module-contents': 'off',
     'react/jsx-props-no-spreading': 'off',
     'react/require-default-props': 'off',
     'react/jsx-filename-extension': ['error', { extensions: ['.tsx', '.jsx'] }],

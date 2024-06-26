@@ -1,12 +1,9 @@
-import * as CursorUtils from './cursorUtils';
-import type * as StyleUtilsTypes from '../styleUtils';
 import * as BrowserUtils from './browserUtils';
-import * as TreeUtils from './treeUtils';
-import type * as TreeUtilsTypes from './treeUtils';
-
-type PartialMarkdownStyle = StyleUtilsTypes.PartialMarkdownStyle;
-type TreeNode = TreeUtilsTypes.TreeNode;
-type NodeType = TreeUtilsTypes.NodeType;
+import type {MarkdownTextInputElement} from '../MarkdownTextInput.web';
+import {addNodeToTree, buildTree} from './treeUtils';
+import type {NodeType, TreeNode} from './treeUtils';
+import type {PartialMarkdownStyle} from '../styleUtils';
+import {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition} from './cursorUtils';
 
 type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'emoji' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax' | 'mention-here' | 'mention-user' | 'mention-report';
 
@@ -155,7 +152,7 @@ function groupMarkdownRangesByLine(lines: Paragraph[], ranges: MarkdownRange[]) 
 }
 
 function appendNode(element: HTMLElement, parentTreeNode: TreeNode, type: NodeType, length: number) {
-  const node = TreeUtils.addNodeToTree(element, parentTreeNode, type, length);
+  const node = addNodeToTree(element, parentTreeNode, type, length);
   parentTreeNode.element.appendChild(element);
   return node;
 }
@@ -300,26 +297,32 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
   return rootElement;
 }
 
-function moveCursor(isFocused: boolean, alwaysMoveCursorToTheEnd: boolean, cursorPosition: number | null, target: HTMLElement) {
+function moveCursor(isFocused: boolean, alwaysMoveCursorToTheEnd: boolean, cursorPosition: number | null, target: MarkdownTextInputElement) {
   if (!isFocused) {
     return;
   }
 
   if (alwaysMoveCursorToTheEnd || cursorPosition === null) {
-    CursorUtils.moveCursorToEnd(target);
+    moveCursorToEnd(target);
   } else if (cursorPosition !== null) {
-    CursorUtils.setCursorPosition(target, cursorPosition);
+    setCursorPosition(target, cursorPosition);
   }
 }
 
-function parseText(target: HTMLElement, text: string, cursorPositionIndex: number | null, markdownStyle: PartialMarkdownStyle = {}, alwaysMoveCursorToTheEnd = false) {
+function updateInputStructure(
+  target: MarkdownTextInputElement,
+  text: string,
+  cursorPositionIndex: number | null,
+  markdownStyle: PartialMarkdownStyle = {},
+  alwaysMoveCursorToTheEnd = false,
+) {
   const targetElement = target;
 
   // in case the cursorPositionIndex is larger than text length, cursorPosition will be null, i.e: move the caret to the end
   let cursorPosition: number | null = cursorPositionIndex && cursorPositionIndex <= text.length ? cursorPositionIndex : null;
   const isFocused = document.activeElement === target;
   if (isFocused && cursorPositionIndex === null) {
-    const selection = CursorUtils.getCurrentCursorPosition(target);
+    const selection = getCurrentCursorPosition(target);
     cursorPosition = selection ? selection.start : null;
   }
   const ranges = global.parseExpensiMarkToRanges(text);
@@ -339,7 +342,7 @@ function parseText(target: HTMLElement, text: string, cursorPositionIndex: numbe
       targetElement.innerText = '';
       targetElement.innerHTML = dom.innerHTML || '';
 
-      tree = TreeUtils.buildTree(targetElement, text);
+      tree = buildTree(targetElement, text);
       targetElement.tree = tree;
 
       if (BrowserUtils.isChromium) {
@@ -355,6 +358,6 @@ function parseText(target: HTMLElement, text: string, cursorPositionIndex: numbe
   return {text, cursorPosition: cursorPosition || 0, tree};
 }
 
-export {parseText, parseRangesToHTMLNodes};
+export {updateInputStructure, parseRangesToHTMLNodes};
 
 export type {MarkdownRange, MarkdownType};

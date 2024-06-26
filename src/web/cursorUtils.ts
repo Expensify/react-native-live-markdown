@@ -1,7 +1,8 @@
+import type {MarkdownTextInputElement} from '../MarkdownTextInput.web';
 import * as BrowserUtils from './browserUtils';
-import * as TreeUtils from './treeUtils';
+import {findHTMLElementInTree, getTreeNodeByIndex} from './treeUtils';
 
-function setCursorPosition(target: HTMLElement, start: number, end: number | null = null) {
+function setCursorPosition(target: MarkdownTextInputElement, start: number, end: number | null = null) {
   // We don't want to move the cursor if the target is not focused
   if (target !== document.activeElement || start < 0 || (end && end < 0)) {
     return;
@@ -10,10 +11,9 @@ function setCursorPosition(target: HTMLElement, start: number, end: number | nul
   const range = document.createRange();
   range.selectNodeContents(target);
 
-  const startTreeItem = TreeUtils.getTreeNodeByIndex(target.tree, start);
+  const startTreeItem = getTreeNodeByIndex(target.tree, start);
 
-  const endTreeItem =
-    end && startTreeItem && (end < startTreeItem.start || end >= startTreeItem.start + startTreeItem.length) ? TreeUtils.getTreeNodeByIndex(target.tree, end) : startTreeItem;
+  const endTreeItem = end && startTreeItem && (end < startTreeItem.start || end >= startTreeItem.start + startTreeItem.length) ? getTreeNodeByIndex(target.tree, end) : startTreeItem;
 
   if (!startTreeItem || !endTreeItem) {
     throw new Error('Invalid start or end tree item');
@@ -40,7 +40,7 @@ function setCursorPosition(target: HTMLElement, start: number, end: number | nul
     selection.setBaseAndExtent(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
   }
 
-  scrollCursorIntoView(target as HTMLInputElement);
+  scrollCursorIntoView(target);
 }
 
 function moveCursorToEnd(target: HTMLElement) {
@@ -53,7 +53,7 @@ function moveCursorToEnd(target: HTMLElement) {
   }
 }
 
-function getCurrentCursorPosition(target: HTMLElement) {
+function getCurrentCursorPosition(target: MarkdownTextInputElement) {
   function getHTMLElement(node: Node) {
     let element = node as HTMLElement | Text;
     if (element instanceof Text) {
@@ -72,8 +72,8 @@ function getCurrentCursorPosition(target: HTMLElement) {
 
   const endElement = range.startContainer === range.endContainer ? startElement : getHTMLElement(range.endContainer);
 
-  const startTreeItem = TreeUtils.findHTMLElementInTree(target.tree, startElement);
-  const endTreeItem = TreeUtils.findHTMLElementInTree(target.tree, endElement);
+  const startTreeItem = findHTMLElementInTree(target.tree, startElement);
+  const endTreeItem = findHTMLElementInTree(target.tree, endElement);
 
   let start = -1;
   let end = -1;
@@ -92,7 +92,7 @@ function removeSelection() {
   }
 }
 
-function scrollCursorIntoView(target: HTMLInputElement) {
+function scrollCursorIntoView(target: MarkdownTextInputElement) {
   if (target.selectionStart === null || !target.value || BrowserUtils.isFirefox) {
     return;
   }

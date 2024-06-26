@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {expect} from '@jest/globals';
-import * as ParserUtils from '../web/parserUtils';
-import type * as MarkdownTypes from '../web/parserUtils';
+import {parseRangesToHTMLNodes} from '../web/parserUtils';
+import type {MarkdownRange} from '../web/parserUtils';
 
 require('../../parser/react-native-live-markdown-parser.js');
 
@@ -17,10 +17,10 @@ const toBeParsedAsHTML = function (actual: string, expectedHTML: string) {
   }
   let expected = expectedHTML;
   const ranges = global.parseExpensiMarkToRanges(actual);
-  const markdownRanges = ranges as MarkdownTypes.MarkdownRange[];
+  const markdownRanges = ranges as MarkdownRange[];
 
-  const actualDOM = ParserUtils.parseRangesToHTMLNodes(actual, markdownRanges, {}, true);
-  const actualHTML = actualDOM.dom.innerHTML;
+  const actualDOM = parseRangesToHTMLNodes(actual, markdownRanges, {}, true);
+  const actualHTML = actualDOM.innerHTML;
 
   if (actualHTML === expected) {
     expected = actualHTML;

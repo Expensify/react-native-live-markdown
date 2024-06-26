@@ -13,15 +13,15 @@ import type {
 import React, {useEffect, useRef, useCallback, useMemo, useLayoutEffect} from 'react';
 import type {CSSProperties, MutableRefObject, ReactEventHandler, FocusEventHandler, MouseEvent, KeyboardEvent, SyntheticEvent} from 'react';
 import {StyleSheet} from 'react-native';
-import * as ParseUtils from './web/parserUtils';
-import * as CursorUtils from './web/cursorUtils';
-import * as StyleUtils from './styleUtils';
-import * as TreeUtils from './web/treeUtils';
-import type * as TreeUtilsTypes from './web/treeUtils';
+import {updateInputStructure} from './web/parserUtils';
 import * as BrowserUtils from './web/browserUtils';
-import type * as MarkdownTextInputDecoratorViewNativeComponent from './MarkdownTextInputDecoratorViewNativeComponent';
-import './web/MarkdownTextInput.css';
 import InputHistory from './web/InputHistory';
+import {buildTree} from './web/treeUtils';
+import type {TreeNode} from './web/treeUtils';
+import {mergeMarkdownStyleWithDefault} from './styleUtils';
+import {getCurrentCursorPosition, removeSelection, setCursorPosition} from './web/cursorUtils';
+import './web/MarkdownTextInput.css';
+import type {MarkdownStyle} from './MarkdownTextInputDecoratorViewNativeComponent';
 
 require('../parser/react-native-live-markdown-parser.js');
 
@@ -54,8 +54,6 @@ try {
   throw new Error('[react-native-live-markdown] Function `dangerousStyleValue` from react-native-web not found.');
 }
 
-type MarkdownStyle = MarkdownTextInputDecoratorViewNativeComponent.MarkdownStyle;
-
 interface MarkdownTextInputProps extends TextInputProps {
   markdownStyle?: MarkdownStyle;
   onClick?: (e: MouseEvent<HTMLDivElement>) => void;
@@ -81,7 +79,7 @@ let focusTimeout: NodeJS.Timeout | null = null;
 
 type MarkdownTextInputElement = HTMLDivElement &
   HTMLInputElement & {
-    tree: TreeUtilsTypes.TreeNode;
+    tree: TreeNode;
   };
 
 // If an Input Method Editor is processing key input, the 'keyCode' is 229.
@@ -113,7 +111,7 @@ function processUnitsInMarkdownStyle(input: MarkdownStyle): MarkdownStyle {
 }
 
 function processMarkdownStyle(input: MarkdownStyle | undefined): MarkdownStyle {
-  return processUnitsInMarkdownStyle(StyleUtils.mergeMarkdownStyleWithDefault(input));
+  return processUnitsInMarkdownStyle(mergeMarkdownStyleWithDefault(input));
 }
 
 function getElementHeight(node: HTMLDivElement, styles: CSSProperties, numberOfLines: number | undefined) {
@@ -202,11 +200,11 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     }, []);
 
     const parseText = useCallback(
-      (target: HTMLDivElement, text: string | null, customMarkdownStyles: MarkdownStyle, cursorPosition: number | null = null, shouldAddToHistory = true) => {
+      (target: MarkdownTextInputElement, text: string | null, customMarkdownStyles: MarkdownStyle, cursorPosition: number | null = null, shouldAddToHistory = true) => {
         if (text === null) {
           return {text: textContent.current, cursorPosition: null};
         }
-        const parsedText = ParseUtils.parseText(target, text, cursorPosition, customMarkdownStyles, !multiline);
+        const parsedText = updateInputStructure(target, text, cursorPosition, customMarkdownStyles, !multiline);
 
         if (divRef.current && parsedText.tree) {
           divRef.current.tree = parsedText.tree;
@@ -243,7 +241,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     );
 
     const undo = useCallback(
-      (target: HTMLDivElement) => {
+      (target: MarkdownTextInputElement) => {
         if (!history.current) {
           return '';
         }
@@ -255,7 +253,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     );
 
     const redo = useCallback(
-      (target: HTMLDivElement) => {
+      (target: MarkdownTextInputElement) => {
         if (!history.current) {
           return '';
         }
@@ -299,7 +297,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         if (!divRef.current) {
           return;
         }
-        const newSelection = predefinedSelection || CursorUtils.getCurrentCursorPosition(divRef.current);
+        const newSelection = predefinedSelection || getCurrentCursorPosition(divRef.current);
 
         if (newSelection && (!contentSelection.current || contentSelection.current.start !== newSelection.start || contentSelection.current.end !== newSelection.end)) {
           updateRefSelectionVariables(newSelection);
@@ -380,7 +378,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         const parsedText = parseInnerHTMLToText(e.target);
         textContent.current = parsedText;
 
-        const tree = TreeUtils.buildTree(divRef.current, parsedText);
+        const tree = buildTree(divRef.current, parsedText);
         divRef.current.tree = tree;
 
         if (compositionRef.current && !BrowserUtils.isMobile) {
@@ -474,7 +472,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
             //  Thanks to that in every situation we have proper amount of new lines in our parsed text. Without it pressing enter in empty lines will add 2 more new lines.
             document.execCommand('insertLineBreak');
             if (contentSelection.current) {
-              CursorUtils.setCursorPosition(divRef.current, contentSelection.current?.start + 1);
+              setCursorPosition(divRef.current, contentSelection.current?.start + 1);
             }
           }
           if (!e.shiftKey && ((shouldBlurOnSubmit && hostNode !== null) || !multiline)) {
@@ -493,10 +491,10 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         setEventProps(e);
         if (divRef.current) {
           if (contentSelection.current) {
-            CursorUtils.setCursorPosition(divRef.current, contentSelection.current.start, contentSelection.current.end);
+            setCursorPosition(divRef.current, contentSelection.current.start, contentSelection.current.end);
           } else {
             const valueLength = value ? value.length : textContent.current.length;
-            CursorUtils.setCursorPosition(divRef.current, valueLength, null);
+            setCursorPosition(divRef.current, valueLength, null);
           }
           updateSelection(event, contentSelection.current);
         }
@@ -530,7 +528,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     const handleBlur: FocusEventHandler<HTMLDivElement> = useCallback(
       (event) => {
         const e = event as unknown as NativeSyntheticEvent<TextInputFocusEventData>;
-        CursorUtils.removeSelection();
+        removeSelection();
         currentlyFocusedField.current = null;
         if (onBlur) {
           setEventProps(e);
@@ -639,7 +637,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       const newSelection: Selection = {start: selection.start, end: selection.end ?? selection.start};
       contentSelection.current = newSelection;
       updateRefSelectionVariables(newSelection);
-      CursorUtils.setCursorPosition(divRef.current, newSelection.start, newSelection.end);
+      setCursorPosition(divRef.current, newSelection.start, newSelection.end);
     }, [selection, updateRefSelectionVariables]);
 
     return (
@@ -694,4 +692,4 @@ const styles = StyleSheet.create({
 
 export default MarkdownTextInput;
 
-export type {MarkdownTextInputProps};
+export type {MarkdownTextInputProps, MarkdownTextInputElement};
