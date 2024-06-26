@@ -18,41 +18,15 @@ import BrowserUtils from './web/utils/browserUtils';
 import InputHistory from './web/InputHistory';
 import {buildTree} from './web/utils/treeUtils';
 import type {TreeNode} from './web/utils/treeUtils';
-import {mergeMarkdownStyleWithDefault} from './styleUtils';
 import {getCurrentCursorPosition, removeSelection, setCursorPosition} from './web/utils/cursorUtils';
 import './web/MarkdownTextInput.css';
 import type {MarkdownStyle} from './MarkdownTextInputDecoratorViewNativeComponent';
+import {getElementHeight, getPlaceholderValue, isEventComposing} from './web/utils/inputUtils';
+import {parseToReactDOMStyle, processMarkdownStyle} from './web/utils/webStyleUtils';
 
 require('../parser/react-native-live-markdown-parser.js');
 
 const useClientEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
-
-let createReactDOMStyle: (style: any) => any;
-try {
-  createReactDOMStyle =
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    require('react-native-web/dist/exports/StyleSheet/compiler/createReactDOMStyle').default;
-} catch (e) {
-  throw new Error('[react-native-live-markdown] Function `createReactDOMStyle` from react-native-web not found. Please make sure that you are using React Native Web 0.18 or newer.');
-}
-
-let preprocessStyle: (style: any) => any;
-try {
-  preprocessStyle =
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    require('react-native-web/dist/exports/StyleSheet/preprocess').default;
-} catch (e) {
-  throw new Error('[react-native-live-markdown] Function `preprocessStyle` from react-native-web not found.');
-}
-
-let dangerousStyleValue: (name: string, value: any, isCustomProperty: boolean) => any;
-try {
-  dangerousStyleValue =
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    require('react-native-web/dist/modules/setValueForStyles/dangerousStyleValue').default;
-} catch (e) {
-  throw new Error('[react-native-live-markdown] Function `dangerousStyleValue` from react-native-web not found.');
-}
 
 interface MarkdownTextInputProps extends TextInputProps {
   markdownStyle?: MarkdownStyle;
@@ -81,54 +55,6 @@ type MarkdownTextInputElement = HTMLDivElement &
   HTMLInputElement & {
     tree: TreeNode;
   };
-
-// If an Input Method Editor is processing key input, the 'keyCode' is 229.
-// https://www.w3.org/TR/uievents/#determine-keydown-keyup-keyCode
-function isEventComposing(nativeEvent: globalThis.KeyboardEvent) {
-  return nativeEvent.isComposing || nativeEvent.keyCode === 229;
-}
-
-const ZERO_WIDTH_SPACE = '\u200B';
-
-function getPlaceholderValue(placeholder: string | undefined) {
-  if (!placeholder) {
-    return ZERO_WIDTH_SPACE;
-  }
-  return placeholder.length ? placeholder : ZERO_WIDTH_SPACE;
-}
-
-function processUnitsInMarkdownStyle(input: MarkdownStyle): MarkdownStyle {
-  const output = JSON.parse(JSON.stringify(input));
-
-  Object.keys(output).forEach((key) => {
-    const obj = output[key];
-    Object.keys(obj).forEach((prop) => {
-      obj[prop] = dangerousStyleValue(prop, obj[prop], false);
-    });
-  });
-
-  return output as MarkdownStyle;
-}
-
-function processMarkdownStyle(input: MarkdownStyle | undefined): MarkdownStyle {
-  return processUnitsInMarkdownStyle(mergeMarkdownStyleWithDefault(input));
-}
-
-function getElementHeight(node: HTMLDivElement, styles: CSSProperties, numberOfLines: number | undefined) {
-  if (numberOfLines) {
-    const tempElement = document.createElement('div');
-    tempElement.setAttribute('contenteditable', 'true');
-    Object.assign(tempElement.style, styles);
-    tempElement.textContent = Array(numberOfLines).fill('A').join('\n');
-    if (node.parentElement) {
-      node.parentElement.appendChild(tempElement);
-      const height = tempElement.clientHeight;
-      node.parentElement.removeChild(tempElement);
-      return height ? `${height}px` : 'auto';
-    }
-  }
-  return styles.height ? `${styles.height}px` : 'auto';
-}
 
 const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
   (
@@ -235,7 +161,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
             caretColor: (flattenedStyle as TextStyle).color || 'black',
           },
           disabled && styles.disabledInputStyles,
-          createReactDOMStyle(preprocessStyle(flattenedStyle)),
+          parseToReactDOMStyle(flattenedStyle),
         ]) as CSSProperties,
       [flattenedStyle, disabled],
     );
