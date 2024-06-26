@@ -1,4 +1,4 @@
-import * as BrowserUtils from './browserUtils';
+import BrowserUtils from './browserUtils';
 import type {MarkdownTextInputElement} from '../MarkdownTextInput.web';
 import {addNodeToTree, buildTree} from './treeUtils';
 import type {NodeType, TreeNode} from './treeUtils';

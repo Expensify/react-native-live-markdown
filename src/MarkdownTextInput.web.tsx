@@ -14,7 +14,7 @@ import React, {useEffect, useRef, useCallback, useMemo, useLayoutEffect} from 'r
 import type {CSSProperties, MutableRefObject, ReactEventHandler, FocusEventHandler, MouseEvent, KeyboardEvent, SyntheticEvent} from 'react';
 import {StyleSheet} from 'react-native';
 import {updateInputStructure} from './web/parserUtils';
-import * as BrowserUtils from './web/browserUtils';
+import BrowserUtils from './web/browserUtils';
 import InputHistory from './web/InputHistory';
 import {buildTree} from './web/treeUtils';
 import type {TreeNode} from './web/treeUtils';

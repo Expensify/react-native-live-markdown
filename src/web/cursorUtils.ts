@@ -1,5 +1,5 @@
 import type {MarkdownTextInputElement} from '../MarkdownTextInput.web';
-import * as BrowserUtils from './browserUtils';
+import BrowserUtils from './browserUtils';
 import {findHTMLElementInTree, getTreeNodeByIndex} from './treeUtils';
 
 function setCursorPosition(target: MarkdownTextInputElement, start: number, end: number | null = null) {
