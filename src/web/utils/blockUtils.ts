@@ -1,9 +1,16 @@
-import type {MarkdownType} from './parserUtils';
 import type {PartialMarkdownStyle} from '../../styleUtils';
+import type {NodeType} from './treeUtils';
 
-function addBlockStyling(targetElement: HTMLElement, type: MarkdownType, markdownStyle: PartialMarkdownStyle) {
+function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownStyle: PartialMarkdownStyle) {
   const node = targetElement;
   switch (type) {
+    case 'line':
+      Object.assign(node.style, {
+        display: 'block',
+        margin: '0',
+        padding: '0',
+      });
+      break;
     case 'syntax':
       Object.assign(node.style, markdownStyle.syntax);
       break;
@@ -62,4 +69,4 @@ function addBlockStyling(targetElement: HTMLElement, type: MarkdownType, markdow
 }
 
 // eslint-disable-next-line import/prefer-default-export
-export {addBlockStyling};
+export {addStyleToBlock};

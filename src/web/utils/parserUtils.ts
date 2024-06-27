@@ -4,7 +4,7 @@ import {addNodeToTree, buildTree} from './treeUtils';
 import type {NodeType, TreeNode} from './treeUtils';
 import type {PartialMarkdownStyle} from '../../styleUtils';
 import {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition} from './cursorUtils';
-import {addBlockStyling} from './blockUtils';
+import {addStyleToBlock} from './blockUtils';
 
 type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'emoji' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax' | 'mention-here' | 'mention-user' | 'mention-report';
 
@@ -111,7 +111,8 @@ function addTextToElement(node: TreeNode, text: string) {
   lines.forEach((line, index) => {
     if (line !== '') {
       const span = document.createElement('span');
-      span.innerText = line;
+      span.setAttribute('data-type', 'text');
+      span.appendChild(document.createTextNode(line));
       appendNode(span, node, 'text', line.length);
     }
 
@@ -121,14 +122,12 @@ function addTextToElement(node: TreeNode, text: string) {
   });
 }
 
-function addParagraph(node: TreeNode, text: string | null = null, length: number) {
+function addParagraph(node: TreeNode, text: string | null = null, length: number, disableInlineStyles = false) {
   const p = document.createElement('p');
-  Object.assign(p.style, {
-    margin: '0',
-    padding: '0',
-    display: 'block',
-  });
   p.setAttribute('data-type', 'line');
+  if (!disableInlineStyles) {
+    addStyleToBlock(p, 'line', {});
+  }
 
   const pNode = appendNode(p, node, 'line', length);
 
@@ -161,8 +160,9 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
 
   if (ranges.length === 0) {
     lines.forEach((line) => {
-      addParagraph(rootNode, line.text, line.length);
+      addParagraph(rootNode, line.text, line.length, disableInlineStyles);
     });
+
     return rootElement;
   }
 
@@ -179,7 +179,7 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
     }
 
     // preparing line paragraph element for markdown text
-    currentParentNode = addParagraph(rootNode, null, line.length);
+    currentParentNode = addParagraph(rootNode, null, line.length, disableInlineStyles);
     if (line.markdownRanges.length === 0) {
       addTextToElement(currentParentNode, line.text);
     }
@@ -205,11 +205,9 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
 
       // create markdown span element
       const span = document.createElement('span');
-      if (disableInlineStyles) {
-        span.className = range.type;
-      } else {
-        addBlockStyling(span, range.type, markdownStyle);
-        span.setAttribute('data-type', range.type);
+      span.setAttribute('data-type', range.type);
+      if (!disableInlineStyles) {
+        addStyleToBlock(span, range.type, markdownStyle);
       }
 
       const spanNode = appendNode(span, currentParentNode, range.type, range.length);
@@ -278,6 +276,7 @@ function updateInputStructure(
   // We don't want to parse text with single '\n', because contentEditable represents it as invisible <br />
   if (text) {
     const dom = parseRangesToHTMLNodes(text, markdownRanges, markdownStyle);
+
     if (targetElement.innerHTML !== dom.innerHTML) {
       targetElement.innerHTML = '';
       targetElement.innerText = '';

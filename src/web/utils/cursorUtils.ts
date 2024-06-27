@@ -22,13 +22,13 @@ function setCursorPosition(target: MarkdownTextInputElement, start: number, end:
   if (startTreeItem.type === 'br') {
     range.setStartBefore(startTreeItem.element);
   } else {
-    range.setStart(startTreeItem.element.childNodes[0] as ChildNode, start - startTreeItem.start);
+    range.setStart(startTreeItem.element as ChildNode, start - startTreeItem.start);
   }
 
   if (endTreeItem.type === 'br') {
     range.setEndBefore(endTreeItem.element);
   } else {
-    range.setEnd(endTreeItem.element.childNodes[0] as ChildNode, (end || start) - endTreeItem.start);
+    range.setEnd(endTreeItem.element as ChildNode, (end || start) - endTreeItem.start);
   }
 
   if (!end) {
