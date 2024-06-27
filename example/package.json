@@ -8,10 +8,10 @@
     "start": "react-native start"
   },
   "dependencies": {
-    "expensify-common": "2.0.23",
+    "expensify-common": "2.0.29",
     "react": "18.2.0",
     "react-native": "0.73.4",
-    "react-native-reanimated": "3.11.0"
+    "react-native-reanimated": "https://github.com/software-mansion/react-native-reanimated.git#workspace=react-native-reanimated&commit=302b3c8049c38c0762e6c290fbcb5f4bd70029de"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

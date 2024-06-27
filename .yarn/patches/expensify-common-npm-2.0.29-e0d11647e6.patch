@@ -1,0 +1,30 @@
+diff --git a/dist/ExpensiMark.js b/dist/ExpensiMark.js
+index ca5bcf1874d986d12fa2c0d01c07488c2feaa5db..a4dbb72565e09b0bc297096b4b4c8b386720ec72 100644
+--- a/dist/ExpensiMark.js
++++ b/dist/ExpensiMark.js
+@@ -1,4 +1,5 @@
+ "use strict";
++"worklet";
+ var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+     if (k2 === undefined) k2 = k;
+     var desc = Object.getOwnPropertyDescriptor(m, k);
+diff --git a/dist/str.js b/dist/str.js
+index bda25fcf8fb0f94fe7a259bc6b534b0eef07621e..b967a87fa47879084d90564400736398fd85be4f 100644
+--- a/dist/str.js
++++ b/dist/str.js
+@@ -1,4 +1,5 @@
+ "use strict";
++"worklet";
+ var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+     if (k2 === undefined) k2 = k;
+     var desc = Object.getOwnPropertyDescriptor(m, k);
+diff --git a/dist/utils.js b/dist/utils.js
+index 70bc31f0dce2bdc72ddc475e7a22da12144d9f2b..38ee61f79fd9e67a4ff66d36c6b4628404d90af0 100644
+--- a/dist/utils.js
++++ b/dist/utils.js
+@@ -1,4 +1,5 @@
+ "use strict";
++"worklet";
+ Object.defineProperty(exports, "__esModule", { value: true });
+ exports.isObject = exports.isFunction = exports.unescape = exports.escape = exports.isNavigatorAvailable = exports.isWindowAvailable = void 0;
+ /** Checks if the `window` global object is available. */

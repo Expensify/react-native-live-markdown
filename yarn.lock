@@ -2320,10 +2320,10 @@ __metadata:
     "@react-native/babel-preset": 0.73.21
     "@react-native/metro-config": 0.73.5
     babel-plugin-module-resolver: ^5.0.0
-    expensify-common: 2.0.23
+    expensify-common: 2.0.29
     react: 18.2.0
     react-native: 0.73.4
-    react-native-reanimated: 3.11.0
+    react-native-reanimated: "https://github.com/software-mansion/react-native-reanimated.git#workspace=react-native-reanimated&commit=302b3c8049c38c0762e6c290fbcb5f4bd70029de"
   languageName: unknown
   linkType: soft
 
@@ -9534,9 +9534,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expensify-common@npm:2.0.23":
-  version: 2.0.23
-  resolution: "expensify-common@npm:2.0.23"
+"expensify-common@npm:2.0.29":
+  version: 2.0.29
+  resolution: "expensify-common@npm:2.0.29"
   dependencies:
     awesome-phonenumber: ^5.4.0
     classnames: 2.5.0
@@ -9548,10 +9548,31 @@ __metadata:
     prop-types: 15.8.1
     react: 16.12.0
     react-dom: 16.12.0
-    semver: ^7.6.0
+    semver: ^7.6.2
     simply-deferred: "git+https://github.com/Expensify/simply-deferred.git#77a08a95754660c7bd6e0b6979fdf84e8e831bf5"
     ua-parser-js: ^1.0.37
-  checksum: 5be467bc68cbd93bccde8803c25184d2d4a76fa000fb29e919bcb64661866601e0ee81d1731220422cfe705e6688b151a9da968da7bdd369a1d46ae48b33702f
+  checksum: 6aa8a54097032ae1d1f32f1ca4ced38bc21c1e7819dcab2eae23a90fec0150fb90348fe27cff3ec23f8cd76030fdd96a12981b4c7760b29966826d33167867b9
+  languageName: node
+  linkType: hard
+
+"expensify-common@patch:expensify-common@npm%3A2.0.29#./.yarn/patches/expensify-common-npm-2.0.29-e0d11647e6.patch::locator=%40expensify%2Freact-native-live-markdown%40workspace%3A.":
+  version: 2.0.29
+  resolution: "expensify-common@patch:expensify-common@npm%3A2.0.29#./.yarn/patches/expensify-common-npm-2.0.29-e0d11647e6.patch::version=2.0.29&hash=63f4e8&locator=%40expensify%2Freact-native-live-markdown%40workspace%3A."
+  dependencies:
+    awesome-phonenumber: ^5.4.0
+    classnames: 2.5.0
+    clipboard: 2.0.11
+    html-entities: ^2.5.2
+    jquery: 3.6.0
+    localforage: ^1.10.0
+    lodash: 4.17.21
+    prop-types: 15.8.1
+    react: 16.12.0
+    react-dom: 16.12.0
+    semver: ^7.6.2
+    simply-deferred: "git+https://github.com/Expensify/simply-deferred.git#77a08a95754660c7bd6e0b6979fdf84e8e831bf5"
+    ua-parser-js: ^1.0.37
+  checksum: 3b8836d4bbd4894a0b48b16aea644241913ed0f8e7c6e0bcfc079ac387a6fa82232117f2e831f81c2b434bd93e9e231977689cd318fc61f39b33f4db8ef6c376
   languageName: node
   linkType: hard
 
@@ -16523,7 +16544,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-reanimated@npm:3.11.0, react-native-reanimated@npm:^3.11.0":
+"react-native-reanimated@https://github.com/software-mansion/react-native-reanimated.git#workspace=react-native-reanimated&commit=302b3c8049c38c0762e6c290fbcb5f4bd70029de":
+  version: 3.12.0
+  resolution: "react-native-reanimated@https://github.com/software-mansion/react-native-reanimated.git#workspace=react-native-reanimated&commit=302b3c8049c38c0762e6c290fbcb5f4bd70029de"
+  dependencies:
+    "@babel/plugin-transform-arrow-functions": ^7.0.0-0
+    "@babel/plugin-transform-nullish-coalescing-operator": ^7.0.0-0
+    "@babel/plugin-transform-optional-chaining": ^7.0.0-0
+    "@babel/plugin-transform-shorthand-properties": ^7.0.0-0
+    "@babel/plugin-transform-template-literals": ^7.0.0-0
+    "@babel/preset-typescript": ^7.16.7
+    convert-source-map: ^2.0.0
+    invariant: ^2.2.4
+  peerDependencies:
+    "@babel/core": ^7.0.0-0
+    react: "*"
+    react-native: "*"
+  checksum: 7dbe2bf5f1eaf1d71fee44760475d82515f537595a862dc1baac7c42026d048c1299999c19c34404e20ecf06ca61d6e98fa7ba9e2d2a35e433e7d441abebe196
+  languageName: node
+  linkType: hard
+
+"react-native-reanimated@npm:^3.11.0":
   version: 3.11.0
   resolution: "react-native-reanimated@npm:3.11.0"
   dependencies:
@@ -17657,14 +17698,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"semver@npm:^7.6.0":
-  version: 7.6.0
-  resolution: "semver@npm:7.6.0"
-  dependencies:
-    lru-cache: ^6.0.0
+"semver@npm:^7.6.2":
+  version: 7.6.2
+  resolution: "semver@npm:7.6.2"
   bin:
     semver: bin/semver.js
-  checksum: 7427f05b70786c696640edc29fdd4bc33b2acf3bbe1740b955029044f80575fc664e1a512e4113c3af21e767154a94b4aa214bf6cd6e42a1f6dba5914e0b208c
+  checksum: 40f6a95101e8d854357a644da1b8dd9d93ce786d5c6a77227bc69dbb17bea83d0d1d1d7c4cd5920a6df909f48e8bd8a5909869535007f90278289f2451d0292d
   languageName: node
   linkType: hard
 
