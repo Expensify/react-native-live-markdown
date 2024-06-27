@@ -156,7 +156,7 @@ export default function App() {
         testID="reset"
         title="Reset"
         onPress={() => {
-          setValue(TEST_CONST.EXAMPLE_CONTENT);
+          setValue('Hello *world*!');
           setMarkdownStyle({});
         }}
       />
