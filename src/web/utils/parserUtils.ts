@@ -295,7 +295,7 @@ function updateInputStructure(
     }
   }
 
-  return {text, cursorPosition: cursorPosition || 0, tree};
+  return {text, cursorPosition: cursorPosition || 0};
 }
 
 export {updateInputStructure, parseRangesToHTMLNodes};

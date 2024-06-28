@@ -100,7 +100,6 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     const className = `react-native-live-markdown-input-${multiline ? 'multiline' : 'singleline'}`;
     const history = useRef<InputHistory>();
     const dimensions = React.useRef<Dimensions | null>(null);
-    const textContent = useRef<string>('');
 
     if (!history.current) {
       history.current = new InputHistory(100, 150, value || '');
@@ -113,11 +112,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
     const setEventProps = useCallback((e: NativeSyntheticEvent<any>) => {
       if (divRef.current) {
-        const text = textContent.current;
-        if (e.target) {
-          // TODO: change the logic here so every event have value property
-          (e.target as unknown as HTMLInputElement).value = text;
-        }
+        const text = divRef.current.value;
         if (e.nativeEvent && e.nativeEvent.text) {
           e.nativeEvent.text = text;
         }
@@ -127,14 +122,15 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
     const parseText = useCallback(
       (target: MarkdownTextInputElement, text: string | null, customMarkdownStyles: MarkdownStyle, cursorPosition: number | null = null, shouldAddToHistory = true) => {
+        if (!divRef.current) {
+          return {text: text || '', cursorPosition: null};
+        }
+
         if (text === null) {
-          return {text: textContent.current, cursorPosition: null};
+          return {text: divRef.current.value, cursorPosition: null};
         }
         const parsedText = updateInputStructure(target, text, cursorPosition, customMarkdownStyles, !multiline);
 
-        if (divRef.current && parsedText.tree) {
-          divRef.current.tree = parsedText.tree;
-        }
         if (history.current && shouldAddToHistory) {
           // We need to normalize the value before saving it to the history to prevent situations when additional new lines break the cursor position calculation logic
           history.current.throttledAdd(parsedText.text, parsedText.cursorPosition);
@@ -148,7 +144,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     const processedMarkdownStyle = useMemo(() => {
       const newMarkdownStyle = processMarkdownStyle(markdownStyle);
       if (divRef.current) {
-        parseText(divRef.current, textContent.current, newMarkdownStyle, null, false);
+        parseText(divRef.current, divRef.current.value, newMarkdownStyle, null, false);
       }
       return newMarkdownStyle;
     }, [markdownStyle, parseText]);
@@ -302,7 +298,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         }
 
         const parsedText = parseInnerHTMLToText(e.target);
-        textContent.current = parsedText;
+        divRef.current.value = parsedText;
 
         const tree = buildTree(divRef.current, parsedText);
         divRef.current.tree = tree;
@@ -419,7 +415,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           if (contentSelection.current) {
             setCursorPosition(divRef.current, contentSelection.current.start, contentSelection.current.end);
           } else {
-            const valueLength = value ? value.length : textContent.current.length;
+            const valueLength = value ? value.length : divRef.current.value.length;
             setCursorPosition(divRef.current, valueLength, null);
           }
           updateSelection(event, contentSelection.current);
@@ -470,7 +466,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         if (!onClick || !divRef.current) {
           return;
         }
-        (e.target as HTMLInputElement).value = textContent.current;
+        (e.target as HTMLInputElement).value = divRef.current.value;
         onClick(e);
       },
       [onClick, updateSelection],
@@ -512,16 +508,16 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
     useClientEffect(
       function parseAndStyleValue() {
-        if (!divRef.current || value === textContent.current) {
+        if (!divRef.current || value === divRef.current.value) {
           return;
         }
 
         if (value === undefined) {
-          parseText(divRef.current, textContent.current, processedMarkdownStyle);
+          parseText(divRef.current, divRef.current.value, processedMarkdownStyle);
           return;
         }
 
-        textContent.current = value;
+        divRef.current.value = value;
         parseText(divRef.current, value, processedMarkdownStyle);
         updateTextColor(divRef.current, value);
       },
