@@ -1,5 +1,4 @@
 import type {MarkdownTextInputElement} from '../../MarkdownTextInput.web';
-import BrowserUtils from './browserUtils';
 import {findHTMLElementInTree, getTreeNodeByIndex} from './treeUtils';
 
 function setCursorPosition(target: MarkdownTextInputElement, start: number, end: number | null = null) {
@@ -38,7 +37,7 @@ function setCursorPosition(target: MarkdownTextInputElement, start: number, end:
     selection.setBaseAndExtent(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
   }
 
-  scrollCursorIntoView(target);
+  startTreeItem.element.scrollIntoView();
 }
 
 function moveCursorToEnd(target: HTMLElement) {
@@ -87,31 +86,4 @@ function removeSelection() {
   }
 }
 
-function scrollCursorIntoView(target: MarkdownTextInputElement) {
-  if (target.selectionStart === null || !target.value || BrowserUtils.isFirefox) {
-    return;
-  }
-
-  const selection = window.getSelection();
-  if (!selection || (selection && selection.rangeCount === 0)) {
-    return;
-  }
-
-  const caretRect = selection.getRangeAt(0).getClientRects()[0];
-  const editableRect = target.getBoundingClientRect();
-
-  // Adjust for padding and border
-  const paddingTop = parseFloat(window.getComputedStyle(target).paddingTop);
-  const borderTop = parseFloat(window.getComputedStyle(target).borderTopWidth);
-
-  if (caretRect && !(caretRect.top >= editableRect.top + paddingTop + borderTop && caretRect.bottom <= editableRect.bottom - 2 * (paddingTop - borderTop))) {
-    const topToCaret = caretRect.top - editableRect.top;
-    const inputHeight = editableRect.height;
-    // Chrome Rects don't include padding & border, so we're adding them manually
-    const inputOffset = caretRect.height - inputHeight + paddingTop + borderTop + (BrowserUtils.isChromium ? 0 : 4 * (paddingTop + borderTop));
-
-    target.scrollTo(0, topToCaret + target.scrollTop + inputOffset);
-  }
-}
-
-export {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition, removeSelection, scrollCursorIntoView};
+export {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition, removeSelection};
