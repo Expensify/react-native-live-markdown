@@ -12,9 +12,7 @@ function setCursorPosition(target: MarkdownTextInputElement, start: number, end:
   range.selectNodeContents(target);
 
   const startTreeItem = getTreeNodeByIndex(target.tree, start);
-
   const endTreeItem = end && startTreeItem && (end < startTreeItem.start || end >= startTreeItem.start + startTreeItem.length) ? getTreeNodeByIndex(target.tree, end) : startTreeItem;
-
   if (!startTreeItem || !endTreeItem) {
     throw new Error('Invalid start or end tree item');
   }
@@ -22,13 +20,13 @@ function setCursorPosition(target: MarkdownTextInputElement, start: number, end:
   if (startTreeItem.type === 'br') {
     range.setStartBefore(startTreeItem.element);
   } else {
-    range.setStart(startTreeItem.element as ChildNode, start - startTreeItem.start);
+    range.setStart(startTreeItem.element.childNodes[0] as ChildNode, start - startTreeItem.start);
   }
 
   if (endTreeItem.type === 'br') {
     range.setEndBefore(endTreeItem.element);
   } else {
-    range.setEnd(endTreeItem.element as ChildNode, (end || start) - endTreeItem.start);
+    range.setEnd(endTreeItem.element.childNodes[0] as ChildNode, (end || start) - endTreeItem.start);
   }
 
   if (!end) {
@@ -66,10 +64,8 @@ function getCurrentCursorPosition(target: MarkdownTextInputElement) {
   if (!selection || (selection && selection.rangeCount === 0)) {
     return null;
   }
-
   const range = selection.getRangeAt(0);
   const startElement = getHTMLElement(range.startContainer);
-
   const endElement = range.startContainer === range.endContainer ? startElement : getHTMLElement(range.endContainer);
 
   const startTreeItem = findHTMLElementInTree(target.tree, startElement);
@@ -81,7 +77,6 @@ function getCurrentCursorPosition(target: MarkdownTextInputElement) {
     start = startTreeItem.start + range.startOffset;
     end = endTreeItem.start + range.endOffset;
   }
-
   return {start, end};
 }
 
