@@ -51,7 +51,7 @@ function buildTree(rootElement: HTMLElement, text: string) {
 
     return (element.getAttribute('data-type') as NodeType) || 'text';
   }
-  const rootTreeItem: TreeNode = {
+  const rootTreeNode: TreeNode = {
     element: rootElement,
     parentNode: null,
     childNodes: [],
@@ -61,20 +61,20 @@ function buildTree(rootElement: HTMLElement, text: string) {
     orderIndex: '',
     isGeneratingNewline: false,
   };
-  const stack = [rootTreeItem];
+  const stack = [rootTreeNode];
   while (stack.length > 0) {
-    const treeItem = stack.pop();
-    if (!treeItem) {
+    const treeNode = stack.pop();
+    if (!treeNode) {
       break;
     }
 
-    Array.from(treeItem.element.children).forEach((childElement) => {
-      const newTreeItem = addNodeToTree(childElement as HTMLElement, treeItem, getElementType(childElement as HTMLElement));
-      stack.push(newTreeItem);
+    Array.from(treeNode.element.children).forEach((childElement) => {
+      const newTreeNode = addNodeToTree(childElement as HTMLElement, treeNode, getElementType(childElement as HTMLElement));
+      stack.push(newTreeNode);
     });
   }
 
-  return rootTreeItem;
+  return rootTreeNode;
 }
 
 function findHTMLElementInTree(treeRoot: TreeNode, element: HTMLElement): TreeNode | null {

@@ -10,22 +10,22 @@ function setCursorPosition(target: MarkdownTextInputElement, start: number, end:
   const range = document.createRange();
   range.selectNodeContents(target);
 
-  const startTreeItem = getTreeNodeByIndex(target.tree, start);
-  const endTreeItem = end && startTreeItem && (end < startTreeItem.start || end >= startTreeItem.start + startTreeItem.length) ? getTreeNodeByIndex(target.tree, end) : startTreeItem;
-  if (!startTreeItem || !endTreeItem) {
-    throw new Error('Invalid start or end tree item');
+  const startTreeNode = getTreeNodeByIndex(target.tree, start);
+  const endTreeNode = end && startTreeNode && (end < startTreeNode.start || end >= startTreeNode.start + startTreeNode.length) ? getTreeNodeByIndex(target.tree, end) : startTreeNode;
+  if (!startTreeNode || !endTreeNode) {
+    throw new Error('Invalid start or end tree node');
   }
 
-  if (startTreeItem.type === 'br') {
-    range.setStartBefore(startTreeItem.element);
+  if (startTreeNode.type === 'br') {
+    range.setStartBefore(startTreeNode.element);
   } else {
-    range.setStart(startTreeItem.element.childNodes[0] as ChildNode, start - startTreeItem.start);
+    range.setStart(startTreeNode.element.childNodes[0] as ChildNode, start - startTreeNode.start);
   }
 
-  if (endTreeItem.type === 'br') {
-    range.setEndBefore(endTreeItem.element);
+  if (endTreeNode.type === 'br') {
+    range.setEndBefore(endTreeNode.element);
   } else {
-    range.setEnd(endTreeItem.element.childNodes[0] as ChildNode, (end || start) - endTreeItem.start);
+    range.setEnd(endTreeNode.element.childNodes[0] as ChildNode, (end || start) - endTreeNode.start);
   }
 
   if (!end) {
@@ -37,7 +37,7 @@ function setCursorPosition(target: MarkdownTextInputElement, start: number, end:
     selection.setBaseAndExtent(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
   }
 
-  startTreeItem.element.scrollIntoView();
+  startTreeNode.element.scrollIntoView();
 }
 
 function moveCursorToEnd(target: HTMLElement) {
@@ -67,14 +67,14 @@ function getCurrentCursorPosition(target: MarkdownTextInputElement) {
   const startElement = getHTMLElement(range.startContainer);
   const endElement = range.startContainer === range.endContainer ? startElement : getHTMLElement(range.endContainer);
 
-  const startTreeItem = findHTMLElementInTree(target.tree, startElement);
-  const endTreeItem = findHTMLElementInTree(target.tree, endElement);
+  const startTreeNode = findHTMLElementInTree(target.tree, startElement);
+  const endTreeNode = findHTMLElementInTree(target.tree, endElement);
 
   let start = -1;
   let end = -1;
-  if (startTreeItem && endTreeItem) {
-    start = startTreeItem.start + range.startOffset;
-    end = endTreeItem.start + range.endOffset;
+  if (startTreeNode && endTreeNode) {
+    start = startTreeNode.start + range.startOffset;
+    end = endTreeNode.start + range.endOffset;
   }
   return {start, end};
 }

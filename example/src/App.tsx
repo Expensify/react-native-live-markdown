@@ -192,6 +192,7 @@ const styles = StyleSheet.create({
     borderColor: 'gray',
     borderWidth: 1,
     textAlignVertical: 'top',
+    height: 100,
   },
   text: {
     fontFamily: 'Courier New',
