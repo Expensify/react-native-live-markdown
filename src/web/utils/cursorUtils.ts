@@ -3,7 +3,7 @@ import {findHTMLElementInTree, getTreeNodeByIndex} from './treeUtils';
 
 function setCursorPosition(target: MarkdownTextInputElement, start: number, end: number | null = null) {
   // We don't want to move the cursor if the target is not focused
-  if (target !== document.activeElement || start < 0 || (end && end < 0)) {
+  if (!target.tree || target !== document.activeElement || start < 0 || (end && end < 0)) {
     return;
   }
 

@@ -113,6 +113,10 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     const setEventProps = useCallback((e: NativeSyntheticEvent<any>) => {
       if (divRef.current) {
         const text = divRef.current.value;
+        if (e.target) {
+          // TODO: change the logic here so every event have value property
+          (e.target as unknown as HTMLInputElement).value = text;
+        }
         if (e.nativeEvent && e.nativeEvent.text) {
           e.nativeEvent.text = text;
         }
@@ -526,7 +530,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         parseText(divRef.current, value, processedMarkdownStyle);
         updateTextColor(divRef.current, value);
       },
-      [multiline, processedMarkdownStyle],
+      [multiline, processedMarkdownStyle, value],
     );
 
     useClientEffect(
