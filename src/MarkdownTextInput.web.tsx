@@ -266,7 +266,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
             nodeCopy.innerHTML = '\n';
           }
           // Replace only br tags with data-id attribute, because we know that were created by the web parser. We need to ignore tags created by contentEditable div
-          nodeCopy.innerHTML = nodeCopy.innerHTML.replaceAll(/<br data-id=.*?>/g, '\n');
+          nodeCopy.innerHTML = nodeCopy.innerHTML.replaceAll(/<br .*?>/g, '\n');
         }
         let nodeText = nodeCopy.textContent ?? '';
 
