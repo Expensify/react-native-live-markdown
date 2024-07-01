@@ -13,7 +13,8 @@ function setCursorPosition(target: MarkdownTextInputElement, start: number, end:
   const startTreeNode = getTreeNodeByIndex(target.tree, start);
   const endTreeNode = end && startTreeNode && (end < startTreeNode.start || end >= startTreeNode.start + startTreeNode.length) ? getTreeNodeByIndex(target.tree, end) : startTreeNode;
   if (!startTreeNode || !endTreeNode) {
-    throw new Error('Invalid start or end tree node');
+    console.error('Invalid start or end tree node');
+    return;
   }
 
   if (startTreeNode.type === 'br') {

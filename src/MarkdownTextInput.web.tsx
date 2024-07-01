@@ -11,7 +11,7 @@ import type {
   TextInputContentSizeChangeEventData,
 } from 'react-native';
 import React, {useEffect, useRef, useCallback, useMemo, useLayoutEffect} from 'react';
-import type {CSSProperties, MutableRefObject, ReactEventHandler, FocusEventHandler, MouseEvent, KeyboardEvent, SyntheticEvent} from 'react';
+import type {CSSProperties, MutableRefObject, ReactEventHandler, FocusEventHandler, MouseEvent, KeyboardEvent, SyntheticEvent, ClipboardEventHandler} from 'react';
 import {StyleSheet} from 'react-native';
 import {updateInputStructure} from './web/utils/parserUtils';
 import BrowserUtils from './web/utils/browserUtils';
@@ -476,13 +476,25 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       [onClick, updateSelection],
     );
 
-    const handlePaste = useCallback((e) => {
-      pasteRef.current = true;
+    const handleCopy: ClipboardEventHandler<HTMLDivElement> = useCallback((e) => {
+      if (!divRef.current || !contentSelection.current) {
+        return;
+      }
       e.preventDefault();
+      const text = divRef.current?.value.substring(contentSelection.current.start, contentSelection.current.end);
+      e.clipboardData.setData('text/plain', text ?? '');
+    }, []);
 
-      const clipboardData = e.clipboardData;
-      const text = clipboardData.getData('text/plain');
-      document.execCommand('insertText', false, text);
+    const handleCut = useCallback((e) => {
+      if (!divRef.current || !contentSelection.current) {
+        return;
+      }
+      const text = divRef.current?.value.substring(contentSelection.current.start, contentSelection.current.end);
+      e.clipboardData.setData('text/plain', text ?? '');
+    }, []);
+
+    const handlePaste = useCallback(() => {
+      pasteRef.current = true;
     }, []);
 
     const startComposition = useCallback(() => {
@@ -593,6 +605,8 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         onClick={handleClick}
         onFocus={handleFocus}
         onBlur={handleBlur}
+        onCopy={handleCopy}
+        onCut={handleCut}
         onPaste={handlePaste}
         placeholder={heightSafePlaceholder}
         spellCheck={spellCheck}
