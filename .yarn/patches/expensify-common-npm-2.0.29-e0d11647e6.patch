@@ -18,6 +18,14 @@ index bda25fcf8fb0f94fe7a259bc6b534b0eef07621e..b967a87fa47879084d90564400736398
  var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
      if (k2 === undefined) k2 = k;
      var desc = Object.getOwnPropertyDescriptor(m, k);
+@@ -37,6 +38,7 @@ function resultFn(parameter, ...args) {
+     return parameter;
+ }
+ const Str = {
++    __workletObject: true,
+     /**
+      * Return true if the string is ending with the provided suffix
+      *
 diff --git a/dist/utils.js b/dist/utils.js
 index 70bc31f0dce2bdc72ddc475e7a22da12144d9f2b..38ee61f79fd9e67a4ff66d36c6b4628404d90af0 100644
 --- a/dist/utils.js

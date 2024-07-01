@@ -2323,7 +2323,7 @@ __metadata:
     expensify-common: 2.0.29
     react: 18.2.0
     react-native: 0.73.4
-    react-native-reanimated: "https://github.com/software-mansion/react-native-reanimated.git#workspace=react-native-reanimated&commit=302b3c8049c38c0762e6c290fbcb5f4bd70029de"
+    react-native-reanimated: "https://github.com/software-mansion/react-native-reanimated.git#workspace=react-native-reanimated&commit=6aaa26bcdad232b2994176fc2b3814cff6348bd4"
   languageName: unknown
   linkType: soft
 
@@ -9557,7 +9557,7 @@ __metadata:
 
 "expensify-common@patch:expensify-common@npm%3A2.0.29#./.yarn/patches/expensify-common-npm-2.0.29-e0d11647e6.patch::locator=%40expensify%2Freact-native-live-markdown%40workspace%3A.":
   version: 2.0.29
-  resolution: "expensify-common@patch:expensify-common@npm%3A2.0.29#./.yarn/patches/expensify-common-npm-2.0.29-e0d11647e6.patch::version=2.0.29&hash=63f4e8&locator=%40expensify%2Freact-native-live-markdown%40workspace%3A."
+  resolution: "expensify-common@patch:expensify-common@npm%3A2.0.29#./.yarn/patches/expensify-common-npm-2.0.29-e0d11647e6.patch::version=2.0.29&hash=0a4990&locator=%40expensify%2Freact-native-live-markdown%40workspace%3A."
   dependencies:
     awesome-phonenumber: ^5.4.0
     classnames: 2.5.0
@@ -9572,7 +9572,7 @@ __metadata:
     semver: ^7.6.2
     simply-deferred: "git+https://github.com/Expensify/simply-deferred.git#77a08a95754660c7bd6e0b6979fdf84e8e831bf5"
     ua-parser-js: ^1.0.37
-  checksum: 3b8836d4bbd4894a0b48b16aea644241913ed0f8e7c6e0bcfc079ac387a6fa82232117f2e831f81c2b434bd93e9e231977689cd318fc61f39b33f4db8ef6c376
+  checksum: 4123983f5c5b45c038ebb7dcdf056fcdb793ad49f4282502ed9e3277bfa41f43cf6790cd092760b06d7b87a8990542fa3a0ea1e7bf887f711d1942f238262355
   languageName: node
   linkType: hard
 
@@ -16544,9 +16544,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-reanimated@https://github.com/software-mansion/react-native-reanimated.git#workspace=react-native-reanimated&commit=302b3c8049c38c0762e6c290fbcb5f4bd70029de":
+"react-native-reanimated@https://github.com/software-mansion/react-native-reanimated.git#workspace=react-native-reanimated&commit=6aaa26bcdad232b2994176fc2b3814cff6348bd4":
   version: 3.12.0
-  resolution: "react-native-reanimated@https://github.com/software-mansion/react-native-reanimated.git#workspace=react-native-reanimated&commit=302b3c8049c38c0762e6c290fbcb5f4bd70029de"
+  resolution: "react-native-reanimated@https://github.com/software-mansion/react-native-reanimated.git#workspace=react-native-reanimated&commit=6aaa26bcdad232b2994176fc2b3814cff6348bd4"
   dependencies:
     "@babel/plugin-transform-arrow-functions": ^7.0.0-0
     "@babel/plugin-transform-nullish-coalescing-operator": ^7.0.0-0
@@ -16560,7 +16560,7 @@ __metadata:
     "@babel/core": ^7.0.0-0
     react: "*"
     react-native: "*"
-  checksum: 7dbe2bf5f1eaf1d71fee44760475d82515f537595a862dc1baac7c42026d048c1299999c19c34404e20ecf06ca61d6e98fa7ba9e2d2a35e433e7d441abebe196
+  checksum: 95fd141be74c4c96575bb0af0fc2c7d53f78de546b75ae5e16e33e5f64a22281dc18368135f05b88e24f5b72cb682779be2df58b4adbf277bf84b09199030b7c
   languageName: node
   linkType: hard
 
