@@ -16,6 +16,8 @@ Pod::Spec.new do |s|
 
   s.source_files = "ios/**/*.{h,m,mm}", "cpp/**/*.{h,cpp}"
 
+  s.dependency "hermes-engine"
+
   install_modules_dependencies(s)
 
   if ENV['USE_FRAMEWORKS'] && ENV['RCT_NEW_ARCH_ENABLED']
