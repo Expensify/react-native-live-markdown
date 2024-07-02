@@ -21,7 +21,7 @@ import type {TreeNode} from './web/utils/treeUtils';
 import {getCurrentCursorPosition, removeSelection, setCursorPosition} from './web/utils/cursorUtils';
 import './web/MarkdownTextInput.css';
 import type {MarkdownStyle} from './MarkdownTextInputDecoratorViewNativeComponent';
-import {getElementHeight, getPlaceholderValue, isEventComposing} from './web/utils/inputUtils';
+import {getElementHeight, getPlaceholderValue, isEventComposing, parseInnerHTMLToText} from './web/utils/inputUtils';
 import {parseToReactDOMStyle, processMarkdownStyle} from './web/utils/webStyleUtils';
 
 require('../parser/react-native-live-markdown-parser.js');
@@ -255,46 +255,6 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       }
     }, [multiline, onContentSizeChange]);
 
-    const parseInnerHTMLToText = useCallback((target: HTMLElement): string => {
-      let text = '';
-      const childNodes = target.childNodes ?? [];
-      childNodes.forEach((node, index) => {
-        const nodeCopy = node.cloneNode(true) as HTMLElement;
-        if (nodeCopy.innerHTML) {
-          // Replace single <br> created by contentEditable with '\n', to enable proper newline deletion on backspace, when next lines also have <br> tags
-          if (nodeCopy.innerHTML === '<br>') {
-            nodeCopy.innerHTML = '\n';
-          }
-          // Replace only br tags with data-id attribute, because we know that were created by the web parser. We need to ignore tags created by contentEditable div
-          nodeCopy.innerHTML = nodeCopy.innerHTML.replaceAll(/<br .*?>/g, '\n');
-        }
-        let nodeText = nodeCopy.textContent ?? '';
-
-        // Remove unnecessary new lines from the end of the text
-        if (nodeText.length > 2 && nodeText[-3] !== '\n' && nodeText.slice(-2) === '\n\n') {
-          nodeText = nodeText.slice(0, -1);
-        }
-
-        // Last line specific handling
-        if (index === childNodes.length - 1) {
-          if (nodeText === '\n\n') {
-            // New line creation
-            nodeText = '\n';
-          } else if (nodeText === '\n') {
-            // New line deletion on backspace
-            nodeText = '';
-          }
-        }
-
-        text += nodeText;
-        // Split paragraphs with new lines
-        if (/[^\n]/.test(nodeText) && index < childNodes.length - 1) {
-          text += '\n';
-        }
-      });
-      return text;
-    }, []);
-
     const handleOnChangeText = useCallback(
       (e: SyntheticEvent<HTMLDivElement>) => {
         if (!divRef.current || !(e.target instanceof HTMLElement)) {
@@ -344,7 +304,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
         handleContentSizeChange();
       },
-      [updateTextColor, onChange, onChangeText, handleContentSizeChange, undo, redo, parseText, parseInnerHTMLToText, processedMarkdownStyle, updateSelection, setEventProps],
+      [updateTextColor, onChange, onChangeText, handleContentSizeChange, undo, redo, parseText, processedMarkdownStyle, updateSelection, setEventProps],
     );
 
     const handleKeyPress = useCallback(
@@ -493,8 +453,16 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       e.clipboardData.setData('text/plain', text ?? '');
     }, []);
 
-    const handlePaste = useCallback(() => {
+    const handlePaste = useCallback((e) => {
       pasteRef.current = true;
+      e.preventDefault();
+
+      const clipboardData = e.clipboardData;
+      const text = clipboardData.getData('text/plain');
+      const span = document.createElement('span');
+      span.setAttribute('data-type', 'paste');
+      span.textContent = text;
+      document.execCommand('insertHTML', true, span.outerHTML);
     }, []);
 
     const startComposition = useCallback(() => {
