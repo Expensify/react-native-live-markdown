@@ -94,6 +94,9 @@ public class MarkdownUtils {
         int length = range.getInt("length");
         int depth = range.optInt("depth", 1);
         int end = start + length;
+        if (length == 0 || end > input.length()) {
+          continue;
+        }
         applyRange(ssb, type, start, end, depth);
       }
     } catch (JSONException e) {
