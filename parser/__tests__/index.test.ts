@@ -1,15 +1,15 @@
 import {expect} from '@jest/globals';
-import type * as ParserTypes from '../index';
+import type {Range} from '../index';
 
 require('../react-native-live-markdown-parser.js');
 
 declare module 'expect' {
   interface Matchers<R> {
-    toBeParsedAs(expectedRanges: ParserTypes.Range[]): R;
+    toBeParsedAs(expectedRanges: Range[]): R;
   }
 }
 
-const toBeParsedAs = function (actual: string, expectedRanges: ParserTypes.Range[]) {
+const toBeParsedAs = function (actual: string, expectedRanges: Range[]) {
   const actualRanges = global.parseExpensiMarkToRanges(actual);
   if (JSON.stringify(actualRanges) !== JSON.stringify(expectedRanges)) {
     return {
