@@ -47,16 +47,6 @@ const parseInnerHTMLToText = (target: HTMLElement): string => {
 
     let nodeText = nodeCopy.textContent ?? '';
 
-    // In case text was pasted into a new empty line, remove the line break
-    if (
-      nodeCopy.children.length > 0 &&
-      nodeCopy.children[0]?.getAttribute('data-type') === 'br' &&
-      nodeCopy.children[0].children.length > 0 &&
-      nodeCopy.children[0].children[0]?.getAttribute('data-type') === 'paste'
-    ) {
-      nodeText = nodeText.slice(0, -1);
-    }
-
     // Remove unnecessary new lines from the end of the text
     if (nodeText.length > 2 && nodeText[-3] !== '\n' && nodeText.slice(-2) === '\n\n') {
       nodeText = nodeText.slice(0, -1);

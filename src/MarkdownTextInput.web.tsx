@@ -260,9 +260,14 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         if (!divRef.current || !(e.target instanceof HTMLElement)) {
           return;
         }
+        const nativeEvent = e.nativeEvent as MarkdownNativeEvent;
 
-        const parsedText = parseInnerHTMLToText(e.target);
-        divRef.current.value = parsedText;
+        let parsedText = '';
+        if (nativeEvent.inputType === 'pasteText') {
+          parsedText = divRef.current.value;
+        } else {
+          parsedText = parseInnerHTMLToText(e.target);
+        }
 
         const tree = buildTree(divRef.current, parsedText);
         divRef.current.tree = tree;
@@ -274,7 +279,6 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         }
 
         let text = '';
-        const nativeEvent = e.nativeEvent as MarkdownNativeEvent;
         switch (nativeEvent.inputType) {
           case 'historyUndo':
             text = undo(divRef.current);
@@ -458,17 +462,23 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       [handleCopy],
     );
 
-    const handlePaste = useCallback((e) => {
-      pasteRef.current = true;
-      e.preventDefault();
+    const handlePaste = useCallback(
+      (e) => {
+        if (!divRef.current || !contentSelection.current) {
+          return;
+        }
+        pasteRef.current = true;
+        e.preventDefault();
 
-      const clipboardData = e.clipboardData;
-      const text = clipboardData.getData('text/plain');
-      const span = document.createElement('span');
-      span.setAttribute('data-type', 'paste');
-      span.textContent = text;
-      document.execCommand('insertHTML', false, span.outerHTML);
-    }, []);
+        const clipboardData = e.clipboardData;
+        const text = clipboardData.getData('text/plain');
+        divRef.current.value = divRef.current?.value.substring(0, contentSelection.current?.start) + text + divRef.current?.value.substring(contentSelection.current?.end);
+        e.nativeEvent.inputType = 'pasteText';
+        handleOnChangeText(e);
+        setCursorPosition(divRef.current, contentSelection.current.start + text.length);
+      },
+      [handleOnChangeText],
+    );
 
     const startComposition = useCallback(() => {
       compositionRef.current = true;
