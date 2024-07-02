@@ -2,6 +2,10 @@ import * as BrowserUtils from './browserUtils';
 
 let prevTextLength: number | undefined;
 
+function getPrevTextLength() {
+  return prevTextLength;
+}
+
 function findTextNodes(textNodes: Text[], node: ChildNode) {
   if (node.nodeType === Node.TEXT_NODE) {
     textNodes.push(node as Text);
@@ -158,4 +162,4 @@ function scrollCursorIntoView(target: HTMLInputElement) {
   }
 }
 
-export {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition, setPrevText, removeSelection, scrollCursorIntoView};
+export {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition, setPrevText, removeSelection, scrollCursorIntoView, getPrevTextLength};
