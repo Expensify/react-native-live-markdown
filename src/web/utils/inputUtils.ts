@@ -46,7 +46,14 @@ const parseInnerHTMLToText = (target: HTMLElement): string => {
     }
 
     let nodeText = nodeCopy.textContent ?? '';
-    if (nodeCopy.innerHTML && nodeCopy.innerHTML.includes('<span data-type="paste"')) {
+
+    // In case text was pasted into a new empty line, remove the line break
+    if (
+      nodeCopy.children.length > 0 &&
+      nodeCopy.children[0]?.getAttribute('data-type') === 'br' &&
+      nodeCopy.children[0].children.length > 0 &&
+      nodeCopy.children[0].children[0]?.getAttribute('data-type') === 'paste'
+    ) {
       nodeText = nodeText.slice(0, -1);
     }
 
