@@ -445,13 +445,18 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       e.clipboardData.setData('text/plain', text ?? '');
     }, []);
 
-    const handleCut = useCallback((e) => {
-      if (!divRef.current || !contentSelection.current) {
-        return;
-      }
-      const text = divRef.current?.value.substring(contentSelection.current.start, contentSelection.current.end);
-      e.clipboardData.setData('text/plain', text ?? '');
-    }, []);
+    const handleCut = useCallback(
+      (e) => {
+        if (!divRef.current || !contentSelection.current) {
+          return;
+        }
+        handleCopy(e);
+        if (contentSelection.current.start !== contentSelection.current.end) {
+          document.execCommand('delete');
+        }
+      },
+      [handleCopy],
+    );
 
     const handlePaste = useCallback((e) => {
       pasteRef.current = true;
@@ -462,7 +467,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       const span = document.createElement('span');
       span.setAttribute('data-type', 'paste');
       span.textContent = text;
-      document.execCommand('insertHTML', true, span.outerHTML);
+      document.execCommand('insertHTML', false, span.outerHTML);
     }, []);
 
     const startComposition = useCallback(() => {
