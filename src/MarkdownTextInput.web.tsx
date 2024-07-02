@@ -341,6 +341,8 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         if (!divRef.current || !(e.target instanceof HTMLElement)) {
           return;
         }
+        const prevSelection = contentSelection.current ?? {start: 0, end: 0};
+        const prevTextLength = CursorUtils.getPrevTextLength() ?? 0;
         const changedText = e.target.innerText;
         if (compositionRef.current && !BrowserUtils.isMobile) {
           updateTextColor(divRef.current, changedText);
@@ -369,6 +371,8 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
             text = parseText(divRef.current, changedText, processedMarkdownStyle).text;
         }
 
+        const normalizedText = normalizeValue(text);
+
         if (pasteRef?.current) {
           pasteRef.current = false;
           updateSelection(e);
@@ -376,13 +380,45 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         updateTextColor(divRef.current, text);
 
         if (onChange) {
-          const event = e as unknown as NativeSyntheticEvent<any>;
+          const event = e as unknown as NativeSyntheticEvent<{
+            count: number;
+            before: number;
+            start: number;
+          }>;
           setEventProps(event);
+
+          const newSelection = CursorUtils.getCurrentCursorPosition(divRef.current) ?? {start: 0, end: 0};
+
+          // The new text is between the prev start selection and the new end selection
+          const maybeAddedtext = normalizedText.slice(prevSelection.start, newSelection.end);
+          // The length of the text that replaced the before text
+          const count = maybeAddedtext.length;
+          // The start index of the replacement operation
+          let start = prevSelection.start;
+
+          const prevSelectionRange = prevSelection.end - prevSelection.start;
+          // The length the deleted text had before
+          let before = prevSelectionRange;
+          if (prevSelectionRange === 0 && (nativeEvent.inputType === 'deleteContentBackward' || nativeEvent.inputType === 'deleteContentForward')) {
+            // its possible the user pressed a delete key without a selection range, so we need to adjust the before value to have the length of the deleted text
+            before = prevTextLength - normalizedText.length;
+          }
+
+          if (nativeEvent.inputType === 'deleteContentBackward') {
+            // When the user does a backspace delete he expects the content before the cursor to be removed.
+            // For this the start value needs to be adjusted (its as if the selection was before the text that we want to delete)
+            start -= before;
+          }
+
+          event.nativeEvent.count = count;
+          event.nativeEvent.before = before;
+          event.nativeEvent.start = start;
+
+          // @ts-expect-error TODO: Remove once react native PR merged https://github.com/facebook/react-native/pull/45248
           onChange(event);
         }
 
         if (onChangeText) {
-          const normalizedText = normalizeValue(text);
           onChangeText(normalizedText);
         }
 
