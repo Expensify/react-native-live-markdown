@@ -65,6 +65,10 @@ using namespace facebook;
             const auto &length = static_cast<int>(item.getProperty(rt, "length").asNumber());
             const auto &depth = item.hasProperty(rt, "depth") ? static_cast<int>(item.getProperty(rt, "depth").asNumber()) : 1;
 
+            if (length == 0 || location + length > attributedString.length) {
+                continue;
+            }
+
             NSRange range = NSMakeRange(location, length);
 
             if (type == "bold" || type == "italic" || type == "code" || type == "pre" || type == "h1" || type == "emoji") {
