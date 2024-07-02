@@ -93,7 +93,6 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     ref,
   ) => {
     const compositionRef = useRef<boolean>(false);
-    const pasteRef = useRef<boolean>(false);
     const divRef = useRef<MarkdownTextInputElement | null>(null);
     const currentlyFocusedField = useRef<HTMLDivElement | null>(null);
     const contentSelection = useRef<Selection | null>(null);
@@ -260,10 +259,13 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         if (!divRef.current || !(e.target instanceof HTMLElement)) {
           return;
         }
+        updateTextColor(divRef.current, e.target.textContent ?? '');
+
         const nativeEvent = e.nativeEvent as MarkdownNativeEvent;
+        const isPasteInputType = nativeEvent.inputType === 'pasteText';
 
         let parsedText = '';
-        if (nativeEvent.inputType === 'pasteText') {
+        if (isPasteInputType) {
           parsedText = divRef.current.value;
         } else {
           parsedText = parseInnerHTMLToText(e.target);
@@ -287,14 +289,8 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
             text = redo(divRef.current);
             break;
           default:
-            text = parseText(divRef.current, parsedText, processedMarkdownStyle).text;
+            text = parseText(divRef.current, parsedText, processedMarkdownStyle, nativeEvent.inputType === 'pasteText' ? contentSelection.current?.start : null).text;
         }
-
-        if (pasteRef?.current) {
-          pasteRef.current = false;
-          updateSelection(e);
-        }
-        updateTextColor(divRef.current, text);
 
         if (onChange) {
           const event = e as unknown as NativeSyntheticEvent<any>;
@@ -308,7 +304,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
         handleContentSizeChange();
       },
-      [updateTextColor, onChange, onChangeText, handleContentSizeChange, undo, redo, parseText, processedMarkdownStyle, updateSelection, setEventProps],
+      [updateTextColor, onChange, onChangeText, handleContentSizeChange, undo, redo, parseText, processedMarkdownStyle, setEventProps],
     );
 
     const handleKeyPress = useCallback(
@@ -467,15 +463,13 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         if (!divRef.current || !contentSelection.current) {
           return;
         }
-        pasteRef.current = true;
         e.preventDefault();
-
         const clipboardData = e.clipboardData;
         const text = clipboardData.getData('text/plain');
         divRef.current.value = divRef.current?.value.substring(0, contentSelection.current?.start) + text + divRef.current?.value.substring(contentSelection.current?.end);
         e.nativeEvent.inputType = 'pasteText';
+        contentSelection.current = {start: contentSelection.current.start + text.length, end: contentSelection.current.start + text.length};
         handleOnChangeText(e);
-        setCursorPosition(divRef.current, contentSelection.current.start + text.length);
       },
       [handleOnChangeText],
     );
