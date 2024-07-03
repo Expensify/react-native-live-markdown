@@ -38,7 +38,7 @@ function setCursorPosition(target: MarkdownTextInputElement, start: number, end:
     selection.setBaseAndExtent(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
   }
 
-  startTreeNode.element.scrollIntoView();
+  startTreeNode.element.scrollIntoView({block: 'nearest'});
 }
 
 function moveCursorToEnd(target: HTMLElement) {
@@ -75,7 +75,13 @@ function getCurrentCursorPosition(target: MarkdownTextInputElement) {
   let end = -1;
   if (startTreeNode && endTreeNode) {
     start = startTreeNode.start + range.startOffset;
-    end = endTreeNode.start + range.endOffset;
+
+    // If the end node is a root node, we need to set the end to the end of the text (FireFox fix)
+    if (endTreeNode?.parentNode === null) {
+      end = target.value.length;
+    } else {
+      end = endTreeNode.start + range.endOffset;
+    }
   }
   return {start, end};
 }
