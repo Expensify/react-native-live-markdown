@@ -1,4 +1,5 @@
 import type {CSSProperties} from 'react';
+import BrowserUtils from './browserUtils';
 
 const ZERO_WIDTH_SPACE = '\u200B';
 
@@ -48,7 +49,10 @@ const parseInnerHTMLToText = (target: HTMLElement): string => {
     let nodeText = nodeCopy.textContent ?? '';
 
     // Remove unnecessary new lines from the end of the text
-    if (nodeText.length > 2 && nodeText[-3] !== '\n' && nodeText.slice(-2) === '\n\n') {
+    if (
+      (nodeText.length > 2 && nodeText[-3] !== '\n' && nodeText.slice(-2) === '\n\n') ||
+      (BrowserUtils.isFirefox && nodeCopy.children?.[0]?.getAttribute('data-type') === 'br' && (nodeCopy.children?.[0]?.textContent?.length || -1) > 1)
+    ) {
       nodeText = nodeText.slice(0, -1);
     }
 
