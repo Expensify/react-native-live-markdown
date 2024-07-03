@@ -258,7 +258,7 @@ function updateInputStructure(
   const targetElement = target;
 
   // in case the cursorPositionIndex is larger than text length, cursorPosition will be null, i.e: move the caret to the end
-  let cursorPosition: number | null = cursorPositionIndex && cursorPositionIndex <= text.length ? cursorPositionIndex : null;
+  let cursorPosition: number | null = cursorPositionIndex !== null && cursorPositionIndex <= text.length ? cursorPositionIndex : null;
   const isFocused = document.activeElement === target;
   if (isFocused && cursorPositionIndex === null) {
     const selection = getCurrentCursorPosition(target);
@@ -267,7 +267,6 @@ function updateInputStructure(
   const ranges = global.parseExpensiMarkToRanges(text);
   const markdownRanges: MarkdownRange[] = ranges as MarkdownRange[];
   let tree: TreeNode | null = null;
-
   if (!text || targetElement.innerHTML === '<br>' || (targetElement && targetElement.innerHTML === '\n')) {
     targetElement.innerHTML = '';
     targetElement.innerText = '';

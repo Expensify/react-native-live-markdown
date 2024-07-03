@@ -256,14 +256,13 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
     const handleOnChangeText = useCallback(
       (e: SyntheticEvent<HTMLDivElement>) => {
-        if (!divRef.current || !(e.target instanceof HTMLElement)) {
+        if (!divRef.current || !(e.target instanceof HTMLElement) || !contentSelection.current) {
           return;
         }
         const nativeEvent = e.nativeEvent as MarkdownNativeEvent;
         const isPasteInputType = nativeEvent.inputType === 'pasteText';
 
         const parsedText = isPasteInputType ? divRef.current.value : parseInnerHTMLToText(e.target);
-        updateTextColor(divRef.current, parsedText);
 
         const tree = buildTree(divRef.current, parsedText);
         divRef.current.tree = tree;
@@ -282,8 +281,15 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
             text = redo(divRef.current);
             break;
           default:
-            text = parseText(divRef.current, parsedText, processedMarkdownStyle).text;
+            text = parseText(
+              divRef.current,
+              parsedText,
+              processedMarkdownStyle,
+              nativeEvent.inputType === 'deleteContentBackward' && contentSelection.current?.start === contentSelection.current?.end ? Math.max(contentSelection.current.start - 1, 0) : null,
+            ).text;
         }
+
+        updateTextColor(divRef.current, text);
         divRef.current.value = text;
 
         if (onChange) {
