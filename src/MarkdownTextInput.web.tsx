@@ -301,6 +301,20 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       [updateTextColor, onChange, onChangeText, handleContentSizeChange, undo, redo, parseText, processedMarkdownStyle, setEventProps],
     );
 
+    const insertText = useCallback(
+      (e: SyntheticEvent<HTMLDivElement, Event>, text: string) => {
+        if (!contentSelection.current || !divRef.current) {
+          return;
+        }
+
+        divRef.current.value = `${divRef.current.value.substring(0, contentSelection.current.start)}${text}${divRef.current.value.substring(contentSelection.current.end)}`;
+        (e.nativeEvent as MarkdownNativeEvent).inputType = 'pasteText';
+        contentSelection.current = {start: contentSelection.current.start + text.length, end: contentSelection.current.start + text.length};
+        handleOnChangeText(e);
+      },
+      [handleOnChangeText],
+    );
+
     const handleKeyPress = useCallback(
       (e: KeyboardEvent<HTMLDivElement>) => {
         if (!divRef.current) {
@@ -350,17 +364,14 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           } else if (multiline) {
             //   We need to change normal behavior of "Enter" key to insert a line breaks, to prevent wrapping contentEditable text in <div> tags.
             //  Thanks to that in every situation we have proper amount of new lines in our parsed text. Without it pressing enter in empty lines will add 2 more new lines.
-            document.execCommand('insertLineBreak');
-            if (contentSelection.current) {
-              setCursorPosition(divRef.current, contentSelection.current?.start + 1);
-            }
+            insertText(e, '\n');
           }
           if (!e.shiftKey && ((shouldBlurOnSubmit && hostNode !== null) || !multiline)) {
             setTimeout(() => divRef.current && divRef.current.blur(), 0);
           }
         }
       },
-      [multiline, blurOnSubmit, setEventProps, onKeyPress, updateSelection, handleOnChangeText, onSubmitEditing],
+      [multiline, blurOnSubmit, setEventProps, onKeyPress, updateSelection, handleOnChangeText, onSubmitEditing, insertText],
     );
 
     const handleFocus: FocusEventHandler<HTMLDivElement> = useCallback(
@@ -460,12 +471,9 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         e.preventDefault();
         const clipboardData = e.clipboardData;
         const text = clipboardData.getData('text/plain');
-        divRef.current.value = divRef.current?.value.substring(0, contentSelection.current?.start) + text + divRef.current?.value.substring(contentSelection.current?.end);
-        e.nativeEvent.inputType = 'pasteText';
-        contentSelection.current = {start: contentSelection.current.start + text.length, end: contentSelection.current.start + text.length};
-        handleOnChangeText(e);
+        insertText(e, text);
       },
-      [handleOnChangeText],
+      [insertText],
     );
 
     const startComposition = useCallback(() => {
