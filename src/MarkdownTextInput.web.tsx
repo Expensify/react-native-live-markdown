@@ -282,7 +282,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
             text = redo(divRef.current);
             break;
           default:
-            text = parseText(divRef.current, parsedText, processedMarkdownStyle, nativeEvent.inputType === 'pasteText' ? contentSelection.current?.start : null).text;
+            text = parseText(divRef.current, parsedText, processedMarkdownStyle).text;
         }
         divRef.current.value = text;
 
@@ -309,8 +309,8 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
         divRef.current.value = `${divRef.current.value.substring(0, contentSelection.current.start)}${text}${divRef.current.value.substring(contentSelection.current.end)}`;
         (e.nativeEvent as MarkdownNativeEvent).inputType = 'pasteText';
-        contentSelection.current = {start: contentSelection.current.start + text.length, end: contentSelection.current.start + text.length};
         handleOnChangeText(e);
+        setCursorPosition(divRef.current, contentSelection.current.start + text.length, null);
       },
       [handleOnChangeText],
     );
