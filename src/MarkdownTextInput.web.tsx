@@ -262,13 +262,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         const nativeEvent = e.nativeEvent as MarkdownNativeEvent;
         const isPasteInputType = nativeEvent.inputType === 'pasteText';
 
-        let parsedText = '';
-        if (isPasteInputType) {
-          parsedText = divRef.current.value;
-        } else {
-          parsedText = parseInnerHTMLToText(e.target);
-        }
-
+        const parsedText = isPasteInputType ? divRef.current.value : parseInnerHTMLToText(e.target);
         const tree = buildTree(divRef.current, parsedText);
         divRef.current.tree = tree;
 
