@@ -284,6 +284,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           default:
             text = parseText(divRef.current, parsedText, processedMarkdownStyle, nativeEvent.inputType === 'pasteText' ? contentSelection.current?.start : null).text;
         }
+        divRef.current.value = text;
 
         if (onChange) {
           const event = e as unknown as NativeSyntheticEvent<any>;
