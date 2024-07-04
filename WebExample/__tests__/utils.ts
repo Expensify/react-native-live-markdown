@@ -1,7 +1,6 @@
 import type {Locator, Page} from '@playwright/test';
 import * as TEST_CONST from '../../example/src/testConstants';
 import type {MarkdownTextInputElement} from '../../src/MarkdownTextInput.web';
-import {getCurrentCursorPosition} from '../../src/web/utils/cursorUtils';
 
 const setupInput = async (page: Page, action?: 'clear' | 'reset') => {
   const inputLocator = await page.locator(`div#${TEST_CONST.INPUT_ID}`);
@@ -12,10 +11,10 @@ const setupInput = async (page: Page, action?: 'clear' | 'reset') => {
   return inputLocator;
 };
 
-const checkCursorPosition = () => {
-  const editableDiv = document.querySelector('div[contenteditable="true"]') as MarkdownTextInputElement;
-
-  return getCurrentCursorPosition(editableDiv);
+const checkCursorPosition = async (elementHandle: Locator) => {
+  const inputTreeHanlde = await elementHandle.evaluateHandle((div: MarkdownTextInputElement) => div.selectionStart);
+  const tree = await inputTreeHanlde.jsonValue();
+  return tree;
 };
 
 const setCursorPosition = ({startNode, endNode}: {startNode?: Element; endNode?: Element | null}) => {
@@ -52,8 +51,8 @@ const pressCmd = async ({inputLocator, command}: {inputLocator: Locator; command
 };
 
 const getElementValue = async (elementHandle: Locator) => {
-  const customVariableValue = await elementHandle.evaluateHandle((div: MarkdownTextInputElement) => div.value);
-  const value = await customVariableValue.jsonValue();
+  const inputValueHandle = await elementHandle.evaluateHandle((div: MarkdownTextInputElement) => div.value);
+  const value = await inputValueHandle.jsonValue();
   return value;
 };
 
