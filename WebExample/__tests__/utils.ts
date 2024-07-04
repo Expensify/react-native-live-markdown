@@ -11,8 +11,8 @@ const setupInput = async (page: Page, action?: 'clear' | 'reset') => {
   return inputLocator;
 };
 
-const checkCursorPosition = async (elementHandle: Locator) => {
-  const inputSelectionHandle = await elementHandle.evaluateHandle((div: MarkdownTextInputElement) => div.selectionEnd);
+const getCursorPosition = async (elementHandle: Locator) => {
+  const inputSelectionHandle = await elementHandle.evaluateHandle((div: MarkdownTextInputElement) => ({start: div.selectionStart, end: div.selectionEnd}));
   const selection = await inputSelectionHandle.jsonValue();
   return selection;
 };
@@ -59,4 +59,4 @@ const getElementValue = async (elementHandle: Locator) => {
   return value;
 };
 
-export {setupInput, checkCursorPosition, setCursorPosition, getElementStyle, pressCmd, getElementValue};
+export {setupInput, getCursorPosition, setCursorPosition, getElementStyle, pressCmd, getElementValue};

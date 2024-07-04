@@ -1,7 +1,7 @@
 import {test, expect} from '@playwright/test';
 import type {Locator, Page} from '@playwright/test';
 import * as TEST_CONST from '../../example/src/testConstants';
-import {checkCursorPosition, setupInput, getElementStyle, pressCmd, getElementValue} from './utils';
+import {getCursorPosition, setupInput, getElementStyle, pressCmd, getElementValue} from './utils';
 
 const pasteContent = async ({text, page, inputLocator}: {text: string; page: Page; inputLocator: Locator}) => {
   await page.evaluate(async (pasteText) => navigator.clipboard.writeText(pasteText), text);
@@ -93,9 +93,9 @@ test('select all', async ({page}) => {
   await inputLocator.focus();
   await pressCmd({inputLocator, command: 'a'});
 
-  const cursorPosition = await checkCursorPosition(inputLocator);
+  const cursorPosition = await getCursorPosition(inputLocator);
 
-  expect(cursorPosition).toBe(TEST_CONST.EXAMPLE_CONTENT.length);
+  expect(cursorPosition.end).toBe(TEST_CONST.EXAMPLE_CONTENT.length);
 });
 
 test('cut content changes', async ({page, browserName}) => {
