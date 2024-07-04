@@ -12,9 +12,9 @@ const setupInput = async (page: Page, action?: 'clear' | 'reset') => {
 };
 
 const checkCursorPosition = async (elementHandle: Locator) => {
-  const inputTreeHanlde = await elementHandle.evaluateHandle((div: MarkdownTextInputElement) => div.selectionStart);
-  const tree = await inputTreeHanlde.jsonValue();
-  return tree;
+  const inputSelectionHandle = await elementHandle.evaluateHandle((div: MarkdownTextInputElement) => div.selectionEnd);
+  const selection = await inputSelectionHandle.jsonValue();
+  return selection;
 };
 
 const setCursorPosition = ({startNode, endNode}: {startNode?: Element; endNode?: Element | null}) => {
