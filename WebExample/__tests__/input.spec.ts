@@ -1,6 +1,6 @@
 import {test, expect} from '@playwright/test';
 import * as TEST_CONST from '../../example/src/testConstants';
-import {checkCursorPosition, setupInput} from './utils';
+import {checkCursorPosition, getElementValue, setupInput} from './utils';
 
 test.beforeEach(async ({page}) => {
   await page.goto(TEST_CONST.LOCAL_URL, {waitUntil: 'load'});
@@ -12,7 +12,8 @@ test.describe('typing', () => {
 
     await inputLocator.focus();
     await inputLocator.pressSequentially(TEST_CONST.EXAMPLE_CONTENT);
-    const value = await inputLocator.innerText();
+
+    const value = await getElementValue(inputLocator);
     expect(value).toEqual(TEST_CONST.EXAMPLE_CONTENT);
   });
 
