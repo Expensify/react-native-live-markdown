@@ -38,8 +38,11 @@ const getElementStyle = async (elementHandle: Locator) => {
 
   if (elementHandle) {
     await elementHandle.waitFor({state: 'attached'});
-
-    elementStyle = await elementHandle.getAttribute('style');
+    // We need to get styles from the parent element because every text node is wrapped additionally with a span element
+    const parentElementHandle = await elementHandle.evaluateHandle((element) => {
+      return element.parentElement;
+    });
+    elementStyle = await parentElementHandle.asElement()?.getAttribute('style');
   }
   return elementStyle;
 };
