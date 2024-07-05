@@ -335,7 +335,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         const hostNode = e.target;
         e.stopPropagation();
 
-        if (e.key === 'z' && e.metaKey) {
+        if (e.key === 'z' && (e.ctrlKey || e.metaKey)) {
           e.preventDefault();
           const nativeEvent = e.nativeEvent as unknown as MarkdownNativeEvent;
           if (e.shiftKey) {
