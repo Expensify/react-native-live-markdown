@@ -100,7 +100,7 @@
     "@types/react": "17.0.21",
     "react-native@0.73.4": "patch:react-native@npm%3A0.73.4#./.yarn/patches/react-native-npm-0.73.4-297ae78b8f.patch",
     "@react-native/gradle-plugin@0.73.4": "patch:@react-native/gradle-plugin@npm%3A0.73.4#./.yarn/patches/@react-native-gradle-plugin-npm-0.73.4-6535082666.patch",
-    "expensify-common@2.0.34": "patch:expensify-common@npm%3A2.0.34#./.yarn/patches/expensify-common-npm-2.0.34-4dc6edf065.patch"
+    "expensify-common@2.0.35": "patch:expensify-common@npm%3A2.0.35#./.yarn/patches/expensify-common-npm-2.0.35-468942f705.patch"
   },
   "peerDependencies": {
     "react": "*",
