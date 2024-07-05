@@ -133,6 +133,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           return {text: divRef.current.value, cursorPosition: null};
         }
         const parsedText = updateInputStructure(target, text, cursorPosition, customMarkdownStyles, !multiline);
+        divRef.current.value = parsedText.text;
 
         if (history.current && shouldAddToHistory) {
           history.current.throttledAdd(parsedText.text, parsedText.cursorPosition);
@@ -291,7 +292,6 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         }
 
         updateTextColor(divRef.current, text);
-        divRef.current.value = text;
 
         if (onChange) {
           const event = e as unknown as NativeSyntheticEvent<any>;
