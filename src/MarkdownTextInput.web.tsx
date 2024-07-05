@@ -135,7 +135,6 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         const parsedText = updateInputStructure(target, text, cursorPosition, customMarkdownStyles, !multiline);
 
         if (history.current && shouldAddToHistory) {
-          // We need to normalize the value before saving it to the history to prevent situations when additional new lines break the cursor position calculation logic
           history.current.throttledAdd(parsedText.text, parsedText.cursorPosition);
         }
 
@@ -272,6 +271,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           return;
         }
 
+        let cursorPosition: number | null = null;
         let text = '';
         switch (nativeEvent.inputType) {
           case 'historyUndo':
@@ -281,12 +281,13 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
             text = redo(divRef.current);
             break;
           default:
-            text = parseText(
-              divRef.current,
-              parsedText,
-              processedMarkdownStyle,
-              nativeEvent.inputType === 'deleteContentBackward' && contentSelection.current?.start === contentSelection.current?.end ? Math.max(contentSelection.current.start - 1, 0) : null,
-            ).text;
+            if (nativeEvent.inputType === 'deleteContentBackward' && contentSelection.current?.start === contentSelection.current?.end) {
+              cursorPosition = Math.max(contentSelection.current.start - 1, 0);
+            } else if (isPasteInputType) {
+              cursorPosition = divRef.current.selectionStart;
+            }
+
+            text = parseText(divRef.current, parsedText, processedMarkdownStyle, cursorPosition).text;
         }
 
         updateTextColor(divRef.current, text);
@@ -315,10 +316,14 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
         divRef.current.value = `${divRef.current.value.substring(0, contentSelection.current.start)}${text}${divRef.current.value.substring(contentSelection.current.end)}`;
         (e.nativeEvent as MarkdownNativeEvent).inputType = 'pasteText';
+        const cursorPositionAfterPaste = contentSelection.current.start + text.length;
+        updateRefSelectionVariables({
+          start: cursorPositionAfterPaste,
+          end: cursorPositionAfterPaste,
+        });
         handleOnChangeText(e);
-        setCursorPosition(divRef.current, contentSelection.current.start + text.length, null);
       },
-      [handleOnChangeText],
+      [handleOnChangeText, updateRefSelectionVariables],
     );
 
     const handleKeyPress = useCallback(
