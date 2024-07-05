@@ -260,7 +260,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     );
 
     const redo = useCallback(
-      (target: HTMLDivElement) => {
+      (target: HTMLDivElement): ParseTextResult => {
         if (!history.current) {
           return {
             text: '',
