@@ -322,8 +322,9 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           end: cursorPositionAfterPaste,
         });
         handleOnChangeText(e);
+        updateSelection(e);
       },
-      [handleOnChangeText, updateRefSelectionVariables],
+      [handleOnChangeText, updateRefSelectionVariables, updateSelection],
     );
 
     const handleKeyPress = useCallback(
