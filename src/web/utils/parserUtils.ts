@@ -52,44 +52,36 @@ function splitTextIntoLines(text: string): Paragraph[] {
   return lines;
 }
 
-function mergeLinesWithMultilineTags(lines: Paragraph[]) {
-  let multiLineRange: MarkdownRange | null = null;
-  let lineWithMultilineTag: Paragraph | null = null;
-  let i = 0;
-  while (i < lines.length) {
-    const currentLine = lines[i];
-    if (!currentLine) {
-      break;
-    }
-    // start merging if line contains range that ends in a different line
-    if (lineWithMultilineTag && multiLineRange && currentLine.start <= multiLineRange.start + multiLineRange.length) {
-      lineWithMultilineTag.text += `\n${currentLine.text}`;
-      lineWithMultilineTag.markdownRanges.push(...currentLine.markdownRanges);
-      lineWithMultilineTag.length += currentLine.length + 1;
-      lines.splice(i, 1);
-    } else {
-      multiLineRange = currentLine.markdownRanges.find((range) => range.start + range.length > currentLine.start + currentLine.length) || null;
-      lineWithMultilineTag = multiLineRange ? currentLine : null;
-      i += 1;
-    }
-  }
-}
+function mergeLinesWithMultilineTags(lines: Paragraph[], ranges: MarkdownRange[]) {
+  let mergedLines = [...lines];
+  const lineIndexes = mergedLines.map((_line, index) => index);
 
-function groupMarkdownRangesByLine(lines: Paragraph[], ranges: MarkdownRange[]) {
-  let lineIndex = 0;
   ranges.forEach((range) => {
-    const {start} = range;
+    const beginLineIndex = mergedLines.findLastIndex((line) => line.start <= range.start);
+    const endLineIndex = mergedLines.findIndex((line) => line.start + line.length >= range.start + range.length);
+    const correspondingLineIndexes = lineIndexes.slice(beginLineIndex, endLineIndex + 1);
 
-    let currentLine = lines[lineIndex];
-    while (currentLine && lineIndex < lines.length && start > currentLine.start + currentLine.length) {
-      lineIndex += 1;
-      currentLine = lines[lineIndex];
-    }
+    if (correspondingLineIndexes.length > 0) {
+      const mainLineIndex = correspondingLineIndexes[0] as number;
+      const mainLine = mergedLines[mainLineIndex] as Paragraph;
 
-    if (currentLine) {
-      currentLine.markdownRanges.push(range);
+      mainLine.markdownRanges.push(range);
+
+      const otherLineIndexes = correspondingLineIndexes.slice(1);
+      otherLineIndexes.forEach((lineIndex) => {
+        const otherLine = mergedLines[lineIndex] as Paragraph;
+
+        mainLine.text += `\n${otherLine.text}`;
+        mainLine.length += otherLine.length + 1;
+        mainLine.markdownRanges.push(...otherLine.markdownRanges);
+      });
+      if (otherLineIndexes.length > 0) {
+        mergedLines = mergedLines.filter((_line, index) => !otherLineIndexes.includes(index));
+      }
     }
   });
+
+  return mergedLines;
 }
 
 function appendNode(element: HTMLElement, parentTreeNode: TreeNode, type: NodeType, length: number) {
@@ -156,7 +148,7 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
   };
   let currentParentNode: TreeNode = rootNode;
 
-  const lines = splitTextIntoLines(text);
+  let lines = splitTextIntoLines(text);
 
   if (ranges.length === 0) {
     lines.forEach((line) => {
@@ -168,8 +160,7 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
 
   const markdownRanges = ungroupRanges(ranges);
 
-  groupMarkdownRangesByLine(lines, markdownRanges);
-  mergeLinesWithMultilineTags(lines);
+  lines = mergeLinesWithMultilineTags(lines, markdownRanges);
 
   let lastRangeEndIndex = 0;
   while (lines.length > 0) {
