@@ -75,6 +75,11 @@ type Dimensions = {
   height: number;
 };
 
+type ParseTextResult = {
+  text: string;
+  cursorPosition: number | null;
+};
+
 let focusTimeout: NodeJS.Timeout | null = null;
 
 // Removes one '\n' from the end of the string that were added by contentEditable div
@@ -203,7 +208,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     }, []);
 
     const parseText = useCallback(
-      (target: HTMLDivElement, text: string | null, customMarkdownStyles: MarkdownStyle, cursorPosition: number | null = null, shouldAddToHistory = true) => {
+      (target: HTMLDivElement, text: string | null, customMarkdownStyles: MarkdownStyle, cursorPosition: number | null = null, shouldAddToHistory = true): ParseTextResult => {
         if (text === null) {
           return {text: target.innerText, cursorPosition: null};
         }
@@ -240,13 +245,16 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     );
 
     const undo = useCallback(
-      (target: HTMLDivElement) => {
+      (target: HTMLDivElement): ParseTextResult => {
         if (!history.current) {
-          return '';
+          return {
+            text: '',
+            cursorPosition: 0,
+          };
         }
         const item = history.current.undo();
         const undoValue = item ? denormalizeValue(item.text) : null;
-        return parseText(target, undoValue, processedMarkdownStyle, item ? item.cursorPosition : null, false).text;
+        return parseText(target, undoValue, processedMarkdownStyle, item ? item.cursorPosition : null, false);
       },
       [parseText, processedMarkdownStyle],
     );
@@ -254,11 +262,14 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     const redo = useCallback(
       (target: HTMLDivElement) => {
         if (!history.current) {
-          return '';
+          return {
+            text: '',
+            cursorPosition: 0,
+          };
         }
         const item = history.current.redo();
         const redoValue = item ? denormalizeValue(item.text) : null;
-        return parseText(target, redoValue, processedMarkdownStyle, item ? item.cursorPosition : null, false).text;
+        return parseText(target, redoValue, processedMarkdownStyle, item ? item.cursorPosition : null, false);
       },
       [parseText, processedMarkdownStyle],
     );
@@ -350,27 +361,29 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           return;
         }
 
-        let text = '';
+        let newInputUpdate: ParseTextResult;
         const nativeEvent = e.nativeEvent as MarkdownNativeEvent;
-        switch (nativeEvent.inputType) {
+        const inputType = nativeEvent.inputType;
+        switch (inputType) {
           case 'historyUndo':
-            text = undo(divRef.current);
+            newInputUpdate = undo(divRef.current);
             break;
           case 'historyRedo':
-            text = redo(divRef.current);
+            newInputUpdate = redo(divRef.current);
             break;
           case 'insertFromPaste':
             // if there is no newline at the end of the copied text, contentEditable adds invisible <br> tag at the end of the text, so we need to normalize it
             if (changedText.length > 2 && changedText[changedText.length - 2] !== '\n' && changedText[changedText.length - 1] === '\n') {
-              text = parseText(divRef.current, normalizeValue(changedText), processedMarkdownStyle).text;
+              newInputUpdate = parseText(divRef.current, normalizeValue(changedText), processedMarkdownStyle);
               break;
             }
-            text = parseText(divRef.current, changedText, processedMarkdownStyle).text;
+            newInputUpdate = parseText(divRef.current, changedText, processedMarkdownStyle);
             break;
           default:
-            text = parseText(divRef.current, changedText, processedMarkdownStyle).text;
+            newInputUpdate = parseText(divRef.current, changedText, processedMarkdownStyle);
         }
 
+        const {text, cursorPosition} = newInputUpdate;
         const normalizedText = normalizeValue(text);
 
         if (pasteRef?.current) {
@@ -387,24 +400,22 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           }>;
           setEventProps(event);
 
-          const newSelection = CursorUtils.getCurrentCursorPosition(divRef.current) ?? {start: 0, end: 0};
-
-          // The new text is between the prev start selection and the new end selection
-          const maybeAddedtext = normalizedText.slice(prevSelection.start, newSelection.end);
+          // The new text is between the prev start selection and the new end selection, can be empty
+          const addedText = normalizedText.slice(prevSelection.start, cursorPosition ?? 0);
           // The length of the text that replaced the before text
-          const count = maybeAddedtext.length;
+          const count = addedText.length;
           // The start index of the replacement operation
           let start = prevSelection.start;
 
           const prevSelectionRange = prevSelection.end - prevSelection.start;
           // The length the deleted text had before
           let before = prevSelectionRange;
-          if (prevSelectionRange === 0 && (nativeEvent.inputType === 'deleteContentBackward' || nativeEvent.inputType === 'deleteContentForward')) {
+          if (prevSelectionRange === 0 && (inputType === 'deleteContentBackward' || inputType === 'deleteContentForward')) {
             // its possible the user pressed a delete key without a selection range, so we need to adjust the before value to have the length of the deleted text
             before = prevTextLength - normalizedText.length;
           }
 
-          if (nativeEvent.inputType === 'deleteContentBackward') {
+          if (inputType === 'deleteContentBackward') {
             // When the user does a backspace delete he expects the content before the cursor to be removed.
             // For this the start value needs to be adjusted (its as if the selection was before the text that we want to delete)
             start -= before;
