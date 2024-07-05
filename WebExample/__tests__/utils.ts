@@ -1,6 +1,5 @@
 import type {Locator, Page} from '@playwright/test';
 import * as TEST_CONST from '../../example/src/testConstants';
-import type {MarkdownTextInputElement} from '../../src/MarkdownTextInput.web';
 
 const setupInput = async (page: Page, action?: 'clear' | 'reset') => {
   const inputLocator = await page.locator(`div#${TEST_CONST.INPUT_ID}`);
@@ -12,7 +11,7 @@ const setupInput = async (page: Page, action?: 'clear' | 'reset') => {
 };
 
 const getCursorPosition = async (elementHandle: Locator) => {
-  const inputSelectionHandle = await elementHandle.evaluateHandle((div: MarkdownTextInputElement) => ({start: div.selectionStart, end: div.selectionEnd}));
+  const inputSelectionHandle = await elementHandle.evaluateHandle((div: HTMLInputElement) => ({start: div.selectionStart, end: div.selectionEnd}));
   const selection = await inputSelectionHandle.jsonValue();
   return selection;
 };
@@ -54,7 +53,7 @@ const pressCmd = async ({inputLocator, command}: {inputLocator: Locator; command
 };
 
 const getElementValue = async (elementHandle: Locator) => {
-  const inputValueHandle = await elementHandle.evaluateHandle((div: MarkdownTextInputElement) => div.value);
+  const inputValueHandle = await elementHandle.evaluateHandle((div: HTMLInputElement) => div.value);
   const value = await inputValueHandle.jsonValue();
   return value;
 };
