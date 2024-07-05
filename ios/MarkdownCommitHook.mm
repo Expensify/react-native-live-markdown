@@ -141,30 +141,31 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
                     stateData.attributedStringBox);
 
             // Handles the first render, where the text stored in props is
-            // different than the one stored in state The one in state is empty,
-            // while the one in props is passed from JS If we don't update the
-            // state here, we'll end up with a one-default-line-sized text
-            // input. A better condition to do that can be probably chosen, but
-            // this seems to work
-            auto plainString =
-                std::string([[nsAttributedString string] UTF8String]);
-            if (plainString != textInputProps.text) {
-              // creates new AttributedString from props, adapted from
-              // TextInputShadowNode (ios one, text inputs are
-              // platform-specific)
-              auto attributedString = AttributedString{};
-              attributedString.appendFragment(AttributedString::Fragment{
-                  textInputProps.text, defaultTextAttributes});
+            // different than the one stored in state. The one in state is empty,
+            // while the one in props is passed from JS. If we don't update the
+            // state here, we'll end up with a one-default-line-sized text input
+            if (textInputState.getRevision() == State::initialRevisionValue) {
+                auto plainStringFromState =
+                    std::string([[nsAttributedString string] UTF8String]);
 
-              auto attachments = BaseTextShadowNode::Attachments{};
-              BaseTextShadowNode::buildAttributedString(
-                  defaultTextAttributes, *nodes.textInput, attributedString,
-                  attachments);
+                if (plainStringFromState != textInputProps.text) {
+                // creates new AttributedString from props, adapted from
+                // TextInputShadowNode (ios one, text inputs are
+                // platform-specific)
+                auto attributedString = AttributedString{};
+                attributedString.appendFragment(AttributedString::Fragment{
+                    textInputProps.text, defaultTextAttributes});
 
-              // convert the newly created attributed string to
-              // NSAttributedString
-              nsAttributedString = RCTNSAttributedStringFromAttributedStringBox(
-                  AttributedStringBox{attributedString});
+                auto attachments = BaseTextShadowNode::Attachments{};
+                BaseTextShadowNode::buildAttributedString(
+                    defaultTextAttributes, *nodes.textInput, attributedString,
+                    attachments);
+
+                // convert the newly created attributed string to
+                // NSAttributedString
+                nsAttributedString = RCTNSAttributedStringFromAttributedStringBox(
+                    AttributedStringBox{attributedString});
+                }
             }
 
             // apply markdown

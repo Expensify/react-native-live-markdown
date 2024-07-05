@@ -24,6 +24,9 @@
             return _prevAttributedString;
         }
 
+        static std::mutex runtimeMutex;
+        auto lock = std::lock_guard<std::mutex>(runtimeMutex);
+
         auto markdownRuntime = expensify::livemarkdown::getMarkdownRuntime();
         jsi::Runtime &rt = markdownRuntime->getJSIRuntime();
 

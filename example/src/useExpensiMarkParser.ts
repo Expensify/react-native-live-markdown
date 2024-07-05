@@ -164,7 +164,7 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
       } else if (node.tag.startsWith('<pre')) {
         appendSyntax('```');
         const content = node.children.join('').replaceAll('&#32;', ' ');
-        addChildrenWithStyle(`\n${content}`, 'pre');
+        addChildrenWithStyle(content, 'pre');
         appendSyntax('```');
       } else if (node.tag.startsWith('<a href="')) {
         const rawHref = node.tag.match(/href="([^"]*)"/)![1]!; // always present
