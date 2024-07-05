@@ -9,7 +9,7 @@ index ca5bcf1874d986d12fa2c0d01c07488c2feaa5db..a4dbb72565e09b0bc297096b4b4c8b38
      if (k2 === undefined) k2 = k;
      var desc = Object.getOwnPropertyDescriptor(m, k);
 diff --git a/dist/str.js b/dist/str.js
-index bda25fcf8fb0f94fe7a259bc6b534b0eef07621e..b967a87fa47879084d90564400736398fd85be4f 100644
+index bda25fcf8fb0f94fe7a259bc6b534b0eef07621e..7a44ab47c01f124f82cd8763862f204e98433485 100644
 --- a/dist/str.js
 +++ b/dist/str.js
 @@ -1,4 +1,5 @@
