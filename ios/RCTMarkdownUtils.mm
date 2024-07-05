@@ -28,6 +28,9 @@ using namespace facebook;
         }
 
         static std::shared_ptr<jsi::Runtime> runtime;
+        static std::mutex runtimeMutex;
+        auto lock = std::lock_guard<std::mutex>(runtimeMutex);
+
         if (runtime == nullptr) {
             NSString *path = [[NSBundle mainBundle] pathForResource:@"react-native-live-markdown-parser" ofType:@"js"];
             assert(path != nil && "[react-native-live-markdown] Markdown parser bundle not found");
