@@ -1,5 +1,6 @@
 import type {MarkdownTextInputElement} from '../../MarkdownTextInput.web';
 import {findHTMLElementInTree, getTreeNodeByIndex} from './treeUtils';
+import type {TreeNode} from './treeUtils';
 
 function setCursorPosition(target: MarkdownTextInputElement, start: number, end: number | null = null) {
   // We don't want to move the cursor if the target is not focused
@@ -38,7 +39,20 @@ function setCursorPosition(target: MarkdownTextInputElement, start: number, end:
     selection.setBaseAndExtent(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
   }
 
-  startTreeNode.element.scrollIntoView({block: 'nearest'});
+  scrollIntoView(startTreeNode);
+}
+
+function scrollIntoView(node: TreeNode) {
+  if (node.type === 'br' && node.parentNode?.parentNode?.type === 'line') {
+    // If the node is a line break, scroll to the parent paragraph, because Safari doesn't support scrollIntoView on br elements
+    node.parentNode.parentNode.element.scrollIntoView({
+      block: 'nearest',
+    });
+  } else {
+    node.element.scrollIntoView({
+      block: 'nearest',
+    });
+  }
 }
 
 function moveCursorToEnd(target: HTMLElement) {
@@ -93,4 +107,4 @@ function removeSelection() {
   }
 }
 
-export {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition, removeSelection};
+export {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition, removeSelection, scrollIntoView};
