@@ -519,13 +519,8 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       [onClick, updateSelection],
     );
 
-    const handlePaste = useCallback((e) => {
+    const handlePaste = useCallback(() => {
       pasteRef.current = true;
-      e.preventDefault();
-
-      const clipboardData = e.clipboardData;
-      const text = clipboardData.getData('text/plain');
-      document.execCommand('insertText', false, text);
     }, []);
 
     const startComposition = useCallback(() => {
