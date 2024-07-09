@@ -98,7 +98,8 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     const contentSelection = useRef<Selection | null>(null);
     const className = `react-native-live-markdown-input-${multiline ? 'multiline' : 'singleline'}`;
     const history = useRef<InputHistory>();
-    const dimensions = React.useRef<Dimensions | null>(null);
+    const dimensions = useRef<Dimensions | null>(null);
+    const pasteContent = useRef<string | null>(null);
 
     if (!history.current) {
       history.current = new InputHistory(100, 150, value || '');
@@ -262,7 +263,11 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         const nativeEvent = e.nativeEvent as MarkdownNativeEvent;
         const isPasteInputType = nativeEvent.inputType === 'pasteText';
 
-        const parsedText = isPasteInputType ? divRef.current.value : parseInnerHTMLToText(e.target);
+        const previousText = divRef.current.value;
+        const parsedText = isPasteInputType ? pasteContent.current || '' : parseInnerHTMLToText(e.target);
+        if (pasteContent.current) {
+          pasteContent.current = null;
+        }
 
         const tree = buildTree(divRef.current, parsedText);
         divRef.current.tree = tree;
@@ -272,7 +277,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           return;
         }
 
-        let cursorPosition: number | null = null;
+        const newCursorPosition = Math.max(Math.max(contentSelection.current.end, 0) + (parsedText.length - previousText.length), 0);
         let text = '';
         switch (nativeEvent.inputType) {
           case 'historyUndo':
@@ -282,13 +287,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
             text = redo(divRef.current);
             break;
           default:
-            if (nativeEvent.inputType === 'deleteContentBackward' && contentSelection.current?.start === contentSelection.current?.end) {
-              cursorPosition = Math.max(contentSelection.current.start - 1, 0);
-            } else if (isPasteInputType) {
-              cursorPosition = divRef.current.selectionStart;
-            }
-
-            text = parseText(divRef.current, parsedText, processedMarkdownStyle, cursorPosition).text;
+            text = parseText(divRef.current, parsedText, processedMarkdownStyle, newCursorPosition).text;
         }
 
         updateTextColor(divRef.current, text);
@@ -314,17 +313,12 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           return;
         }
 
-        divRef.current.value = `${divRef.current.value.substring(0, contentSelection.current.start)}${text}${divRef.current.value.substring(contentSelection.current.end)}`;
+        pasteContent.current = `${divRef.current.value.substring(0, contentSelection.current.start)}${text}${divRef.current.value.substring(contentSelection.current.end)}`;
         (e.nativeEvent as MarkdownNativeEvent).inputType = 'pasteText';
-        const cursorPositionAfterPaste = contentSelection.current.start + text.length;
-        updateRefSelectionVariables({
-          start: cursorPositionAfterPaste,
-          end: cursorPositionAfterPaste,
-        });
         handleOnChangeText(e);
         updateSelection(e);
       },
-      [handleOnChangeText, updateRefSelectionVariables, updateSelection],
+      [handleOnChangeText, updateSelection],
     );
 
     const handleKeyPress = useCallback(
