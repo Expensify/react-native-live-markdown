@@ -477,7 +477,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
     const handlePaste = useCallback(
       (e) => {
-        if (!divRef.current || !contentSelection.current) {
+        if (e.isDefaultPrevented() || !divRef.current || !contentSelection.current) {
           return;
         }
         e.preventDefault();
