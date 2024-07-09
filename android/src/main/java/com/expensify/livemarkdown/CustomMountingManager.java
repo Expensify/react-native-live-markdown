@@ -21,8 +21,8 @@ import com.facebook.react.fabric.mounting.MountingManager;
 import com.facebook.react.uimanager.PixelUtil;
 import com.facebook.react.uimanager.ViewManagerRegistry;
 import com.facebook.react.views.text.TextAttributeProps;
-import com.facebook.react.views.text.TextInlineViewPlaceholderSpan;
-import com.facebook.react.views.text.TextLayoutManagerMapBuffer;
+import com.facebook.react.views.text.internal.span.TextInlineViewPlaceholderSpan;
+import com.facebook.react.views.text.TextLayoutManager;
 import com.facebook.yoga.YogaMeasureMode;
 import com.facebook.yoga.YogaMeasureOutput;
 
@@ -63,7 +63,7 @@ public class CustomMountingManager extends MountingManager {
       @Nullable float[] attachmentsPositions) {
 
     Spannable text =
-      TextLayoutManagerMapBuffer.getOrCreateSpannableForText(context, attributedString, null);
+      TextLayoutManager.getOrCreateSpannableForText(context, attributedString, null);
 
     if (text == null) {
       return 0;
@@ -71,14 +71,14 @@ public class CustomMountingManager extends MountingManager {
 
     int textBreakStrategy =
       TextAttributeProps.getTextBreakStrategy(
-        paragraphAttributes.getString(TextLayoutManagerMapBuffer.PA_KEY_TEXT_BREAK_STRATEGY));
+        paragraphAttributes.getString(TextLayoutManager.PA_KEY_TEXT_BREAK_STRATEGY));
     boolean includeFontPadding =
-      paragraphAttributes.contains(TextLayoutManagerMapBuffer.PA_KEY_INCLUDE_FONT_PADDING)
-        ? paragraphAttributes.getBoolean(TextLayoutManagerMapBuffer.PA_KEY_INCLUDE_FONT_PADDING)
+      paragraphAttributes.contains(TextLayoutManager.PA_KEY_INCLUDE_FONT_PADDING)
+        ? paragraphAttributes.getBoolean(TextLayoutManager.PA_KEY_INCLUDE_FONT_PADDING)
         : DEFAULT_INCLUDE_FONT_PADDING;
     int hyphenationFrequency =
       TextAttributeProps.getHyphenationFrequency(
-        paragraphAttributes.getString(TextLayoutManagerMapBuffer.PA_KEY_HYPHENATION_FREQUENCY));
+        paragraphAttributes.getString(TextLayoutManager.PA_KEY_HYPHENATION_FREQUENCY));
 
     // StaticLayout returns wrong metrics for the last line if it's empty, add something to the
     // last line so it's measured correctly
@@ -93,7 +93,7 @@ public class CustomMountingManager extends MountingManager {
 
     BoringLayout.Metrics boring = BoringLayout.isBoring(text, sTextPaintInstance);
 
-    Class<TextLayoutManagerMapBuffer> mapBufferClass = TextLayoutManagerMapBuffer.class;
+    Class<TextLayoutManager> mapBufferClass = TextLayoutManager.class;
     try {
       Method createLayoutMethod = mapBufferClass.getDeclaredMethod("createLayout", Spannable.class, BoringLayout.Metrics.class, float.class, YogaMeasureMode.class, boolean.class, int.class, int.class);
       createLayoutMethod.setAccessible(true);
@@ -109,8 +109,8 @@ public class CustomMountingManager extends MountingManager {
         hyphenationFrequency);
 
       int maximumNumberOfLines =
-        paragraphAttributes.contains(TextLayoutManagerMapBuffer.PA_KEY_MAX_NUMBER_OF_LINES)
-          ? paragraphAttributes.getInt(TextLayoutManagerMapBuffer.PA_KEY_MAX_NUMBER_OF_LINES)
+        paragraphAttributes.contains(TextLayoutManager.PA_KEY_MAX_NUMBER_OF_LINES)
+          ? paragraphAttributes.getInt(TextLayoutManager.PA_KEY_MAX_NUMBER_OF_LINES)
           : UNSET;
 
       int calculatedLineCount =
