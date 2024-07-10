@@ -305,8 +305,11 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           default:
             newInputUpdate = parseText(divRef.current, parsedText, processedMarkdownStyle, newCursorPosition);
         }
-
         const {text, cursorPosition} = newInputUpdate;
+        updateSelection(e, {
+          start: cursorPosition ?? 0,
+          end: cursorPosition ?? 0,
+        });
 
         if (onChange) {
           const event = e as unknown as NativeSyntheticEvent<{
@@ -351,7 +354,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
         handleContentSizeChange();
       },
-      [updateTextColor, onChange, onChangeText, handleContentSizeChange, undo, redo, parseText, processedMarkdownStyle, setEventProps],
+      [updateTextColor, updateSelection, onChange, onChangeText, handleContentSizeChange, undo, redo, parseText, processedMarkdownStyle, setEventProps],
     );
 
     const insertText = useCallback(
