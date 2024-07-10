@@ -276,6 +276,8 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
         const previousText = divRef.current.value;
         const parsedText = isPasteInputType ? pasteContent.current || '' : parseInnerHTMLToText(e.target);
+        updateTextColor(divRef.current, parsedText);
+
         if (pasteContent.current) {
           pasteContent.current = null;
         }
@@ -285,10 +287,12 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         const prevSelection = contentSelection.current ?? {start: 0, end: 0};
 
         if (compositionRef.current && !BrowserUtils.isMobile) {
+          divRef.current.value = parsedText;
           compositionRef.current = false;
           return;
         }
 
+        const newCursorPosition = Math.max(Math.max(contentSelection.current.end, 0) + (parsedText.length - previousText.length), 0);
         let newInputUpdate: ParseTextResult;
         const inputType = nativeEvent.inputType;
         switch (nativeEvent.inputType) {
@@ -299,16 +303,10 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
             newInputUpdate = redo(divRef.current);
             break;
           default:
-            newInputUpdate = parseText(
-              divRef.current,
-              parsedText,
-              processedMarkdownStyle,
-              Math.max(Math.max(contentSelection.current.end, 0) + (parsedText.length - previousText.length), 0),
-            );
+            newInputUpdate = parseText(divRef.current, parsedText, processedMarkdownStyle, newCursorPosition);
         }
 
         const {text, cursorPosition} = newInputUpdate;
-        updateTextColor(divRef.current, text);
 
         if (onChange) {
           const event = e as unknown as NativeSyntheticEvent<{
