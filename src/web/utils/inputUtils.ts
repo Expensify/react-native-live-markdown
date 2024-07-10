@@ -37,10 +37,14 @@ const parseInnerHTMLToText = (target: HTMLElement): string => {
   const childNodes = target.childNodes ?? [];
   childNodes.forEach((node, index) => {
     const nodeCopy = node.cloneNode(true) as HTMLElement;
+    let isIncorrectNewLineGenerated = false;
     if (nodeCopy.innerHTML) {
       // Replace single <br> created by contentEditable with '\n', to enable proper newline deletion on backspace, when next lines also have <br> tags
       if (nodeCopy.innerHTML === '<br>') {
         nodeCopy.innerHTML = '\n';
+      }
+      if (nodeCopy.innerHTML.includes('\n')) {
+        isIncorrectNewLineGenerated = true;
       }
       // Replace only br tags with data-id attribute, because we know that were created by the web parser. We need to ignore tags created by contentEditable div
       nodeCopy.innerHTML = nodeCopy.innerHTML.replaceAll(/<br .*?>/g, '\n');
@@ -48,10 +52,16 @@ const parseInnerHTMLToText = (target: HTMLElement): string => {
 
     let nodeText = nodeCopy.textContent ?? '';
 
-    // Remove unnecessary new lines from the end of the text
+    // Remove unnecessary new lines from the end of the text in following cases:
+    // 1. '\n\n' is at the end of the line - it means that '\n' was added by the browser or by the user. We can delete it since we are adding new lines after each paragraph.
+    // 2. BR span contains text + BR - fix for writing in empty line on Firefox browser.
+    // 3. Last child is a <br> tag - it means that BR was added by the browser since our br are wrapped in span with data-type attribute.
+    // 4. innerHTML contains '\n' - it means that the '\n' was added by the browser since we are using only BR tags for new lines.
     if (
       (nodeText.length > 2 && nodeText[-3] !== '\n' && nodeText.slice(-2) === '\n\n') ||
-      (BrowserUtils.isFirefox && nodeCopy.children?.[0]?.getAttribute('data-type') === 'br' && (nodeCopy.children?.[0]?.textContent?.length || -1) > 1)
+      (BrowserUtils.isFirefox && nodeCopy.children?.[0]?.getAttribute('data-type') === 'br' && (nodeCopy.children?.[0]?.textContent?.length || -1) > 1) ||
+      nodeCopy.childNodes[nodeCopy.childNodes.length - 1]?.nodeName === 'BR' ||
+      isIncorrectNewLineGenerated
     ) {
       nodeText = nodeText.slice(0, -1);
     }
@@ -71,6 +81,9 @@ const parseInnerHTMLToText = (target: HTMLElement): string => {
     // Split paragraphs with new lines
     if (/[^\n]/.test(nodeText) && index < childNodes.length - 1) {
       text += '\n';
+    } else if (index === childNodes.length - 1 && nodeText === '') {
+      // Remove unnecessary new line from the end of the text if the last line is empty
+      text = text.slice(0, -1);
     }
   });
   return text;
