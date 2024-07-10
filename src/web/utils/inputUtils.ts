@@ -32,7 +32,7 @@ function getElementHeight(node: HTMLDivElement, styles: CSSProperties, numberOfL
   return styles.height ? `${styles.height}px` : 'auto';
 }
 
-const parseInnerHTMLToText = (target: HTMLElement): string => {
+const parseInnerHTMLToText = (target: HTMLElement, inputType = 'insertText'): string => {
   let text = '';
   const childNodes = target.childNodes ?? [];
   childNodes.forEach((node, index) => {
@@ -81,8 +81,8 @@ const parseInnerHTMLToText = (target: HTMLElement): string => {
     // Split paragraphs with new lines
     if (/[^\n]/.test(nodeText) && index < childNodes.length - 1) {
       text += '\n';
-    } else if (index === childNodes.length - 1 && nodeText === '') {
-      // Remove unnecessary new line from the end of the text if the last line is empty
+    } else if (index === childNodes.length - 1 && inputType === 'deleteSoftLineBackward' && nodeText === '') {
+      // Remove unnecessary '\n' from the end of the text if user deleted line using CMD + Backspace
       text = text.slice(0, -1);
     }
   });

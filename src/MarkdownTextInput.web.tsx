@@ -272,10 +272,11 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           return;
         }
         const nativeEvent = e.nativeEvent as MarkdownNativeEvent;
-        const isPasteInputType = nativeEvent.inputType === 'pasteText';
+        const inputType = nativeEvent.inputType;
+        const isPasteInputType = inputType === 'pasteText';
 
         const previousText = divRef.current.value;
-        const parsedText = isPasteInputType ? pasteContent.current || '' : parseInnerHTMLToText(e.target);
+        const parsedText = isPasteInputType ? pasteContent.current || '' : parseInnerHTMLToText(e.target, inputType);
 
         updateTextColor(divRef.current, parsedText);
         if (pasteContent.current) {
@@ -294,7 +295,6 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
         const newCursorPosition = Math.max(Math.max(contentSelection.current.end, 0) + (parsedText.length - previousText.length), 0);
         let newInputUpdate: ParseTextResult;
-        const inputType = nativeEvent.inputType;
         switch (nativeEvent.inputType) {
           case 'historyUndo':
             newInputUpdate = undo(divRef.current);
