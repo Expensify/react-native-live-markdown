@@ -49,6 +49,11 @@ type Dimensions = {
   height: number;
 };
 
+type ParseTextResult = {
+  text: string;
+  cursorPosition: number | null;
+};
+
 let focusTimeout: NodeJS.Timeout | null = null;
 
 type MarkdownTextInputElement = HTMLDivElement &
@@ -125,7 +130,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     }, []);
 
     const parseText = useCallback(
-      (target: MarkdownTextInputElement, text: string | null, customMarkdownStyles: MarkdownStyle, cursorPosition: number | null = null, shouldAddToHistory = true) => {
+      (target: MarkdownTextInputElement, text: string | null, customMarkdownStyles: MarkdownStyle, cursorPosition: number | null = null, shouldAddToHistory = true): ParseTextResult => {
         if (!divRef.current) {
           return {text: text || '', cursorPosition: null};
         }
@@ -167,25 +172,31 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     );
 
     const undo = useCallback(
-      (target: MarkdownTextInputElement) => {
+      (target: MarkdownTextInputElement): ParseTextResult => {
         if (!history.current) {
-          return '';
+          return {
+            text: '',
+            cursorPosition: 0,
+          };
         }
         const item = history.current.undo();
         const undoValue = item ? item.text : null;
-        return parseText(target, undoValue, processedMarkdownStyle, item ? item.cursorPosition : null, false).text;
+        return parseText(target, undoValue, processedMarkdownStyle, item ? item.cursorPosition : null, false);
       },
       [parseText, processedMarkdownStyle],
     );
 
     const redo = useCallback(
-      (target: MarkdownTextInputElement) => {
+      (target: MarkdownTextInputElement): ParseTextResult => {
         if (!history.current) {
-          return '';
+          return {
+            text: '',
+            cursorPosition: 0,
+          };
         }
         const item = history.current.redo();
         const redoValue = item ? item.text : null;
-        return parseText(target, redoValue, processedMarkdownStyle, item ? item.cursorPosition : null, false).text;
+        return parseText(target, redoValue, processedMarkdownStyle, item ? item.cursorPosition : null, false);
       },
       [parseText, processedMarkdownStyle],
     );
@@ -271,30 +282,68 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
         const tree = buildTree(divRef.current, parsedText);
         divRef.current.tree = tree;
+        const prevSelection = contentSelection.current ?? {start: 0, end: 0};
 
         if (compositionRef.current && !BrowserUtils.isMobile) {
           compositionRef.current = false;
           return;
         }
 
-        const newCursorPosition = Math.max(Math.max(contentSelection.current.end, 0) + (parsedText.length - previousText.length), 0);
-        let text = '';
+        let newInputUpdate: ParseTextResult;
+        const inputType = nativeEvent.inputType;
         switch (nativeEvent.inputType) {
           case 'historyUndo':
-            text = undo(divRef.current);
+            newInputUpdate = undo(divRef.current);
             break;
           case 'historyRedo':
-            text = redo(divRef.current);
+            newInputUpdate = redo(divRef.current);
             break;
           default:
-            text = parseText(divRef.current, parsedText, processedMarkdownStyle, newCursorPosition).text;
+            newInputUpdate = parseText(
+              divRef.current,
+              parsedText,
+              processedMarkdownStyle,
+              Math.max(Math.max(contentSelection.current.end, 0) + (parsedText.length - previousText.length), 0),
+            );
         }
 
+        const {text, cursorPosition} = newInputUpdate;
         updateTextColor(divRef.current, text);
 
         if (onChange) {
-          const event = e as unknown as NativeSyntheticEvent<any>;
+          const event = e as unknown as NativeSyntheticEvent<{
+            count: number;
+            before: number;
+            start: number;
+          }>;
           setEventProps(event);
+
+          // The new text is between the prev start selection and the new end selection, can be empty
+          const addedText = text.slice(prevSelection.start, cursorPosition ?? 0);
+          // The length of the text that replaced the before text
+          const count = addedText.length;
+          // The start index of the replacement operation
+          let start = prevSelection.start;
+
+          const prevSelectionRange = prevSelection.end - prevSelection.start;
+          // The length the deleted text had before
+          let before = prevSelectionRange;
+          if (prevSelectionRange === 0 && (inputType === 'deleteContentBackward' || inputType === 'deleteContentForward')) {
+            // its possible the user pressed a delete key without a selection range, so we need to adjust the before value to have the length of the deleted text
+            before = previousText.length - text.length;
+          }
+
+          if (inputType === 'deleteContentBackward') {
+            // When the user does a backspace delete he expects the content before the cursor to be removed.
+            // For this the start value needs to be adjusted (its as if the selection was before the text that we want to delete)
+            start -= before;
+          }
+
+          event.nativeEvent.count = count;
+          event.nativeEvent.before = before;
+          event.nativeEvent.start = start;
+
+          // @ts-expect-error TODO: Remove once react native PR merged https://github.com/facebook/react-native/pull/45248
           onChange(event);
         }
 
