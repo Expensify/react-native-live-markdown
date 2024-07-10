@@ -276,8 +276,8 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
         const previousText = divRef.current.value;
         const parsedText = isPasteInputType ? pasteContent.current || '' : parseInnerHTMLToText(e.target);
-        updateTextColor(divRef.current, parsedText);
 
+        updateTextColor(divRef.current, parsedText);
         if (pasteContent.current) {
           pasteContent.current = null;
         }
@@ -306,6 +306,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
             newInputUpdate = parseText(divRef.current, parsedText, processedMarkdownStyle, newCursorPosition);
         }
         const {text, cursorPosition} = newInputUpdate;
+        updateTextColor(divRef.current, text);
         updateSelection(e, {
           start: cursorPosition ?? 0,
           end: cursorPosition ?? 0,
