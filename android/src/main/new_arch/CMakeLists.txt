@@ -63,6 +63,12 @@ target_link_libraries(
   yoga
   android
   log
+  mapbufferjni
+  reactnativejni
+  react_render_consistency
+  react_performance_timeline
+  react_render_observers_events
+  react_featureflags
 )
 
 target_compile_options(
