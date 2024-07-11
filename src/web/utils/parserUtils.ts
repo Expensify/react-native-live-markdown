@@ -1,4 +1,3 @@
-import BrowserUtils from './browserUtils';
 import type {MarkdownTextInputElement} from '../../MarkdownTextInput.web';
 import {addNodeToTree, buildTree} from './treeUtils';
 import type {NodeType, TreeNode} from './treeUtils';
@@ -274,15 +273,9 @@ function updateInputStructure(
 
       tree = buildTree(targetElement, text);
       targetElement.tree = tree;
-
-      if (BrowserUtils.isChromium) {
-        moveCursor(isFocused, alwaysMoveCursorToTheEnd, cursorPosition, target);
-      }
     }
 
-    if (!BrowserUtils.isChromium) {
-      moveCursor(isFocused, alwaysMoveCursorToTheEnd, cursorPosition, target);
-    }
+    moveCursor(isFocused, alwaysMoveCursorToTheEnd, cursorPosition, target);
   }
 
   return {text, cursorPosition: cursorPosition || 0};
