@@ -11,7 +11,7 @@ import androidx.annotation.NonNull;
 import com.facebook.infer.annotation.Assertions;
 import com.facebook.infer.annotation.ThreadConfined;
 import com.facebook.react.bridge.UiThreadUtil;
-import com.facebook.react.views.text.CustomLineHeightSpan;
+import com.facebook.react.views.text.internal.span.CustomLineHeightSpan;
 import com.facebook.soloader.SoLoader;
 
 import org.json.JSONArray;
