@@ -19,7 +19,7 @@ const toBeParsedAsHTML = function (actual: string, expectedHTML: string) {
   const ranges = global.parseExpensiMarkToRanges(actual);
   const markdownRanges = ranges as MarkdownRange[];
 
-  const actualDOM = parseRangesToHTMLNodes(actual, markdownRanges, {}, true);
+  const actualDOM = parseRangesToHTMLNodes(actual, markdownRanges, {}, true).dom;
   const actualHTML = actualDOM.innerHTML;
 
   if (actualHTML === expected) {

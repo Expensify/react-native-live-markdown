@@ -61,6 +61,10 @@ type MarkdownTextInputElement = HTMLDivElement &
     tree: TreeNode;
   };
 
+type HTMLMarkdownElement = HTMLElement & {
+  value: string;
+};
+
 const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
   (
     {
@@ -673,4 +677,4 @@ const styles = StyleSheet.create({
 
 export default MarkdownTextInput;
 
-export type {MarkdownTextInputProps, MarkdownTextInputElement};
+export type {MarkdownTextInputProps, MarkdownTextInputElement, HTMLMarkdownElement};

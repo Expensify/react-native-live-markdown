@@ -1,9 +1,10 @@
+import type {HTMLMarkdownElement} from '../../MarkdownTextInput.web';
 import type {MarkdownRange, MarkdownType} from './parserUtils';
 
 type NodeType = MarkdownType | 'line' | 'text' | 'br' | 'root';
 
 type TreeNode = Omit<MarkdownRange, 'type'> & {
-  element: HTMLElement;
+  element: HTMLMarkdownElement;
   parentNode: TreeNode | null;
   childNodes: TreeNode[];
   type: NodeType;
@@ -11,8 +12,8 @@ type TreeNode = Omit<MarkdownRange, 'type'> & {
   isGeneratingNewline: boolean;
 };
 
-function addNodeToTree(element: HTMLElement, parentTreeNode: TreeNode, type: NodeType, length: number | null = null) {
-  const contentLength = length || (element.nodeName === 'BR' || type === 'br' ? 1 : element.innerText?.length) || 0;
+function addNodeToTree(element: HTMLMarkdownElement, parentTreeNode: TreeNode, type: NodeType, length: number | null = null) {
+  const contentLength = length || (element.nodeName === 'BR' || type === 'br' ? 1 : element.value?.length) || 0;
   const isGeneratingNewline = type === 'line' && !(element.childNodes.length === 1 && (element.childNodes[0] as HTMLElement)?.getAttribute?.('data-type') === 'br');
   const parentChildrenCount = parentTreeNode?.childNodes.length || 0;
   let startIndex = parentTreeNode.start;
@@ -20,7 +21,7 @@ function addNodeToTree(element: HTMLElement, parentTreeNode: TreeNode, type: Nod
     const lastParentChild = parentTreeNode.childNodes[parentChildrenCount - 1];
     if (lastParentChild) {
       startIndex = lastParentChild.start + lastParentChild.length;
-      startIndex += lastParentChild.isGeneratingNewline ? 1 : 0;
+      startIndex += lastParentChild.isGeneratingNewline || element.style.display === 'block' ? 1 : 0;
     }
   }
 
@@ -40,7 +41,7 @@ function addNodeToTree(element: HTMLElement, parentTreeNode: TreeNode, type: Nod
   return item;
 }
 
-function buildTree(rootElement: HTMLElement, text: string) {
+function buildTree(rootElement: HTMLMarkdownElement, text: string) {
   function getElementType(element: HTMLElement): NodeType {
     if (element.nodeName === 'BR') {
       return 'br';
@@ -69,7 +70,7 @@ function buildTree(rootElement: HTMLElement, text: string) {
     }
 
     Array.from(treeNode.element.children).forEach((childElement) => {
-      const newTreeNode = addNodeToTree(childElement as HTMLElement, treeNode, getElementType(childElement as HTMLElement));
+      const newTreeNode = addNodeToTree(childElement as HTMLMarkdownElement, treeNode, getElementType(childElement as HTMLMarkdownElement));
       stack.push(newTreeNode);
     });
   }
@@ -120,7 +121,7 @@ function getTreeNodeByIndex(treeRoot: TreeNode, index: number): TreeNode | null 
       }
       el = child;
       i = 0;
-    } else if ((child.isGeneratingNewline || newLineGenerated) && index === child.start + child.length) {
+    } else if ((child.isGeneratingNewline || newLineGenerated || i === el.childNodes.length - 1) && index === child.start + child.length) {
       newLineGenerated = true;
       if (child.childNodes.length === 0) {
         return child;

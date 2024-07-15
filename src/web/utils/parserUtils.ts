@@ -1,5 +1,5 @@
-import type {MarkdownTextInputElement} from '../../MarkdownTextInput.web';
-import {addNodeToTree, buildTree} from './treeUtils';
+import type {HTMLMarkdownElement, MarkdownTextInputElement} from '../../MarkdownTextInput.web';
+import {addNodeToTree} from './treeUtils';
 import type {NodeType, TreeNode} from './treeUtils';
 import type {PartialMarkdownStyle} from '../../styleUtils';
 import {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition} from './cursorUtils';
@@ -83,17 +83,25 @@ function mergeLinesWithMultilineTags(lines: Paragraph[], ranges: MarkdownRange[]
   return mergedLines;
 }
 
-function appendNode(element: HTMLElement, parentTreeNode: TreeNode, type: NodeType, length: number) {
+function appendValueToElement(element: HTMLMarkdownElement, parentNode: TreeNode, value: string) {
+  const targetElement = element;
+  const node = parentNode;
+  targetElement.value = value;
+  node.element.value = (node.element.value || '') + value;
+}
+
+function appendNode(element: HTMLMarkdownElement, parentTreeNode: TreeNode, type: NodeType, length: number) {
   const node = addNodeToTree(element, parentTreeNode, type, length);
   parentTreeNode.element.appendChild(element);
   return node;
 }
 
 function addBrElement(node: TreeNode) {
-  const span = document.createElement('span');
+  const span = document.createElement('span') as HTMLMarkdownElement;
   span.setAttribute('data-type', 'br');
+  appendValueToElement(span, node, '\n');
   const spanNode = appendNode(span, node, 'br', 1);
-  appendNode(document.createElement('br'), spanNode, 'br', 1);
+  appendNode(document.createElement('br') as unknown as HTMLMarkdownElement, spanNode, 'br', 1);
   return spanNode;
 }
 
@@ -101,7 +109,9 @@ function addTextToElement(node: TreeNode, text: string) {
   const lines = text.split('\n');
   lines.forEach((line, index) => {
     if (line !== '') {
-      const span = document.createElement('span');
+      const span = document.createElement('span') as HTMLMarkdownElement;
+      appendValueToElement(span, node, line);
+
       span.setAttribute('data-type', 'text');
       span.appendChild(document.createTextNode(line));
       appendNode(span, node, 'text', line.length);
@@ -120,7 +130,11 @@ function addParagraph(node: TreeNode, text: string | null = null, length: number
     addStyleToBlock(p, 'line', {});
   }
 
-  const pNode = appendNode(p, node, 'line', length);
+  if (text) {
+    appendValueToElement(p as unknown as HTMLMarkdownElement, node, text);
+  }
+
+  const pNode = appendNode(p as unknown as HTMLMarkdownElement, node, 'line', length);
 
   if (text === '') {
     addBrElement(pNode);
@@ -132,9 +146,8 @@ function addParagraph(node: TreeNode, text: string | null = null, length: number
 }
 
 function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownStyle: PartialMarkdownStyle = {}, disableInlineStyles = false) {
-  const rootElement: HTMLElement = document.createElement('div');
+  const rootElement: HTMLMarkdownElement = document.createElement('span') as HTMLMarkdownElement;
   const textLength = text.replace(/\n/g, '\\n').length;
-
   const rootNode: TreeNode = {
     element: rootElement,
     start: 0,
@@ -146,19 +159,16 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
     isGeneratingNewline: false,
   };
   let currentParentNode: TreeNode = rootNode;
-
   let lines = splitTextIntoLines(text);
 
   if (ranges.length === 0) {
     lines.forEach((line) => {
       addParagraph(rootNode, line.text, line.length, disableInlineStyles);
     });
-
-    return rootElement;
+    return {dom: rootElement, tree: rootNode};
   }
 
   const markdownRanges = ungroupRanges(ranges);
-
   lines = mergeLinesWithMultilineTags(lines, markdownRanges);
 
   let lastRangeEndIndex = 0;
@@ -175,7 +185,6 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
     }
 
     lastRangeEndIndex = line.start;
-
     const lineMarkdownRanges = line.markdownRanges;
     // go through all markdown ranges in the line
     while (lineMarkdownRanges.length > 0) {
@@ -194,7 +203,7 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
       }
 
       // create markdown span element
-      const span = document.createElement('span');
+      const span = document.createElement('span') as HTMLMarkdownElement;
       span.setAttribute('data-type', range.type);
       if (!disableInlineStyles) {
         addStyleToBlock(span, range.type, markdownStyle);
@@ -209,6 +218,7 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
       } else {
         // adding markdown tag
         addTextToElement(spanNode, text.substring(range.start, endOfCurrentRange));
+        currentParentNode.element.value = (currentParentNode.element.value || '') + (spanNode.element.value || '');
         lastRangeEndIndex = endOfCurrentRange;
         // tag unnesting and adding text after the tag
         while (currentParentNode.parentNode !== null && nextRangeStartIndex >= currentParentNode.start + currentParentNode.length) {
@@ -217,13 +227,16 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
             addTextToElement(currentParentNode, textAfterRange);
           }
           lastRangeEndIndex = currentParentNode.start + currentParentNode.length;
+          currentParentNode.parentNode.element.value = currentParentNode.element.value || '';
           currentParentNode = currentParentNode.parentNode || rootNode;
         }
       }
     }
+
+    rootNode.element.value = (rootNode.element.value || '') + (currentParentNode.element.value || '');
   }
 
-  return rootElement;
+  return {dom: rootElement, tree: rootNode};
 }
 
 function moveCursor(isFocused: boolean, alwaysMoveCursorToTheEnd: boolean, cursorPosition: number | null, target: MarkdownTextInputElement) {
@@ -256,7 +269,6 @@ function updateInputStructure(
   }
   const ranges = global.parseExpensiMarkToRanges(text);
   const markdownRanges: MarkdownRange[] = ranges as MarkdownRange[];
-  let tree: TreeNode | null = null;
   if (!text || targetElement.innerHTML === '<br>' || (targetElement && targetElement.innerHTML === '\n')) {
     targetElement.innerHTML = '';
     targetElement.innerText = '';
@@ -264,18 +276,18 @@ function updateInputStructure(
 
   // We don't want to parse text with single '\n', because contentEditable represents it as invisible <br />
   if (text) {
-    const dom = parseRangesToHTMLNodes(text, markdownRanges, markdownStyle);
+    const {dom, tree} = parseRangesToHTMLNodes(text, markdownRanges, markdownStyle);
 
     if (targetElement.innerHTML !== dom.innerHTML) {
       targetElement.innerHTML = '';
       targetElement.innerText = '';
-      targetElement.innerHTML = dom.innerHTML || '';
-
-      tree = buildTree(targetElement, text);
-      targetElement.tree = tree;
+      Array.from(dom.children).forEach((child) => {
+        targetElement.appendChild(child);
+      });
     }
 
-    moveCursor(isFocused, alwaysMoveCursorToTheEnd, cursorPosition, target);
+    targetElement.tree = tree;
+    moveCursor(isFocused, alwaysMoveCursorToTheEnd, cursorPosition, targetElement);
   }
 
   return {text, cursorPosition: cursorPosition || 0};
