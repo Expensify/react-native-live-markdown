@@ -1,5 +1,6 @@
 import type {CSSProperties} from 'react';
-import BrowserUtils from './browserUtils';
+import type {TreeNode} from './treeUtils';
+import type {MarkdownTextInputElement} from '../../MarkdownTextInput.web';
 
 const ZERO_WIDTH_SPACE = '\u200B';
 
@@ -32,61 +33,75 @@ function getElementHeight(node: HTMLDivElement, styles: CSSProperties, numberOfL
   return styles.height ? `${styles.height}px` : 'auto';
 }
 
-const parseInnerHTMLToText = (target: HTMLElement, inputType = 'insertText'): string => {
+function parseInnerHTMLToText(target: MarkdownTextInputElement) {
+  function getParentType(node: TreeNode) {
+    let currentNode = node;
+    while (['text', 'br'].includes(currentNode.type)) {
+      if (currentNode.parentNode) {
+        currentNode = currentNode.parentNode;
+      } else {
+        return null;
+      }
+    }
+
+    return currentNode.type;
+  }
+
+  const root = target.tree;
+
+  if (root.childNodes.length === 0 || (root.childNodes.length === 1 && root.childNodes?.[0]?.type === 'line')) {
+    return root.element.textContent ?? '';
+  }
+
+  const stack: TreeNode[] = [root];
   let text = '';
-  const childNodes = target.childNodes ?? [];
-  childNodes.forEach((node, index) => {
-    const nodeCopy = node.cloneNode(true) as HTMLElement;
-    let isIncorrectNewLineGenerated = false;
-    if (nodeCopy.innerHTML) {
-      // Replace single <br> created by contentEditable with '\n', to enable proper newline deletion on backspace, when next lines also have <br> tags
-      if (nodeCopy.innerHTML === '<br>') {
-        nodeCopy.innerHTML = '\n';
+  let ShouldInsertNewlineAfterParagraph = false;
+  while (stack.length > 0) {
+    const node = stack.pop();
+    if (!node) {
+      break;
+    }
+
+    switch (node.type) {
+      case 'line':
+        if (ShouldInsertNewlineAfterParagraph) {
+          text += '\n';
+          ShouldInsertNewlineAfterParagraph = false;
+        }
+        if (node.element.textContent !== '') {
+          ShouldInsertNewlineAfterParagraph = true;
+        }
+        break;
+      case 'br':
+        if (node.element.nodeName === 'BR') {
+          const parentType = getParentType(node);
+          if ((parentType === 'line' && node.parentNode?.element?.textContent === '') || parentType !== 'line') {
+            text += `\n`;
+          }
+        } else if (node.element?.textContent) {
+          text += node.element?.textContent;
+        }
+        break;
+      case 'text':
+        text += node.element.textContent;
+        break;
+      default:
+        break;
+    }
+
+    let i = node.childNodes.length - 1;
+    while (i > -1) {
+      const child = node.childNodes[i];
+      if (!child) {
+        break;
       }
-      if (nodeCopy.innerHTML.includes('\n')) {
-        isIncorrectNewLineGenerated = true;
-      }
-      // Replace only br tags with data-id attribute, because we know that were created by the web parser. We need to ignore tags created by contentEditable div
-      nodeCopy.innerHTML = nodeCopy.innerHTML.replaceAll(/<br .*?>/g, '\n');
-    }
 
-    let nodeText = nodeCopy.textContent ?? '';
-
-    // Remove unnecessary new lines from the end of the text in following cases:
-    // 1. '\n\n' is at the end of the line - it means that '\n' was added by the browser or by the user. We can delete it since we are adding new lines after each paragraph.
-    // 2. BR span contains text + BR - fix for writing in empty line on Firefox browser.
-    // 3. Last child is a <br> tag - it means that BR was added by the browser since our br are wrapped in span with data-type attribute.
-    // 4. innerHTML contains '\n' - it means that the '\n' was added by the browser since we are using only BR tags for new lines.
-    if (
-      (nodeText.length > 2 && nodeText[-3] !== '\n' && nodeText.slice(-2) === '\n\n') ||
-      (BrowserUtils.isFirefox && nodeCopy.children?.[0]?.getAttribute('data-type') === 'br' && (nodeCopy.children?.[0]?.textContent?.length || -1) > 1) ||
-      nodeCopy.childNodes[nodeCopy.childNodes.length - 1]?.nodeName === 'BR' ||
-      isIncorrectNewLineGenerated
-    ) {
-      nodeText = nodeText.slice(0, -1);
+      stack.push(child);
+      i--;
     }
+  }
 
-    // Last line specific handling
-    if (index === childNodes.length - 1) {
-      if (nodeText === '\n\n') {
-        // New line creation
-        nodeText = '\n';
-      } else if (nodeText === '\n') {
-        // New line deletion on backspace
-        nodeText = '';
-      }
-    }
-
-    text += nodeText;
-    // Split paragraphs with new lines
-    if (/[^\n]/.test(nodeText) && index < childNodes.length - 1) {
-      text += '\n';
-    } else if (index === childNodes.length - 1 && inputType === 'deleteSoftLineBackward' && nodeText === '') {
-      // Remove unnecessary '\n' from the end of the text if user deleted line using CMD + Backspace
-      text = text.slice(0, -1);
-    }
-  });
   return text;
-};
+}
 
 export {isEventComposing, getPlaceholderValue, getElementHeight, parseInnerHTMLToText};

@@ -141,7 +141,7 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
     length: textLength,
     parentNode: null,
     childNodes: [],
-    type: 'text',
+    type: 'root',
     orderIndex: '',
     isGeneratingNewline: false,
   };

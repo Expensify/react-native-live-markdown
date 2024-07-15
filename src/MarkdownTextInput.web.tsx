@@ -275,18 +275,17 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         const inputType = nativeEvent.inputType;
         const isPasteInputType = inputType === 'pasteText';
 
+        updateTextColor(divRef.current, e.target.textContent ?? '');
+        const tree = buildTree(divRef.current, divRef.current.value);
+        divRef.current.tree = tree;
         const previousText = divRef.current.value;
-        const parsedText = isPasteInputType ? pasteContent.current || '' : parseInnerHTMLToText(e.target, inputType);
+        const parsedText = isPasteInputType ? pasteContent.current || '' : parseInnerHTMLToText(e.target as MarkdownTextInputElement);
 
-        updateTextColor(divRef.current, parsedText);
         if (pasteContent.current) {
           pasteContent.current = null;
         }
 
-        const tree = buildTree(divRef.current, parsedText);
-        divRef.current.tree = tree;
         const prevSelection = contentSelection.current ?? {start: 0, end: 0};
-
         if (compositionRef.current && !BrowserUtils.isMobile) {
           divRef.current.value = parsedText;
           compositionRef.current = false;
@@ -366,6 +365,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
         pasteContent.current = `${divRef.current.value.substring(0, contentSelection.current.start)}${text}${divRef.current.value.substring(contentSelection.current.end)}`;
         (e.nativeEvent as MarkdownNativeEvent).inputType = 'pasteText';
+
         handleOnChangeText(e);
         updateSelection(e);
       },

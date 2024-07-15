@@ -1,6 +1,6 @@
 import type {MarkdownRange, MarkdownType} from './parserUtils';
 
-type NodeType = MarkdownType | 'line' | 'text' | 'br';
+type NodeType = MarkdownType | 'line' | 'text' | 'br' | 'root';
 
 type TreeNode = Omit<MarkdownRange, 'type'> & {
   element: HTMLElement;
@@ -57,7 +57,7 @@ function buildTree(rootElement: HTMLElement, text: string) {
     childNodes: [],
     start: 0,
     length: text.replace(/\n/g, '\\n').length,
-    type: 'text',
+    type: 'root',
     orderIndex: '',
     isGeneratingNewline: false,
   };
