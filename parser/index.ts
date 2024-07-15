@@ -153,6 +153,8 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
       } else if (node.tag === '<h1>') {
         appendSyntax('# ');
         addChildrenWithStyle(node, 'h1');
+      } else if (node.tag === '<br />') {
+        text += '\n';
       } else if (node.tag.startsWith('<pre')) {
         appendSyntax('```');
         const content = node.children.join('').replaceAll('&#32;', ' ');
