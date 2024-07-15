@@ -1,6 +1,6 @@
 #include "MarkdownGlobal.h"
 
-#include <map>
+#include <unordered_map>
 
 using namespace facebook;
 
