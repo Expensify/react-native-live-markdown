@@ -65,6 +65,10 @@ using namespace facebook::react;
     // TODO: if (oldViewProps.markdownStyle != newViewProps.markdownStyle)
     RCTMarkdownStyle *markdownStyle = [[RCTMarkdownStyle alloc] initWithStruct:newViewProps.markdownStyle];
     [_view setMarkdownStyle:markdownStyle];
+    
+    if (oldViewProps.parserId != newViewProps.parserId) {
+      [_view setParserId:@(newViewProps.parserId)];
+    }
 
     [super updateProps:props oldProps:oldProps];
 }
