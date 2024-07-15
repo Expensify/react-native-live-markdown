@@ -23,7 +23,8 @@ namespace livemarkdown {
 
     static jni::local_ref<jni::JString> nativeParseMarkdown(
         jni::alias_ref<jhybridobject> jThis,
-        jni::alias_ref<jni::JString> input);
+        jni::alias_ref<jni::JString> input,
+        int parserId);
 
     static void registerNatives();
 
