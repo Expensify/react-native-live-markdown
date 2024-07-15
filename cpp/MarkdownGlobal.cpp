@@ -1,5 +1,7 @@
 #include "MarkdownGlobal.h"
 
+#include <map>
+
 using namespace facebook;
 
 namespace expensify {
@@ -15,14 +17,21 @@ std::shared_ptr<WorkletRuntime> getMarkdownRuntime() {
   return globalMarkdownWorkletRuntime;
 }
 
-std::shared_ptr<ShareableWorklet> globalMarkdownShareableWorklet;
+std::unordered_map<int, std::shared_ptr<ShareableWorklet>> globalMarkdownShareableWorklets;
+int nextParserId = 1;
 
-void setMarkdownWorklet(const std::shared_ptr<ShareableWorklet> &markdownWorklet) {
-  globalMarkdownShareableWorklet = markdownWorklet;
+const int registerMarkdownWorklet(const std::shared_ptr<ShareableWorklet> &markdownWorklet) {
+  auto parserId = nextParserId++;
+  globalMarkdownShareableWorklets[parserId] = markdownWorklet;
+  return parserId;
 }
 
-std::shared_ptr<ShareableWorklet> getMarkdownWorklet() {
-  return globalMarkdownShareableWorklet;
+void unregisterMarkdownWorklet(const int parserId) {
+  globalMarkdownShareableWorklets.erase(parserId);
+}
+
+std::shared_ptr<ShareableWorklet> getMarkdownWorklet(const int parserId) {
+  return globalMarkdownShareableWorklets[parserId];
 }
 
 } // namespace livemarkdown

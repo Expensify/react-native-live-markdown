@@ -1,6 +1,5 @@
 import ExpensiMark from 'expensify-common/dist/ExpensiMark';
 import {unescape} from 'expensify-common/dist/utils';
-import {useMarkdownParser} from '@expensify/react-native-live-markdown';
 
 type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'emoji' | 'mention-here' | 'mention-user' | 'mention-report' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax';
 type Range = {
@@ -276,15 +275,5 @@ function parseExpensiMarkToRanges(markdown: string): Range[] {
   }
 }
 
-function useExpensiMarkParser() {
-  const parser = useMarkdownParser((markdown: string) => {
-    'worklet';
-
-    return parseExpensiMarkToRanges(markdown);
-  }, []);
-
-  return parser;
-}
-
-export default useExpensiMarkParser;
+export default parseExpensiMarkToRanges;
 export type {MarkdownType, Range};

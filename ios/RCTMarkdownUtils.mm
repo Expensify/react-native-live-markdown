@@ -10,6 +10,7 @@
   NSAttributedString *_prevAttributedString;
   NSDictionary<NSAttributedStringKey, id> *_prevTextAttributes;
   __weak RCTMarkdownStyle *_prevMarkdownStyle;
+  __weak NSNumber *_prevParserId;
 }
 
 - (NSAttributedString *)parseMarkdown:(nullable NSAttributedString *)input withAttributes:(nullable NSDictionary<NSAttributedStringKey,id> *)attributes
@@ -20,7 +21,7 @@
         }
 
         NSString *inputString = [input string];
-        if ([inputString isEqualToString:_prevInputString] && [attributes isEqualToDictionary:_prevTextAttributes] && [_markdownStyle isEqual:_prevMarkdownStyle]) {
+        if ([inputString isEqualToString:_prevInputString] && [attributes isEqualToDictionary:_prevTextAttributes] && [_markdownStyle isEqual:_prevMarkdownStyle] && [_parserId isEqualToNumber:_prevParserId]) {
             return _prevAttributedString;
         }
 
@@ -30,7 +31,7 @@
         auto markdownRuntime = expensify::livemarkdown::getMarkdownRuntime();
         jsi::Runtime &rt = markdownRuntime->getJSIRuntime();
 
-        auto markdownWorklet = expensify::livemarkdown::getMarkdownWorklet();
+        auto markdownWorklet = expensify::livemarkdown::getMarkdownWorklet([_parserId intValue]);
 
         auto text = jsi::String::createFromUtf8(rt, [inputString UTF8String]);
         auto output = markdownRuntime->runGuarded(markdownWorklet, text);
@@ -150,6 +151,7 @@
         _prevAttributedString = attributedString;
         _prevTextAttributes = attributes;
         _prevMarkdownStyle = _markdownStyle;
+        _prevParserId = _parserId;
 
         return attributedString;
 

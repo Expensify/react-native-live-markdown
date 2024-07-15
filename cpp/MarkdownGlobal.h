@@ -14,9 +14,11 @@ void setMarkdownRuntime(const std::shared_ptr<WorkletRuntime> &markdownWorkletRu
 
 std::shared_ptr<WorkletRuntime> getMarkdownRuntime();
 
-void setMarkdownWorklet(const std::shared_ptr<ShareableWorklet> &markdownWorklet);
+const int registerMarkdownWorklet(const std::shared_ptr<ShareableWorklet> &markdownWorklet);
 
-std::shared_ptr<ShareableWorklet> getMarkdownWorklet();
+void unregisterMarkdownWorklet(const int parserId);
+
+std::shared_ptr<ShareableWorklet> getMarkdownWorklet(const int parserId);
 
 } // namespace livemarkdown
 } // namespace expensify
