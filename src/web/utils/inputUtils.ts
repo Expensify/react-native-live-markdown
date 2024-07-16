@@ -49,13 +49,14 @@ function parseInnerHTMLToText(target: MarkdownTextInputElement) {
 
   const root = target.tree;
 
-  if (root.childNodes.length === 0 || (root.childNodes.length === 1 && root.childNodes?.[0]?.type === 'line')) {
+  // early return when writing in empty input
+  if (root.childNodes.length === 0) {
     return root.element.textContent ?? '';
   }
 
   const stack: TreeNode[] = [root];
   let text = '';
-  let ShouldInsertNewlineAfterParagraph = false;
+  let shouldInsertNewlineAfterParagraph = false;
   while (stack.length > 0) {
     const node = stack.pop();
     if (!node) {
@@ -64,12 +65,18 @@ function parseInnerHTMLToText(target: MarkdownTextInputElement) {
 
     switch (node.type) {
       case 'line':
-        if (ShouldInsertNewlineAfterParagraph) {
+        // Insert new line after every line
+        if (shouldInsertNewlineAfterParagraph) {
           text += '\n';
-          ShouldInsertNewlineAfterParagraph = false;
+          shouldInsertNewlineAfterParagraph = false;
         }
         if (node.element.textContent !== '') {
-          ShouldInsertNewlineAfterParagraph = true;
+          shouldInsertNewlineAfterParagraph = true;
+        }
+
+        // Add text in case the span was removed and text is directly in paragraph
+        if (node.childNodes.length === 0 && !!node.element.textContent) {
+          text += node.element.textContent;
         }
         break;
       case 'br':
@@ -79,6 +86,7 @@ function parseInnerHTMLToText(target: MarkdownTextInputElement) {
             text += `\n`;
           }
         } else if (node.element?.textContent) {
+          // If the br span element has text content next to the br tag, add it to the text
           text += node.element?.textContent;
         }
         break;

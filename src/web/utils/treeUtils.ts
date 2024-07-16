@@ -70,6 +70,9 @@ function buildTree(rootElement: HTMLMarkdownElement, text: string) {
     }
 
     Array.from(treeNode.element.children).forEach((childElement) => {
+      if (childElement.nodeName === 'BR' && !childElement.getAttribute('data-id')) {
+        return;
+      }
       const newTreeNode = addNodeToTree(childElement as HTMLMarkdownElement, treeNode, getElementType(childElement as HTMLMarkdownElement));
       stack.push(newTreeNode);
     });
