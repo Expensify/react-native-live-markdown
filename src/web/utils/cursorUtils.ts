@@ -43,6 +43,7 @@ function setCursorPosition(target: MarkdownTextInputElement, startIndex: number,
 
   const selection = window.getSelection();
   if (selection) {
+    selection.removeAllRanges();
     selection.setBaseAndExtent(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
   }
 
