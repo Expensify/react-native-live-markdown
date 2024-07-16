@@ -8,10 +8,9 @@ function setCursorPosition(target: MarkdownTextInputElement, startIndex: number,
     return;
   }
 
-  const start = Math.max(0, Math.min(startIndex, target.value.length));
+  const start = Math.max(0, Math.min(startIndex, target.tree.length));
   const end = endIndex ? Math.max(0, Math.min(endIndex, target.tree.length)) : null;
-
-  if (start < 0 || (end && end < 0)) {
+  if (end && end < start) {
     return;
   }
 
