@@ -2,9 +2,16 @@ import type {MarkdownTextInputElement} from '../../MarkdownTextInput.web';
 import {findHTMLElementInTree, getTreeNodeByIndex} from './treeUtils';
 import type {TreeNode} from './treeUtils';
 
-function setCursorPosition(target: MarkdownTextInputElement, start: number, end: number | null = null) {
+function setCursorPosition(target: MarkdownTextInputElement, startIndex: number, endIndex: number | null = null) {
   // We don't want to move the cursor if the target is not focused
-  if (!target.tree || target !== document.activeElement || start < 0 || (end && end < 0)) {
+  if (!target.tree || target !== document.activeElement) {
+    return;
+  }
+
+  const start = Math.max(0, Math.min(startIndex, target.value.length));
+  const end = endIndex ? Math.max(0, Math.min(endIndex, target.tree.length)) : null;
+
+  if (start < 0 || (end && end < 0)) {
     return;
   }
 
