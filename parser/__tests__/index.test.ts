@@ -177,6 +177,15 @@ describe('email with same label as address', () => {
   });
 });
 
+test('email with multiline hyperlinks', () => {
+  expect('[test\ntest](test@test.com)').toBeParsedAs([
+    {type: 'syntax', start: 0, length: 1},
+    {type: 'syntax', start: 10, length: 2},
+    {type: 'link', start: 12, length: 13},
+    {type: 'syntax', start: 25, length: 1},
+  ]);
+});
+
 test('inline code', () => {
   expect('Hello `world`!').toBeParsedAs([
     {type: 'syntax', start: 6, length: 1},
