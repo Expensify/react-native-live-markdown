@@ -27,12 +27,30 @@ index bda25fcf8fb0f94fe7a259bc6b534b0eef07621e..7a44ab47c01f124f82cd8763862f204e
       * Return true if the string is ending with the provided suffix
       *
 diff --git a/dist/utils.js b/dist/utils.js
-index 70bc31f0dce2bdc72ddc475e7a22da12144d9f2b..38ee61f79fd9e67a4ff66d36c6b4628404d90af0 100644
+index f4c1bef6c7786ef2398c25c2a700e2ca4900ddf1..5857c61f94852cb975d321e278d80036a353e498 100644
 --- a/dist/utils.js
 +++ b/dist/utils.js
-@@ -1,4 +1,5 @@
+@@ -1,11 +1,5 @@
  "use strict";
+-Object.defineProperty(exports, "__esModule", { value: true });
+-exports.isWindowAvailable = isWindowAvailable;
+-exports.isNavigatorAvailable = isNavigatorAvailable;
+-exports.escape = escape;
+-exports.unescape = unescape;
+-exports.isFunction = isFunction;
+-exports.isObject = isObject;
 +"worklet";
- Object.defineProperty(exports, "__esModule", { value: true });
- exports.isObject = exports.isFunction = exports.unescape = exports.escape = exports.isNavigatorAvailable = exports.isWindowAvailable = void 0;
  /** Checks if the `window` global object is available. */
+ function isWindowAvailable() {
+     return typeof window !== 'undefined';
+@@ -69,3 +63,10 @@ function isObject(obj) {
+     const type = typeof obj;
+     return type === 'function' || (!!obj && type === 'object');
+ }
++Object.defineProperty(exports, "__esModule", { value: true });
++exports.isWindowAvailable = isWindowAvailable;
++exports.isNavigatorAvailable = isNavigatorAvailable;
++exports.escape = escape;
++exports.unescape = unescape;
++exports.isFunction = isFunction;
++exports.isObject = isObject;
