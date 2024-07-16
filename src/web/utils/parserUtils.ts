@@ -130,10 +130,6 @@ function addParagraph(node: TreeNode, text: string | null = null, length: number
     addStyleToBlock(p, 'line', {});
   }
 
-  if (text) {
-    appendValueToElement(p as unknown as HTMLMarkdownElement, node, text);
-  }
-
   const pNode = appendNode(p as unknown as HTMLMarkdownElement, node, 'line', length);
 
   if (text === '') {
@@ -180,6 +176,11 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
 
     // preparing line paragraph element for markdown text
     currentParentNode = addParagraph(rootNode, null, line.length, disableInlineStyles);
+    rootElement.value = (rootElement.value || '') + line.text;
+    if (lines.length > 1) {
+      rootElement.value = `${rootElement.value || ''}\n`;
+    }
+
     if (line.markdownRanges.length === 0) {
       addTextToElement(currentParentNode, line.text);
     }
@@ -227,7 +228,9 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
             addTextToElement(currentParentNode, textAfterRange);
           }
           lastRangeEndIndex = currentParentNode.start + currentParentNode.length;
-          currentParentNode.parentNode.element.value = currentParentNode.element.value || '';
+          if (currentParentNode.parentNode.type !== 'root') {
+            currentParentNode.parentNode.element.value = currentParentNode.element.value || '';
+          }
           currentParentNode = currentParentNode.parentNode || rootNode;
         }
       }

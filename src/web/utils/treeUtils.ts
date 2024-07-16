@@ -69,12 +69,27 @@ function buildTree(rootElement: HTMLMarkdownElement, text: string) {
       break;
     }
 
-    Array.from(treeNode.element.children).forEach((childElement) => {
-      if (childElement.nodeName === 'BR' && !childElement.getAttribute('data-id')) {
+    Array.from(treeNode.element.childNodes).forEach((childNode) => {
+      let newTreeNode: TreeNode | null = null;
+      if (treeNode.element.getAttribute('data-type') === 'line' && childNode.nodeName === 'BR') {
         return;
       }
-      const newTreeNode = addNodeToTree(childElement as HTMLMarkdownElement, treeNode, getElementType(childElement as HTMLMarkdownElement));
-      stack.push(newTreeNode);
+
+      if (treeNode.type === 'root' && childNode.nodeType === Node.TEXT_NODE) {
+        const p = document.createElement('p') as unknown as HTMLMarkdownElement;
+        p.textContent = childNode.nodeValue;
+        newTreeNode = addNodeToTree(p, treeNode, 'line');
+      } else if (treeNode.type === 'root' && childNode.nodeName === 'DIV') {
+        const p = document.createElement('p') as unknown as HTMLMarkdownElement;
+        p.innerHTML = (childNode as HTMLElement)?.innerHTML;
+        newTreeNode = addNodeToTree(p, treeNode, 'line');
+      } else if (childNode.nodeType !== Node.TEXT_NODE) {
+        newTreeNode = addNodeToTree(childNode as HTMLMarkdownElement, treeNode, getElementType(childNode as HTMLMarkdownElement));
+      }
+
+      if (newTreeNode) {
+        stack.push(newTreeNode);
+      }
     });
   }
 
