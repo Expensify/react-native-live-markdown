@@ -127,7 +127,7 @@ function getTreeNodeByIndex(treeRoot: TreeNode, index: number): TreeNode | null 
         return child;
       }
       el = child;
-      i = el.childNodes.length - 1;
+      i = 0;
     } else {
       i++;
     }
