@@ -18,6 +18,26 @@ type NestedNode = {
   endIndex: number;
 };
 
+type TextChangeMetrics = {
+  /**
+   * The start index in the provided string where the repalcement started from.
+   */
+  start: number;
+  /**
+   * The amount of characters that have been added.
+   */
+  count: number;
+  /**
+   * The amount of characters replaced.
+   */
+  before: number;
+};
+
+type Selection = {
+  start: number;
+  end: number;
+};
+
 function addStyling(targetElement: HTMLElement, type: MarkdownType, markdownStyle: PartialMarkdownStyle) {
   const node = targetElement;
   switch (type) {
@@ -223,6 +243,57 @@ function parseText(target: HTMLElement, text: string, cursorPositionIndex: numbe
   return {text: target.innerText, cursorPosition: cursorPosition || 0};
 }
 
-export {parseText, parseRangesToHTMLNodes};
+/**
+ * Calculates start, count and before values. Whenever the text is being changed you can think of it as a replacement operation,
+ * where parts of the string get replaced with new content.
+ * For example:
+ *
+ * 1. Text input is abc
+ * 2. User adds "d"
+ * 3. start: 3, before: 0, count: 1
+ *
+ * We started to replace text starting from position 3, we replaced 0 characters and added 1 character.
+ * Another example:
+ *
+ * 1. Text input is abc
+ * 2. User selects "b" and adds "d"
+ * 3. start: 1, before: 1, count: 1
+ *
+ * We started to replace text starting from position 1, we replaced 1 character and added 1 character.
+ *
+ * This is to align the onChange event with the native counter part:
+ * - https://github.com/facebook/react-native/pull/45248
+ */
+function calculateInputMetrics(inputType: string, prevSelection: Selection, prevTextLength: number, normalizedText: string, cursorPosition: number | null): TextChangeMetrics {
+  // The new text is between the prev start selection and the new end selection, can be empty
+  const addedText = normalizedText.slice(prevSelection.start, cursorPosition ?? 0);
+  // The length of the text that replaced the "before" text
+  const count = addedText.length;
+  // The start index of the replacement operation
+  let start = prevSelection.start;
+  // Before is by default the length of the previous selection
+  let before = prevSelection.end - prevSelection.start;
 
-export type {MarkdownRange, MarkdownType};
+  // For some events start and before need to be adjusted
+  if (inputType === 'historyUndo') {
+    start = cursorPosition ?? 0;
+    before = prevTextLength - normalizedText.length;
+  } else if (inputType === 'deleteContentBackward' || inputType === 'deleteContentForward') {
+    if (before === 0) {
+      // Its possible the user pressed a delete key without a selection range (before = 0),
+      // so we need to adjust the before value to have the length of the deleted text
+      before = prevTextLength - normalizedText.length;
+    }
+    if (inputType === 'deleteContentBackward') {
+      // When the user does a backspace delete he expects the content before the cursor to be removed.
+      // For this the start value needs to be adjusted (its as if the selection was before the text that we want to delete)
+      start = Math.max(start - before, 0);
+    }
+  }
+
+  return {start, before, count};
+}
+
+export {parseText, parseRangesToHTMLNodes, calculateInputMetrics};
+
+export type {MarkdownRange, MarkdownType, Selection};
