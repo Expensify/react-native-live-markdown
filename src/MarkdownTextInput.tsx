@@ -62,6 +62,9 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>((p
 
   // eslint-disable-next-line no-underscore-dangle
   const workletHash = (props.parser as unknown as {__workletHash: number}).__workletHash;
+  if (workletHash === undefined) {
+    throw new Error('[react-native-live-markdown] `parser` is not a worklet');
+  }
 
   const parserId = React.useMemo(() => {
     const shareableWorklet = makeShareableCloneRecursive(props.parser);
