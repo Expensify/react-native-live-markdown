@@ -257,8 +257,24 @@ function calculateInputMetrics(inputType: string, prevSelection: CursorUtils.Sel
 
   // For some events start and before need to be adjusted
   if (inputType === 'historyUndo') {
-    start = cursorPosition ?? 0;
-    before = prevTextLength - normalizedText.length;
+    // wip: not working yet
+    before = Math.abs(prevText.length - normalizedText.length);
+
+    count = 0;
+    let startFound = false;
+    let charIndex = newCursorPosition - 1;
+    while (!startFound) {
+      const newChar = normalizedText[charIndex];
+      const prevChar = prevText[charIndex];
+      charIndex--;
+
+      if (newChar !== prevChar) {
+        count++;
+      } else {
+        startFound = count > 0 || charIndex === 0;
+      }
+    }
+    start = newCursorPosition - count;
   } else if (inputType === 'deleteContentBackward' || inputType === 'deleteContentForward') {
     if (before === 0) {
       // Its possible the user pressed a delete key without a selection range (before = 0),
