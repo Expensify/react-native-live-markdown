@@ -252,7 +252,7 @@ function groupRanges(ranges: Range[]) {
   }, [] as Range[]);
 }
 
-function parseExpensiMarkToRanges(markdown: string): Range[] {
+function parseExpensiMark(markdown: string): Range[] {
   'worklet';
 
   try {
@@ -277,5 +277,5 @@ function parseExpensiMarkToRanges(markdown: string): Range[] {
   }
 }
 
-export default parseExpensiMarkToRanges;
+export default parseExpensiMark;
 export type {MarkdownType, Range};

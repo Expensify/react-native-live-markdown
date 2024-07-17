@@ -4,7 +4,7 @@ import {Button, Platform, StyleSheet, Text, View} from 'react-native';
 
 import {MarkdownTextInput} from '@expensify/react-native-live-markdown';
 import type {TextInput} from 'react-native';
-import parseExpensiMarkToRanges from './parseExpensiMarkToRanges';
+import parseExpensiMark from './parseExpensiMark';
 
 function isWeb() {
   return Platform.OS === 'web';
@@ -109,7 +109,7 @@ export default function App() {
         style={styles.input}
         ref={ref}
         markdownStyle={markdownStyle}
-        parser={parseExpensiMarkToRanges}
+        parser={parseExpensiMark}
         placeholder="Type here..."
         onSelectionChange={(e) => setSelection(e.nativeEvent.selection)}
         selection={selection}
