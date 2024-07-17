@@ -82,7 +82,10 @@ function parseInnerHTMLToText(target: MarkdownTextInputElement) {
       case 'br':
         if (node.element.nodeName === 'BR') {
           const parentType = getParentType(node);
-          if ((parentType === 'line' && node.parentNode?.element?.textContent === '') || parentType !== 'line') {
+          if (
+            (node.orderIndex.split(',')[0] !== (target.tree.childNodes.length - 1).toString() && parentType === 'line' && node.parentNode?.element?.textContent === '') ||
+            parentType !== 'line'
+          ) {
             text += `\n`;
           }
         } else if (node.element?.textContent) {

@@ -71,7 +71,7 @@ function buildTree(rootElement: HTMLMarkdownElement, text: string) {
 
     Array.from(treeNode.element.childNodes).forEach((childNode) => {
       let newTreeNode: TreeNode | null = null;
-      if (treeNode.element.getAttribute('data-type') === 'line' && childNode.nodeName === 'BR') {
+      if (treeNode.element.getAttribute('data-type') === 'line' && childNode.nodeName === 'BR' && treeNode.element.value.length < 1) {
         return;
       }
 
