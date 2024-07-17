@@ -418,7 +418,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           if (inputType === 'deleteContentBackward') {
             // When the user does a backspace delete he expects the content before the cursor to be removed.
             // For this the start value needs to be adjusted (its as if the selection was before the text that we want to delete)
-            start -= before;
+            start = Math.max(start - before, 0);
           }
 
           event.nativeEvent.count = count;
