@@ -167,4 +167,5 @@ function scrollCursorIntoView(target: HTMLInputElement) {
   }
 }
 
-export {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition, setPrevText, removeSelection, scrollCursorIntoView, getPrevTextLength, Selection};
+export type {Selection};
+export {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition, setPrevText, removeSelection, scrollCursorIntoView, getPrevTextLength};
