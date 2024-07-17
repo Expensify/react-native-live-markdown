@@ -33,11 +33,6 @@ type TextChangeMetrics = {
   before: number;
 };
 
-type Selection = {
-  start: number;
-  end: number;
-};
-
 function addStyling(targetElement: HTMLElement, type: MarkdownType, markdownStyle: PartialMarkdownStyle) {
   const node = targetElement;
   switch (type) {
@@ -250,7 +245,7 @@ function parseText(target: HTMLElement, text: string, cursorPositionIndex: numbe
  * This is to align the onChange event with the native counter part:
  * - https://github.com/facebook/react-native/pull/45248
  */
-function calculateInputMetrics(inputType: string, prevSelection: Selection, prevTextLength: number, normalizedText: string, cursorPosition: number | null): TextChangeMetrics {
+function calculateInputMetrics(inputType: string, prevSelection: CursorUtils.Selection, prevTextLength: number, normalizedText: string, cursorPosition: number | null): TextChangeMetrics {
   // The new text is between the prev start selection and the new end selection, can be empty
   const addedText = normalizedText.slice(prevSelection.start, cursorPosition ?? 0);
   // The length of the text that replaced the "before" text
@@ -282,4 +277,4 @@ function calculateInputMetrics(inputType: string, prevSelection: Selection, prev
 
 export {parseText, parseRangesToHTMLNodes, calculateInputMetrics};
 
-export type {MarkdownRange, MarkdownType, Selection};
+export type {MarkdownRange, MarkdownType};

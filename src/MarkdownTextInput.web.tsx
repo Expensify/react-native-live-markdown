@@ -174,7 +174,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     const pasteRef = useRef<boolean>(false);
     const divRef = useRef<HTMLDivElement | null>(null);
     const currentlyFocusedField = useRef<HTMLDivElement | null>(null);
-    const contentSelection = useRef<ParseUtils.Selection | null>(null);
+    const contentSelection = useRef<CursorUtils.Selection | null>(null);
     const className = `react-native-live-markdown-input-${multiline ? 'multiline' : 'singleline'}`;
     const history = useRef<InputHistory>();
     const dimensions = React.useRef<Dimensions | null>(null);
@@ -298,7 +298,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       [onSelectionChange, setEventProps],
     );
 
-    const updateRefSelectionVariables = useCallback((newSelection: ParseUtils.Selection) => {
+    const updateRefSelectionVariables = useCallback((newSelection: CursorUtils.Selection) => {
       const {start, end} = newSelection;
       const markdownHTMLInput = divRef.current as HTMLInputElement;
       markdownHTMLInput.selectionStart = start;
@@ -306,7 +306,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     }, []);
 
     const updateSelection = useCallback(
-      (e: SyntheticEvent<HTMLDivElement> | null = null, predefinedSelection: ParseUtils.Selection | null = null) => {
+      (e: SyntheticEvent<HTMLDivElement> | null = null, predefinedSelection: CursorUtils.Selection | null = null) => {
         if (!divRef.current) {
           return;
         }
@@ -636,7 +636,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         return;
       }
 
-      const newSelection: ParseUtils.Selection = {start: selection.start, end: selection.end ?? selection.start};
+      const newSelection: CursorUtils.Selection = {start: selection.start, end: selection.end ?? selection.start};
       contentSelection.current = newSelection;
       updateRefSelectionVariables(newSelection);
       CursorUtils.setCursorPosition(divRef.current, newSelection.start, newSelection.end);

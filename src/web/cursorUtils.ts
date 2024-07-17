@@ -1,5 +1,10 @@
 import * as BrowserUtils from './browserUtils';
 
+type Selection = {
+  start: number;
+  end: number;
+};
+
 let prevTextLength: number | undefined;
 
 function getPrevTextLength() {
@@ -162,4 +167,4 @@ function scrollCursorIntoView(target: HTMLInputElement) {
   }
 }
 
-export {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition, setPrevText, removeSelection, scrollCursorIntoView, getPrevTextLength};
+export {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition, setPrevText, removeSelection, scrollCursorIntoView, getPrevTextLength, Selection};
