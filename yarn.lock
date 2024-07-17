@@ -2320,7 +2320,7 @@ __metadata:
     "@react-native/babel-preset": 0.73.21
     "@react-native/metro-config": 0.73.5
     babel-plugin-module-resolver: ^5.0.0
-    expensify-common: 2.0.48
+    expensify-common: 2.0.49
     react: 18.2.0
     react-native: 0.73.4
     react-native-reanimated: "https://github.com/software-mansion/react-native-reanimated.git#workspace=react-native-reanimated&commit=6aaa26bcdad232b2994176fc2b3814cff6348bd4"
@@ -9534,9 +9534,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expensify-common@npm:2.0.48":
-  version: 2.0.48
-  resolution: "expensify-common@npm:2.0.48"
+"expensify-common@npm:2.0.49":
+  version: 2.0.49
+  resolution: "expensify-common@npm:2.0.49"
   dependencies:
     awesome-phonenumber: ^5.4.0
     classnames: 2.5.0
@@ -9551,13 +9551,13 @@ __metadata:
     semver: ^7.6.2
     simply-deferred: "git+https://github.com/Expensify/simply-deferred.git#77a08a95754660c7bd6e0b6979fdf84e8e831bf5"
     ua-parser-js: ^1.0.38
-  checksum: f1eb283f8f717e21f532ab4df31fae425844f758f616c62385c1e46d219375f93fe49fe104adfcb175bfd64d8b438f1d21100e01944a2c9d417c4001bb401c20
+  checksum: bcd7bb298e6f1d5aa2c606bff8ade6bd7cc372e3e6ad057f5e0cb67e31e968fa76a27910141485d5221d7ebcd4d221f0c7d5dc55978d6baa8a7f7e00a4d0613e
   languageName: node
   linkType: hard
 
-"expensify-common@patch:expensify-common@npm%3A2.0.48#./.yarn/patches/expensify-common-npm-2.0.48-ed21b3616e.patch::locator=%40expensify%2Freact-native-live-markdown%40workspace%3A.":
-  version: 2.0.48
-  resolution: "expensify-common@patch:expensify-common@npm%3A2.0.48#./.yarn/patches/expensify-common-npm-2.0.48-ed21b3616e.patch::version=2.0.48&hash=cc2be6&locator=%40expensify%2Freact-native-live-markdown%40workspace%3A."
+"expensify-common@patch:expensify-common@npm%3A2.0.49#./.yarn/patches/expensify-common-npm-2.0.49-49c1fa1dd2.patch::locator=%40expensify%2Freact-native-live-markdown%40workspace%3A.":
+  version: 2.0.49
+  resolution: "expensify-common@patch:expensify-common@npm%3A2.0.49#./.yarn/patches/expensify-common-npm-2.0.49-49c1fa1dd2.patch::version=2.0.49&hash=9b097e&locator=%40expensify%2Freact-native-live-markdown%40workspace%3A."
   dependencies:
     awesome-phonenumber: ^5.4.0
     classnames: 2.5.0
@@ -9572,7 +9572,7 @@ __metadata:
     semver: ^7.6.2
     simply-deferred: "git+https://github.com/Expensify/simply-deferred.git#77a08a95754660c7bd6e0b6979fdf84e8e831bf5"
     ua-parser-js: ^1.0.38
-  checksum: 56bbe075235829cec0c4f8f7ec1784e1a1032b53c99a8712f151190d3b519f6a175e661e9870c66fb5414d14048260f56fe580ff8de56e68cc77aea961185e23
+  checksum: 9ffaa419147f7d00492105c10e2cac027f6036e45635d607c5d842e627d1fc500314eb53590776165c79240638336154811092b060f984026d9e476371d3b975
   languageName: node
   linkType: hard
 
