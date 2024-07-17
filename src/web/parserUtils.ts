@@ -1,6 +1,7 @@
 import * as CursorUtils from './cursorUtils';
 import type * as StyleUtilsTypes from '../styleUtils';
 import * as BrowserUtils from './browserUtils';
+import type {Range} from '../MarkdownTextInput';
 
 type PartialMarkdownStyle = StyleUtilsTypes.PartialMarkdownStyle;
 
@@ -179,7 +180,14 @@ function moveCursor(isFocused: boolean, alwaysMoveCursorToTheEnd: boolean, curso
   }
 }
 
-function parseText(target: HTMLElement, text: string, cursorPositionIndex: number | null, markdownStyle: PartialMarkdownStyle = {}, alwaysMoveCursorToTheEnd = false) {
+function parseText(
+  parser: (input: string) => Range[],
+  target: HTMLElement,
+  text: string,
+  cursorPositionIndex: number | null,
+  markdownStyle: PartialMarkdownStyle = {},
+  alwaysMoveCursorToTheEnd = false,
+) {
   const targetElement = target;
 
   // in case the cursorPositionIndex is larger than text length, cursorPosition will be null, i.e: move the caret to the end
@@ -189,7 +197,7 @@ function parseText(target: HTMLElement, text: string, cursorPositionIndex: numbe
     const selection = CursorUtils.getCurrentCursorPosition(target);
     cursorPosition = selection ? selection.end : null;
   }
-  const ranges = global.parseExpensiMarkToRanges(text);
+  const ranges = parser(text);
 
   const markdownRanges: MarkdownRange[] = ranges as MarkdownRange[];
   const rootSpan = targetElement.firstChild as HTMLElement | null;
