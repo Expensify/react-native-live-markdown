@@ -246,20 +246,6 @@ function parseText(target: HTMLElement, text: string, cursorPositionIndex: numbe
 /**
  * Calculates start, count and before values. Whenever the text is being changed you can think of it as a replacement operation,
  * where parts of the string get replaced with new content.
- * For example:
- *
- * 1. Text input is abc
- * 2. User adds "d"
- * 3. start: 3, before: 0, count: 1
- *
- * We started to replace text starting from position 3, we replaced 0 characters and added 1 character.
- * Another example:
- *
- * 1. Text input is abc
- * 2. User selects "b" and adds "d"
- * 3. start: 1, before: 1, count: 1
- *
- * We started to replace text starting from position 1, we replaced 1 character and added 1 character.
  *
  * This is to align the onChange event with the native counter part:
  * - https://github.com/facebook/react-native/pull/45248
