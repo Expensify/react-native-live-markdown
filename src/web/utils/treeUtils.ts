@@ -41,61 +41,6 @@ function addNodeToTree(element: HTMLMarkdownElement, parentTreeNode: TreeNode, t
   return item;
 }
 
-function buildTree(rootElement: HTMLMarkdownElement, text: string) {
-  function getElementType(element: HTMLElement): NodeType {
-    if (element.nodeName === 'BR') {
-      return 'br';
-    }
-    if (element.nodeName === 'P') {
-      return 'line';
-    }
-
-    return (element.getAttribute('data-type') as NodeType) || 'text';
-  }
-  const rootTreeNode: TreeNode = {
-    element: rootElement,
-    parentNode: null,
-    childNodes: [],
-    start: 0,
-    length: text.replace(/\n/g, '\\n').length,
-    type: 'root',
-    orderIndex: '',
-    isGeneratingNewline: false,
-  };
-  const stack = [rootTreeNode];
-  while (stack.length > 0) {
-    const treeNode = stack.pop();
-    if (!treeNode) {
-      break;
-    }
-
-    Array.from(treeNode.element.childNodes).forEach((childNode) => {
-      let newTreeNode: TreeNode | null = null;
-      if (treeNode.element.getAttribute('data-type') === 'line' && childNode.nodeName === 'BR' && treeNode.element.value.length < 1) {
-        return;
-      }
-
-      if (treeNode.type === 'root' && childNode.nodeType === Node.TEXT_NODE) {
-        const p = document.createElement('p') as unknown as HTMLMarkdownElement;
-        p.textContent = childNode.nodeValue;
-        newTreeNode = addNodeToTree(p, treeNode, 'line');
-      } else if (treeNode.type === 'root' && childNode.nodeName === 'DIV') {
-        const p = document.createElement('p') as unknown as HTMLMarkdownElement;
-        p.innerHTML = (childNode as HTMLElement)?.innerHTML;
-        newTreeNode = addNodeToTree(p, treeNode, 'line');
-      } else if (childNode.nodeType !== Node.TEXT_NODE) {
-        newTreeNode = addNodeToTree(childNode as HTMLMarkdownElement, treeNode, getElementType(childNode as HTMLMarkdownElement));
-      }
-
-      if (newTreeNode) {
-        stack.push(newTreeNode);
-      }
-    });
-  }
-
-  return rootTreeNode;
-}
-
 function findHTMLElementInTree(treeRoot: TreeNode, element: HTMLElement): TreeNode | null {
   if (element.hasAttribute('contenteditable')) {
     return treeRoot;
@@ -153,6 +98,6 @@ function getTreeNodeByIndex(treeRoot: TreeNode, index: number): TreeNode | null 
   return null;
 }
 
-export {addNodeToTree, findHTMLElementInTree, getTreeNodeByIndex, buildTree};
+export {addNodeToTree, findHTMLElementInTree, getTreeNodeByIndex};
 
 export type {TreeNode, NodeType};
