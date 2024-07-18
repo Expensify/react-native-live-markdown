@@ -1,7 +1,5 @@
 import {Platform} from 'react-native';
-import type * as MarkdownTextInputDecoractorView from './MarkdownTextInputDecoratorViewNativeComponent';
-
-type MarkdownStyle = MarkdownTextInputDecoractorView.MarkdownStyle;
+import type {MarkdownStyle} from './MarkdownTextInputDecoratorViewNativeComponent';
 
 type PartialMarkdownStyle = Partial<{
   [K in keyof MarkdownStyle]: Partial<MarkdownStyle[K]>;
