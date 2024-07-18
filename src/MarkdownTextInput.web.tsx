@@ -16,7 +16,6 @@ import {StyleSheet} from 'react-native';
 import {updateInputStructure} from './web/utils/parserUtils';
 import BrowserUtils from './web/utils/browserUtils';
 import InputHistory from './web/InputHistory';
-import {buildTree} from './web/utils/treeUtils';
 import type {TreeNode} from './web/utils/treeUtils';
 import {getCurrentCursorPosition, removeSelection, setCursorPosition} from './web/utils/cursorUtils';
 import './web/MarkdownTextInput.css';
@@ -280,8 +279,6 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         const isPasteInputType = inputType === 'pasteText';
 
         updateTextColor(divRef.current, e.target.textContent ?? '');
-        const tree = buildTree(divRef.current, divRef.current.value);
-        divRef.current.tree = tree;
         const previousText = divRef.current.value;
         const parsedText = isPasteInputType ? pasteContent.current || '' : parseInnerHTMLToText(e.target as MarkdownTextInputElement);
 

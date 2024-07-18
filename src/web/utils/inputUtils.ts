@@ -1,5 +1,4 @@
 import type {CSSProperties} from 'react';
-import type {TreeNode} from './treeUtils';
 import type {MarkdownTextInputElement} from '../../MarkdownTextInput.web';
 
 const ZERO_WIDTH_SPACE = '\u200B';
@@ -33,86 +32,65 @@ function getElementHeight(node: HTMLDivElement, styles: CSSProperties, numberOfL
   return styles.height ? `${styles.height}px` : 'auto';
 }
 
-function parseInnerHTMLToText(target: MarkdownTextInputElement) {
-  function getParentType(node: TreeNode) {
-    let currentNode = node;
-    while (['text', 'br'].includes(currentNode.type)) {
-      if (currentNode.parentNode) {
-        currentNode = currentNode.parentNode;
-      } else {
-        return null;
-      }
+const parseInnerHTMLToText = (target: MarkdownTextInputElement): string => {
+  function getTopParentNode(node: ChildNode) {
+    let currentParentNode = node.parentNode;
+    while (currentParentNode && ['text', 'br', 'line'].includes(currentParentNode.parentElement?.getAttribute('data-type') || '')) {
+      currentParentNode = currentParentNode?.parentNode || null;
     }
-
-    return currentNode.type;
+    return currentParentNode;
   }
 
-  const root = target.tree;
-
-  // early return when writing in empty input
-  if (root.childNodes.length === 0) {
-    return root.element.textContent ?? '';
-  }
-
-  const stack: TreeNode[] = [root];
+  const stack: ChildNode[] = [target];
   let text = '';
-  let shouldInsertNewlineAfterParagraph = false;
+  let shouldAddNewline = false;
+
+  const n = target.childNodes.length;
+  const lastNode = target.childNodes[n - 1];
+  if (lastNode?.nodeName === 'DIV' && (lastNode as HTMLElement)?.innerHTML === '<br>') {
+    target.removeChild(lastNode);
+  }
+
   while (stack.length > 0) {
     const node = stack.pop();
     if (!node) {
       break;
     }
 
-    switch (node.type) {
-      case 'line':
-        // Insert new line after every line
-        if (shouldInsertNewlineAfterParagraph) {
-          text += '\n';
-          shouldInsertNewlineAfterParagraph = false;
-        }
-        if (node.element.textContent !== '') {
-          shouldInsertNewlineAfterParagraph = true;
-        }
-
-        // Add text in case the span was removed and text is directly in paragraph
-        if (node.childNodes.length === 0 && !!node.element.textContent) {
-          text += node.element.textContent;
-        }
-        break;
-      case 'br':
-        if (node.element.nodeName === 'BR') {
-          const parentType = getParentType(node);
-          if (
-            (node.orderIndex.split(',')[0] !== (target.tree.childNodes.length - 1).toString() && parentType === 'line' && node.parentNode?.element?.textContent === '') ||
-            parentType !== 'line'
-          ) {
-            text += `\n`;
-          }
-        } else if (node.element?.textContent) {
-          // If the br span element has text content next to the br tag, add it to the text
-          text += node.element?.textContent;
-        }
-        break;
-      case 'text':
-        text += node.element.textContent;
-        break;
-      default:
-        break;
-    }
-
-    let i = node.childNodes.length - 1;
-    while (i > -1) {
-      const child = node.childNodes[i];
-      if (!child) {
-        break;
+    const isTopComponent = node.parentElement?.contentEditable === 'true';
+    if (isTopComponent) {
+      if (shouldAddNewline) {
+        text += '\n';
+        shouldAddNewline = false;
       }
 
-      stack.push(child);
-      i--;
+      if (!shouldAddNewline) {
+        shouldAddNewline = true;
+      }
+    }
+
+    if (node.nodeType === Node.TEXT_NODE) {
+      text += node.textContent;
+    } else if (node.nodeName === 'BR') {
+      const parentNode = getTopParentNode(node);
+      if (parentNode && parentNode.nodeName !== 'DIV' && parentNode.nodeName !== 'P') {
+        text += '\n';
+      }
+    } else {
+      let i = node.childNodes.length - 1;
+      while (i > -1) {
+        const child = node.childNodes[i];
+        if (!child) {
+          break;
+        }
+
+        stack.push(child);
+        i--;
+      }
     }
   }
 
   return text;
-}
+};
 
 export {isEventComposing, getPlaceholderValue, getElementHeight, parseInnerHTMLToText};
