@@ -177,7 +177,7 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
     // preparing line paragraph element for markdown text
     currentParentNode = addParagraph(rootNode, null, line.length, disableInlineStyles);
     rootElement.value = (rootElement.value || '') + line.text;
-    if (lines.length > 1) {
+    if (lines.length > 0) {
       rootElement.value = `${rootElement.value || ''}\n`;
     }
 
@@ -235,8 +235,6 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
         }
       }
     }
-
-    rootNode.element.value = (rootNode.element.value || '') + (currentParentNode.element.value || '');
   }
 
   return {dom: rootElement, tree: rootNode};
