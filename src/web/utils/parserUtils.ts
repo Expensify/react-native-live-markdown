@@ -258,6 +258,7 @@ function updateInputStructure(
   cursorPositionIndex: number | null,
   markdownStyle: PartialMarkdownStyle = {},
   alwaysMoveCursorToTheEnd = false,
+  shouldForceDOMUpdate = false,
 ) {
   const targetElement = target;
 
@@ -279,7 +280,7 @@ function updateInputStructure(
   if (text) {
     const {dom, tree} = parseRangesToHTMLNodes(text, markdownRanges, markdownStyle);
 
-    if (targetElement.innerHTML !== dom.innerHTML) {
+    if (shouldForceDOMUpdate || targetElement.innerHTML !== dom.innerHTML) {
       targetElement.innerHTML = '';
       targetElement.innerText = '';
       Array.from(dom.children).forEach((child) => {

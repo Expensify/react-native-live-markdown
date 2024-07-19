@@ -133,7 +133,14 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     }, []);
 
     const parseText = useCallback(
-      (target: MarkdownTextInputElement, text: string | null, customMarkdownStyles: MarkdownStyle, cursorPosition: number | null = null, shouldAddToHistory = true): ParseTextResult => {
+      (
+        target: MarkdownTextInputElement,
+        text: string | null,
+        customMarkdownStyles: MarkdownStyle,
+        cursorPosition: number | null = null,
+        shouldAddToHistory = true,
+        shouldForceDOMUpdate = false,
+      ): ParseTextResult => {
         if (!divRef.current) {
           return {text: text || '', cursorPosition: null};
         }
@@ -141,7 +148,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         if (text === null) {
           return {text: divRef.current.value, cursorPosition: null};
         }
-        const parsedText = updateInputStructure(target, text, cursorPosition, customMarkdownStyles, !multiline);
+        const parsedText = updateInputStructure(target, text, cursorPosition, customMarkdownStyles, !multiline, shouldForceDOMUpdate);
         divRef.current.value = parsedText.text;
 
         if (history.current && shouldAddToHistory) {
@@ -295,7 +302,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
         const newCursorPosition = Math.max(Math.max(contentSelection.current.end, 0) + (parsedText.length - previousText.length), 0);
         let newInputUpdate: ParseTextResult;
-        switch (nativeEvent.inputType) {
+        switch (inputType) {
           case 'historyUndo':
             newInputUpdate = undo(divRef.current);
             break;
@@ -303,7 +310,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
             newInputUpdate = redo(divRef.current);
             break;
           default:
-            newInputUpdate = parseText(divRef.current, parsedText, processedMarkdownStyle, newCursorPosition);
+            newInputUpdate = parseText(divRef.current, parsedText, processedMarkdownStyle, newCursorPosition, true, !inputType);
         }
         const {text, cursorPosition} = newInputUpdate;
         updateTextColor(divRef.current, text);
