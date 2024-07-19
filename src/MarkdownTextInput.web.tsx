@@ -283,11 +283,10 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         }
         const nativeEvent = e.nativeEvent as MarkdownNativeEvent;
         const inputType = nativeEvent.inputType;
-        const isPasteInputType = inputType === 'pasteText';
 
         updateTextColor(divRef.current, e.target.textContent ?? '');
         const previousText = divRef.current.value;
-        const parsedText = isPasteInputType ? pasteContent.current || '' : parseInnerHTMLToText(e.target as MarkdownTextInputElement);
+        const parsedText = inputType === 'pasteText' ? pasteContent.current || '' : parseInnerHTMLToText(e.target as MarkdownTextInputElement);
 
         if (pasteContent.current) {
           pasteContent.current = null;

@@ -32,7 +32,9 @@ function getElementHeight(node: HTMLDivElement, styles: CSSProperties, numberOfL
   return styles.height ? `${styles.height}px` : 'auto';
 }
 
-const parseInnerHTMLToText = (target: MarkdownTextInputElement): string => {
+// Parses the HTML structure of a MarkdownTextInputElement to a plain text string. Used for getting the correct value of the input element.
+function parseInnerHTMLToText(target: MarkdownTextInputElement): string {
+  // Returns the parent of a given node that is higher in the hierarchy and is of a different type than 'text', 'br' or 'line'
   function getTopParentNode(node: ChildNode) {
     let currentParentNode = node.parentNode;
     while (currentParentNode && ['text', 'br', 'line'].includes(currentParentNode.parentElement?.getAttribute('data-type') || '')) {
@@ -44,9 +46,8 @@ const parseInnerHTMLToText = (target: MarkdownTextInputElement): string => {
   const stack: ChildNode[] = [target];
   let text = '';
   let shouldAddNewline = false;
-
-  const n = target.childNodes.length;
-  const lastNode = target.childNodes[n - 1];
+  const lastNode = target.childNodes[target.childNodes.length - 1];
+  // Remove the last <br> element if it's the last child of the target element. Fixes the issue with adding extra newline when pasting into the empty input.
   if (lastNode?.nodeName === 'DIV' && (lastNode as HTMLElement)?.innerHTML === '<br>') {
     target.removeChild(lastNode);
   }
@@ -57,23 +58,24 @@ const parseInnerHTMLToText = (target: MarkdownTextInputElement): string => {
       break;
     }
 
+    // If we are operating on the nodes that are children of the MarkdownTextInputElement, we need to add a newline after each
     const isTopComponent = node.parentElement?.contentEditable === 'true';
     if (isTopComponent) {
       if (shouldAddNewline) {
         text += '\n';
         shouldAddNewline = false;
       }
-
-      if (!shouldAddNewline) {
-        shouldAddNewline = true;
-      }
+      shouldAddNewline = true;
     }
 
     if (node.nodeType === Node.TEXT_NODE) {
+      // Parse text nodes into text
       text += node.textContent;
     } else if (node.nodeName === 'BR') {
       const parentNode = getTopParentNode(node);
-      if (parentNode && parentNode.nodeName !== 'DIV' && parentNode.nodeName !== 'P') {
+      if (parentNode && parentNode.parentElement?.contentEditable !== 'true') {
+        // Parse br elements into newlines only if their parent is not a child of the MarkdownTextInputElement (a paragraph when writing or a div when pasting).
+        // It prevents adding extra newlines when entering text
         text += '\n';
       }
     } else {
@@ -83,7 +85,6 @@ const parseInnerHTMLToText = (target: MarkdownTextInputElement): string => {
         if (!child) {
           break;
         }
-
         stack.push(child);
         i--;
       }
@@ -91,6 +92,6 @@ const parseInnerHTMLToText = (target: MarkdownTextInputElement): string => {
   }
 
   return text;
-};
+}
 
 export {isEventComposing, getPlaceholderValue, getElementHeight, parseInnerHTMLToText};

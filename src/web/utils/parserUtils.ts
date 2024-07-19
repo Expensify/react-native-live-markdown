@@ -51,6 +51,7 @@ function splitTextIntoLines(text: string): Paragraph[] {
   return lines;
 }
 
+/** Merges lines that contain multiline markdown tags into one line */
 function mergeLinesWithMultilineTags(lines: Paragraph[], ranges: MarkdownRange[]) {
   let mergedLines = [...lines];
   const lineIndexes = mergedLines.map((_line, index) => index);
@@ -83,11 +84,12 @@ function mergeLinesWithMultilineTags(lines: Paragraph[], ranges: MarkdownRange[]
   return mergedLines;
 }
 
-function appendValueToElement(element: HTMLMarkdownElement, parentNode: TreeNode, value: string) {
+/** Adds a value prop to the element and appends the value to the parent node element */
+function appendValueToElement(element: HTMLMarkdownElement, parentTreeNode: TreeNode, value: string) {
   const targetElement = element;
-  const node = parentNode;
+  const parentNode = parentTreeNode;
   targetElement.value = value;
-  node.element.value = (node.element.value || '') + value;
+  parentNode.element.value = (parentNode.element.value || '') + value;
 }
 
 function appendNode(element: HTMLMarkdownElement, parentTreeNode: TreeNode, type: NodeType, length: number) {
@@ -111,7 +113,6 @@ function addTextToElement(node: TreeNode, text: string) {
     if (line !== '') {
       const span = document.createElement('span') as HTMLMarkdownElement;
       appendValueToElement(span, node, line);
-
       span.setAttribute('data-type', 'text');
       span.appendChild(document.createTextNode(line));
       appendNode(span, node, 'text', line.length);
@@ -133,6 +134,7 @@ function addParagraph(node: TreeNode, text: string | null = null, length: number
   const pNode = appendNode(p as unknown as HTMLMarkdownElement, node, 'line', length);
 
   if (text === '') {
+    // If the line is empty, we still need to add a br element to keep the line height
     addBrElement(pNode);
   } else if (text) {
     addTextToElement(pNode, text);
@@ -141,6 +143,7 @@ function addParagraph(node: TreeNode, text: string | null = null, length: number
   return pNode;
 }
 
+/** Builds HTML DOM structure based on passed text and markdown ranges */
 function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownStyle: PartialMarkdownStyle = {}, disableInlineStyles = false) {
   const rootElement: HTMLMarkdownElement = document.createElement('span') as HTMLMarkdownElement;
   const textLength = text.replace(/\n/g, '\\n').length;
@@ -251,7 +254,6 @@ function moveCursor(isFocused: boolean, alwaysMoveCursorToTheEnd: boolean, curso
     setCursorPosition(target, cursorPosition);
   }
 }
-
 function updateInputStructure(
   target: MarkdownTextInputElement,
   text: string,
