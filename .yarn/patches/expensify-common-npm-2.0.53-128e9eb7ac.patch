@@ -9,7 +9,7 @@ index 73449891ea0bdb5606d5a33755c32e201526dd44..792cfd1b29da6d2fd337c5e39ff6c217
      if (k2 === undefined) k2 = k;
      var desc = Object.getOwnPropertyDescriptor(m, k);
 diff --git a/dist/str.js b/dist/str.js
-index 802204f9c6fa5fd58f3e006592d46f6907b7080f..504218805ad0e8ba105ed3b977c1cf0ee0566039 100644
+index 802204f9c6fa5fd58f3e006592d46f6907b7080f..213d5d28faa3f71995590c040f9f6876376e7513 100644
 --- a/dist/str.js
 +++ b/dist/str.js
 @@ -1,4 +1,5 @@
@@ -18,14 +18,6 @@ index 802204f9c6fa5fd58f3e006592d46f6907b7080f..504218805ad0e8ba105ed3b977c1cf0e
  var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
      if (k2 === undefined) k2 = k;
      var desc = Object.getOwnPropertyDescriptor(m, k);
-@@ -37,6 +38,7 @@ function resultFn(parameter, ...args) {
-     return parameter;
- }
- const Str = {
-+    __workletObject: true,
-     /**
-      * Return true if the string is ending with the provided suffix
-      *
 diff --git a/dist/utils.js b/dist/utils.js
 index 2958dd8d0ddcad91b0203ce7225ec00316e2d370..567807f4ddbefb10d1f8cb210a52ac7bb9f361e4 100644
 --- a/dist/utils.js

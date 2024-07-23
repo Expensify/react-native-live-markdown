@@ -1053,18 +1053,18 @@ PODS:
     - React-jsi (= 0.73.4)
     - React-logger (= 0.73.4)
     - React-perflogger (= 0.73.4)
-  - RNLiveMarkdown (0.1.107):
+  - RNLiveMarkdown (0.1.108):
     - glog
     - hermes-engine
     - RCT-Folly (= 2022.05.16.00)
     - React-Core
-    - RNLiveMarkdown/common (= 0.1.107)
-  - RNLiveMarkdown/common (0.1.107):
+    - RNLiveMarkdown/common (= 0.1.108)
+  - RNLiveMarkdown/common (0.1.108):
     - glog
     - hermes-engine
     - RCT-Folly (= 2022.05.16.00)
     - React-Core
-  - RNReanimated (3.12.0):
+  - RNReanimated (3.15.0-nightly-20240722-a15e0edec):
     - glog
     - RCT-Folly (= 2022.05.16.00)
     - React-Core
@@ -1286,8 +1286,8 @@ SPEC CHECKSUMS:
   React-runtimescheduler: ed48e5faac6751e66ee1261c4bd01643b436f112
   React-utils: 6e5ad394416482ae21831050928ae27348f83487
   ReactCommon: 840a955d37b7f3358554d819446bffcf624b2522
-  RNLiveMarkdown: 17772a61cbdc0436c6929a159f73db9612b9794e
-  RNReanimated: 60feb9b752e2cbe60bbb8d90da29672a81fa59b2
+  RNLiveMarkdown: cc9e1b1cee0ac29f80fe875a75345b68ed13cdfa
+  RNReanimated: 93e9cd97d5ead280eb74f7a42b775c2012a6cfba
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
   Yoga: 64cd2a583ead952b0315d5135bf39e053ae9be70
 
