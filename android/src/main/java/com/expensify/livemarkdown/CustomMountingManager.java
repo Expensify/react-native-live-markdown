@@ -13,7 +13,6 @@ import android.text.TextPaint;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.facebook.common.logging.FLog;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.common.mapbuffer.MapBuffer;
@@ -44,7 +43,6 @@ public class CustomMountingManager extends MountingManager {
 
     AssetManager assetManager = context.getAssets();
     MarkdownUtils.maybeInitializeRuntime(assetManager);
-    
     this.markdownUtils = new MarkdownUtils(assetManager);
     this.markdownUtils.setMarkdownStyle(new MarkdownStyle(decoratorProps, context));
   }
@@ -89,13 +87,15 @@ public class CustomMountingManager extends MountingManager {
       text = sb;
     }
 
+    Layout.Alignment alignment = TextLayoutManager.getTextAlignment(attributedString, text);
+
     markdownUtils.applyMarkdownFormatting((SpannableStringBuilder)text);
 
     BoringLayout.Metrics boring = BoringLayout.isBoring(text, sTextPaintInstance);
 
     Class<TextLayoutManager> mapBufferClass = TextLayoutManager.class;
     try {
-      Method createLayoutMethod = mapBufferClass.getDeclaredMethod("createLayout", Spannable.class, BoringLayout.Metrics.class, float.class, YogaMeasureMode.class, boolean.class, int.class, int.class);
+      Method createLayoutMethod = mapBufferClass.getDeclaredMethod("createLayout", Spannable.class, BoringLayout.Metrics.class, float.class, YogaMeasureMode.class, boolean.class, int.class, int.class, Layout.Alignment.class);
       createLayoutMethod.setAccessible(true);
 
       Layout layout = (Layout)createLayoutMethod.invoke(
@@ -106,7 +106,8 @@ public class CustomMountingManager extends MountingManager {
         widthYogaMeasureMode,
         includeFontPadding,
         textBreakStrategy,
-        hyphenationFrequency);
+        hyphenationFrequency,
+        alignment);
 
       int maximumNumberOfLines =
         paragraphAttributes.contains(TextLayoutManager.PA_KEY_MAX_NUMBER_OF_LINES)
