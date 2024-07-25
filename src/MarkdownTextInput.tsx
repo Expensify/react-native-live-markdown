@@ -60,7 +60,9 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>((p
 
   const markdownStyle = React.useMemo(() => processMarkdownStyle(props.markdownStyle), [props.markdownStyle]);
 
-  // eslint-disable-next-line no-underscore-dangle
+  if (props.parser === undefined) {
+    throw new Error('[react-native-live-markdown] `parser` is undefined');
+  }
   const workletHash = (props.parser as unknown as {__workletHash: number}).__workletHash;
   if (workletHash === undefined) {
     throw new Error('[react-native-live-markdown] `parser` is not a worklet');
