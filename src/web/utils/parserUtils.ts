@@ -209,11 +209,10 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
       // create markdown span element
       const span = document.createElement('span') as HTMLMarkdownElement;
       span.setAttribute('data-type', range.type);
+      const spanNode = appendNode(span, currentParentNode, range.type, range.length);
       if (!disableInlineStyles) {
         addStyleToBlock(span, range.type, markdownStyle);
       }
-
-      const spanNode = appendNode(span, currentParentNode, range.type, range.length);
 
       if (lineMarkdownRanges.length > 0 && nextRangeStartIndex < endOfCurrentRange && range.type !== 'syntax') {
         // tag nesting

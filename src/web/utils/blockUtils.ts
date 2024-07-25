@@ -9,6 +9,10 @@ function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownSty
         display: 'block',
         margin: '0',
         padding: '0',
+        position: 'relative',
+        width: 'fit-content',
+        maxWidth: '100%',
+        boxSizing: 'border-box',
       });
       break;
     case 'syntax':
@@ -45,7 +49,13 @@ function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownSty
       Object.assign(node.style, markdownStyle.code);
       break;
     case 'pre':
-      Object.assign(node.style, markdownStyle.pre);
+      Object.assign(node.style, {
+        ...markdownStyle.pre,
+        backgroundColor: 'transparent',
+      });
+      Object.assign((node.parentNode as HTMLElement).style, {
+        padding: '5px',
+      });
       break;
 
     case 'blockquote':
