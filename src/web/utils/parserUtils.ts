@@ -4,6 +4,7 @@ import type {NodeType, TreeNode} from './treeUtils';
 import type {PartialMarkdownStyle} from '../../styleUtils';
 import {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition} from './cursorUtils';
 import {addStyleToBlock} from './blockUtils';
+import BrowserUtils from './browserUtils';
 
 type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'emoji' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax' | 'mention-here' | 'mention-user' | 'mention-report';
 
@@ -221,6 +222,10 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
       } else {
         // adding markdown tag
         addTextToElement(spanNode, text.substring(range.start, endOfCurrentRange));
+        if (range.type === 'pre') {
+          // this property is used for code block background - only chromium displays single \n at the end of a block as a new line, hence this if check
+          span.setAttribute('data-content', text.substring(range.start, BrowserUtils.isChromium ? endOfCurrentRange - 1 : endOfCurrentRange));
+        }
         currentParentNode.element.value = (currentParentNode.element.value || '') + (spanNode.element.value || '');
         lastRangeEndIndex = endOfCurrentRange;
         // tag unnesting and adding text after the tag
