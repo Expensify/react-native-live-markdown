@@ -176,6 +176,13 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     },
     ref,
   ) => {
+    if (parser === undefined) {
+      throw new Error('[react-native-live-markdown] `parser` is undefined');
+    }
+    if (typeof parser !== 'function') {
+      throw new Error('[react-native-live-markdown] `parser` is not a function');
+    }
+
     const compositionRef = useRef<boolean>(false);
     const pasteRef = useRef<boolean>(false);
     const divRef = useRef<HTMLDivElement | null>(null);
