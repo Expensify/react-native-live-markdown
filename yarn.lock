@@ -2616,7 +2616,7 @@ __metadata:
     expensify-common: 2.0.53
     react: 18.2.0
     react-native: 0.73.4
-    react-native-reanimated: 3.15.0-nightly-20240722-a15e0edec
+    react-native-reanimated: 3.15.0-nightly-20240724-d65549b9e
   languageName: unknown
   linkType: soft
 
@@ -2656,7 +2656,7 @@ __metadata:
     react: 18.2.0
     react-native: 0.73.4
     react-native-builder-bob: ^0.20.0
-    react-native-reanimated: 3.15.0-nightly-20240722-a15e0edec
+    react-native-reanimated: 3.15.0-nightly-20240724-d65549b9e
     react-native-web: ^0.19.10
     release-it: ^15.0.0
     turbo: ^1.10.7
@@ -16879,9 +16879,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-reanimated@npm:3.15.0-nightly-20240722-a15e0edec":
-  version: 3.15.0-nightly-20240722-a15e0edec
-  resolution: "react-native-reanimated@npm:3.15.0-nightly-20240722-a15e0edec"
+"react-native-reanimated@npm:3.15.0-nightly-20240724-d65549b9e":
+  version: 3.15.0-nightly-20240724-d65549b9e
+  resolution: "react-native-reanimated@npm:3.15.0-nightly-20240724-d65549b9e"
   dependencies:
     "@babel/plugin-transform-arrow-functions": ^7.0.0-0
     "@babel/plugin-transform-class-properties": ^7.0.0-0
@@ -16898,7 +16898,7 @@ __metadata:
     "@babel/core": ^7.0.0-0
     react: "*"
     react-native: "*"
-  checksum: 1fca7b92f716b54e13cedd6e4c25090a5188345f189bfe78148fb6f9419c873e4e2755d8a8ccc36944e2f8a92dd21b5e6a997eb69da003be90dd2e35ecfffd28
+  checksum: 5fe432ec3b7d208aadb500bb47cd4160a09764b0c59cdb032da61912655b9222b55286cd8b286c2d223a6bcfae80d459d55aecd701a6564ebbab90482a0b2174
   languageName: node
   linkType: hard
 
