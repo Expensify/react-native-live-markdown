@@ -550,3 +550,86 @@ describe('report mentions', () => {
     expect('reported #report-name!').toBeParsedAs([{type: 'mention-report', start: 9, length: 12}]);
   });
 });
+
+describe('inline video', () => {
+  test('with alt text', () => {
+    expect('![test](https://example.com/video.mp4)').toBeParsedAs([
+      {type: 'syntax', start: 0, length: 1},
+      {type: 'syntax', start: 1, length: 1},
+      {type: 'syntax', start: 6, length: 1},
+      {type: 'syntax', start: 7, length: 1},
+      {type: 'link', start: 8, length: 29},
+      {type: 'syntax', start: 37, length: 1},
+    ]);
+  });
+
+  test('without alt text', () => {
+    expect('![](https://example.com/video.mp4)').toBeParsedAs([
+      {type: 'syntax', start: 0, length: 1},
+      {type: 'syntax', start: 1, length: 1},
+      {type: 'syntax', start: 2, length: 1},
+      {type: 'syntax', start: 3, length: 1},
+      {type: 'link', start: 4, length: 29},
+      {type: 'syntax', start: 33, length: 1},
+    ]);
+  });
+
+  test('with same alt text as src', () => {
+    expect('![https://example.com/video.mp4](https://example.com/video.mp4)').toBeParsedAs([
+      {type: 'syntax', start: 0, length: 1},
+      {type: 'syntax', start: 1, length: 1},
+      {type: 'syntax', start: 31, length: 1},
+      {type: 'syntax', start: 32, length: 1},
+      {type: 'link', start: 33, length: 29},
+      {type: 'syntax', start: 62, length: 1},
+    ]);
+  });
+
+  test('with alt text containing markdown', () => {
+    expect('![# fake-heading *bold* _italic_ ~strike~ [:-)]](https://example.com/video.mp4)').toBeParsedAs([
+      {type: 'syntax', start: 0, length: 1},
+      {type: 'syntax', start: 1, length: 1},
+      {type: 'syntax', start: 47, length: 1},
+      {type: 'syntax', start: 48, length: 1},
+      {type: 'link', start: 49, length: 29},
+      {type: 'syntax', start: 78, length: 1},
+    ]);
+  });
+
+  test('trying to pass additional attributes', () => {
+    expect('![test](https://example.com/video.mp4 "title" class="video")').toBeParsedAs([{type: 'link', start: 8, length: 29}]);
+  });
+
+  test('trying to inject additional attributes', () => {
+    expect('![test" onerror="alert(\'xss\')](https://example.com/video.mp4)').toBeParsedAs([
+      {type: 'syntax', start: 0, length: 1},
+      {type: 'syntax', start: 1, length: 1},
+      {type: 'syntax', start: 29, length: 1},
+      {type: 'syntax', start: 30, length: 1},
+      {type: 'link', start: 31, length: 29},
+      {type: 'syntax', start: 60, length: 1},
+    ]);
+  });
+
+  test('inline code in alt', () => {
+    expect('![`code`](https://example.com/video.mp4)').toBeParsedAs([
+      {type: 'syntax', start: 0, length: 1},
+      {type: 'syntax', start: 1, length: 1},
+      {type: 'syntax', start: 8, length: 1},
+      {type: 'syntax', start: 9, length: 1},
+      {type: 'link', start: 10, length: 29},
+      {type: 'syntax', start: 39, length: 1},
+    ]);
+  });
+
+  test('blockquote in alt', () => {
+    expect('![```test```](https://example.com/video.mp4)').toBeParsedAs([
+      {type: 'syntax', start: 0, length: 1},
+      {type: 'syntax', start: 1, length: 1},
+      {type: 'syntax', start: 12, length: 1},
+      {type: 'syntax', start: 13, length: 1},
+      {type: 'link', start: 14, length: 29},
+      {type: 'syntax', start: 43, length: 1},
+    ]);
+  });
+});
