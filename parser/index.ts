@@ -191,6 +191,20 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
         appendSyntax('(');
         addChildrenWithStyle(linkString, 'link');
         appendSyntax(')');
+      } else if (node.tag.startsWith('<video data-expensify-source="')) {
+        const src = node.tag.match(/data-expensify-source="([^"]*)"/)![1]!; // always present
+        const rawLink = node.tag.match(/data-raw-href="([^"]*)"/);
+        const linkString = rawLink ? Utils.unescapeText(rawLink[1]!) : src;
+        const attachmentName = node.children?.join('')?.replaceAll('&#32;', ' ');
+        appendSyntax('!');
+        if (attachmentName) {
+          appendSyntax('[');
+          processChildren(Utils.unescapeText(attachmentName || ''));
+          appendSyntax(']');
+        }
+        appendSyntax('(');
+        addChildrenWithStyle(linkString, 'link');
+        appendSyntax(')');
       } else {
         throw new Error(`[react-native-live-markdown] Error in function parseTreeToTextAndRanges: Unknown tag '${node.tag}'. This tag is not supported in this function's logic.`);
       }
