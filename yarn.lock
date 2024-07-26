@@ -2613,7 +2613,7 @@ __metadata:
     "@react-native/babel-preset": 0.73.21
     "@react-native/metro-config": 0.73.5
     babel-plugin-module-resolver: ^5.0.0
-    expensify-common: 2.0.54
+    expensify-common: 2.0.55
     react: 18.2.0
     react-native: 0.73.4
     react-native-reanimated: 3.15.0-nightly-20240724-d65549b9e
@@ -9862,9 +9862,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expensify-common@npm:2.0.54":
-  version: 2.0.54
-  resolution: "expensify-common@npm:2.0.54"
+"expensify-common@npm:2.0.55":
+  version: 2.0.55
+  resolution: "expensify-common@npm:2.0.55"
   dependencies:
     awesome-phonenumber: ^5.4.0
     classnames: 2.5.0
@@ -9879,28 +9879,7 @@ __metadata:
     semver: ^7.6.2
     simply-deferred: "git+https://github.com/Expensify/simply-deferred.git#77a08a95754660c7bd6e0b6979fdf84e8e831bf5"
     ua-parser-js: ^1.0.38
-  checksum: c89df5e4027a32457efde2457a1e9a28484c585a3e67c63929eabe5cf9a7758b0a49d681659f03ffd105f1a6e5ba1c97ff6317e43dbaf43c49e38092cda0a4bf
-  languageName: node
-  linkType: hard
-
-"expensify-common@patch:expensify-common@npm%3A2.0.54#./.yarn/patches/expensify-common-npm-2.0.54-a44d85c9ec.patch::locator=%40expensify%2Freact-native-live-markdown%40workspace%3A.":
-  version: 2.0.54
-  resolution: "expensify-common@patch:expensify-common@npm%3A2.0.54#./.yarn/patches/expensify-common-npm-2.0.54-a44d85c9ec.patch::version=2.0.54&hash=b90d36&locator=%40expensify%2Freact-native-live-markdown%40workspace%3A."
-  dependencies:
-    awesome-phonenumber: ^5.4.0
-    classnames: 2.5.0
-    clipboard: 2.0.11
-    html-entities: ^2.5.2
-    jquery: 3.6.0
-    localforage: ^1.10.0
-    lodash: 4.17.21
-    prop-types: 15.8.1
-    react: 16.12.0
-    react-dom: 16.12.0
-    semver: ^7.6.2
-    simply-deferred: "git+https://github.com/Expensify/simply-deferred.git#77a08a95754660c7bd6e0b6979fdf84e8e831bf5"
-    ua-parser-js: ^1.0.38
-  checksum: 3a3b948dd6fe12ab82177e2538d613960981e37f5f0930ce48d0b4fcc7199f88ac796980e8af06eed8348fdbbf8f7fb0c30f3dceddf10d898a91b42b6ea11375
+  checksum: 43021adcc9e8d1f04bb23d7276b78a8a9c5ffd8e221e4f73a2689ead228da20bd395183bd09eb59d6037d3aa907acd9e8d40b1ecc20042f86b46728ee597b213
   languageName: node
   linkType: hard
 
