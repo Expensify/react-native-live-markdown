@@ -5,6 +5,7 @@ import type {PartialMarkdownStyle} from '../../styleUtils';
 import {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition} from './cursorUtils';
 import {addStyleToBlock} from './blockUtils';
 import BrowserUtils from './browserUtils';
+import {handleCustomStyles} from './webStyleUtils';
 
 type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'emoji' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax' | 'mention-here' | 'mention-user' | 'mention-report';
 
@@ -224,7 +225,7 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
         addTextToElement(spanNode, text.substring(range.start, endOfCurrentRange));
         if (range.type === 'pre') {
           // this property is used for code block background - only chromium displays single \n at the end of a block as a new line, hence this if check
-          span.setAttribute('data-content', text.substring(range.start, BrowserUtils.isChromium ? endOfCurrentRange - 1 : endOfCurrentRange));
+          span.setAttribute('data-content', text.substring(range.start, BrowserUtils.isChromium ? endOfCurrentRange : endOfCurrentRange));
         }
         currentParentNode.element.value = (currentParentNode.element.value || '') + (spanNode.element.value || '');
         lastRangeEndIndex = endOfCurrentRange;
@@ -297,6 +298,8 @@ function updateInputStructure(
     targetElement.tree = tree;
     moveCursor(isFocused, alwaysMoveCursorToTheEnd, cursorPosition, targetElement);
   }
+
+  handleCustomStyles(target, markdownStyle);
 
   return {text, cursorPosition: cursorPosition || 0};
 }

@@ -32,27 +32,19 @@
   position: absolute;
   z-index: -1;
   left: 0;
-
-  top: 23px;
-  padding: 4px;
-  background-color: lightgrey;
-  border-radius: 4px;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 *[data-type='line'] *[data-type='syntax']:has(+ *[data-type='pre']) {
   display: block;
-
-  transform: translate(-5px, -5px);
 }
 
 *[data-type='line'] *[data-type='pre'] + *[data-type='syntax'] {
   display: inline-block;
-
-  transform: translate(-5px, 5px);
 }
 
 *[data-type='line'] *[data-type='pre'] + *[data-type='syntax'] + *[data-type='text'] {
   display: inline-block;
-
-  transform: translate(-5px, 5px);
+  max-width: 100%;
 }

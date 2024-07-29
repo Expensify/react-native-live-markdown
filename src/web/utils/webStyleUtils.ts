@@ -2,6 +2,8 @@
 import type {TextStyle} from 'react-native';
 import type {MarkdownStyle} from '../../MarkdownTextInputDecoratorViewNativeComponent';
 import {mergeMarkdownStyleWithDefault} from '../../styleUtils';
+import type {PartialMarkdownStyle} from '../../styleUtils';
+import type {MarkdownTextInputElement} from '../../MarkdownTextInput.web';
 
 let createReactDOMStyle: (style: any) => any;
 try {
@@ -51,4 +53,59 @@ function parseToReactDOMStyle(style: TextStyle): any {
   return createReactDOMStyle(preprocessStyle(style));
 }
 
-export {parseToReactDOMStyle, processMarkdownStyle};
+const CUSTOM_WEB_STYLES_ID = 'LiveMarkdownCustomWebStyles';
+
+function* generateUniqueId() {
+  let idCounter = 0;
+  while (true) {
+    yield `live-markdown-input-${idCounter++}`;
+  }
+}
+
+const idGenerator = generateUniqueId();
+
+function configureCustomWebStylesheet() {
+  if (document.getElementById(CUSTOM_WEB_STYLES_ID) !== null) {
+    return;
+  }
+
+  const customStyleTag = document.createElement('style');
+  customStyleTag.id = CUSTOM_WEB_STYLES_ID;
+
+  document.head.appendChild(customStyleTag);
+}
+
+function handleCustomStyles(target: MarkdownTextInputElement, markdownStyle: PartialMarkdownStyle) {
+  const line = target.querySelector('*[data-type="line"]:has(> *[data-type="pre"]) > span:first-child');
+  const styleTag = document.getElementById(CUSTOM_WEB_STYLES_ID) as HTMLStyleElement;
+  if (!line || !styleTag || Object.values(styleTag.sheet?.cssRules ?? {}).some((rule) => rule.selectorText === `.${target.uniqueId} [data-type="pre"]::before`)) {
+    return;
+  }
+
+  const lineHeight = line.getBoundingClientRect()?.height;
+  const preStyles = markdownStyle.pre;
+  const padding = preStyles?.padding ?? 5;
+
+  const beforeRule = `.${target.uniqueId} *[data-type='pre']::before {
+      top: ${Math.floor(lineHeight)}px;
+      padding: ${(padding - 1)?.toString()}px;
+      background-color: ${(preStyles?.backgroundColor as string) ?? 'lightgray'};
+      border-radius: ${preStyles?.borderRadius?.toString() ?? '4'}px;
+      border-color: ${preStyles?.borderColor ?? 'grey'};
+    }`;
+  const firstSyntaxRule = `.${target.uniqueId} *[data-type='line'] *[data-type='syntax']:has(+ *[data-type='pre']) {
+      transform: translate(-${padding}px, -${padding}px);
+    }`;
+  const secondSyntaxRule = `.${target.uniqueId} *[data-type='line'] *[data-type='pre'] + *[data-type='syntax'] {
+      transform: translate(-${padding}px, ${padding}px);
+    }`;
+  const textRule = `.${target.uniqueId} *[data-type='line'] *[data-type='pre'] + *[data-type='syntax'] + *[data-type='text'] {
+      transform: translate(-${padding}px, ${padding}px);
+    }`;
+  styleTag.sheet?.insertRule(beforeRule, 0);
+  styleTag.sheet?.insertRule(firstSyntaxRule, 1);
+  styleTag.sheet?.insertRule(secondSyntaxRule, 2);
+  styleTag.sheet?.insertRule(textRule, 3);
+}
+
+export {parseToReactDOMStyle, processMarkdownStyle, configureCustomWebStylesheet, idGenerator, handleCustomStyles};

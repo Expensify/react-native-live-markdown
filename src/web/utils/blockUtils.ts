@@ -52,6 +52,7 @@ function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownSty
       Object.assign(node.style, {
         ...markdownStyle.pre,
         backgroundColor: 'transparent',
+        padding: '0px',
       });
       Object.assign((node.parentNode as HTMLElement).style, {
         padding: '5px',

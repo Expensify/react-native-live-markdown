@@ -10,7 +10,7 @@ import type {
   TextInputFocusEventData,
   TextInputContentSizeChangeEventData,
 } from 'react-native';
-import React, {useEffect, useRef, useCallback, useMemo, useLayoutEffect} from 'react';
+import React, {useEffect, useRef, useCallback, useMemo, useLayoutEffect, useState} from 'react';
 import type {CSSProperties, MutableRefObject, ReactEventHandler, FocusEventHandler, MouseEvent, KeyboardEvent, SyntheticEvent, ClipboardEventHandler} from 'react';
 import {StyleSheet} from 'react-native';
 import {updateInputStructure} from './web/utils/parserUtils';
@@ -21,7 +21,8 @@ import {getCurrentCursorPosition, removeSelection, setCursorPosition} from './we
 import './web/MarkdownTextInput.css';
 import type {MarkdownStyle} from './MarkdownTextInputDecoratorViewNativeComponent';
 import {getElementHeight, getPlaceholderValue, isEventComposing, parseInnerHTMLToText} from './web/utils/inputUtils';
-import {parseToReactDOMStyle, processMarkdownStyle} from './web/utils/webStyleUtils';
+import {configureCustomWebStylesheet, handleCustomStyles, idGenerator, parseToReactDOMStyle, processMarkdownStyle} from './web/utils/webStyleUtils';
+import type {PartialMarkdownStyle} from './styleUtils';
 
 require('../parser/react-native-live-markdown-parser.js');
 
@@ -58,6 +59,7 @@ let focusTimeout: NodeJS.Timeout | null = null;
 type MarkdownTextInputElement = HTMLDivElement &
   HTMLInputElement & {
     tree: TreeNode;
+    uniqueId: string;
   };
 
 type HTMLMarkdownElement = HTMLElement & {
@@ -104,7 +106,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     const divRef = useRef<MarkdownTextInputElement | null>(null);
     const currentlyFocusedField = useRef<HTMLDivElement | null>(null);
     const contentSelection = useRef<Selection | null>(null);
-    const className = `react-native-live-markdown-input-${multiline ? 'multiline' : 'singleline'}`;
+    const [className, setClassName] = useState(`react-native-live-markdown-input-${multiline ? 'multiline' : 'singleline'}`);
     const history = useRef<InputHistory>();
     const dimensions = useRef<Dimensions | null>(null);
     const pasteContent = useRef<string | null>(null);
@@ -614,6 +616,11 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       if (autoFocus) {
         divRef.current.focus();
       }
+
+      configureCustomWebStylesheet();
+      divRef.current.uniqueId = idGenerator.next().value as string;
+      setClassName(`${className} ${divRef.current.uniqueId}`);
+      handleCustomStyles(divRef.current, markdownStyle as PartialMarkdownStyle);
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
