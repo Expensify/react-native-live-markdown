@@ -2,6 +2,7 @@ import {StyleSheet, TextInput, processColor} from 'react-native';
 import React from 'react';
 import type {TextInputProps} from 'react-native';
 import {makeShareableCloneRecursive} from 'react-native-reanimated';
+import type {ShareableRef, WorkletFunction} from 'react-native-reanimated/lib/typescript/commonTypes';
 
 import MarkdownTextInputDecoratorViewNativeComponent from './MarkdownTextInputDecoratorViewNativeComponent';
 import NativeLiveMarkdownModule from './NativeLiveMarkdownModule';
@@ -9,6 +10,13 @@ import type * as MarkdownTextInputDecoratorViewNativeComponentTypes from './Mark
 import * as StyleUtils from './styleUtils';
 import type * as StyleUtilsTypes from './styleUtils';
 import getMarkdownRuntime from './native/getMarkdownRuntime';
+
+declare global {
+  // eslint-disable-next-line no-var
+  var registerMarkdownWorklet: (shareableWorklet: ShareableRef<WorkletFunction<[], void>>) => number;
+  // eslint-disable-next-line no-var
+  var unregisterMarkdownWorklet: (parserId: number) => void;
+}
 
 NativeLiveMarkdownModule?.install();
 
@@ -63,6 +71,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>((p
   if (props.parser === undefined) {
     throw new Error('[react-native-live-markdown] `parser` is undefined');
   }
+
   // eslint-disable-next-line no-underscore-dangle
   const workletHash = (props.parser as unknown as {__workletHash: number}).__workletHash;
   if (workletHash === undefined) {
@@ -70,12 +79,14 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>((p
   }
 
   const parserId = React.useMemo(() => {
-    const shareableWorklet = makeShareableCloneRecursive(props.parser);
-    // @ts-expect-error TODO fix types
+    const shareableWorklet = makeShareableCloneRecursive(props.parser) as ShareableRef<WorkletFunction<[], void>>;
     return global.registerMarkdownWorklet(shareableWorklet);
-    // TODO: unregisterMarkdownWorklet
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [workletHash]);
+
+  React.useEffect(() => {
+    return () => global.unregisterMarkdownWorklet(parserId);
+  }, [parserId]);
 
   return (
     <>
