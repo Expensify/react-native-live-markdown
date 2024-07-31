@@ -25,6 +25,10 @@ jobs:
             - name: Install node_modules
               run: yarn install --immutable
 
+            - name: Apply patches
+              working-directory: example
+              run: yarn patch-package
+
             - name: Verify there's no Prettier diff
               run: |
                 yarn lint --fix --quiet
