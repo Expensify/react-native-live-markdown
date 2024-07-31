@@ -17,7 +17,7 @@ jobs:
        if: ${{ github.actor != 'OSBotify' }}
 
        steps:
-           - uses: actions/checkout@v3
+           - uses: actions/checkout@v4
              with:
                ref: main
 
@@ -36,16 +36,10 @@ jobs:
                git config --global user.name OSBotify
                git config --global user.email infra+osbotify@expensify.com
 
-           - uses: actions/setup-node@v3
+           - uses: actions/setup-node@v4
              with:
-               node-version: '16.x'
+               node-version-file: '.nvmrc'
                registry-url: 'https://registry.npmjs.org'
-
-           - name: Generate branch name
-             run: echo "BRANCH_NAME=OSBotify-bump-version-$(uuidgen)" >> $GITHUB_ENV
-
-           - name: Create branch for version-bump pull request
-             run: git checkout -b ${{ env.BRANCH_NAME }}
 
            - name: Install yarn packages
              run: yarn install --immutable
@@ -63,26 +57,7 @@ jobs:
              run: git tag ${{ env.NEW_VERSION }}
 
            - name: Push branch and publish tags
-             run: git push --set-upstream origin ${{ env.BRANCH_NAME }} && git push --tags
-
-           - name: Create pull request
-             run: |
-               gh pr create \
-                 --title "Update version to ${{ env.NEW_VERSION }}" \
-                 --body "Update version to ${{ env.NEW_VERSION }}"
-               sleep 5
-             env:
-               GITHUB_TOKEN: ${{ secrets.OS_BOTIFY_TOKEN }}
-
-           - name: Auto-approve pull request
-             run: gh pr review --approve ${{ env.BRANCH_NAME }}
-             env:
-               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-           - name: Auto-merge pull request
-             run: gh pr merge --squash --delete-branch ${{ env.BRANCH_NAME }}
-             env:
-               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+             run: git push --set-upstream origin main && git push --tags
 
            - name: Build package
              run: yarn pack
