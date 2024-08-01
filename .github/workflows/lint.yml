@@ -1,35 +1,35 @@
 name: Lint JavaScript
 
 on:
-  pull_request:
-    types: [opened, synchronize]
+    pull_request:
+        types: [opened, synchronize]
 
 jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
+    lint:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
 
-      - uses: actions/cache@v2
-        with:
-          path: ~/.yarn
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
+            - uses: actions/cache@v2
+              with:
+                  path: ~/.yarn
+                  key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-yarn-
 
-      - name: Setup Node
-        uses: actions/setup-node@v1
-        with:
-          node-version: '16.x'
+            - name: Setup Node
+              uses: actions/setup-node@v1
+              with:
+                  node-version: "16.x"
 
-      - name: Install node_modules
-        run: yarn install --immutable
+            - name: Install node_modules
+              run: yarn install --immutable
 
-      - name: Verify there's no Prettier diff
-        run: |
-          yarn lint --fix --quiet
-          if ! git diff --name-only --exit-code; then
-              # shellcheck disable=SC2016
-              echo 'Error: Prettier diff detected! Please run `yarn lint --fix` and commit the changes.'
-              exit 1
-          fi
+            - name: Verify there's no Prettier diff
+              run: |
+                yarn lint --fix --quiet
+                if ! git diff --name-only --exit-code; then
+                    # shellcheck disable=SC2016
+                    echo 'Error: Prettier diff detected! Please run `yarn lint --fix` and commit the changes.'
+                    exit 1
+                fi
