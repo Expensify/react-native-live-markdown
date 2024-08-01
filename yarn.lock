@@ -2613,7 +2613,7 @@ __metadata:
     "@react-native/babel-preset": 0.73.21
     "@react-native/metro-config": 0.73.5
     babel-plugin-module-resolver: ^5.0.0
-    expensify-common: 2.0.55
+    expensify-common: 2.0.64
     react: 18.2.0
     react-native: 0.73.4
     react-native-reanimated: 3.15.0-nightly-20240724-d65549b9e
@@ -9862,9 +9862,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expensify-common@npm:2.0.55":
-  version: 2.0.55
-  resolution: "expensify-common@npm:2.0.55"
+"expensify-common@npm:2.0.64":
+  version: 2.0.64
+  resolution: "expensify-common@npm:2.0.64"
   dependencies:
     awesome-phonenumber: ^5.4.0
     classnames: 2.5.0
@@ -9879,7 +9879,7 @@ __metadata:
     semver: ^7.6.2
     simply-deferred: "git+https://github.com/Expensify/simply-deferred.git#77a08a95754660c7bd6e0b6979fdf84e8e831bf5"
     ua-parser-js: ^1.0.38
-  checksum: 43021adcc9e8d1f04bb23d7276b78a8a9c5ffd8e221e4f73a2689ead228da20bd395183bd09eb59d6037d3aa907acd9e8d40b1ecc20042f86b46728ee597b213
+  checksum: c58c9404da09be588be799798f03e2c74c5598b069218e6a895b65bb8e7132f11820c4f1b50f8e92fcb39b498f71159d75fadd90112632eac250dd09a346488a
   languageName: node
   linkType: hard
 
