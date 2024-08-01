@@ -194,12 +194,12 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
       } else if (node.tag.startsWith('<video data-expensify-source="')) {
         const src = node.tag.match(/data-expensify-source="([^"]*)"/)![1]!; // always present
         const rawLink = node.tag.match(/data-raw-href="([^"]*)"/);
+        const hasAlt = node.tag.match(/data-link-variant="([^"]*)"/)![1] === 'labeled';
         const linkString = rawLink ? Utils.unescapeText(rawLink[1]!) : src;
-        const attachmentName = node.children?.join('')?.replaceAll('&#32;', ' ');
         appendSyntax('!');
-        if (attachmentName) {
+        if (hasAlt) {
           appendSyntax('[');
-          processChildren(Utils.unescapeText(attachmentName || ''));
+          node.children.forEach((child) => processChildren(child));
           appendSyntax(']');
         }
         appendSyntax('(');
