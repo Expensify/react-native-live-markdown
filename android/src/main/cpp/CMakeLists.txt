@@ -6,10 +6,10 @@ set(CMAKE_VERBOSE_MAKEFILE on)
 
 add_compile_options(-fvisibility=hidden -fexceptions -frtti)
 
-file(GLOB android_SRC CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
-file(GLOB cpp_SRC CONFIGURE_DEPENDS /Users/tomekzaw/Expensify/react-native-live-markdown/cpp/*.cpp)
+file(GLOB ANDROID_SRC CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
+file(GLOB CPP_SRC CONFIGURE_DEPENDS /Users/tomekzaw/Expensify/react-native-live-markdown/cpp/*.cpp)
 
-add_library(${CMAKE_PROJECT_NAME} SHARED ${android_SRC} ${cpp_SRC})
+add_library(${CMAKE_PROJECT_NAME} SHARED ${ANDROID_SRC} ${CPP_SRC})
 
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} /Users/tomekzaw/Expensify/react-native-live-markdown/cpp)
 
