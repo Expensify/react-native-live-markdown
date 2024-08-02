@@ -1,13 +1,10 @@
 import ExpensiMark from 'expensify-common/dist/ExpensiMark';
 import * as Utils from 'expensify-common/dist/utils';
+import type * as MarkdownTextInputTypes from './MarkdownTextInput';
 
-type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'emoji' | 'mention-here' | 'mention-user' | 'mention-report' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax';
-type Range = {
-  type: MarkdownType;
-  start: number;
-  length: number;
-  depth?: number;
-};
+type Range = MarkdownTextInputTypes.Range;
+type MarkdownType = MarkdownTextInputTypes.MarkdownType;
+
 type Token = ['TEXT' | 'HTML', string];
 type StackItem = {tag: string; children: Array<StackItem | string>};
 

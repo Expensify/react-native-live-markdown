@@ -53,8 +53,10 @@ function unregisterParser(parserId: number) {
 type PartialMarkdownStyle = StyleUtilsTypes.PartialMarkdownStyle;
 type MarkdownStyle = MarkdownTextInputDecoratorViewNativeComponentTypes.MarkdownStyle;
 
+type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'emoji' | 'mention-here' | 'mention-user' | 'mention-report' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax';
+
 interface Range {
-  type: string;
+  type: MarkdownType;
   start: number;
   length: number;
   depth?: number;
@@ -136,6 +138,6 @@ const styles = StyleSheet.create({
   },
 });
 
-export type {PartialMarkdownStyle as MarkdownStyle, MarkdownTextInputProps, Range};
+export type {PartialMarkdownStyle as MarkdownStyle, MarkdownTextInputProps, Range, MarkdownType};
 
 export default MarkdownTextInput;

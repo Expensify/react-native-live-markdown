@@ -1,11 +1,11 @@
 import * as CursorUtils from './cursorUtils';
 import type * as StyleUtilsTypes from '../styleUtils';
 import * as BrowserUtils from './browserUtils';
-import type {Range} from '../MarkdownTextInput';
+import type * as MarkdownTextInputTypes from '../MarkdownTextInput';
 
 type PartialMarkdownStyle = StyleUtilsTypes.PartialMarkdownStyle;
-
-type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'emoji' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax' | 'mention-here' | 'mention-user' | 'mention-report';
+type Range = MarkdownTextInputTypes.Range;
+type MarkdownType = MarkdownTextInputTypes.MarkdownType;
 
 type MarkdownRange = {
   type: MarkdownType;
