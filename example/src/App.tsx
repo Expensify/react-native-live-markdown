@@ -4,6 +4,7 @@ import {Button, Platform, StyleSheet, Text, View} from 'react-native';
 
 import {MarkdownTextInput, parseExpensiMark} from '@expensify/react-native-live-markdown';
 import type {TextInput} from 'react-native';
+import * as TEST_CONST from './testConstants';
 
 function isWeb() {
   return Platform.OS === 'web';
@@ -65,18 +66,6 @@ export default function App() {
   // TODO: use MarkdownTextInput ref instead of TextInput ref
   const ref = React.useRef<TextInput>(null);
 
-  // const parser = useMarkdownParser((markdown: string) => {
-  //   'worklet';
-
-  //   const result = [];
-  //   for (let i = 0; i < markdown.length; i++) {
-  //     const type = ['mention-report', 'mention-here', 'mention-user'][i % 3];
-  //     result.push({type, start: i, length: 1, depth: 0} as Range);
-  //   }
-
-  //   return result;
-  // }, []);
-
   return (
     <View style={styles.container}>
       <View style={styles.platform}>
@@ -112,6 +101,7 @@ export default function App() {
         placeholder="Type here..."
         onSelectionChange={(e) => setSelection(e.nativeEvent.selection)}
         selection={selection}
+        id={TEST_CONST.INPUT_ID}
       />
       {/* <Text>TextInput singleline</Text>
       <TextInput
@@ -153,7 +143,7 @@ export default function App() {
         testID="reset"
         title="Reset"
         onPress={() => {
-          setValue('Hello *world*!');
+          setValue(TEST_CONST.EXAMPLE_CONTENT);
           setMarkdownStyle({});
         }}
       />
