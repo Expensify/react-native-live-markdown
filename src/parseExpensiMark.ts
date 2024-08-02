@@ -1,5 +1,5 @@
 import ExpensiMark from 'expensify-common/dist/ExpensiMark';
-import {unescapeText} from 'expensify-common/dist/utils';
+import * as Utils from 'expensify-common/dist/utils';
 
 type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'emoji' | 'mention-here' | 'mention-user' | 'mention-report' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax';
 type Range = {
@@ -54,7 +54,7 @@ function parseTokensToTree(tokens: Token[]): StackItem {
   const stack: StackItem[] = [{tag: '<>', children: []}];
   tokens.forEach(([type, payload]) => {
     if (type === 'TEXT') {
-      const text = unescapeText(payload);
+      const text = Utils.unescapeText(payload);
       const top = stack[stack.length - 1];
       top!.children.push(text);
     } else if (type === 'HTML') {
@@ -169,10 +169,10 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
         appendSyntax('```');
       } else if (node.tag.startsWith('<a href="')) {
         const rawHref = node.tag.match(/href="([^"]*)"/)![1]!; // always present
-        const href = unescapeText(rawHref);
+        const href = Utils.unescapeText(rawHref);
         const isLabeledLink = node.tag.match(/data-link-variant="([^"]*)"/)![1] === 'labeled';
         const dataRawHref = node.tag.match(/data-raw-href="([^"]*)"/);
-        const matchString = dataRawHref ? unescapeText(dataRawHref[1]!) : href;
+        const matchString = dataRawHref ? Utils.unescapeText(dataRawHref[1]!) : href;
         if (!isLabeledLink && node.children.length === 1 && typeof node.children[0] === 'string' && (node.children[0] === matchString || `mailto:${node.children[0]}` === href)) {
           addChildrenWithStyle(node.children[0], 'link');
         } else {
@@ -187,12 +187,12 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
         const alt = node.tag.match(/alt="([^"]*)"/);
         const hasAlt = node.tag.match(/data-link-variant="([^"]*)"/)![1] === 'labeled';
         const rawLink = node.tag.match(/data-raw-href="([^"]*)"/);
-        const linkString = rawLink ? unescapeText(rawLink[1]!) : src;
+        const linkString = rawLink ? Utils.unescapeText(rawLink[1]!) : src;
 
         appendSyntax('!');
         if (hasAlt) {
           appendSyntax('[');
-          processChildren(unescapeText(alt?.[1] || ''));
+          processChildren(Utils.unescapeText(alt?.[1] || ''));
           appendSyntax(']');
         }
         appendSyntax('(');
@@ -202,7 +202,7 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
         const src = node.tag.match(/data-expensify-source="([^"]*)"/)![1]!; // always present
         const rawLink = node.tag.match(/data-raw-href="([^"]*)"/);
         const hasAlt = node.tag.match(/data-link-variant="([^"]*)"/)![1] === 'labeled';
-        const linkString = rawLink ? unescapeText(rawLink[1]!) : src;
+        const linkString = rawLink ? Utils.unescapeText(rawLink[1]!) : src;
         appendSyntax('!');
         if (hasAlt) {
           appendSyntax('[');
