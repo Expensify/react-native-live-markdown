@@ -57,6 +57,7 @@ interface Range {
   type: string;
   start: number;
   length: number;
+  depth?: number;
 }
 
 interface MarkdownTextInputProps extends TextInputProps {
