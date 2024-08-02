@@ -59,7 +59,7 @@ function getRandomColor() {
 }
 
 export default function App() {
-  const [value, setValue] = React.useState('Hello *world*! @here\n> Lorem ipsum');
+  const [value, setValue] = React.useState(TEST_CONST.EXAMPLE_CONTENT);
   const [markdownStyle, setMarkdownStyle] = React.useState({});
   const [selection, setSelection] = React.useState({start: 0, end: 0});
 
