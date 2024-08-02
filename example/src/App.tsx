@@ -2,9 +2,8 @@ import * as React from 'react';
 
 import {Button, Platform, StyleSheet, Text, View} from 'react-native';
 
-import {MarkdownTextInput} from '@expensify/react-native-live-markdown';
+import {MarkdownTextInput, parseExpensiMark} from '@expensify/react-native-live-markdown';
 import type {TextInput} from 'react-native';
-import parseExpensiMark from './parseExpensiMark';
 
 function isWeb() {
   return Platform.OS === 'web';

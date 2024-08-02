@@ -2,8 +2,7 @@
 import {expect} from '@jest/globals';
 import * as ParserUtils from '../web/parserUtils';
 import type * as MarkdownTypes from '../web/parserUtils';
-
-require('../../parser/react-native-live-markdown-parser.js');
+import parseExpensiMark from '../parseExpensiMark';
 
 declare module 'expect' {
   interface Matchers<R> {
@@ -16,7 +15,7 @@ const toBeParsedAsHTML = function (actual: string, expectedHTML: string) {
     throw new Error('Actual value must be a string');
   }
   let expected = expectedHTML;
-  const ranges = global.parseExpensiMarkToRanges(actual);
+  const ranges = parseExpensiMark(actual);
   const markdownRanges = ranges as MarkdownTypes.MarkdownRange[];
 
   const actualDOM = ParserUtils.parseRangesToHTMLNodes(actual, markdownRanges, {}, true);
