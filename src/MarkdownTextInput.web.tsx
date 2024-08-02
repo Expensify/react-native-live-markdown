@@ -293,13 +293,15 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         }
 
         const prevSelection = contentSelection.current ?? {start: 0, end: 0};
+        const newCursorPosition = Math.max(Math.max(contentSelection.current.end, 0) + (parsedText.length - previousText.length), 0);
+
         if (compositionRef.current && !BrowserUtils.isMobile) {
           divRef.current.value = parsedText;
           compositionRef.current = false;
+          contentSelection.current.end = newCursorPosition;
           return;
         }
 
-        const newCursorPosition = Math.max(Math.max(contentSelection.current.end, 0) + (parsedText.length - previousText.length), 0);
         let newInputUpdate: ParseTextResult;
         switch (inputType) {
           case 'historyUndo':
