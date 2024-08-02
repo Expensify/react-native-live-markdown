@@ -36,17 +36,8 @@ The library includes native code so you will need to re-build the native app.
 ## Usage
 
 ```tsx
-import {MarkdownTextInput} from '@expensify/react-native-live-markdown';
+import {MarkdownTextInput, parseExpensiMark} from '@expensify/react-native-live-markdown';
 import React from 'react';
-
-function parser(value: string) {
-  'worklet';
-
-  return [
-    {start: 2, length: 3, type: 'bold'},
-    {start: 5, length: 7, type: 'link'},
-  ];
-}
 
 export default function App() {
   const [text, setText] = React.useState('Hello, *world*!');
@@ -55,7 +46,7 @@ export default function App() {
     <MarkdownTextInput
       value={text}
       onChangeText={setText}
-      parser={parser}
+      parser={parseExpensiMark}
     />
   );
 }
