@@ -30,9 +30,6 @@ jobs:
       - name: Typecheck library
         run: yarn tsc --project tsconfig.json --noEmit
 
-      - name: Typecheck parser
-        run: yarn tsc --project parser/tsconfig.json --noEmit
-
       - name: Typecheck example app
         run: yarn tsc --project example/tsconfig.json --noEmit
 

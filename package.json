@@ -31,12 +31,11 @@
     "test": "jest",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --ext .js,.ts,.tsx",
-    "lint:root": "eslint . --ext .js,.ts,.tsx --ignore-pattern '/parser/**/*' --ignore-pattern '/example/**/*' --ignore-pattern '/WebExample/**/*'",
-    "lint:parser": "eslint parser --ext .js,.ts,.tsx",
+    "lint:root": "eslint . --ext .js,.ts,.tsx --ignore-pattern '/example/**/*' --ignore-pattern '/WebExample/**/*'",
     "lint:example": "eslint example --ext .js,.ts,.tsx",
     "lint:WebExample": "eslint WebExample --ext .js,.ts,.tsx",
     "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
-    "prepare": "bob build && mkdir -p lib/parser && cp parser/react-native-live-markdown-parser.js lib/parser/react-native-live-markdown-parser.js",
+    "prepare": "bob build",
     "release": "release-it"
   },
   "keywords": [
@@ -109,7 +108,6 @@
     "react-native-reanimated": ">=3.11.0"
   },
   "workspaces": [
-    "parser",
     "example",
     "WebExample"
   ],
