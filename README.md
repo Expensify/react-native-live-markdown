@@ -15,12 +15,12 @@
 First, install the library from npm with the package manager of your choice:
 
 ```sh
-yarn add @expensify/react-native-live-markdown react-native-reanimated
-npm install @expensify/react-native-live-markdown react-native-reanimated --save
-npx expo install @expensify/react-native-live-markdown react-native-reanimated
+yarn add @expensify/react-native-live-markdown react-native-reanimated expensify-common
+npm install @expensify/react-native-live-markdown react-native-reanimated expensify-common --save
+npx expo install @expensify/react-native-live-markdown react-native-reanimated expensify-common
 ```
 
-Live Markdown requires [react-native-reanimated](https://github.com/software-mansion/react-native-reanimated) 3.11.0 or newer.
+React Native Live Markdown requires [react-native-reanimated](https://github.com/software-mansion/react-native-reanimated) 3.11.0 or newer and [expensify-common](https://github.com/Expensify/expensify-common) 2.0.46 or newer.
 
 Then, install the iOS dependencies with CocoaPods:
 
