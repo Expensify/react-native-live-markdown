@@ -128,9 +128,10 @@ The style object can be passed to multiple `MarkdownTextInput` components using 
 
 ```ts
 interface Range {
+  type: MarkdownType;
   start: number;
   length: number;
-  type: string;
+  depth?: number;
 }
 ```
 
