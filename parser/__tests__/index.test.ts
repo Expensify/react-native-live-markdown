@@ -1,16 +1,27 @@
+import {expect} from '@jest/globals';
+import type * as ParserTypes from '../index';
+
 require('../react-native-live-markdown-parser.js');
 
+declare module 'expect' {
+  interface Matchers<R> {
+    toBeParsedAs(expectedRanges: ParserTypes.Range[]): R;
+  }
+}
+
+const toBeParsedAs = function (actual: string, expectedRanges: ParserTypes.Range[]) {
+  const actualRanges = global.parseExpensiMarkToRanges(actual);
+  if (JSON.stringify(actualRanges) !== JSON.stringify(expectedRanges)) {
+    return {
+      pass: false,
+      message: () => `Expected ${JSON.stringify(expectedRanges)}, got ${JSON.stringify(actualRanges)}`,
+    };
+  }
+  return {pass: true, message: () => ''};
+};
+
 expect.extend({
-  toBeParsedAs(received, expectedRanges) {
-    const actualRanges = global.parseExpensiMarkToRanges(received);
-    if (JSON.stringify(actualRanges) !== JSON.stringify(expectedRanges)) {
-      return {
-        pass: false,
-        message: () => `Expected ${JSON.stringify(expectedRanges)}, got ${JSON.stringify(actualRanges)}`,
-      };
-    }
-    return {pass: true};
-  },
+  toBeParsedAs,
 });
 
 test('empty string', () => {
@@ -76,8 +87,12 @@ describe('mention-user', () => {
     expect('@mail@mail.com!').toBeParsedAs([{type: 'mention-user', start: 0, length: 14}]);
   });
 
-  test('with phone number', () => {
-    expect('@+1234567890 Hello!').toBeParsedAs([{type: 'mention-user', start: 0, length: 12}]);
+  test('with invalid phone number', () => {
+    expect('@+1234567890 Hello!').toBeParsedAs([]);
+  });
+
+  test('with valid phone number', () => {
+    expect('@+15005550006 Hello!').toBeParsedAs([{type: 'mention-user', start: 0, length: 13}]);
   });
 });
 
@@ -160,6 +175,15 @@ describe('email with same label as address', () => {
       {type: 'syntax', start: 55, length: 1},
     ]);
   });
+});
+
+test('email with multiline hyperlinks', () => {
+  expect('[test\ntest](test@test.com)').toBeParsedAs([
+    {type: 'syntax', start: 0, length: 1},
+    {type: 'syntax', start: 10, length: 2},
+    {type: 'link', start: 12, length: 13},
+    {type: 'syntax', start: 25, length: 1},
+  ]);
 });
 
 test('inline code', () => {
@@ -524,5 +548,88 @@ describe('report mentions', () => {
 
   test('report mention with punctuation', () => {
     expect('reported #report-name!').toBeParsedAs([{type: 'mention-report', start: 9, length: 12}]);
+  });
+});
+
+describe('inline video', () => {
+  test('with alt text', () => {
+    expect('![test](https://example.com/video.mp4)').toBeParsedAs([
+      {type: 'syntax', start: 0, length: 1},
+      {type: 'syntax', start: 1, length: 1},
+      {type: 'syntax', start: 6, length: 1},
+      {type: 'syntax', start: 7, length: 1},
+      {type: 'link', start: 8, length: 29},
+      {type: 'syntax', start: 37, length: 1},
+    ]);
+  });
+
+  test('without alt text', () => {
+    expect('![](https://example.com/video.mp4)').toBeParsedAs([
+      {type: 'syntax', start: 0, length: 1},
+      {type: 'syntax', start: 1, length: 1},
+      {type: 'syntax', start: 2, length: 1},
+      {type: 'syntax', start: 3, length: 1},
+      {type: 'link', start: 4, length: 29},
+      {type: 'syntax', start: 33, length: 1},
+    ]);
+  });
+
+  test('with same alt text as src', () => {
+    expect('![https://example.com/video.mp4](https://example.com/video.mp4)').toBeParsedAs([
+      {type: 'syntax', start: 0, length: 1},
+      {type: 'syntax', start: 1, length: 1},
+      {type: 'syntax', start: 31, length: 1},
+      {type: 'syntax', start: 32, length: 1},
+      {type: 'link', start: 33, length: 29},
+      {type: 'syntax', start: 62, length: 1},
+    ]);
+  });
+
+  test('with alt text containing markdown', () => {
+    expect('![# fake-heading *bold* _italic_ ~strike~ [:-)]](https://example.com/video.mp4)').toBeParsedAs([
+      {type: 'syntax', start: 0, length: 1},
+      {type: 'syntax', start: 1, length: 1},
+      {type: 'syntax', start: 47, length: 1},
+      {type: 'syntax', start: 48, length: 1},
+      {type: 'link', start: 49, length: 29},
+      {type: 'syntax', start: 78, length: 1},
+    ]);
+  });
+
+  test('trying to pass additional attributes', () => {
+    expect('![test](https://example.com/video.mp4 "title" class="video")').toBeParsedAs([{type: 'link', start: 8, length: 29}]);
+  });
+
+  test('trying to inject additional attributes', () => {
+    expect('![test" onerror="alert(\'xss\')](https://example.com/video.mp4)').toBeParsedAs([
+      {type: 'syntax', start: 0, length: 1},
+      {type: 'syntax', start: 1, length: 1},
+      {type: 'syntax', start: 29, length: 1},
+      {type: 'syntax', start: 30, length: 1},
+      {type: 'link', start: 31, length: 29},
+      {type: 'syntax', start: 60, length: 1},
+    ]);
+  });
+
+  test('inline code in alt', () => {
+    expect('![`code`](https://example.com/video.mp4)').toBeParsedAs([
+      {type: 'syntax', start: 0, length: 1},
+      {type: 'syntax', start: 1, length: 1},
+      {type: 'syntax', start: 8, length: 1},
+      {type: 'syntax', start: 9, length: 1},
+      {type: 'link', start: 10, length: 29},
+      {type: 'syntax', start: 39, length: 1},
+    ]);
+  });
+
+  test('blockquote in alt', () => {
+    expect('![```test```](https://example.com/video.mp4)').toBeParsedAs([
+      {type: 'syntax', start: 0, length: 1},
+      {type: 'syntax', start: 1, length: 1},
+      {type: 'syntax', start: 12, length: 1},
+      {type: 'syntax', start: 13, length: 1},
+      {type: 'link', start: 14, length: 29},
+      {type: 'syntax', start: 43, length: 1},
+    ]);
   });
 });

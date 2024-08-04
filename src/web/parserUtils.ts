@@ -34,7 +34,7 @@ function addStyling(targetElement: HTMLElement, type: MarkdownType, markdownStyl
       node.style.textDecoration = 'line-through';
       break;
     case 'emoji':
-      Object.assign(node.style, markdownStyle.emoji);
+      Object.assign(node.style, {...markdownStyle.emoji, verticalAlign: 'middle'});
       break;
     case 'mention-here':
       Object.assign(node.style, markdownStyle.mentionHere);
@@ -203,7 +203,7 @@ function parseText(target: HTMLElement, text: string, cursorPositionIndex: numbe
   if (text) {
     const dom = parseRangesToHTMLNodes(text, markdownRanges, markdownStyle);
 
-    if (!rootSpan || rootSpan.innerHTML !== dom.innerHTML) {
+    if (!rootSpan || !rootSpan?.classList?.contains('root') || rootSpan.innerHTML !== dom.innerHTML) {
       targetElement.innerHTML = '';
       targetElement.innerText = '';
       target.appendChild(dom);
