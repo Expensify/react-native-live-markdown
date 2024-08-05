@@ -1,5 +1,4 @@
 **/node_modules/*
-parser/react-native-live-markdown-parser.js
 
 # any js file inside android and ios folders
 **/android/**/*.js

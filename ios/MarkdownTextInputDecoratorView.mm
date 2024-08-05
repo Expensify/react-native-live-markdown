@@ -17,6 +17,7 @@
 @implementation MarkdownTextInputDecoratorView {
   RCTMarkdownUtils *_markdownUtils;
   RCTMarkdownStyle *_markdownStyle;
+  NSNumber *_parserId;
 #ifdef RCT_NEW_ARCH_ENABLED
   __weak RCTTextInputComponentView *_textInput;
 #else
@@ -62,6 +63,7 @@
   _markdownUtils = [[RCTMarkdownUtils alloc] init];
   react_native_assert(_markdownStyle != nil);
   [_markdownUtils setMarkdownStyle:_markdownStyle];
+  [_markdownUtils setParserId:_parserId];
 
   [_textInput setMarkdownUtils:_markdownUtils];
   if ([_backedTextInputView isKindOfClass:[RCTUITextField class]]) {
@@ -109,8 +111,18 @@
 {
   _markdownStyle = markdownStyle;
   [_markdownUtils setMarkdownStyle:markdownStyle];
+  [self applyNewStyles];
+}
 
-  // apply new styles
+- (void)setParserId:(NSNumber *)parserId
+{
+  _parserId = parserId;
+  [_markdownUtils setParserId:parserId];
+  [self applyNewStyles];
+}
+
+- (void)applyNewStyles
+{
 #ifdef RCT_NEW_ARCH_ENABLED
   [_textInput _setAttributedString:_backedTextInputView.attributedText];
 #else

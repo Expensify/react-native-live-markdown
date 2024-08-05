@@ -20,8 +20,7 @@ import * as BrowserUtils from './web/browserUtils';
 import type * as MarkdownTextInputDecoratorViewNativeComponent from './MarkdownTextInputDecoratorViewNativeComponent';
 import './web/MarkdownTextInput.css';
 import InputHistory from './web/InputHistory';
-
-require('../parser/react-native-live-markdown-parser.js');
+import type * as MarkdownTextInputRange from './MarkdownTextInput';
 
 const useClientEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
 
@@ -56,6 +55,7 @@ type MarkdownStyle = MarkdownTextInputDecoratorViewNativeComponent.MarkdownStyle
 
 interface MarkdownTextInputProps extends TextInputProps {
   markdownStyle?: MarkdownStyle;
+  parser: (text: string) => MarkdownTextInputRange.Range[];
   onClick?: (e: MouseEvent<HTMLDivElement>) => void;
   dir?: string;
   disabled?: boolean;
@@ -154,6 +154,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       numberOfLines,
       multiline = false,
       markdownStyle,
+      parser,
       onBlur,
       onChange,
       onChangeText,
@@ -175,6 +176,13 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     },
     ref,
   ) => {
+    if (parser === undefined) {
+      throw new Error('[react-native-live-markdown] `parser` is undefined');
+    }
+    if (typeof parser !== 'function') {
+      throw new Error('[react-native-live-markdown] `parser` is not a function');
+    }
+
     const compositionRef = useRef<boolean>(false);
     const pasteRef = useRef<boolean>(false);
     const divRef = useRef<HTMLDivElement | null>(null);
@@ -208,11 +216,18 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     }, []);
 
     const parseText = useCallback(
-      (target: HTMLDivElement, text: string | null, customMarkdownStyles: MarkdownStyle, cursorPosition: number | null = null, shouldAddToHistory = true): ParseTextResult => {
+      (
+        parserFunction: (input: string) => MarkdownTextInputRange.Range[],
+        target: HTMLDivElement,
+        text: string | null,
+        customMarkdownStyles: MarkdownStyle,
+        cursorPosition: number | null = null,
+        shouldAddToHistory = true,
+      ): ParseTextResult => {
         if (text === null) {
           return {text: target.innerText, cursorPosition: null};
         }
-        const parsedText = ParseUtils.parseText(target, text, cursorPosition, customMarkdownStyles, !multiline);
+        const parsedText = ParseUtils.parseText(parserFunction, target, text, cursorPosition, customMarkdownStyles, !multiline);
         if (history.current && shouldAddToHistory) {
           // We need to normalize the value before saving it to the history to prevent situations when additional new lines break the cursor position calculation logic
           history.current.throttledAdd(normalizeValue(parsedText.text), parsedText.cursorPosition);
@@ -226,10 +241,10 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     const processedMarkdownStyle = useMemo(() => {
       const newMarkdownStyle = processMarkdownStyle(markdownStyle);
       if (divRef.current) {
-        parseText(divRef.current, divRef.current.innerText, newMarkdownStyle, null, false);
+        parseText(parser, divRef.current, divRef.current.innerText, newMarkdownStyle, null, false);
       }
       return newMarkdownStyle;
-    }, [markdownStyle, parseText]);
+    }, [parser, markdownStyle, parseText]);
 
     const inputStyles = useMemo(
       () =>
@@ -254,9 +269,9 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         }
         const item = history.current.undo();
         const undoValue = item ? denormalizeValue(item.text) : null;
-        return parseText(target, undoValue, processedMarkdownStyle, item ? item.cursorPosition : null, false);
+        return parseText(parser, target, undoValue, processedMarkdownStyle, item ? item.cursorPosition : null, false);
       },
-      [parseText, processedMarkdownStyle],
+      [parser, parseText, processedMarkdownStyle],
     );
 
     const redo = useCallback(
@@ -269,9 +284,9 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         }
         const item = history.current.redo();
         const redoValue = item ? denormalizeValue(item.text) : null;
-        return parseText(target, redoValue, processedMarkdownStyle, item ? item.cursorPosition : null, false);
+        return parseText(parser, target, redoValue, processedMarkdownStyle, item ? item.cursorPosition : null, false);
       },
-      [parseText, processedMarkdownStyle],
+      [parser, parseText, processedMarkdownStyle],
     );
 
     // We have to process value property since contentEditable div adds one additional '\n' at the end of the text if we are entering new line
@@ -374,13 +389,13 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           case 'insertFromPaste':
             // if there is no newline at the end of the copied text, contentEditable adds invisible <br> tag at the end of the text, so we need to normalize it
             if (changedText.length > 2 && changedText[changedText.length - 2] !== '\n' && changedText[changedText.length - 1] === '\n') {
-              newInputUpdate = parseText(divRef.current, normalizeValue(changedText), processedMarkdownStyle);
+              newInputUpdate = parseText(parser, divRef.current, normalizeValue(changedText), processedMarkdownStyle);
               break;
             }
-            newInputUpdate = parseText(divRef.current, changedText, processedMarkdownStyle);
+            newInputUpdate = parseText(parser, divRef.current, changedText, processedMarkdownStyle);
             break;
           default:
-            newInputUpdate = parseText(divRef.current, changedText, processedMarkdownStyle);
+            newInputUpdate = parseText(parser, divRef.current, changedText, processedMarkdownStyle);
         }
 
         const {text, cursorPosition} = newInputUpdate;
@@ -615,13 +630,13 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         }
 
         if (value === undefined) {
-          parseText(divRef.current, divRef.current.innerText, processedMarkdownStyle);
+          parseText(parser, divRef.current, divRef.current.innerText, processedMarkdownStyle);
           return;
         }
 
         const text = processedValue !== undefined ? processedValue : '';
 
-        parseText(divRef.current, text, processedMarkdownStyle, text.length);
+        parseText(parser, divRef.current, text, processedMarkdownStyle, text.length);
         updateTextColor(divRef.current, value);
       },
       [multiline, processedMarkdownStyle, processedValue],

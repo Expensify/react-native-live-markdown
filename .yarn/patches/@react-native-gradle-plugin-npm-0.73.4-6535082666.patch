@@ -1,0 +1,21 @@
+diff --git a/src/main/kotlin/com/facebook/react/tasks/internal/PreparePrefabHeadersTask.kt b/src/main/kotlin/com/facebook/react/tasks/internal/PreparePrefabHeadersTask.kt
+index f3b55e091104a5e9617d95da63e9632fe9beece0..5ca7316a333338c2fd1563d97227afb5d3b8e554 100644
+--- a/src/main/kotlin/com/facebook/react/tasks/internal/PreparePrefabHeadersTask.kt
++++ b/src/main/kotlin/com/facebook/react/tasks/internal/PreparePrefabHeadersTask.kt
+@@ -45,15 +45,9 @@ abstract class PreparePrefabHeadersTask : DefaultTask() {
+         fs.copy {
+           it.from(headerPath)
+           it.include("**/*.h")
++          it.include("**/*.hpp")
+           it.exclude("**/*.cpp")
+           it.exclude("**/*.txt")
+-          // We don't want to copy all the boost headers as they are 250Mb+
+-          it.include("boost/config.hpp")
+-          it.include("boost/config/**/*.hpp")
+-          it.include("boost/core/*.hpp")
+-          it.include("boost/detail/workaround.hpp")
+-          it.include("boost/operators.hpp")
+-          it.include("boost/preprocessor/**/*.hpp")
+           it.into(File(outputFolder.asFile, headerPrefix))
+         }
+       }

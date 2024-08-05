@@ -58,9 +58,9 @@ android {
     minSdkVersion getExtOrIntegerDefault("minSdkVersion")
     targetSdkVersion getExtOrIntegerDefault("targetSdkVersion")
     buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
-    
+
     consumerProguardFiles "proguard-rules.pro"
-    
+
     externalNativeBuild {
       cmake {
         arguments "-DANDROID_STL=c++_shared", "-DANDROID_TOOLCHAIN=clang"
@@ -119,6 +119,8 @@ android {
       "**/libfbjni.so",
       "**/libjsi.so",
       "**/libreactnativejni.so",
+      "**/libreact_nativemodule_core.so",
+      "**/libworklets.so",
     ]
   }
 
@@ -141,6 +143,7 @@ repositories {
 dependencies {
   implementation "com.facebook.react:react-android" // version substituted by RNGP
   implementation "com.facebook.react:hermes-android" // version substituted by RNGP
+  implementation project(":react-native-reanimated")
 }
 
 if (isNewArchitectureEnabled()) {
@@ -149,13 +152,4 @@ if (isNewArchitectureEnabled()) {
     libraryName = "LiveMarkdown"
     codegenJavaPackageName = "com.expensify.livemarkdown"
   }
-}
-
-task copyJS(type: Copy) {
-  from '../parser/react-native-live-markdown-parser.js'
-  into 'src/main/assets'
-}
-
-tasks.preBuild {
-  dependsOn copyJS
 }

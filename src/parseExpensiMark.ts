@@ -1,18 +1,16 @@
-// eslint-disable-next-line import/no-unresolved
 import ExpensiMark from 'expensify-common/dist/ExpensiMark';
-import * as Utils from './utils';
+import * as Utils from 'expensify-common/dist/utils';
+import type * as MarkdownTextInputTypes from './MarkdownTextInput';
 
-type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'emoji' | 'mention-here' | 'mention-user' | 'mention-report' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax';
-type Range = {
-  type: MarkdownType;
-  start: number;
-  length: number;
-  depth?: number;
-};
+type Range = MarkdownTextInputTypes.Range;
+type MarkdownType = MarkdownTextInputTypes.MarkdownType;
+
 type Token = ['TEXT' | 'HTML', string];
 type StackItem = {tag: string; children: Array<StackItem | string>};
 
 function parseMarkdownToHTML(markdown: string): string {
+  'worklet';
+
   const parser = new ExpensiMark();
   const html = parser.replace(markdown, {
     shouldKeepRawInput: true,
@@ -21,6 +19,8 @@ function parseMarkdownToHTML(markdown: string): string {
 }
 
 function parseHTMLToTokens(html: string): Token[] {
+  'worklet';
+
   const tokens: Token[] = [];
   let left = 0;
   // eslint-disable-next-line no-constant-condition
@@ -46,6 +46,8 @@ function parseHTMLToTokens(html: string): Token[] {
 }
 
 function parseTokensToTree(tokens: Token[]): StackItem {
+  'worklet';
+
   const stack: StackItem[] = [{tag: '<>', children: []}];
   tokens.forEach(([type, payload]) => {
     if (type === 'TEXT') {
@@ -88,6 +90,8 @@ function parseTokensToTree(tokens: Token[]): StackItem {
 }
 
 function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
+  'worklet';
+
   let text = '';
 
   function processChildren(node: StackItem | string) {
@@ -216,6 +220,8 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
 
 // getTagPriority returns a priority for a tag, higher priority means the tag should be processed first
 function getTagPriority(tag: string) {
+  'worklet';
+
   switch (tag) {
     case 'blockquote':
       return 2;
@@ -227,11 +233,15 @@ function getTagPriority(tag: string) {
 }
 
 function sortRanges(ranges: Range[]) {
+  'worklet';
+
   // sort ranges by start position, then by length, then by tag hierarchy
   return ranges.sort((a, b) => a.start - b.start || b.length - a.length || getTagPriority(b.type) - getTagPriority(a.type) || 0);
 }
 
 function groupRanges(ranges: Range[]) {
+  'worklet';
+
   const lastVisibleRangeIndex: {[key in MarkdownType]?: number} = {};
 
   return ranges.reduce((acc, range) => {
@@ -253,7 +263,9 @@ function groupRanges(ranges: Range[]) {
   }, [] as Range[]);
 }
 
-function parseExpensiMarkToRanges(markdown: string): Range[] {
+function parseExpensiMark(markdown: string): Range[] {
+  'worklet';
+
   try {
     const html = parseMarkdownToHTML(markdown);
     const tokens = parseHTMLToTokens(html);
@@ -270,11 +282,11 @@ function parseExpensiMarkToRanges(markdown: string): Range[] {
     const groupedRanges = groupRanges(sortedRanges);
     return groupedRanges;
   } catch (error) {
-    console.error(error);
+    console.error(String(error));
     // returning an empty array in case of error
     return [];
   }
 }
 
-globalThis.parseExpensiMarkToRanges = parseExpensiMarkToRanges;
+export default parseExpensiMark;
 export type {MarkdownType, Range};

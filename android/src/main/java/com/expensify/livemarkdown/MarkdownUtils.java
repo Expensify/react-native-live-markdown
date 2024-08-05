@@ -27,32 +27,11 @@ public class MarkdownUtils {
     SoLoader.loadLibrary("livemarkdown");
   }
 
-  private static boolean IS_RUNTIME_INITIALIZED = false;
-
-  public static synchronized void maybeInitializeRuntime(AssetManager assetManager) {
-    if (IS_RUNTIME_INITIALIZED) {
-      return;
-    }
-    try {
-      InputStream inputStream = assetManager.open("react-native-live-markdown-parser.js");
-      byte[] buffer = new byte[inputStream.available()];
-      inputStream.read(buffer);
-      inputStream.close();
-      String code = new String(buffer);
-      nativeInitializeRuntime(code);
-      IS_RUNTIME_INITIALIZED = true;
-    } catch (IOException e) {
-      throw new RuntimeException("Failed to initialize Markdown runtime");
-    }
+  private synchronized static String parseMarkdown(String input, int parserId) {
+    return nativeParseMarkdown(input, parserId);
   }
 
-  private static native void nativeInitializeRuntime(String code);
-
-  private synchronized static String parseMarkdown(String input) {
-    return nativeParseMarkdown(input);
-  }
-
-  private static native String nativeParseMarkdown(String input);
+  private static native String nativeParseMarkdown(String input, int parserId);
 
   public MarkdownUtils(@NonNull AssetManager assetManager) {
     mAssetManager = assetManager;
@@ -61,13 +40,18 @@ public class MarkdownUtils {
   private final @NonNull AssetManager mAssetManager;
 
   private String mPrevInput;
-
   private String mPrevOutput;
+  private int mPrevParserId;
 
   private MarkdownStyle mMarkdownStyle;
+  private int mParserId;
 
   public void setMarkdownStyle(@NonNull MarkdownStyle markdownStyle) {
     mMarkdownStyle = markdownStyle;
+  }
+
+  public void setParserId(int parserId) {
+    mParserId = parserId;
   }
 
   public void applyMarkdownFormatting(SpannableStringBuilder ssb) {
@@ -77,12 +61,13 @@ public class MarkdownUtils {
 
     String input = ssb.toString();
     String output;
-    if (input.equals(mPrevInput)) {
+    if (input.equals(mPrevInput) && mParserId == mPrevParserId) {
       output = mPrevOutput;
     } else {
-      output = parseMarkdown(input);
+      output = parseMarkdown(input, mParserId);
       mPrevInput = input;
       mPrevOutput = output;
+      mPrevParserId = mParserId;
     }
 
     try {

@@ -1,7 +1,7 @@
-diff --git a/node_modules/react-native/ReactAndroid/build.gradle b/node_modules/react-native/ReactAndroid/build.gradle
-index 78c57eb..ec147fd 100644
---- a/node_modules/react-native/ReactAndroid/build.gradle
-+++ b/node_modules/react-native/ReactAndroid/build.gradle
+diff --git a/ReactAndroid/build.gradle b/ReactAndroid/build.gradle
+index 78c57ebabe560c93e691ee48a9899a77a8073fe1..ec147fd315b142e6a2c8e5a8c60c8f0f8eae5085 100644
+--- a/ReactAndroid/build.gradle
++++ b/ReactAndroid/build.gradle
 @@ -125,6 +125,19 @@ final def preparePrefab = tasks.register("preparePrefab", PreparePrefabHeadersTa
                  "rrc_root",
                  new Pair("../ReactCommon/react/renderer/components/root/", "react/renderer/components/root/")
@@ -62,10 +62,10 @@ index 78c57eb..ec147fd 100644
          rrc_view {
              headers(new File(prefabHeadersDir, "rrc_view").absolutePath)
          }
-diff --git a/node_modules/react-native/ReactAndroid/cmake-utils/ReactNative-application.cmake b/node_modules/react-native/ReactAndroid/cmake-utils/ReactNative-application.cmake
-index d49fa9e..3607c69 100644
---- a/node_modules/react-native/ReactAndroid/cmake-utils/ReactNative-application.cmake
-+++ b/node_modules/react-native/ReactAndroid/cmake-utils/ReactNative-application.cmake
+diff --git a/ReactAndroid/cmake-utils/ReactNative-application.cmake b/ReactAndroid/cmake-utils/ReactNative-application.cmake
+index d49fa9ed80d80b1451799fe1da1d78d12fe8bb87..3607c694dde1114853e3b21de858ae1955c32703 100644
+--- a/ReactAndroid/cmake-utils/ReactNative-application.cmake
++++ b/ReactAndroid/cmake-utils/ReactNative-application.cmake
 @@ -78,11 +78,14 @@ add_library(jsi ALIAS ReactAndroid::jsi)
  add_library(glog ALIAS ReactAndroid::glog)
  add_library(fabricjni ALIAS ReactAndroid::fabricjni)
