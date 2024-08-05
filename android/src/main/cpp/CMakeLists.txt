@@ -17,13 +17,11 @@ target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_
 
 find_package(fbjni REQUIRED CONFIG)
 find_package(ReactAndroid REQUIRED CONFIG)
-find_package(hermes-engine REQUIRED CONFIG)
 find_package(react-native-reanimated REQUIRED CONFIG)
 
 target_link_libraries(${CMAKE_PROJECT_NAME}
         fbjni::fbjni
-        hermes-engine::libhermes
-        react-native-reanimated::reanimated
+        react-native-reanimated::worklets
         ReactAndroid::jsi
         ReactAndroid::reactnativejni
         ReactAndroid::runtimeexecutor

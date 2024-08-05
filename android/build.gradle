@@ -58,9 +58,9 @@ android {
     minSdkVersion getExtOrIntegerDefault("minSdkVersion")
     targetSdkVersion getExtOrIntegerDefault("targetSdkVersion")
     buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
-    
+
     consumerProguardFiles "proguard-rules.pro"
-    
+
     externalNativeBuild {
       cmake {
         arguments "-DANDROID_STL=c++_shared", "-DANDROID_TOOLCHAIN=clang"
@@ -120,7 +120,7 @@ android {
       "**/libjsi.so",
       "**/libreactnativejni.so",
       "**/libreact_nativemodule_core.so",
-      "**/libreanimated.so",
+      "**/libworklets.so",
     ]
   }
 

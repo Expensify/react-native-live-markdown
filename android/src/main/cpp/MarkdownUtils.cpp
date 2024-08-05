@@ -2,7 +2,6 @@
 #include "MarkdownGlobal.h"
 
 #include <fbjni/fbjni.h>
-#include <hermes/hermes.h>
 
 using namespace facebook;
 
