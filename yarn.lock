@@ -2613,7 +2613,7 @@ __metadata:
     "@react-native/babel-preset": 0.73.21
     "@react-native/metro-config": 0.73.5
     babel-plugin-module-resolver: ^5.0.0
-    expensify-common: 2.0.64
+    expensify-common: 2.0.66
     react: 18.2.0
     react-native: 0.73.4
     react-native-reanimated: 3.15.0-nightly-20240804-7df5fd57d
@@ -2650,7 +2650,7 @@ __metadata:
     eslint-plugin-prettier: ^4.0.0
     eslint-plugin-promise: ^6.1.1
     eslint-plugin-tsdoc: ^0.2.17
-    expensify-common: 2.0.64
+    expensify-common: 2.0.66
     jest: ^29.6.3
     jest-environment-jsdom: ^29.7.0
     prettier: 2.8.8
@@ -2663,7 +2663,7 @@ __metadata:
     turbo: ^1.10.7
     typescript: ^5.3.3
   peerDependencies:
-    expensify-common: ">=2.0.64"
+    expensify-common: ">=2.0.66"
     react: "*"
     react-native: "*"
     react-native-reanimated: ">=3.11.0"
@@ -9864,9 +9864,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expensify-common@npm:2.0.64":
-  version: 2.0.64
-  resolution: "expensify-common@npm:2.0.64"
+"expensify-common@npm:2.0.66":
+  version: 2.0.66
+  resolution: "expensify-common@npm:2.0.66"
   dependencies:
     awesome-phonenumber: ^5.4.0
     classnames: 2.5.0
@@ -9881,7 +9881,7 @@ __metadata:
     semver: ^7.6.2
     simply-deferred: "git+https://github.com/Expensify/simply-deferred.git#77a08a95754660c7bd6e0b6979fdf84e8e831bf5"
     ua-parser-js: ^1.0.38
-  checksum: c58c9404da09be588be799798f03e2c74c5598b069218e6a895b65bb8e7132f11820c4f1b50f8e92fcb39b498f71159d75fadd90112632eac250dd09a346488a
+  checksum: 562b70f08e561bc0e14a0c634bb4dffeea315d6df1b4910a296ac72a02e13c09973754d1a739e26068776cd2aa56bf24061c9a9569edda10add41c1ad37340b7
   languageName: node
   linkType: hard
 
