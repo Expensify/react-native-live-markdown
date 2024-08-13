@@ -172,6 +172,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       autoFocus = false,
       onContentSizeChange,
       id,
+      inputMode
     },
     ref,
   ) => {
@@ -692,6 +693,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         placeholder={heightSafePlaceholder}
         spellCheck={spellCheck}
         dir={dir}
+        inputMode={inputMode}
       />
     );
   },
