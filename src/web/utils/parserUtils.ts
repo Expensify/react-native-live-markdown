@@ -5,7 +5,21 @@ import type {PartialMarkdownStyle} from '../../styleUtils';
 import {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition} from './cursorUtils';
 import {addStyleToBlock} from './blockUtils';
 
-type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'emoji' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax' | 'mention-here' | 'mention-user' | 'mention-report';
+type MarkdownType =
+  | 'bold'
+  | 'italic'
+  | 'strikethrough'
+  | 'emoji'
+  | 'link'
+  | 'code'
+  | 'pre'
+  | 'blockquote'
+  | 'h1'
+  | 'syntax'
+  | 'mention-here'
+  | 'mention-user'
+  | 'mention-report'
+  | 'inline-image';
 
 type MarkdownRange = {
   type: MarkdownType;
@@ -209,6 +223,36 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
       // create markdown span element
       const span = document.createElement('span') as HTMLMarkdownElement;
       span.setAttribute('data-type', range.type);
+
+      if (range.type === 'syntax' && text.substring(range.start, endOfCurrentRange) === '!') {
+        const inlineImageSpan = document.createElement('span') as HTMLMarkdownElement;
+        inlineImageSpan.setAttribute('data-type', 'inline-image');
+
+        const linkRange = lineMarkdownRanges[3];
+        let imageHref = '';
+        if (linkRange) {
+          imageHref = text.substring(linkRange.start, linkRange.start + linkRange.length);
+        }
+
+        let p = currentParentNode;
+        while (p.element.tagName !== 'P' && p.parentNode) {
+          p = p.parentNode;
+        }
+
+        Object.assign(p.element.style, {
+          backgroundImage: `url("${imageHref}")`,
+          backgroundPosition: `bottom left`,
+          backgroundSize: `auto 100px`,
+          backgroundRepeat: `no-repeat`,
+          paddingBottom: `100px`,
+        });
+
+        const inlineImageEndRange = lineMarkdownRanges[4];
+        if (inlineImageEndRange) {
+          currentParentNode = appendNode(inlineImageSpan, currentParentNode, 'inline-image', inlineImageEndRange.start + inlineImageEndRange.length - range.start);
+        }
+      }
+
       if (!disableInlineStyles) {
         addStyleToBlock(span, range.type, markdownStyle);
       }
