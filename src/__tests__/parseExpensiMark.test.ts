@@ -106,6 +106,13 @@ test('labeled link', () => {
     {type: 'link', start: 7, length: 19},
     {type: 'syntax', start: 26, length: 1},
   ]);
+
+  expect('[ Link ](https://example.com)').toBeParsedAs([
+    {type: 'syntax', start: 0, length: 1},
+    {type: 'syntax', start: 7, length: 2},
+    {type: 'link', start: 9, length: 19},
+    {type: 'syntax', start: 28, length: 1},
+  ]);
 });
 
 test('link with same label as href', () => {

@@ -282,7 +282,6 @@ function parseExpensiMark(markdown: string): Range[] {
     const groupedRanges = groupRanges(sortedRanges);
     return groupedRanges;
   } catch (error) {
-    console.error(String(error));
     // returning an empty array in case of error
     return [];
   }
