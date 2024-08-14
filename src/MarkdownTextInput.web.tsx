@@ -172,7 +172,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       autoFocus = false,
       onContentSizeChange,
       id,
-      inputMode
+      inputMode,
     },
     ref,
   ) => {
