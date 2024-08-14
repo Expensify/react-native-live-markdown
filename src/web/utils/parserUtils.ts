@@ -224,11 +224,8 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
       const span = document.createElement('span') as HTMLMarkdownElement;
       span.setAttribute('data-type', range.type);
 
-      if (range.type === 'syntax' && text.substring(range.start, endOfCurrentRange) === '!') {
-        const inlineImageSpan = document.createElement('span') as HTMLMarkdownElement;
-        inlineImageSpan.setAttribute('data-type', 'inline-image');
-
-        const linkRange = lineMarkdownRanges[3];
+      if (range.type === 'inline-image') {
+        const linkRange = lineMarkdownRanges.find((r) => r.type === 'link');
         let imageHref = '';
         if (linkRange) {
           imageHref = text.substring(linkRange.start, linkRange.start + linkRange.length);
@@ -246,11 +243,6 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
           backgroundRepeat: `no-repeat`,
           paddingBottom: `100px`,
         });
-
-        const inlineImageEndRange = lineMarkdownRanges[4];
-        if (inlineImageEndRange) {
-          currentParentNode = appendNode(inlineImageSpan, currentParentNode, 'inline-image', inlineImageEndRange.start + inlineImageEndRange.length - range.start);
-        }
       }
 
       if (!disableInlineStyles) {
