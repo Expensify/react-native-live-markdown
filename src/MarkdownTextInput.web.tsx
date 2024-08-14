@@ -16,7 +16,6 @@ import {StyleSheet} from 'react-native';
 import * as ParseUtils from './web/parserUtils';
 import * as CursorUtils from './web/cursorUtils';
 import * as StyleUtils from './styleUtils';
-import * as BrowserUtils from './web/browserUtils';
 import type * as MarkdownTextInputDecoratorViewNativeComponent from './MarkdownTextInputDecoratorViewNativeComponent';
 import './web/MarkdownTextInput.css';
 import InputHistory from './web/InputHistory';
@@ -355,9 +354,8 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         const prevSelection = contentSelection.current ?? {start: 0, end: 0};
         const prevTextLength = CursorUtils.getPrevTextLength() ?? 0;
         const changedText = e.target.innerText;
-        if (compositionRef.current && !BrowserUtils.isMobile) {
+        if (compositionRef.current) {
           updateTextColor(divRef.current, changedText);
-          compositionRef.current = false;
           return;
         }
 
@@ -582,6 +580,14 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       compositionRef.current = true;
     }, []);
 
+    const endComposition = useCallback(
+      (e) => {
+        compositionRef.current = false;
+        handleOnChangeText(e);
+      },
+      [handleOnChangeText],
+    );
+
     const setRef = (currentRef: HTMLDivElement | null) => {
       const r = currentRef;
       if (r) {
@@ -683,6 +689,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         className={className}
         onKeyDown={handleKeyPress}
         onCompositionStart={startComposition}
+        onCompositionEnd={endComposition}
         onKeyUp={updateSelection}
         onInput={handleOnChangeText}
         onClick={handleClick}
