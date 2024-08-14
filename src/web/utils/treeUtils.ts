@@ -1,7 +1,7 @@
 import type {HTMLMarkdownElement} from '../../MarkdownTextInput.web';
 import type {MarkdownRange, MarkdownType} from './parserUtils';
 
-type NodeType = MarkdownType | 'line' | 'text' | 'br' | 'root';
+type NodeType = MarkdownType | 'line' | 'text' | 'br' | 'block' | 'root';
 
 type TreeNode = Omit<MarkdownRange, 'type'> & {
   element: HTMLMarkdownElement;

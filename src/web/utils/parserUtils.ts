@@ -202,6 +202,8 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
       addTextToElement(currentParentNode, line.text);
     }
 
+    let isWrapperGenerated = false;
+
     lastRangeEndIndex = line.start;
     const lineMarkdownRanges = line.markdownRanges;
     // go through all markdown ranges in the line
@@ -214,6 +216,13 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
       const endOfCurrentRange = range.start + range.length;
       const nextRangeStartIndex = lineMarkdownRanges.length > 0 && !!lineMarkdownRanges[0] ? lineMarkdownRanges[0].start || 0 : textLength;
 
+      const inlineImageRange = range.type === 'inline-image' ? range : lineMarkdownRanges.find((r) => r.type === 'inline-image');
+      if (!isWrapperGenerated && inlineImageRange) {
+        const span = document.createElement('span') as HTMLMarkdownElement;
+        span.setAttribute('data-type', 'block');
+        currentParentNode = appendNode(span, currentParentNode, 'block', line.text.substring(lastRangeEndIndex, inlineImageRange.start - line.start + inlineImageRange.length).length);
+        isWrapperGenerated = true;
+      }
       // add text before the markdown range
       const textBeforeRange = line.text.substring(lastRangeEndIndex - line.start, range.start - line.start);
       if (textBeforeRange) {
@@ -230,13 +239,8 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
         if (linkRange) {
           imageHref = text.substring(linkRange.start, linkRange.start + linkRange.length);
         }
-
-        let p = currentParentNode;
-        while (p.element.tagName !== 'P' && p.parentNode) {
-          p = p.parentNode;
-        }
-
-        Object.assign(p.element.style, {
+        Object.assign(currentParentNode.element.style, {
+          display: 'block',
           backgroundImage: `url("${imageHref}")`,
           backgroundPosition: `bottom left`,
           backgroundSize: `auto 100px`,
@@ -269,6 +273,9 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
           lastRangeEndIndex = currentParentNode.start + currentParentNode.length;
           if (currentParentNode.parentNode.type !== 'root') {
             currentParentNode.parentNode.element.value = currentParentNode.element.value || '';
+          }
+          if (currentParentNode.type === 'inline-image') {
+            isWrapperGenerated = false;
           }
           currentParentNode = currentParentNode.parentNode || rootNode;
         }
