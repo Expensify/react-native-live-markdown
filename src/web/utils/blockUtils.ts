@@ -1,7 +1,8 @@
 import type {PartialMarkdownStyle} from '../../styleUtils';
-import type {NodeType} from './treeUtils';
+import type {MarkdownRange} from './parserUtils';
+import type {NodeType, TreeNode} from './treeUtils';
 
-function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownStyle: PartialMarkdownStyle) {
+function addMarkdownStyleToRange(targetElement: HTMLElement, type: NodeType, markdownStyle: PartialMarkdownStyle) {
   const node = targetElement;
   switch (type) {
     case 'line':
@@ -68,5 +69,79 @@ function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownSty
   }
 }
 
-// eslint-disable-next-line import/prefer-default-export
-export {addStyleToBlock};
+const BLOCK_MARKDOWN_TYPES = ['inline-image'];
+
+function isBlockMarkdownType(type: NodeType) {
+  return BLOCK_MARKDOWN_TYPES.includes(type);
+}
+
+function getFirstBlockMarkdownRange(ranges: MarkdownRange[]) {
+  return ranges.find((r) => isBlockMarkdownType(r.type));
+}
+
+function extendBlockStructure(currentRange: MarkdownRange, targetNode: TreeNode, text: string, ranges: MarkdownRange[]) {
+  switch (currentRange.type) {
+    case 'inline-image':
+      addInlineImagePreview(targetNode, text, ranges);
+      break;
+    default:
+      break;
+  }
+}
+
+function getImageMeta(url: string, callback: (err: string | Event | null, img?: HTMLImageElement) => void) {
+  const img = new Image();
+  img.onload = () => callback(null, img);
+  img.onerror = (err) => callback(err);
+  img.src = url;
+}
+
+function addInlineImagePreview(targetNode: TreeNode, text: string, ranges: MarkdownRange[]) {
+  const linkRange = ranges.find((r) => r.type === 'link');
+  let imageHref = '';
+  if (linkRange) {
+    imageHref = text.substring(linkRange.start, linkRange.start + linkRange.length);
+  }
+
+  Object.assign(targetNode.element.style, {
+    display: 'block',
+  });
+
+  const maxWidth = 200;
+  const maxHeight = 200;
+
+  const orderIndex = targetNode.orderIndex;
+
+  getImageMeta(imageHref, (_err, img) => {
+    const element = document.querySelector(`[data-id="${orderIndex}"]`) as HTMLElement;
+    if (!img || !element) {
+      return;
+    }
+
+    const {naturalWidth, naturalHeight} = img;
+    let width: number | null = null;
+    let height: number | null = null;
+
+    let paddingValue = 0;
+    if (naturalWidth > naturalHeight) {
+      width = Math.min(maxWidth, naturalWidth);
+      paddingValue = (width / naturalWidth) * naturalHeight;
+    } else {
+      height = Math.min(maxHeight, naturalHeight);
+      paddingValue = height;
+    }
+
+    const widthSize = width ? `${width}px` : 'auto';
+    const heightSize = height ? `${height}px` : 'auto';
+
+    Object.assign(element.style, {
+      backgroundImage: `url("${imageHref}")`,
+      backgroundPosition: `bottom left`,
+      backgroundSize: `${widthSize} ${heightSize}`,
+      backgroundRepeat: `no-repeat`,
+      paddingBottom: `${paddingValue}px`,
+    });
+  });
+}
+
+export {addMarkdownStyleToRange, extendBlockStructure, isBlockMarkdownType, getFirstBlockMarkdownRange};

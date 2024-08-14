@@ -3,7 +3,7 @@ import {addNodeToTree} from './treeUtils';
 import type {NodeType, TreeNode} from './treeUtils';
 import type {PartialMarkdownStyle} from '../../styleUtils';
 import {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition} from './cursorUtils';
-import {addStyleToBlock} from './blockUtils';
+import {addMarkdownStyleToRange, extendBlockStructure, getFirstBlockMarkdownRange, isBlockMarkdownType} from './blockUtils';
 
 type MarkdownType =
   | 'bold'
@@ -142,7 +142,7 @@ function addParagraph(node: TreeNode, text: string | null = null, length: number
   const p = document.createElement('p');
   p.setAttribute('data-type', 'line');
   if (!disableInlineStyles) {
-    addStyleToBlock(p, 'line', {});
+    addMarkdownStyleToRange(p, 'line', {});
   }
 
   const pNode = appendNode(p as unknown as HTMLMarkdownElement, node, 'line', length);
@@ -155,13 +155,6 @@ function addParagraph(node: TreeNode, text: string | null = null, length: number
   }
 
   return pNode;
-}
-
-function getImageMeta(url: string, callback: (err: string | Event | null, img?: HTMLImageElement) => void) {
-  const img = new Image();
-  img.onload = () => callback(null, img);
-  img.onerror = (err) => callback(err);
-  img.src = url;
 }
 
 /** Builds HTML DOM structure based on passed text and markdown ranges */
@@ -209,7 +202,7 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
       addTextToElement(currentParentNode, line.text);
     }
 
-    let isWrapperGenerated = false;
+    let wasBlockGenerated = false;
 
     lastRangeEndIndex = line.start;
     const lineMarkdownRanges = line.markdownRanges;
@@ -223,12 +216,13 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
       const endOfCurrentRange = range.start + range.length;
       const nextRangeStartIndex = lineMarkdownRanges.length > 0 && !!lineMarkdownRanges[0] ? lineMarkdownRanges[0].start || 0 : textLength;
 
-      const inlineImageRange = range.type === 'inline-image' ? range : lineMarkdownRanges.find((r) => r.type === 'inline-image');
-      if (!isWrapperGenerated && inlineImageRange) {
+      // wrap all elements before the first block type markdown range with a span element
+      const blockRange = getFirstBlockMarkdownRange([range, ...lineMarkdownRanges]);
+      if (!wasBlockGenerated && blockRange) {
         const span = document.createElement('span') as HTMLMarkdownElement;
         span.setAttribute('data-type', 'block');
-        currentParentNode = appendNode(span, currentParentNode, 'block', line.text.substring(lastRangeEndIndex, inlineImageRange.start - line.start + inlineImageRange.length).length);
-        isWrapperGenerated = true;
+        currentParentNode = appendNode(span, currentParentNode, 'block', line.text.substring(lastRangeEndIndex, blockRange.start - line.start + blockRange.length).length);
+        wasBlockGenerated = true;
       }
       // add text before the markdown range
       const textBeforeRange = line.text.substring(lastRangeEndIndex - line.start, range.start - line.start);
@@ -240,56 +234,9 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
       const span = document.createElement('span') as HTMLMarkdownElement;
       span.setAttribute('data-type', range.type);
 
-      if (range.type === 'inline-image') {
-        const linkRange = lineMarkdownRanges.find((r) => r.type === 'link');
-        let imageHref = '';
-        if (linkRange) {
-          imageHref = text.substring(linkRange.start, linkRange.start + linkRange.length);
-        }
-
-        Object.assign(currentParentNode.element.style, {
-          display: 'block',
-        });
-
-        const maxWidth = 200;
-        const maxHeight = 200;
-
-        const orderIndex = currentParentNode.orderIndex;
-
-        getImageMeta(imageHref, (_err, img) => {
-          const element = document.querySelector(`[data-id="${orderIndex}"]`) as HTMLElement;
-          if (!img || !element) {
-            return;
-          }
-
-          const {naturalWidth, naturalHeight} = img;
-          let width: number | null = null;
-          let height: number | null = null;
-
-          let paddingValue = 0;
-          if (naturalWidth > naturalHeight) {
-            width = Math.min(maxWidth, naturalWidth);
-            paddingValue = (width / naturalWidth) * naturalHeight;
-          } else {
-            height = Math.min(maxHeight, naturalHeight);
-            paddingValue = height;
-          }
-
-          const widthSize = width ? `${width}px` : 'auto';
-          const heightSize = height ? `${height}px` : 'auto';
-
-          Object.assign(element.style, {
-            backgroundImage: `url("${imageHref}")`,
-            backgroundPosition: `bottom left`,
-            backgroundSize: `${widthSize} ${heightSize}`,
-            backgroundRepeat: `no-repeat`,
-            paddingBottom: `${paddingValue}px`,
-          });
-        });
-      }
-
       if (!disableInlineStyles) {
-        addStyleToBlock(span, range.type, markdownStyle);
+        addMarkdownStyleToRange(span, range.type, markdownStyle);
+        extendBlockStructure(range, currentParentNode, text, lineMarkdownRanges);
       }
 
       const spanNode = appendNode(span, currentParentNode, range.type, range.length);
@@ -313,8 +260,8 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
           if (currentParentNode.parentNode.type !== 'root') {
             currentParentNode.parentNode.element.value = currentParentNode.element.value || '';
           }
-          if (currentParentNode.type === 'inline-image') {
-            isWrapperGenerated = false;
+          if (isBlockMarkdownType(currentParentNode.type)) {
+            wasBlockGenerated = false;
           }
           currentParentNode = currentParentNode.parentNode || rootNode;
         }
