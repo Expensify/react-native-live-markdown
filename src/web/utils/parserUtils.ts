@@ -157,6 +157,13 @@ function addParagraph(node: TreeNode, text: string | null = null, length: number
   return pNode;
 }
 
+function getImageMeta(url: string, callback: (err: string | Event | null, img?: HTMLImageElement) => void) {
+  const img = new Image();
+  img.onload = () => callback(null, img);
+  img.onerror = (err) => callback(err);
+  img.src = url;
+}
+
 /** Builds HTML DOM structure based on passed text and markdown ranges */
 function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownStyle: PartialMarkdownStyle = {}, disableInlineStyles = false) {
   const rootElement: HTMLMarkdownElement = document.createElement('span') as HTMLMarkdownElement;
@@ -239,13 +246,45 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
         if (linkRange) {
           imageHref = text.substring(linkRange.start, linkRange.start + linkRange.length);
         }
+
         Object.assign(currentParentNode.element.style, {
           display: 'block',
-          backgroundImage: `url("${imageHref}")`,
-          backgroundPosition: `bottom left`,
-          backgroundSize: `auto 100px`,
-          backgroundRepeat: `no-repeat`,
-          paddingBottom: `100px`,
+        });
+
+        const maxWidth = 200;
+        const maxHeight = 200;
+
+        const orderIndex = currentParentNode.orderIndex;
+
+        getImageMeta(imageHref, (_err, img) => {
+          const element = document.querySelector(`[data-id="${orderIndex}"]`) as HTMLElement;
+          if (!img || !element) {
+            return;
+          }
+
+          const {naturalWidth, naturalHeight} = img;
+          let width: number | null = null;
+          let height: number | null = null;
+
+          let paddingValue = 0;
+          if (naturalWidth > naturalHeight) {
+            width = Math.min(maxWidth, naturalWidth);
+            paddingValue = (width / naturalWidth) * naturalHeight;
+          } else {
+            height = Math.min(maxHeight, naturalHeight);
+            paddingValue = height;
+          }
+
+          const widthSize = width ? `${width}px` : 'auto';
+          const heightSize = height ? `${height}px` : 'auto';
+
+          Object.assign(element.style, {
+            backgroundImage: `url("${imageHref}")`,
+            backgroundPosition: `bottom left`,
+            backgroundSize: `${widthSize} ${heightSize}`,
+            backgroundRepeat: `no-repeat`,
+            paddingBottom: `${paddingValue}px`,
+          });
         });
       }
 
