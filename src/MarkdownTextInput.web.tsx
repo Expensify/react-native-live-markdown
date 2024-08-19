@@ -14,7 +14,6 @@ import React, {useEffect, useRef, useCallback, useMemo, useLayoutEffect} from 'r
 import type {CSSProperties, MutableRefObject, ReactEventHandler, FocusEventHandler, MouseEvent, KeyboardEvent, SyntheticEvent, ClipboardEventHandler} from 'react';
 import {StyleSheet} from 'react-native';
 import {updateInputStructure} from './web/utils/parserUtils';
-import BrowserUtils from './web/utils/browserUtils';
 import InputHistory from './web/InputHistory';
 import type {TreeNode} from './web/utils/treeUtils';
 import {getCurrentCursorPosition, removeSelection, setCursorPosition} from './web/utils/cursorUtils';
@@ -97,6 +96,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       autoFocus = false,
       onContentSizeChange,
       id,
+      inputMode,
     },
     ref,
   ) => {
@@ -295,7 +295,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         const prevSelection = contentSelection.current ?? {start: 0, end: 0};
         const newCursorPosition = Math.max(Math.max(contentSelection.current.end, 0) + (parsedText.length - previousText.length), 0);
 
-        if (compositionRef.current && !BrowserUtils.isMobile) {
+        if (compositionRef.current) {
           divRef.current.value = parsedText;
           compositionRef.current = false;
           contentSelection.current.end = newCursorPosition;
@@ -346,7 +346,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           if (inputType === 'deleteContentBackward') {
             // When the user does a backspace delete he expects the content before the cursor to be removed.
             // For this the start value needs to be adjusted (its as if the selection was before the text that we want to delete)
-            start -= before;
+            start = Math.max(start - before, 0);
           }
 
           event.nativeEvent.count = count;
@@ -552,6 +552,14 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       compositionRef.current = true;
     }, []);
 
+    const endComposition = useCallback(
+      (e) => {
+        compositionRef.current = false;
+        handleOnChangeText(e);
+      },
+      [handleOnChangeText],
+    );
+
     const setRef = (currentRef: HTMLDivElement | null) => {
       const r = currentRef;
       if (r) {
@@ -651,6 +659,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         className={className}
         onKeyDown={handleKeyPress}
         onCompositionStart={startComposition}
+        onCompositionEnd={endComposition}
         onKeyUp={updateSelection}
         onInput={handleOnChangeText}
         onClick={handleClick}
@@ -662,6 +671,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         placeholder={heightSafePlaceholder}
         spellCheck={spellCheck}
         dir={dir}
+        inputMode={inputMode}
       />
     );
   },

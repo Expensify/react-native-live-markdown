@@ -2647,7 +2647,7 @@ __metadata:
     "@types/underscore": ^1.11.15
     esbuild: 0.19.4
     esbuild-plugin-tsc: ^0.4.0
-    expensify-common: 2.0.35
+    expensify-common: 2.0.72
     jest: ^29.7.0
     typescript: ^5.3.3
   languageName: unknown
@@ -9967,9 +9967,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expensify-common@npm:2.0.35":
-  version: 2.0.35
-  resolution: "expensify-common@npm:2.0.35"
+"expensify-common@npm:2.0.72":
+  version: 2.0.72
+  resolution: "expensify-common@npm:2.0.72"
   dependencies:
     awesome-phonenumber: ^5.4.0
     classnames: 2.5.0
@@ -9981,10 +9981,10 @@ __metadata:
     prop-types: 15.8.1
     react: 16.12.0
     react-dom: 16.12.0
-    semver: ^7.6.2
+    semver: ^7.6.3
     simply-deferred: "git+https://github.com/Expensify/simply-deferred.git#77a08a95754660c7bd6e0b6979fdf84e8e831bf5"
-    ua-parser-js: ^1.0.37
-  checksum: eeceea5fc03849c95af12c04a29c5c97a89a61e4714cdfc401ea5f15e8a4284557c5b77e5cbb77c0f0905a6e9d608f3b4e079ba310f32188a0ff4d2ad356a5b5
+    ua-parser-js: ^1.0.38
+  checksum: b1331aad5a512ffeb67fcb657025f2a2bfe86d3d905cbc0d09b8dff856562ecb2be5c0bbd37bd218f6bc8309f0417e52b918ea4132dfddd555dd3bfa1c89cb89
   languageName: node
   linkType: hard
 
@@ -18087,12 +18087,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"semver@npm:^7.6.2":
-  version: 7.6.2
-  resolution: "semver@npm:7.6.2"
+"semver@npm:^7.6.3":
+  version: 7.6.3
+  resolution: "semver@npm:7.6.3"
   bin:
     semver: bin/semver.js
-  checksum: 40f6a95101e8d854357a644da1b8dd9d93ce786d5c6a77227bc69dbb17bea83d0d1d1d7c4cd5920a6df909f48e8bd8a5909869535007f90278289f2451d0292d
+  checksum: 4110ec5d015c9438f322257b1c51fe30276e5f766a3f64c09edd1d7ea7118ecbc3f379f3b69032bacf13116dc7abc4ad8ce0d7e2bd642e26b0d271b56b61a7d8
   languageName: node
   linkType: hard
 
@@ -19801,10 +19801,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ua-parser-js@npm:^1.0.35, ua-parser-js@npm:^1.0.37":
+"ua-parser-js@npm:^1.0.35":
   version: 1.0.37
   resolution: "ua-parser-js@npm:1.0.37"
   checksum: 4d481c720d523366d7762dc8a46a1b58967d979aacf786f9ceceb1cd767de069f64a4bdffb63956294f1c0696eb465ddb950f28ba90571709e33521b4bd75e07
+  languageName: node
+  linkType: hard
+
+"ua-parser-js@npm:^1.0.38":
+  version: 1.0.38
+  resolution: "ua-parser-js@npm:1.0.38"
+  checksum: d0772b22b027338d806ab17d1ac2896ee7485bdf9217c526028159f3cd6bb10272bb18f6196d2f94dde83e3b36dc9d2533daf08a414764f6f4f1844842383838
   languageName: node
   linkType: hard
 
