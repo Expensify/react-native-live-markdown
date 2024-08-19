@@ -42,11 +42,11 @@ function addNodeToTree(element: HTMLMarkdownElement, parentTreeNode: TreeNode, t
 }
 
 function findHTMLElementInTree(treeRoot: TreeNode, element: HTMLElement): TreeNode | null {
-  if (element.hasAttribute('contenteditable')) {
+  if (element.hasAttribute?.('contenteditable')) {
     return treeRoot;
   }
 
-  if (!element || !element.hasAttribute('data-id')) {
+  if (!element || !element.hasAttribute?.('data-id')) {
     return null;
   }
   const indexes = element.getAttribute('data-id')?.split(',');
