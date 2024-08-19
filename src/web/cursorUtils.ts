@@ -145,7 +145,19 @@ function scrollCursorIntoView(target: HTMLInputElement) {
     return;
   }
 
-  const caretRect = selection.getRangeAt(0).getClientRects()[0];
+  const caretRects = selection.getRangeAt(0).getClientRects();
+
+  // we'll find the caretRect from the DOMRectList above with the largest bottom value
+  let caretRect = caretRects[0];
+  if (caretRect) {
+    for (let i = 1; i < caretRects.length; i++) {
+      const ithCaretRect = caretRects[i];
+      if (ithCaretRect && ithCaretRect.bottom > caretRect.bottom) {
+        caretRect = ithCaretRect;
+      }
+    }
+  }
+
   const editableRect = target.getBoundingClientRect();
 
   // Adjust for padding and border
