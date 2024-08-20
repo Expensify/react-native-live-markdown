@@ -32,6 +32,10 @@ function getElementHeight(node: HTMLDivElement, styles: CSSProperties, numberOfL
   return styles.height ? `${styles.height}px` : 'auto';
 }
 
+function normalizeValue(value: string) {
+  return value.replaceAll('\r\n', '\n');
+}
+
 // Parses the HTML structure of a MarkdownTextInputElement to a plain text string. Used for getting the correct value of the input element.
 function parseInnerHTMLToText(target: MarkdownTextInputElement): string {
   // Returns the parent of a given node that is higher in the hierarchy and is of a different type than 'text', 'br' or 'line'
@@ -96,7 +100,7 @@ function parseInnerHTMLToText(target: MarkdownTextInputElement): string {
     }
   }
 
-  return text;
+  return text.replaceAll('\r\n', '\n');
 }
 
-export {isEventComposing, getPlaceholderValue, getElementHeight, parseInnerHTMLToText};
+export {isEventComposing, getPlaceholderValue, getElementHeight, parseInnerHTMLToText, normalizeValue};

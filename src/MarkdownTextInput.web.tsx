@@ -19,7 +19,7 @@ import type {TreeNode} from './web/utils/treeUtils';
 import {getCurrentCursorPosition, removeSelection, setCursorPosition} from './web/utils/cursorUtils';
 import './web/MarkdownTextInput.css';
 import type {MarkdownStyle} from './MarkdownTextInputDecoratorViewNativeComponent';
-import {getElementHeight, getPlaceholderValue, isEventComposing, parseInnerHTMLToText} from './web/utils/inputUtils';
+import {getElementHeight, getPlaceholderValue, isEventComposing, normalizeValue, parseInnerHTMLToText} from './web/utils/inputUtils';
 import {parseToReactDOMStyle, processMarkdownStyle} from './web/utils/webStyleUtils';
 
 require('../parser/react-native-live-markdown-parser.js');
@@ -286,7 +286,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
         updateTextColor(divRef.current, e.target.textContent ?? '');
         const previousText = divRef.current.value;
-        const parsedText = inputType === 'pasteText' ? pasteContent.current || '' : parseInnerHTMLToText(e.target as MarkdownTextInputElement);
+        const parsedText = normalizeValue(inputType === 'pasteText' ? pasteContent.current || '' : parseInnerHTMLToText(e.target as MarkdownTextInputElement));
 
         if (pasteContent.current) {
           pasteContent.current = null;
@@ -596,9 +596,9 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           parseText(divRef.current, divRef.current.value, processedMarkdownStyle);
           return;
         }
-
-        divRef.current.value = value;
-        parseText(divRef.current, value, processedMarkdownStyle);
+        const normalizedValue = normalizeValue(value);
+        divRef.current.value = normalizedValue;
+        parseText(divRef.current, normalizedValue, processedMarkdownStyle);
         updateTextColor(divRef.current, value);
       },
       [multiline, processedMarkdownStyle, value],
