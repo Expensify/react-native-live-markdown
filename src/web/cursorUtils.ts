@@ -148,12 +148,12 @@ function scrollCursorIntoView(target: HTMLInputElement) {
   const caretRects = selection.getRangeAt(0).getClientRects();
 
   // we'll find the caretRect from the DOMRectList above with the largest bottom value
-  let caretRect = caretRects[0];
-  if (caretRect) {
+  let currentCaretRect = caretRects[0];
+  if (currentCaretRect) {
     for (let i = 1; i < caretRects.length; i++) {
-      const ithCaretRect = caretRects[i];
-      if (ithCaretRect && ithCaretRect.bottom > caretRect.bottom) {
-        caretRect = ithCaretRect;
+      const caretRect = caretRects[i];
+      if (caretRect && caretRect.bottom > currentCaretRect.bottom) {
+        currentCaretRect = caretRect;
       }
     }
   }
@@ -164,11 +164,11 @@ function scrollCursorIntoView(target: HTMLInputElement) {
   const paddingTop = parseFloat(window.getComputedStyle(target).paddingTop);
   const borderTop = parseFloat(window.getComputedStyle(target).borderTopWidth);
 
-  if (caretRect && !(caretRect.top >= editableRect.top + paddingTop + borderTop && caretRect.bottom <= editableRect.bottom - 2 * (paddingTop - borderTop))) {
-    const topToCaret = caretRect.top - editableRect.top;
+  if (currentCaretRect && !(currentCaretRect.top >= editableRect.top + paddingTop + borderTop && currentCaretRect.bottom <= editableRect.bottom - 2 * (paddingTop - borderTop))) {
+    const topToCaret = currentCaretRect.top - editableRect.top;
     const inputHeight = editableRect.height;
     // Chrome Rects don't include padding & border, so we're adding them manually
-    const inputOffset = caretRect.height - inputHeight + paddingTop + borderTop + (BrowserUtils.isChromium ? 0 : 4 * (paddingTop + borderTop));
+    const inputOffset = currentCaretRect.height - inputHeight + paddingTop + borderTop + (BrowserUtils.isChromium ? 0 : 4 * (paddingTop + borderTop));
 
     target.scrollTo(0, topToCaret + target.scrollTop + inputOffset);
   }
