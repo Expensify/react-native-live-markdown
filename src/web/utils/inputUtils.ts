@@ -61,11 +61,16 @@ function parseInnerHTMLToText(target: MarkdownTextInputElement): string {
     // If we are operating on the nodes that are children of the MarkdownTextInputElement, we need to add a newline after each
     const isTopComponent = node.parentElement?.contentEditable === 'true';
     if (isTopComponent) {
-      if (shouldAddNewline) {
-        text += '\n';
+      // Replaced text is beeing added as text node, so we need to not add the newline before and after it
+      if (node.nodeType === Node.TEXT_NODE) {
         shouldAddNewline = false;
+      } else {
+        if (shouldAddNewline) {
+          text += '\n';
+          shouldAddNewline = false;
+        }
+        shouldAddNewline = true;
       }
-      shouldAddNewline = true;
     }
 
     if (node.nodeType === Node.TEXT_NODE) {
