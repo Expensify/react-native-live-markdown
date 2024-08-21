@@ -38,7 +38,7 @@
     "lint:WebExample": "eslint WebExample --ext .js,.ts,.tsx",
     "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
     "prepare": "bob build && mkdir -p lib/parser && cp parser/react-native-live-markdown-parser.js lib/parser/react-native-live-markdown-parser.js",
-    "build:watch": "nodemon --watch src --ext .ts,.tsx,.css --exec \"yarn prepare && yarn pack\"",
+    "build:watch": "nodemon --watch src --ext .ts,.tsx,.css --exec \"rm -f .build_complete && yarn prepare && yarn pack && touch .build_complete\"",
     "release": "release-it"
   },
   "keywords": [
@@ -100,7 +100,8 @@
     "typescript": "^5.3.3"
   },
   "resolutions": {
-    "@types/react": "17.0.21"
+    "@types/react": "17.0.21",
+    "link@^2.1.1": "patch:link@npm%3A2.1.1#./.yarn/patches/link-npm-2.1.1-1c9fea076e.patch"
   },
   "peerDependencies": {
     "react": "*",
