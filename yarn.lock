@@ -13967,12 +13967,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"link@npm:^2.1.1":
+"link@npm:2.1.1":
   version: 2.1.1
   resolution: "link@npm:2.1.1"
   bin:
     link: dist/cli.js
   checksum: 9fed33fa026584bfb726e0a98a2d630f8b6ebb1d160a5e45a63b1a46c60358b604192d22ea8c4bd4f8cbb62c5badefafafdd9a8e85adfe062fa7e3222c1d8590
+  languageName: node
+  linkType: hard
+
+"link@patch:link@npm%3A2.1.1#./.yarn/patches/link-npm-2.1.1-1c9fea076e.patch::locator=%40expensify%2Freact-native-live-markdown%40workspace%3A.":
+  version: 2.1.1
+  resolution: "link@patch:link@npm%3A2.1.1#./.yarn/patches/link-npm-2.1.1-1c9fea076e.patch::version=2.1.1&hash=f773b8&locator=%40expensify%2Freact-native-live-markdown%40workspace%3A."
+  bin:
+    link: dist/cli.js
+  checksum: 75027509648dee9617e348c88b785b4ce0447a5cbdbc57ebb083b66b6557a20a396e4d11b9c5ac192ecd0634b54389fba38c8771d8dea3d614ffd62bea248529
   languageName: node
   linkType: hard
 
