@@ -1,3 +1,4 @@
+import type {HTMLMarkdownElement} from '../../MarkdownTextInput.web';
 import type {PartialMarkdownStyle} from '../../styleUtils';
 import type {MarkdownRange} from './parserUtils';
 import type {NodeType, TreeNode} from './treeUtils';
@@ -82,11 +83,29 @@ function getFirstBlockMarkdownRange(ranges: MarkdownRange[]) {
 function extendBlockStructure(currentRange: MarkdownRange, targetNode: TreeNode, text: string, ranges: MarkdownRange[]) {
   switch (currentRange.type) {
     case 'inline-image':
-      addInlineImagePreview(targetNode, text, ranges);
-      break;
+      return addInlineImagePreview(targetNode, text, ranges);
     default:
       break;
   }
+
+  return targetNode;
+}
+
+function replaceElementInTreeNode(targetNode: TreeNode, newElement: HTMLMarkdownElement) {
+  // Clear newElement from its children
+  [...newElement.children].forEach((child) => {
+    child.remove();
+  });
+  newElement.remove();
+
+  // Move all children from targetNode to newElement
+  [...targetNode.element.children].forEach((child) => {
+    newElement.appendChild(child);
+  });
+  targetNode.element.remove();
+
+  targetNode.parentNode?.element.appendChild(newElement);
+  return {...targetNode, element: newElement};
 }
 
 function getImageMeta(url: string, callback: (err: string | Event | null, img?: HTMLImageElement) => void) {
@@ -103,6 +122,13 @@ function addInlineImagePreview(targetNode: TreeNode, text: string, ranges: Markd
     imageHref = text.substring(linkRange.start, linkRange.start + linkRange.length);
   }
 
+  // If the inline image markdown with the same href is already loaded, replace the targetNode with the already loaded preview
+  const alreadyLoadedPreview = document.querySelector(`[data-image-href="${imageHref}"]`);
+  if (alreadyLoadedPreview) {
+    return replaceElementInTreeNode(targetNode, alreadyLoadedPreview as HTMLMarkdownElement);
+  }
+  targetNode.element.setAttribute('data-image-href', imageHref);
+
   Object.assign(targetNode.element.style, {
     display: 'block',
   });
@@ -110,11 +136,8 @@ function addInlineImagePreview(targetNode: TreeNode, text: string, ranges: Markd
   const maxWidth = 200;
   const maxHeight = 200;
 
-  const orderIndex = targetNode.orderIndex;
-
   getImageMeta(imageHref, (_err, img) => {
-    const element = document.querySelector(`[data-id="${orderIndex}"]`) as HTMLElement;
-    if (!img || !element) {
+    if (!img) {
       return;
     }
 
@@ -134,7 +157,7 @@ function addInlineImagePreview(targetNode: TreeNode, text: string, ranges: Markd
     const widthSize = width ? `${width}px` : 'auto';
     const heightSize = height ? `${height}px` : 'auto';
 
-    Object.assign(element.style, {
+    Object.assign(targetNode.element.style, {
       backgroundImage: `url("${imageHref}")`,
       backgroundPosition: `bottom left`,
       backgroundSize: `${widthSize} ${heightSize}`,
@@ -142,6 +165,8 @@ function addInlineImagePreview(targetNode: TreeNode, text: string, ranges: Markd
       paddingBottom: `${paddingValue}px`,
     });
   });
+
+  return targetNode;
 }
 
 export {addMarkdownStyleToRange, extendBlockStructure, isBlockMarkdownType, getFirstBlockMarkdownRange};

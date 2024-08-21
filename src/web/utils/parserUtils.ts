@@ -236,7 +236,7 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
 
       if (!disableInlineStyles) {
         addMarkdownStyleToRange(span, range.type, markdownStyle);
-        extendBlockStructure(range, currentParentNode, text, lineMarkdownRanges);
+        currentParentNode = extendBlockStructure(range, currentParentNode, text, lineMarkdownRanges);
       }
 
       const spanNode = appendNode(span, currentParentNode, range.type, range.length);
