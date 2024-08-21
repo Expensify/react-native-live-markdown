@@ -57,6 +57,7 @@ function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownSty
         display: 'inline-block',
         maxWidth: '100%',
         boxSizing: 'border-box',
+        overflowWrap: 'anywhere',
       });
       break;
     case 'h1':
@@ -77,7 +78,8 @@ function isBlockMarkdownType(type: NodeType) {
 }
 
 function getFirstBlockMarkdownRange(ranges: MarkdownRange[]) {
-  return ranges.find((r) => isBlockMarkdownType(r.type));
+  const blockMarkdownRange = ranges.find((r) => isBlockMarkdownType(r.type) || r.type === 'blockquote');
+  return blockMarkdownRange?.type === 'blockquote' ? undefined : blockMarkdownRange;
 }
 
 function extendBlockStructure(currentRange: MarkdownRange, targetNode: TreeNode, text: string, ranges: MarkdownRange[]) {
