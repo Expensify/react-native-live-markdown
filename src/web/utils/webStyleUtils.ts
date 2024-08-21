@@ -76,9 +76,34 @@ function configureCustomWebStylesheet() {
 }
 
 function handleCustomStyles(target: MarkdownTextInputElement, markdownStyle: PartialMarkdownStyle) {
-  const line = target.querySelector('*[data-type="line"]:has(> *[data-type="pre"]) > span:first-child');
   const styleTag = document.getElementById(CUSTOM_WEB_STYLES_ID) as HTMLStyleElement;
-  if (!line || !styleTag || Object.values(styleTag.sheet?.cssRules ?? {}).some((rule) => rule.selectorText === `.${target.uniqueId} [data-type="pre"]::before`)) {
+  const cssRules = Object.values(styleTag?.sheet?.cssRules ?? {});
+  if (!styleTag || cssRules.some((rule) => (rule as any).selectorText === `.${target.uniqueId} [data-type="pre"]::before`)) {
+    return;
+  }
+
+  generateCodeBlocksRules(target, styleTag, markdownStyle);
+}
+
+type Rule = {selector: string; properties: Record<string, string>};
+
+function addStylesheetRules(rules: Rule[], styleSheet: CSSStyleSheet) {
+  rules.forEach((rule) => {
+    const {selector, properties} = rule;
+    let propertiesStr = '';
+
+    Object.keys(properties).forEach((property) => {
+      const value = properties[property];
+      propertiesStr += `${property}: ${value};\n`;
+    });
+
+    styleSheet.insertRule(`${selector}{${propertiesStr}}`, styleSheet.cssRules.length);
+  });
+}
+
+function generateCodeBlocksRules(target: MarkdownTextInputElement, styleTag: HTMLStyleElement, markdownStyle: PartialMarkdownStyle) {
+  const line = target.querySelector('*[data-type="line"]:has(> *[data-type="pre"]) > span:first-child');
+  if (!line) {
     return;
   }
 
@@ -86,26 +111,40 @@ function handleCustomStyles(target: MarkdownTextInputElement, markdownStyle: Par
   const preStyles = markdownStyle.pre;
   const padding = preStyles?.padding ?? 5;
 
-  const beforeRule = `.${target.uniqueId} *[data-type='pre']::before {
-      top: ${Math.floor(lineHeight)}px;
-      padding: ${(padding - 1)?.toString()}px;
-      background-color: ${(preStyles?.backgroundColor as string) ?? 'lightgray'};
-      border-radius: ${preStyles?.borderRadius?.toString() ?? '4'}px;
-      border-color: ${preStyles?.borderColor ?? 'grey'};
-    }`;
-  const firstSyntaxRule = `.${target.uniqueId} *[data-type='line'] *[data-type='syntax']:has(+ *[data-type='pre']) {
-      transform: translate(-${padding}px, -${padding}px);
-    }`;
-  const secondSyntaxRule = `.${target.uniqueId} *[data-type='line'] *[data-type='pre'] + *[data-type='syntax'] {
-      transform: translate(-${padding}px, ${padding}px);
-    }`;
-  const textRule = `.${target.uniqueId} *[data-type='line'] *[data-type='pre'] + *[data-type='syntax'] + *[data-type='text'] {
-      transform: translate(-${padding}px, ${padding}px);
-    }`;
-  styleTag.sheet?.insertRule(beforeRule, 0);
-  styleTag.sheet?.insertRule(firstSyntaxRule, 1);
-  styleTag.sheet?.insertRule(secondSyntaxRule, 2);
-  styleTag.sheet?.insertRule(textRule, 3);
+  const rules: Rule[] = [
+    {
+      selector: `.${target.uniqueId} *[data-type='pre']::before`,
+      properties: {
+        top: `${Math.floor(lineHeight)}px`,
+        padding: `${(padding - 1)?.toString()}px`,
+        'background-color': `${(preStyles?.backgroundColor as string) ?? 'lightgray'}`,
+        'border-radius': `${preStyles?.borderRadius?.toString() ?? '4'}px`,
+        'border-color': `${preStyles?.borderColor ?? 'grey'}`,
+      },
+    },
+    {
+      selector: `.${target.uniqueId} *[data-type='line'] *[data-type='syntax']:has(+ *[data-type='pre'])`,
+      properties: {
+        transform: `translate(-${padding}px, -${padding}px)`,
+      },
+    },
+    {
+      selector: `.${target.uniqueId} *[data-type='line'] *[data-type='pre'] + *[data-type='syntax']`,
+      properties: {
+        transform: `translate(-${padding}px, ${padding}px)`,
+      },
+    },
+    {
+      selector: `.${target.uniqueId} *[data-type='line'] *[data-type='pre'] + *[data-type='syntax'] + *[data-type='text']`,
+      properties: {
+        transform: `translate(-${padding}px, ${padding}px)`,
+      },
+    },
+  ];
+
+  if (styleTag.sheet) {
+    addStylesheetRules(rules, styleTag.sheet);
+  }
 }
 
 export {parseToReactDOMStyle, processMarkdownStyle, configureCustomWebStylesheet, idGenerator, handleCustomStyles};
