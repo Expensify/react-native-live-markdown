@@ -3,7 +3,7 @@ import {addNodeToTree} from './treeUtils';
 import type {NodeType, TreeNode} from './treeUtils';
 import type {PartialMarkdownStyle} from '../../styleUtils';
 import {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition} from './cursorUtils';
-import {addMarkdownStyleToRange, extendBlockStructure, getFirstBlockMarkdownRange, isBlockMarkdownType} from './blockUtils';
+import {addStyleToBlock, extendBlockStructure, getFirstBlockMarkdownRange, isBlockMarkdownType} from './blockUtils';
 
 type MarkdownType =
   | 'bold'
@@ -142,7 +142,7 @@ function addParagraph(node: TreeNode, text: string | null = null, length: number
   const p = document.createElement('p');
   p.setAttribute('data-type', 'line');
   if (!disableInlineStyles) {
-    addMarkdownStyleToRange(p, 'line', {});
+    addStyleToBlock(p, 'line', {});
   }
 
   const pNode = appendNode(p as unknown as HTMLMarkdownElement, node, 'line', length);
@@ -235,7 +235,7 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
       span.setAttribute('data-type', range.type);
 
       if (!disableInlineStyles) {
-        addMarkdownStyleToRange(span, range.type, markdownStyle);
+        addStyleToBlock(span, range.type, markdownStyle);
         currentParentNode = extendBlockStructure(range, currentParentNode, text, lineMarkdownRanges);
       }
 

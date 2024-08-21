@@ -3,7 +3,7 @@ import type {PartialMarkdownStyle} from '../../styleUtils';
 import type {MarkdownRange} from './parserUtils';
 import type {NodeType, TreeNode} from './treeUtils';
 
-function addMarkdownStyleToRange(targetElement: HTMLElement, type: NodeType, markdownStyle: PartialMarkdownStyle) {
+function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownStyle: PartialMarkdownStyle) {
   const node = targetElement;
   switch (type) {
     case 'line':
@@ -169,4 +169,4 @@ function addInlineImagePreview(targetNode: TreeNode, text: string, ranges: Markd
   return targetNode;
 }
 
-export {addMarkdownStyleToRange, extendBlockStructure, isBlockMarkdownType, getFirstBlockMarkdownRange};
+export {addStyleToBlock, extendBlockStructure, isBlockMarkdownType, getFirstBlockMarkdownRange};

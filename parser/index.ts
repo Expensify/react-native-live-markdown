@@ -167,6 +167,8 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
       } else if (node.tag === '<h1>') {
         appendSyntax('# ');
         addChildrenWithStyle(node, 'h1');
+      } else if (node.tag === '<br />') {
+        text += '\n';
       } else if (node.tag.startsWith('<pre')) {
         appendSyntax('```');
         const content = node.children.join('').replaceAll('&#32;', ' ');
@@ -198,6 +200,20 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
         if (hasAlt) {
           appendSyntax('[');
           processChildren(unescapeText(alt?.[1] || ''));
+          appendSyntax(']');
+        }
+        appendSyntax('(');
+        addChildrenWithStyle(linkString, 'link');
+        appendSyntax(')');
+      } else if (node.tag.startsWith('<video data-expensify-source="')) {
+        const src = node.tag.match(/data-expensify-source="([^"]*)"/)![1]!; // always present
+        const rawLink = node.tag.match(/data-raw-href="([^"]*)"/);
+        const hasAlt = node.tag.match(/data-link-variant="([^"]*)"/)![1] === 'labeled';
+        const linkString = rawLink ? unescapeText(rawLink[1]!) : src;
+        appendSyntax('!');
+        if (hasAlt) {
+          appendSyntax('[');
+          node.children.forEach((child) => processChildren(child));
           appendSyntax(']');
         }
         appendSyntax('(');
@@ -268,7 +284,6 @@ function parseExpensiMarkToRanges(markdown: string): Range[] {
     const groupedRanges = groupRanges(sortedRanges);
     return groupedRanges;
   } catch (error) {
-    console.error(error);
     // returning an empty array in case of error
     return [];
   }
