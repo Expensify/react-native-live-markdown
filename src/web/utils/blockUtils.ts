@@ -3,6 +3,10 @@ import type {PartialMarkdownStyle} from '../../styleUtils';
 import type {MarkdownRange} from './parserUtils';
 import type {NodeType, TreeNode} from './treeUtils';
 
+function parseStyleToNumber(style: string | null) {
+  return style ? parseInt(style.replace('px', ''), 10) : 0;
+}
+
 function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownStyle: PartialMarkdownStyle) {
   const node = targetElement;
   switch (type) {
@@ -82,10 +86,10 @@ function getFirstBlockMarkdownRange(ranges: MarkdownRange[]) {
   return blockMarkdownRange?.type === 'blockquote' ? undefined : blockMarkdownRange;
 }
 
-function extendBlockStructure(currentRange: MarkdownRange, targetNode: TreeNode, text: string, ranges: MarkdownRange[]) {
+function extendBlockStructure(currentRange: MarkdownRange, targetNode: TreeNode, text: string, ranges: MarkdownRange[], markdownStyle: PartialMarkdownStyle) {
   switch (currentRange.type) {
     case 'inline-image':
-      return addInlineImagePreview(targetNode, text, ranges);
+      return addInlineImagePreview(targetNode, text, ranges, markdownStyle);
     default:
       break;
   }
@@ -117,7 +121,7 @@ function getImageMeta(url: string, callback: (err: string | Event | null, img?: 
   img.src = url;
 }
 
-function addInlineImagePreview(targetNode: TreeNode, text: string, ranges: MarkdownRange[]) {
+function addInlineImagePreview(targetNode: TreeNode, text: string, ranges: MarkdownRange[], markdownStyle: PartialMarkdownStyle) {
   const linkRange = ranges.find((r) => r.type === 'link');
   let imageHref = '';
   if (linkRange) {
@@ -131,12 +135,15 @@ function addInlineImagePreview(targetNode: TreeNode, text: string, ranges: Markd
   }
   targetNode.element.setAttribute('data-image-href', imageHref);
 
+  const maxWidth = parseStyleToNumber(`${markdownStyle.inlineImage?.maxWidth}`) || 0;
+  const maxHeight = parseStyleToNumber(`${markdownStyle.inlineImage?.maxHeight}`) || 0;
+  const imageMarginTop = parseStyleToNumber(`${markdownStyle.inlineImage?.marginTop}`) || 0;
+  const imageMarginBottom = parseStyleToNumber(`${markdownStyle.inlineImage?.marginBottom}`) || 0;
+
   Object.assign(targetNode.element.style, {
     display: 'block',
+    marginBottom: `${imageMarginBottom}px`,
   });
-
-  const maxWidth = 200;
-  const maxHeight = 200;
 
   getImageMeta(imageHref, (_err, img) => {
     if (!img) {
@@ -164,7 +171,7 @@ function addInlineImagePreview(targetNode: TreeNode, text: string, ranges: Markd
       backgroundPosition: `bottom left`,
       backgroundSize: `${widthSize} ${heightSize}`,
       backgroundRepeat: `no-repeat`,
-      paddingBottom: `${paddingValue}px`,
+      paddingBottom: `${imageMarginTop + paddingValue}px`,
     });
   });
 
