@@ -2,17 +2,14 @@ import {StyleSheet, TextInput, processColor} from 'react-native';
 import React from 'react';
 import type {TextInputProps} from 'react-native';
 import MarkdownTextInputDecoratorViewNativeComponent from './MarkdownTextInputDecoratorViewNativeComponent';
+import type {MarkdownStyle} from './MarkdownTextInputDecoratorViewNativeComponent';
 import NativeLiveMarkdownModule from './NativeLiveMarkdownModule';
-import type * as MarkdownTextInputDecoratorViewNativeComponentTypes from './MarkdownTextInputDecoratorViewNativeComponent';
-import * as StyleUtils from './styleUtils';
-import type * as StyleUtilsTypes from './styleUtils';
+import {mergeMarkdownStyleWithDefault} from './styleUtils';
+import type {PartialMarkdownStyle} from './styleUtils';
 
 if (NativeLiveMarkdownModule) {
   NativeLiveMarkdownModule.install();
 }
-
-type PartialMarkdownStyle = StyleUtilsTypes.PartialMarkdownStyle;
-type MarkdownStyle = MarkdownTextInputDecoratorViewNativeComponentTypes.MarkdownStyle;
 
 interface MarkdownTextInputProps extends TextInputProps {
   markdownStyle?: PartialMarkdownStyle;
@@ -36,7 +33,7 @@ function processColorsInMarkdownStyle(input: MarkdownStyle): MarkdownStyle {
 }
 
 function processMarkdownStyle(input: PartialMarkdownStyle | undefined): MarkdownStyle {
-  return processColorsInMarkdownStyle(StyleUtils.mergeMarkdownStyleWithDefault(input));
+  return processColorsInMarkdownStyle(mergeMarkdownStyleWithDefault(input));
 }
 
 const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>((props, ref) => {
