@@ -242,11 +242,11 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     }, []);
 
     const updateSelection = useCallback(
-      (e: SyntheticEvent<HTMLDivElement>) => {
+      (e: SyntheticEvent<HTMLDivElement>, predefinedSelection: Selection | null = null) => {
         if (!divRef.current) {
           return;
         }
-        const newSelection = getCurrentCursorPosition(divRef.current);
+        const newSelection = predefinedSelection || getCurrentCursorPosition(divRef.current);
 
         if (newSelection && (!contentSelection.current || contentSelection.current.start !== newSelection.start || contentSelection.current.end !== newSelection.end)) {
           updateRefSelectionVariables(newSelection);
@@ -315,6 +315,10 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         }
         const {text, cursorPosition} = newInputUpdate;
         updateTextColor(divRef.current, text);
+        updateSelection(e, {
+          start: cursorPosition ?? 0,
+          end: cursorPosition ?? 0,
+        });
 
         if (onChange) {
           const event = e as unknown as NativeSyntheticEvent<{
@@ -359,7 +363,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
         handleContentSizeChange();
       },
-      [updateTextColor, onChange, onChangeText, handleContentSizeChange, undo, redo, parseText, processedMarkdownStyle, setEventProps],
+      [updateTextColor, updateSelection, onChange, onChangeText, handleContentSizeChange, undo, redo, parseText, processedMarkdownStyle, setEventProps],
     );
 
     const insertText = useCallback(
