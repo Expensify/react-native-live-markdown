@@ -57,6 +57,7 @@ let focusTimeout: NodeJS.Timeout | null = null;
 type MarkdownTextInputElement = HTMLDivElement &
   HTMLInputElement & {
     tree: TreeNode;
+    selection: Selection;
   };
 
 type HTMLMarkdownElement = HTMLElement & {
@@ -233,26 +234,25 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     );
 
     const updateRefSelectionVariables = useCallback((newSelection: Selection) => {
+      if (!divRef.current) {
+        return;
+      }
       const {start, end} = newSelection;
-      const markdownHTMLInput = divRef.current as HTMLInputElement;
-      markdownHTMLInput.selectionStart = start;
-      markdownHTMLInput.selectionEnd = end;
+      divRef.current.selection = {start, end};
     }, []);
 
     const updateSelection = useCallback(
-      (e: SyntheticEvent<HTMLDivElement> | null = null, predefinedSelection: Selection | null = null) => {
+      (e: SyntheticEvent<HTMLDivElement>) => {
         if (!divRef.current) {
           return;
         }
-        const newSelection = predefinedSelection || getCurrentCursorPosition(divRef.current);
+        const newSelection = getCurrentCursorPosition(divRef.current);
 
         if (newSelection && (!contentSelection.current || contentSelection.current.start !== newSelection.start || contentSelection.current.end !== newSelection.end)) {
           updateRefSelectionVariables(newSelection);
           contentSelection.current = newSelection;
 
-          if (e) {
-            handleSelectionChange(e);
-          }
+          handleSelectionChange(e);
         }
       },
       [handleSelectionChange, updateRefSelectionVariables],
@@ -315,10 +315,6 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         }
         const {text, cursorPosition} = newInputUpdate;
         updateTextColor(divRef.current, text);
-        updateSelection(e, {
-          start: cursorPosition ?? 0,
-          end: cursorPosition ?? 0,
-        });
 
         if (onChange) {
           const event = e as unknown as NativeSyntheticEvent<{
@@ -363,7 +359,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
         handleContentSizeChange();
       },
-      [updateTextColor, updateSelection, onChange, onChangeText, handleContentSizeChange, undo, redo, parseText, processedMarkdownStyle, setEventProps],
+      [updateTextColor, onChange, onChangeText, handleContentSizeChange, undo, redo, parseText, processedMarkdownStyle, setEventProps],
     );
 
     const insertText = useCallback(
@@ -382,9 +378,8 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         (e.nativeEvent as MarkdownNativeEvent).inputType = 'pasteText';
 
         handleOnChangeText(e);
-        updateSelection(e);
       },
-      [handleOnChangeText, updateSelection],
+      [handleOnChangeText],
     );
 
     const handleKeyPress = useCallback(
@@ -421,8 +416,6 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           onKeyPress(event);
         }
 
-        updateSelection(event as unknown as SyntheticEvent<HTMLDivElement, Event>);
-
         if (
           e.key === 'Enter' &&
           // Do not call submit if composition is occuring.
@@ -443,7 +436,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           }
         }
       },
-      [multiline, blurOnSubmit, setEventProps, onKeyPress, updateSelection, handleOnChangeText, onSubmitEditing, insertText],
+      [multiline, blurOnSubmit, setEventProps, onKeyPress, handleOnChangeText, onSubmitEditing, insertText],
     );
 
     const handleFocus: FocusEventHandler<HTMLDivElement> = useCallback(
@@ -459,7 +452,6 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
             const valueLength = value ? value.length : divRef.current.value.length;
             setCursorPosition(divRef.current, valueLength, null);
           }
-          updateSelection(event, contentSelection.current);
         }
 
         if (onFocus) {
@@ -485,7 +477,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           }
         }
       },
-      [clearTextOnFocus, onFocus, selectTextOnFocus, setEventProps, updateSelection, value],
+      [clearTextOnFocus, onFocus, selectTextOnFocus, setEventProps, value],
     );
 
     const handleBlur: FocusEventHandler<HTMLDivElement> = useCallback(
@@ -503,14 +495,13 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
     const handleClick = useCallback(
       (e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>) => {
-        updateSelection(e);
         if (!onClick || !divRef.current) {
           return;
         }
         (e.target as HTMLInputElement).value = divRef.current.value;
         onClick(e);
       },
-      [onClick, updateSelection],
+      [onClick],
     );
 
     const handleCopy: ClipboardEventHandler<HTMLDivElement> = useCallback((e) => {
@@ -660,7 +651,6 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         onKeyDown={handleKeyPress}
         onCompositionStart={startComposition}
         onCompositionEnd={endComposition}
-        onKeyUp={updateSelection}
         onInput={handleOnChangeText}
         onClick={handleClick}
         onFocus={handleFocus}
@@ -672,6 +662,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         spellCheck={spellCheck}
         dir={dir}
         inputMode={inputMode}
+        onSelect={updateSelection}
       />
     );
   },
