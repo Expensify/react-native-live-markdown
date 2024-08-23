@@ -221,6 +221,7 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
       if (!wasBlockGenerated && blockRange) {
         const span = document.createElement('span') as HTMLMarkdownElement;
         span.setAttribute('data-type', 'block');
+        addStyleToBlock(span, 'block', markdownStyle);
         currentParentNode = appendNode(span, currentParentNode, 'block', line.text.substring(lastRangeEndIndex - line.start, blockRange.start + blockRange.length - line.start).length);
         wasBlockGenerated = true;
       }

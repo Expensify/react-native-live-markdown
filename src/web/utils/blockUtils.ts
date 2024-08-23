@@ -70,9 +70,55 @@ function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownSty
         fontWeight: 'bold',
       });
       break;
+    case 'block':
+      Object.assign(node.style, {
+        display: 'block',
+        margin: '0',
+        padding: '0',
+        position: 'relative',
+      });
+      break;
     default:
       break;
   }
+}
+
+function createLoadingIndicator(markdownStyle: PartialMarkdownStyle) {
+  const container = document.createElement('span');
+  container.contentEditable = 'false';
+
+  const spinner = document.createElement('span');
+
+  const spinnerStyles = markdownStyle.loadingIndicator;
+  if (spinnerStyles) {
+    const spinnerBorderWidth = spinnerStyles.borderWidth || 3;
+    Object.assign(spinner.style, {
+      border: `${spinnerBorderWidth}px solid ${String(spinnerStyles.secondaryColor)}`,
+      borderTop: `${spinnerBorderWidth}px solid ${String(spinnerStyles.primaryColor)}`,
+      borderRadius: '50%',
+      width: spinnerStyles.width || '20px',
+      height: spinnerStyles.height || '20px',
+      animation: 'react-native-live-markdown-spin 1s linear infinite',
+      display: 'block',
+    });
+  }
+
+  container.setAttribute('data-type', 'spinner');
+  const containerStyles = markdownStyle.loadingIndicatorContainer;
+  Object.assign(container.style, {
+    ...markdownStyle.loadingIndicatorContainer,
+    position: 'absolute',
+    bottom: '0',
+    left: '0',
+    width: containerStyles?.width || 'auto',
+    height: containerStyles?.height || 'auto',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  });
+  container.contentEditable = 'false';
+  container.appendChild(spinner);
+  return container;
 }
 
 const BLOCK_MARKDOWN_TYPES = ['inline-image'];
@@ -133,7 +179,11 @@ function addInlineImagePreview(targetNode: TreeNode, text: string, ranges: Markd
   if (alreadyLoadedPreview) {
     return replaceElementInTreeNode(targetNode, alreadyLoadedPreview as HTMLMarkdownElement);
   }
-  targetNode.element.setAttribute('data-image-href', imageHref);
+
+  const spinner = createLoadingIndicator(markdownStyle);
+  if (spinner) {
+    targetNode.element.appendChild(spinner);
+  }
 
   const maxWidth = parseStyleToNumber(`${markdownStyle.inlineImage?.maxWidth}`) || 0;
   const maxHeight = parseStyleToNumber(`${markdownStyle.inlineImage?.maxHeight}`) || 0;
@@ -143,12 +193,19 @@ function addInlineImagePreview(targetNode: TreeNode, text: string, ranges: Markd
   Object.assign(targetNode.element.style, {
     display: 'block',
     marginBottom: `${imageMarginBottom}px`,
+    paddingBottom: markdownStyle.loadingIndicatorContainer?.height || markdownStyle.loadingIndicator?.height || (!!markdownStyle.loadingIndicator && '30px') || undefined,
   });
 
   getImageMeta(imageHref, (_err, img) => {
     if (!img) {
       return;
     }
+
+    if (spinner) {
+      spinner.remove();
+    }
+
+    targetNode.element.setAttribute('data-image-href', imageHref);
 
     const {naturalWidth, naturalHeight} = img;
     let width: number | null = null;

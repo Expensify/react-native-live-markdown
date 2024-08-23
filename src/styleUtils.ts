@@ -60,6 +60,10 @@ function makeDefaultMarkdownStyle(): MarkdownStyle {
       marginTop: 5,
       marginBottom: 0,
     },
+    loadingIndicator: {
+      primaryColor: 'gray',
+      secondaryColor: 'lightgray',
+    },
   };
 }
 
@@ -71,7 +75,11 @@ function mergeMarkdownStyleWithDefault(input: PartialMarkdownStyle | undefined):
       if (!(key in output)) {
         return;
       }
-      Object.assign(output[key as keyof MarkdownStyle], input[key as keyof MarkdownStyle]);
+
+      const outputValue = output[key as keyof MarkdownStyle];
+      if (outputValue) {
+        Object.assign(outputValue, input[key as keyof MarkdownStyle]);
+      }
     });
   }
 
