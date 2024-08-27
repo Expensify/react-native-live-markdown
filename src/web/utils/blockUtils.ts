@@ -133,10 +133,17 @@ function getFirstBlockMarkdownRange(ranges: MarkdownRange[]) {
   return blockMarkdownRange?.type === 'blockquote' ? undefined : blockMarkdownRange;
 }
 
-function extendBlockStructure(currentRange: MarkdownRange, targetNode: TreeNode, text: string, ranges: MarkdownRange[], markdownStyle: PartialMarkdownStyle) {
+function extendBlockStructure(
+  inputElement: HTMLMarkdownElement,
+  targetNode: TreeNode,
+  currentRange: MarkdownRange,
+  ranges: MarkdownRange[],
+  text: string,
+  markdownStyle: PartialMarkdownStyle,
+) {
   switch (currentRange.type) {
     case 'inline-image':
-      return addInlineImagePreview(targetNode, text, ranges, markdownStyle);
+      return addInlineImagePreview(inputElement, targetNode, text, ranges, markdownStyle);
     default:
       break;
   }
@@ -168,7 +175,7 @@ function getImageMeta(url: string, callback: (err: string | Event | null, img?: 
   img.src = url;
 }
 
-function addInlineImagePreview(targetNode: TreeNode, text: string, ranges: MarkdownRange[], markdownStyle: PartialMarkdownStyle) {
+function addInlineImagePreview(inputElement: HTMLMarkdownElement, targetNode: TreeNode, text: string, ranges: MarkdownRange[], markdownStyle: PartialMarkdownStyle) {
   const linkRange = ranges.find((r) => r.type === 'link');
   let imageHref = '';
   if (linkRange) {
@@ -176,7 +183,7 @@ function addInlineImagePreview(targetNode: TreeNode, text: string, ranges: Markd
   }
 
   // If the inline image markdown with the same href is already loaded, replace the targetNode with the already loaded preview
-  const alreadyLoadedPreview = document.querySelector(`[data-image-href="${imageHref}"]`);
+  const alreadyLoadedPreview = inputElement.querySelector(`[data-image-href="${imageHref}"]`);
   if (alreadyLoadedPreview) {
     return replaceElementInTreeNode(targetNode, alreadyLoadedPreview as HTMLMarkdownElement);
   }
@@ -202,7 +209,7 @@ function addInlineImagePreview(targetNode: TreeNode, text: string, ranges: Markd
       return;
     }
 
-    const currentSpinner = document.querySelector('[data-type="spinner"]');
+    const currentSpinner = inputElement.querySelector('[data-type="spinner"]');
     if (currentSpinner !== spinner) {
       return;
     }

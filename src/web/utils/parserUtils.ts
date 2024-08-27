@@ -158,7 +158,13 @@ function addParagraph(node: TreeNode, text: string | null = null, length: number
 }
 
 /** Builds HTML DOM structure based on passed text and markdown ranges */
-function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownStyle: PartialMarkdownStyle = {}, disableInlineStyles = false) {
+function parseRangesToHTMLNodes(
+  text: string,
+  ranges: MarkdownRange[],
+  markdownStyle: PartialMarkdownStyle = {},
+  disableInlineStyles = false,
+  inputElement: HTMLMarkdownElement | null = null,
+) {
   const rootElement: HTMLMarkdownElement = document.createElement('span') as HTMLMarkdownElement;
   const textLength = text.replace(/\n/g, '\\n').length;
   const rootNode: TreeNode = {
@@ -237,7 +243,9 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
 
       if (!disableInlineStyles) {
         addStyleToBlock(span, range.type, markdownStyle);
-        currentParentNode = extendBlockStructure(range, currentParentNode, text, lineMarkdownRanges, markdownStyle);
+        if (inputElement) {
+          currentParentNode = extendBlockStructure(inputElement, currentParentNode, range, lineMarkdownRanges, text, markdownStyle);
+        }
       }
 
       const spanNode = appendNode(span, currentParentNode, range.type, range.length);
@@ -310,7 +318,7 @@ function updateInputStructure(
 
   // We don't want to parse text with single '\n', because contentEditable represents it as invisible <br />
   if (text) {
-    const {dom, tree} = parseRangesToHTMLNodes(text, markdownRanges, markdownStyle);
+    const {dom, tree} = parseRangesToHTMLNodes(text, markdownRanges, markdownStyle, false, targetElement);
 
     if (shouldForceDOMUpdate || targetElement.innerHTML !== dom.innerHTML) {
       targetElement.innerHTML = '';
