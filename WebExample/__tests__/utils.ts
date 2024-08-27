@@ -11,7 +11,13 @@ const setupInput = async (page: Page, action?: 'clear' | 'reset') => {
 };
 
 const getCursorPosition = async (elementHandle: Locator) => {
-  const inputSelectionHandle = await elementHandle.evaluateHandle((div: HTMLInputElement) => ({start: div.selectionStart, end: div.selectionEnd}));
+  const inputSelectionHandle = await elementHandle.evaluateHandle(
+    (
+      div: HTMLInputElement & {
+        selection: {start: number; end: number};
+      },
+    ) => div.selection,
+  );
   const selection = await inputSelectionHandle.jsonValue();
   return selection;
 };
