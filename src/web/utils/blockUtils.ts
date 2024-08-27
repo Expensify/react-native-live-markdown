@@ -83,7 +83,7 @@ function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownSty
   }
 }
 
-function createLoadingIndicator(markdownStyle: PartialMarkdownStyle) {
+function createLoadingIndicator(url: string, markdownStyle: PartialMarkdownStyle) {
   const container = document.createElement('span');
   container.contentEditable = 'false';
 
@@ -104,6 +104,7 @@ function createLoadingIndicator(markdownStyle: PartialMarkdownStyle) {
   }
 
   container.setAttribute('data-type', 'spinner');
+  container.setAttribute('data-url', url);
   const containerStyles = markdownStyle.loadingIndicatorContainer;
   Object.assign(container.style, {
     ...markdownStyle.loadingIndicatorContainer,
@@ -180,7 +181,7 @@ function addInlineImagePreview(targetNode: TreeNode, text: string, ranges: Markd
     return replaceElementInTreeNode(targetNode, alreadyLoadedPreview as HTMLMarkdownElement);
   }
 
-  const spinner = createLoadingIndicator(markdownStyle);
+  const spinner = createLoadingIndicator(imageHref, markdownStyle);
   if (spinner) {
     targetNode.element.appendChild(spinner);
   }
@@ -201,7 +202,13 @@ function addInlineImagePreview(targetNode: TreeNode, text: string, ranges: Markd
       return;
     }
 
-    if (spinner) {
+    const currentSpinner = document.querySelector('[data-type="spinner"]');
+    if (currentSpinner !== spinner) {
+      return;
+    }
+
+    if (currentSpinner) {
+      currentSpinner.remove();
       spinner.remove();
     }
 
