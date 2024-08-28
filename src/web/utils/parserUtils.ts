@@ -146,7 +146,7 @@ function addParagraph(node: TreeNode, text: string | null = null, length: number
 /** Builds HTML DOM structure based on passed text and markdown ranges */
 function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownStyle: PartialMarkdownStyle = {}, disableInlineStyles = false) {
   const rootElement: HTMLMarkdownElement = document.createElement('span') as HTMLMarkdownElement;
-  const textLength = text.replace(/\n/g, '\\n').length;
+  const textLength = text.length;
   const rootNode: TreeNode = {
     element: rootElement,
     start: 0,
