@@ -163,7 +163,7 @@ function parseRangesToHTMLNodes(
   ranges: MarkdownRange[],
   markdownStyle: PartialMarkdownStyle = {},
   disableInlineStyles = false,
-  inputElement: HTMLMarkdownElement | null = null,
+  currentInput: MarkdownTextInputElement | null = null,
 ) {
   const rootElement: HTMLMarkdownElement = document.createElement('span') as HTMLMarkdownElement;
   const textLength = text.replace(/\n/g, '\\n').length;
@@ -243,8 +243,8 @@ function parseRangesToHTMLNodes(
 
       if (!disableInlineStyles) {
         addStyleToBlock(span, range.type, markdownStyle);
-        if (inputElement) {
-          currentParentNode = extendBlockStructure(inputElement, currentParentNode, range, lineMarkdownRanges, text, markdownStyle);
+        if (currentInput) {
+          currentParentNode = extendBlockStructure(currentInput, currentParentNode, range, lineMarkdownRanges, text, markdownStyle);
         }
       }
 
@@ -292,6 +292,7 @@ function moveCursor(isFocused: boolean, alwaysMoveCursorToTheEnd: boolean, curso
     setCursorPosition(target, cursorPosition);
   }
 }
+
 function updateInputStructure(
   target: MarkdownTextInputElement,
   text: string,
