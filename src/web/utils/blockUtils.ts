@@ -84,11 +84,20 @@ function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownSty
 }
 
 function createLoadingIndicator(url: string, markdownStyle: PartialMarkdownStyle) {
+  // Get current spinner animation progress if it exists
+  const currentSpinner = document.querySelector('[data-type="spinner"]')?.firstChild;
+  let currentTime: CSSNumberish = 0;
+  if (currentSpinner) {
+    const animation = (currentSpinner as HTMLMarkdownElement).getAnimations()[0];
+    if (animation) {
+      currentTime = animation.currentTime || 0;
+    }
+  }
+
   const container = document.createElement('span');
   container.contentEditable = 'false';
 
   const spinner = document.createElement('span');
-
   const spinnerStyles = markdownStyle.loadingIndicator;
   if (spinnerStyles) {
     const spinnerBorderWidth = spinnerStyles.borderWidth || 3;
@@ -98,8 +107,8 @@ function createLoadingIndicator(url: string, markdownStyle: PartialMarkdownStyle
       borderRadius: '50%',
       width: spinnerStyles.width || '20px',
       height: spinnerStyles.height || '20px',
-      animation: 'react-native-live-markdown-spin 1s linear infinite',
       display: 'block',
+      animationPlayState: 'paused',
     });
   }
 
@@ -119,6 +128,15 @@ function createLoadingIndicator(url: string, markdownStyle: PartialMarkdownStyle
   });
   container.contentEditable = 'false';
   container.appendChild(spinner);
+
+  const keyframes = [{transform: 'rotate(0deg)'}, {transform: 'rotate(360deg)'}];
+
+  const options = {
+    duration: 1000,
+    iterations: Infinity,
+  };
+  const animation2 = spinner.animate(keyframes, options);
+  animation2.currentTime = currentTime;
   return container;
 }
 
