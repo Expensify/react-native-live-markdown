@@ -10,7 +10,7 @@ type Paragraph = {
   text: string;
   start: number;
   length: number;
-  Ranges: MarkdownRange[];
+  markdownRanges: MarkdownRange[];
 };
 
 function ungroupRanges(ranges: MarkdownRange[]): MarkdownRange[] {
@@ -34,7 +34,7 @@ function splitTextIntoLines(text: string): Paragraph[] {
       text: line,
       start: lineStartIndex,
       length: line.length,
-      Ranges: [],
+      markdownRanges: [],
     };
     lineStartIndex += line.length + 1; // Adding 1 for the newline character
     return lineObject;
@@ -57,7 +57,7 @@ function mergeLinesWithMultilineTags(lines: Paragraph[], ranges: MarkdownRange[]
       const mainLineIndex = correspondingLineIndexes[0] as number;
       const mainLine = mergedLines[mainLineIndex] as Paragraph;
 
-      mainLine.Ranges.push(range);
+      mainLine.markdownRanges.push(range);
 
       const otherLineIndexes = correspondingLineIndexes.slice(1);
       otherLineIndexes.forEach((lineIndex) => {
@@ -65,7 +65,7 @@ function mergeLinesWithMultilineTags(lines: Paragraph[], ranges: MarkdownRange[]
 
         mainLine.text += `\n${otherLine.text}`;
         mainLine.length += otherLine.length + 1;
-        mainLine.Ranges.push(...otherLine.Ranges);
+        mainLine.markdownRanges.push(...otherLine.markdownRanges);
       });
       if (otherLineIndexes.length > 0) {
         mergedLines = mergedLines.filter((_line, index) => !otherLineIndexes.includes(index));
@@ -159,8 +159,8 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
     return {dom: rootElement, tree: rootNode};
   }
 
-  const Ranges = ungroupRanges(ranges);
-  lines = mergeLinesWithMultilineTags(lines, Ranges);
+  const markdownRanges = ungroupRanges(ranges);
+  lines = mergeLinesWithMultilineTags(lines, markdownRanges);
 
   let lastRangeEndIndex = 0;
   while (lines.length > 0) {
@@ -176,21 +176,21 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
       rootElement.value = `${rootElement.value || ''}\n`;
     }
 
-    if (line.Ranges.length === 0) {
+    if (line.markdownRanges.length === 0) {
       addTextToElement(currentParentNode, line.text);
     }
 
     lastRangeEndIndex = line.start;
-    const lineRanges = line.Ranges;
+    const lineMarkdownRanges = line.markdownRanges;
     // go through all markdown ranges in the line
-    while (lineRanges.length > 0) {
-      const range = lineRanges.shift();
+    while (lineMarkdownRanges.length > 0) {
+      const range = lineMarkdownRanges.shift();
       if (!range) {
         break;
       }
 
       const endOfCurrentRange = range.start + range.length;
-      const nextRangeStartIndex = lineRanges.length > 0 && !!lineRanges[0] ? lineRanges[0].start || 0 : textLength;
+      const nextRangeStartIndex = lineMarkdownRanges.length > 0 && !!lineMarkdownRanges[0] ? lineMarkdownRanges[0].start || 0 : textLength;
 
       // add text before the markdown range
       const textBeforeRange = line.text.substring(lastRangeEndIndex - line.start, range.start - line.start);
@@ -207,7 +207,7 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
 
       const spanNode = appendNode(span, currentParentNode, range.type, range.length);
 
-      if (lineRanges.length > 0 && nextRangeStartIndex < endOfCurrentRange && range.type !== 'syntax') {
+      if (lineMarkdownRanges.length > 0 && nextRangeStartIndex < endOfCurrentRange && range.type !== 'syntax') {
         // tag nesting
         currentParentNode = spanNode;
         lastRangeEndIndex = range.start;
@@ -264,7 +264,7 @@ function updateInputStructure(
     const selection = getCurrentCursorPosition(target);
     cursorPosition = selection ? selection.start : null;
   }
-  const ranges = parserFunction(text);
+  const markdownRanges = parserFunction(text);
   if (!text || targetElement.innerHTML === '<br>' || (targetElement && targetElement.innerHTML === '\n')) {
     targetElement.innerHTML = '';
     targetElement.innerText = '';
@@ -272,7 +272,7 @@ function updateInputStructure(
 
   // We don't want to parse text with single '\n', because contentEditable represents it as invisible <br />
   if (text) {
-    const {dom, tree} = parseRangesToHTMLNodes(text, ranges, markdownStyle);
+    const {dom, tree} = parseRangesToHTMLNodes(text, markdownRanges, markdownStyle);
 
     if (shouldForceDOMUpdate || targetElement.innerHTML !== dom.innerHTML) {
       targetElement.innerHTML = '';
