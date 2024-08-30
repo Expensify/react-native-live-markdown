@@ -195,7 +195,7 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
         const hasAlt = node.tag.match(/data-link-variant="([^"]*)"/)![1] === 'labeled';
         const rawLink = node.tag.match(/data-raw-href="([^"]*)"/);
         const linkString = rawLink ? unescapeText(rawLink[1]!) : src;
-        ranges.push({type: 'inline-image', start: text.length, length: `!${hasAlt ? `[${alt?.[1] || ''}]` : ''}(${linkString})`.length});
+        ranges.push({type: 'inline-image', start: text.length, length: 3 + (alt?.[1] ? (alt?.[1].length || 0) + 2 : 0) + linkString.length});
         appendSyntax('!');
         if (hasAlt) {
           appendSyntax('[');
