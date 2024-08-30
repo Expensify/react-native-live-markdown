@@ -100,7 +100,8 @@
   },
   "resolutions": {
     "@types/react": "17.0.21",
-    "link@^2.1.1": "patch:link@npm%3A2.1.1#./.yarn/patches/link-npm-2.1.1-1c9fea076e.patch"
+    "link@^2.1.1": "patch:link@npm%3A2.1.1#./.yarn/patches/link-npm-2.1.1-1c9fea076e.patch",
+    "react-native@0.74.5": "patch:react-native@npm%3A0.74.5#./.yarn/patches/react-native-npm-0.74.5-3cfd406787.patch"
   },
   "peerDependencies": {
     "react": "*",

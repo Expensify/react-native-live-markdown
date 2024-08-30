@@ -1,7 +1,7 @@
-diff --git a/node_modules/react-native/ReactAndroid/build.gradle.kts b/node_modules/react-native/ReactAndroid/build.gradle.kts
-index 4909aed..b1cfd32 100644
---- a/node_modules/react-native/ReactAndroid/build.gradle.kts
-+++ b/node_modules/react-native/ReactAndroid/build.gradle.kts
+diff --git a/ReactAndroid/build.gradle.kts b/ReactAndroid/build.gradle.kts
+index 4909aeddba5dd256882dcf1cef170b6e948935ca..b1cfd32e07fb7c1ec182aab2a33414f670ccd229 100644
+--- a/ReactAndroid/build.gradle.kts
++++ b/ReactAndroid/build.gradle.kts
 @@ -155,6 +155,8 @@ val preparePrefab by
                    "glog", Pair(File(buildDir, "third-party-ndk/glog/exported/").absolutePath, "")),
                PrefabPreprocessingEntry(
@@ -27,10 +27,10 @@ index 4909aed..b1cfd32 100644
      create("react_render_mapbuffer") {
        headers = File(prefabHeadersDir, "react_render_mapbuffer").absolutePath
      }
-diff --git a/node_modules/react-native/ReactAndroid/cmake-utils/ReactNative-application.cmake b/node_modules/react-native/ReactAndroid/cmake-utils/ReactNative-application.cmake
-index e2efc26..3d4e151 100644
---- a/node_modules/react-native/ReactAndroid/cmake-utils/ReactNative-application.cmake
-+++ b/node_modules/react-native/ReactAndroid/cmake-utils/ReactNative-application.cmake
+diff --git a/ReactAndroid/cmake-utils/ReactNative-application.cmake b/ReactAndroid/cmake-utils/ReactNative-application.cmake
+index e2efc266ca0f68dd2226ec027491f193e6153ec9..3d4e1517a757dec5298a3af3471b9a4cffdbd04e 100644
+--- a/ReactAndroid/cmake-utils/ReactNative-application.cmake
++++ b/ReactAndroid/cmake-utils/ReactNative-application.cmake
 @@ -79,6 +79,7 @@ add_library(rrc_textinput ALIAS ReactAndroid::rrc_textinput)
  add_library(jsi ALIAS ReactAndroid::jsi)
  add_library(glog ALIAS ReactAndroid::glog)
@@ -40,7 +40,7 @@ index e2efc26..3d4e151 100644
  add_library(react_render_textlayoutmanager ALIAS ReactAndroid::react_render_textlayoutmanager)
  add_library(yoga ALIAS ReactAndroid::yoga)
 @@ -93,6 +94,7 @@ add_library(fbjni ALIAS fbjni::fbjni)
-
+ 
  target_link_libraries(${CMAKE_PROJECT_NAME}
          fabricjni                           # prefab ready
 +        mapbufferjni                        # prefab ready
