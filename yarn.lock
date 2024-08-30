@@ -2667,7 +2667,7 @@ __metadata:
     expensify-common: ">=2.0.76"
     react: "*"
     react-native: "*"
-    react-native-reanimated: ">=3.11.0"
+    react-native-reanimated: ">=3.15.0"
   languageName: unknown
   linkType: soft
 
