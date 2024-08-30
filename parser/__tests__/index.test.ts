@@ -489,7 +489,7 @@ describe('inline image', () => {
 
   test('trying to inject additional attributes', () => {
     expect('![test" onerror="alert(\'xss\')](https://example.com/image.png)').toBeParsedAs([
-      {type: 'inline-image', start: 0, length: 81},
+      {type: 'inline-image', start: 0, length: 61},
       {type: 'syntax', start: 0, length: 1},
       {type: 'syntax', start: 1, length: 1},
       {type: 'syntax', start: 29, length: 1},
@@ -501,7 +501,7 @@ describe('inline image', () => {
 
   test('inline code in alt', () => {
     expect('![`code`](https://example.com/image.png)').toBeParsedAs([
-      {type: 'inline-image', start: 0, length: 50},
+      {type: 'inline-image', start: 0, length: 40},
       {type: 'syntax', start: 0, length: 1},
       {type: 'syntax', start: 1, length: 1},
       {type: 'syntax', start: 8, length: 1},
@@ -513,7 +513,7 @@ describe('inline image', () => {
 
   test('blockquote in alt', () => {
     expect('![```test```](https://example.com/image.png)').toBeParsedAs([
-      {type: 'inline-image', start: 0, length: 74},
+      {type: 'inline-image', start: 0, length: 44},
       {type: 'syntax', start: 0, length: 1},
       {type: 'syntax', start: 1, length: 1},
       {type: 'syntax', start: 12, length: 1},
