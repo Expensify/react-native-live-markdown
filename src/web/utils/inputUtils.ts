@@ -82,7 +82,7 @@ function parseInnerHTMLToText(target: MarkdownTextInputElement, inputType: strin
       text += node.textContent;
     } else if (node.nodeName === 'BR') {
       const parentNode = getTopParentNode(node);
-      if (parentNode && parentNode.parentElement?.contentEditable !== 'true') {
+      if (parentNode && parentNode.parentElement?.contentEditable !== 'true' && !!(node as HTMLElement).getAttribute('data-id')) {
         // Parse br elements into newlines only if their parent is not a child of the MarkdownTextInputElement (a paragraph when writing or a div when pasting).
         // It prevents adding extra newlines when entering text
         text += '\n';

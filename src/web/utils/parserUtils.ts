@@ -166,7 +166,7 @@ function parseRangesToHTMLNodes(
   currentInput: MarkdownTextInputElement | null = null,
 ) {
   const rootElement: HTMLMarkdownElement = document.createElement('span') as HTMLMarkdownElement;
-  const textLength = text.replace(/\n/g, '\\n').length;
+  const textLength = text.length;
   const rootNode: TreeNode = {
     element: rootElement,
     start: 0,
