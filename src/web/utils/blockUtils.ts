@@ -1,6 +1,6 @@
 import type {MarkdownTextInputElement} from '../../MarkdownTextInput.web';
 import type {PartialMarkdownStyle} from '../../styleUtils';
-import {addInlineImagePreview} from '../markdown/inlineImages';
+import {addInlineImagePreview} from '../markdown/inlineImage';
 import type {MarkdownRange} from './parserUtils';
 import type {NodeType, TreeNode} from './treeUtils';
 
