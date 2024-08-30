@@ -6,10 +6,11 @@ import type {WorkletRuntime} from 'react-native-reanimated';
 import type {ShareableRef, WorkletFunction} from 'react-native-reanimated/lib/typescript/commonTypes';
 
 import MarkdownTextInputDecoratorViewNativeComponent from './MarkdownTextInputDecoratorViewNativeComponent';
+import type {MarkdownStyle} from './MarkdownTextInputDecoratorViewNativeComponent';
 import NativeLiveMarkdownModule from './NativeLiveMarkdownModule';
-import type * as MarkdownTextInputDecoratorViewNativeComponentTypes from './MarkdownTextInputDecoratorViewNativeComponent';
-import * as StyleUtils from './styleUtils';
-import type * as StyleUtilsTypes from './styleUtils';
+import {mergeMarkdownStyleWithDefault} from './styleUtils';
+import type {PartialMarkdownStyle} from './styleUtils';
+import type {MarkdownRange} from './commonTypes';
 
 declare global {
   // eslint-disable-next-line no-var
@@ -39,7 +40,7 @@ function initializeLiveMarkdownIfNeeded() {
   initialized = true;
 }
 
-function registerParser(parser: (input: string) => Range[]): number {
+function registerParser(parser: (input: string) => MarkdownRange[]): number {
   initializeLiveMarkdownIfNeeded();
   const shareableWorklet = makeShareableCloneRecursive(parser) as ShareableRef<WorkletFunction<[string], Range[]>>;
   const parserId = global.jsi_registerMarkdownWorklet(shareableWorklet);
@@ -50,21 +51,9 @@ function unregisterParser(parserId: number) {
   global.jsi_unregisterMarkdownWorklet(parserId);
 }
 
-type PartialMarkdownStyle = StyleUtilsTypes.PartialMarkdownStyle;
-type MarkdownStyle = MarkdownTextInputDecoratorViewNativeComponentTypes.MarkdownStyle;
-
-type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'emoji' | 'mention-here' | 'mention-user' | 'mention-report' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax';
-
-interface Range {
-  type: MarkdownType;
-  start: number;
-  length: number;
-  depth?: number;
-}
-
 interface MarkdownTextInputProps extends TextInputProps {
   markdownStyle?: PartialMarkdownStyle;
-  parser: (value: string) => Range[];
+  parser: (value: string) => MarkdownRange[];
 }
 
 function processColorsInMarkdownStyle(input: MarkdownStyle): MarkdownStyle {
@@ -85,7 +74,7 @@ function processColorsInMarkdownStyle(input: MarkdownStyle): MarkdownStyle {
 }
 
 function processMarkdownStyle(input: PartialMarkdownStyle | undefined): MarkdownStyle {
-  return processColorsInMarkdownStyle(StyleUtils.mergeMarkdownStyleWithDefault(input));
+  return processColorsInMarkdownStyle(mergeMarkdownStyleWithDefault(input));
 }
 
 const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>((props, ref) => {
@@ -138,6 +127,6 @@ const styles = StyleSheet.create({
   },
 });
 
-export type {PartialMarkdownStyle as MarkdownStyle, MarkdownTextInputProps, Range, MarkdownType};
+export type {PartialMarkdownStyle as MarkdownStyle, MarkdownTextInputProps};
 
 export default MarkdownTextInput;

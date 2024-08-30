@@ -10,16 +10,16 @@ const setupInput = async (page: Page, action?: 'clear' | 'reset') => {
   return inputLocator;
 };
 
-const checkCursorPosition = () => {
-  const editableDiv = document.querySelector('div[contenteditable="true"]') as HTMLElement;
-  const range = window.getSelection()?.getRangeAt(0);
-  if (!range || !editableDiv) {
-    return null;
-  }
-  const preCaretRange = range.cloneRange();
-  preCaretRange.selectNodeContents(editableDiv);
-  preCaretRange.setEnd(range.endContainer, range.endOffset);
-  return preCaretRange.toString().length;
+const getCursorPosition = async (elementHandle: Locator) => {
+  const inputSelectionHandle = await elementHandle.evaluateHandle(
+    (
+      div: HTMLInputElement & {
+        selection: {start: number; end: number};
+      },
+    ) => div.selection,
+  );
+  const selection = await inputSelectionHandle.jsonValue();
+  return selection;
 };
 
 const setCursorPosition = ({startNode, endNode}: {startNode?: Element; endNode?: Element | null}) => {
@@ -43,8 +43,11 @@ const getElementStyle = async (elementHandle: Locator) => {
 
   if (elementHandle) {
     await elementHandle.waitFor({state: 'attached'});
-
-    elementStyle = await elementHandle.getAttribute('style');
+    // We need to get styles from the parent element because every text node is wrapped additionally with a span element
+    const parentElementHandle = await elementHandle.evaluateHandle((element) => {
+      return element.parentElement;
+    });
+    elementStyle = await parentElementHandle.asElement()?.getAttribute('style');
   }
   return elementStyle;
 };
@@ -55,4 +58,10 @@ const pressCmd = async ({inputLocator, command}: {inputLocator: Locator; command
   await inputLocator.press(`${OPERATION_MODIFIER}+${command}`);
 };
 
-export {setupInput, checkCursorPosition, setCursorPosition, getElementStyle, pressCmd};
+const getElementValue = async (elementHandle: Locator) => {
+  const inputValueHandle = await elementHandle.evaluateHandle((div: HTMLInputElement) => div.value);
+  const value = await inputValueHandle.jsonValue();
+  return value;
+};
+
+export {setupInput, getCursorPosition, setCursorPosition, getElementStyle, pressCmd, getElementValue};

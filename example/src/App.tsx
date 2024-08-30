@@ -1,7 +1,5 @@
 import * as React from 'react';
-
 import {Button, Platform, StyleSheet, Text, View} from 'react-native';
-
 import {MarkdownTextInput, parseExpensiMark} from '@expensify/react-native-live-markdown';
 import type {TextInput} from 'react-native';
 import * as TEST_CONST from './testConstants';

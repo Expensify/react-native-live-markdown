@@ -124,10 +124,10 @@ The style object can be passed to multiple `MarkdownTextInput` components using 
 
 ## Parsing logic
 
-`MarkdownTextInput` behavior can be customized via `parser` property. Parser is a function that accepts a plaintext string and returns an array of `Range` objects:
+`MarkdownTextInput` behavior can be customized via `parser` property. Parser is a function that accepts a plaintext string and returns an array of `MarkdownRange` objects:
 
 ```ts
-interface Range {
+interface MarkdownRange {
   type: MarkdownType;
   start: number;
   length: number;
@@ -172,10 +172,10 @@ Currently, `react-native-live-markdown` supports only [ExpensiMark](https://gith
 
 `MarkdownTextInput` inherits all props of React Native's `TextInput` component as well as introduces the following properties:
 
-| Prop            | Type                         | Default     | Note                                                                                                                                                                                                                   |
-| --------------- | ---------------------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `parser`        | `(value: string) => Range[]` | `undefined` | A function that parses the current value and returns an array of ranges.                                                                                                                                               |
-| `markdownStyle` | `MarkdownStyle`              | `undefined` | Adds custom styling to Markdown text. The provided value is merged with default style object. See [Styling](https://github.com/expensify/react-native-live-markdown/blob/main/README.md#styling) for more information. |
+| Prop            | Type                                 | Default     | Note                                                                                                                                                                                                                   |
+| --------------- | ------------------------------------ | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `parser`        | `(value: string) => MarkdownRange[]` | `undefined` | A function that parses the current value and returns an array of ranges.                                                                                                                                               |
+| `markdownStyle` | `MarkdownStyle`                      | `undefined` | Adds custom styling to Markdown text. The provided value is merged with default style object. See [Styling](https://github.com/expensify/react-native-live-markdown/blob/main/README.md#styling) for more information. |
 
 ## Compatibility
 

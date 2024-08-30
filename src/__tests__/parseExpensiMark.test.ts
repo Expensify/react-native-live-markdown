@@ -1,14 +1,14 @@
 import {expect} from '@jest/globals';
-import type * as ParserTypes from '../index';
 import parseExpensiMark from '../parseExpensiMark';
+import type {MarkdownRange} from '../commonTypes';
 
 declare module 'expect' {
   interface Matchers<R> {
-    toBeParsedAs(expectedRanges: ParserTypes.Range[]): R;
+    toBeParsedAs(expectedRanges: MarkdownRange[]): R;
   }
 }
 
-const toBeParsedAs = function (actual: string, expectedRanges: ParserTypes.Range[]) {
+const toBeParsedAs = function (actual: string, expectedRanges: MarkdownRange[]) {
   const actualRanges = parseExpensiMark(actual);
   if (JSON.stringify(actualRanges) !== JSON.stringify(expectedRanges)) {
     return {

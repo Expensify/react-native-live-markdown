@@ -1,9 +1,6 @@
 import ExpensiMark from 'expensify-common/dist/ExpensiMark';
-import * as Utils from 'expensify-common/dist/utils';
-import type * as MarkdownTextInputTypes from './MarkdownTextInput';
-
-type Range = MarkdownTextInputTypes.Range;
-type MarkdownType = MarkdownTextInputTypes.MarkdownType;
+import {unescapeText} from 'expensify-common/dist/utils';
+import type {MarkdownType, MarkdownRange} from './commonTypes';
 
 type Token = ['TEXT' | 'HTML', string];
 type StackItem = {tag: string; children: Array<StackItem | string>};
@@ -51,7 +48,7 @@ function parseTokensToTree(tokens: Token[]): StackItem {
   const stack: StackItem[] = [{tag: '<>', children: []}];
   tokens.forEach(([type, payload]) => {
     if (type === 'TEXT') {
-      const text = Utils.unescapeText(payload);
+      const text = unescapeText(payload);
       const top = stack[stack.length - 1];
       top!.children.push(text);
     } else if (type === 'HTML') {
@@ -89,7 +86,7 @@ function parseTokensToTree(tokens: Token[]): StackItem {
   return stack[0]!;
 }
 
-function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
+function parseTreeToTextAndRanges(tree: StackItem): [string, MarkdownRange[]] {
   'worklet';
 
   let text = '';
@@ -113,7 +110,7 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
     ranges.push({type, start, length: end - start});
   }
 
-  const ranges: Range[] = [];
+  const ranges: MarkdownRange[] = [];
   function dfs(node: StackItem | string) {
     if (typeof node === 'string') {
       text += node;
@@ -166,10 +163,10 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
         appendSyntax('```');
       } else if (node.tag.startsWith('<a href="')) {
         const rawHref = node.tag.match(/href="([^"]*)"/)![1]!; // always present
-        const href = Utils.unescapeText(rawHref);
+        const href = unescapeText(rawHref);
         const isLabeledLink = node.tag.match(/data-link-variant="([^"]*)"/)![1] === 'labeled';
         const dataRawHref = node.tag.match(/data-raw-href="([^"]*)"/);
-        const matchString = dataRawHref ? Utils.unescapeText(dataRawHref[1]!) : href;
+        const matchString = dataRawHref ? unescapeText(dataRawHref[1]!) : href;
         if (!isLabeledLink && node.children.length === 1 && typeof node.children[0] === 'string' && (node.children[0] === matchString || `mailto:${node.children[0]}` === href)) {
           addChildrenWithStyle(node.children[0], 'link');
         } else {
@@ -184,12 +181,12 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
         const alt = node.tag.match(/alt="([^"]*)"/);
         const hasAlt = node.tag.match(/data-link-variant="([^"]*)"/)![1] === 'labeled';
         const rawLink = node.tag.match(/data-raw-href="([^"]*)"/);
-        const linkString = rawLink ? Utils.unescapeText(rawLink[1]!) : src;
+        const linkString = rawLink ? unescapeText(rawLink[1]!) : src;
 
         appendSyntax('!');
         if (hasAlt) {
           appendSyntax('[');
-          processChildren(Utils.unescapeText(alt?.[1] || ''));
+          processChildren(unescapeText(alt?.[1] || ''));
           appendSyntax(']');
         }
         appendSyntax('(');
@@ -199,7 +196,7 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
         const src = node.tag.match(/data-expensify-source="([^"]*)"/)![1]!; // always present
         const rawLink = node.tag.match(/data-raw-href="([^"]*)"/);
         const hasAlt = node.tag.match(/data-link-variant="([^"]*)"/)![1] === 'labeled';
-        const linkString = rawLink ? Utils.unescapeText(rawLink[1]!) : src;
+        const linkString = rawLink ? unescapeText(rawLink[1]!) : src;
         appendSyntax('!');
         if (hasAlt) {
           appendSyntax('[');
@@ -232,14 +229,14 @@ function getTagPriority(tag: string) {
   }
 }
 
-function sortRanges(ranges: Range[]) {
+function sortRanges(ranges: MarkdownRange[]) {
   'worklet';
 
   // sort ranges by start position, then by length, then by tag hierarchy
   return ranges.sort((a, b) => a.start - b.start || b.length - a.length || getTagPriority(b.type) - getTagPriority(a.type) || 0);
 }
 
-function groupRanges(ranges: Range[]) {
+function groupRanges(ranges: MarkdownRange[]) {
   'worklet';
 
   const lastVisibleRangeIndex: {[key in MarkdownType]?: number} = {};
@@ -260,10 +257,10 @@ function groupRanges(ranges: Range[]) {
     }
 
     return acc;
-  }, [] as Range[]);
+  }, [] as MarkdownRange[]);
 }
 
-function parseExpensiMark(markdown: string): Range[] {
+function parseExpensiMark(markdown: string): MarkdownRange[] {
   'worklet';
 
   try {
@@ -288,4 +285,3 @@ function parseExpensiMark(markdown: string): Range[] {
 }
 
 export default parseExpensiMark;
-export type {MarkdownType, Range};
