@@ -3,65 +3,21 @@ import {parseStyleToNumber} from '../../styleUtils';
 import type {PartialMarkdownStyle} from '../../styleUtils';
 import type {MarkdownRange} from '../utils/parserUtils';
 import type {TreeNode} from '../utils/treeUtils';
+import {createLoadingIndicator} from './loadingIndicator';
 
-function createLoadingIndicator(currentInput: MarkdownTextInputElement, url: string, markdownStyle: PartialMarkdownStyle) {
-  // Get current spinner animation progress if it exists
-  const currentSpinner = currentInput.querySelector(`[data-type="spinner"][data-url="${url}"]`)?.firstChild;
-  let currentTime: CSSNumberish = 0;
-  if (currentSpinner) {
-    const animation = (currentSpinner as HTMLMarkdownElement).getAnimations()[0];
-    if (animation) {
-      currentTime = animation.currentTime || 0;
-    }
-  }
+const inlineImageDefaultStyles = {
+  backgroundPosition: `bottom left`,
+  backgroundRepeat: `no-repeat`,
+};
 
-  const container = document.createElement('span');
-  container.contentEditable = 'false';
-
-  const spinner = document.createElement('span');
-  const spinnerStyles = markdownStyle.loadingIndicator;
-  if (spinnerStyles) {
-    const spinnerBorderWidth = spinnerStyles.borderWidth || 3;
-    Object.assign(spinner.style, {
-      border: `${spinnerBorderWidth}px solid ${String(spinnerStyles.secondaryColor)}`,
-      borderTop: `${spinnerBorderWidth}px solid ${String(spinnerStyles.primaryColor)}`,
-      borderRadius: '50%',
-      width: spinnerStyles.width || '20px',
-      height: spinnerStyles.height || '20px',
-      display: 'block',
-      animationPlayState: 'paused',
-    });
-  }
-
-  const containerStyles = markdownStyle.loadingIndicatorContainer;
-  Object.assign(container.style, {
-    ...markdownStyle.loadingIndicatorContainer,
-    position: 'absolute',
-    bottom: '0',
-    left: '0',
-    width: containerStyles?.width || 'auto',
-    height: containerStyles?.height || 'auto',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-  });
-  container.setAttribute('data-type', 'spinner');
-  container.setAttribute('data-url', url);
-  container.contentEditable = 'false';
-  container.appendChild(spinner);
-
-  const keyframes = [{transform: 'rotate(0deg)'}, {transform: 'rotate(360deg)'}];
-
-  const options = {
-    duration: 1000,
-    iterations: Infinity,
-  };
-  const animation2 = spinner.animate(keyframes, options);
-  animation2.currentTime = currentTime;
-  return container;
+function getImageMeta(url: string, callback: (err: string | Event | null, img?: HTMLImageElement) => void) {
+  const img = new Image();
+  img.onload = () => callback(null, img);
+  img.onerror = (err) => callback(err);
+  img.src = url;
 }
 
-/* Replaces element in the tree, that is beeing builded, with the element from the currently rendered input (with previous state) */
+/** Replaces element in the tree, that is beeing builded, with the element from the currently rendered input (with previous state) */
 function replaceElementInTreeNode(targetNode: TreeNode, newElement: HTMLMarkdownElement) {
   // Clear newElement from its children
   [...newElement.children].forEach((child) => {
@@ -79,14 +35,7 @@ function replaceElementInTreeNode(targetNode: TreeNode, newElement: HTMLMarkdown
   return {...targetNode, element: newElement};
 }
 
-function getImageMeta(url: string, callback: (err: string | Event | null, img?: HTMLImageElement) => void) {
-  const img = new Image();
-  img.onload = () => callback(null, img);
-  img.onerror = (err) => callback(err);
-  img.src = url;
-}
-
-/* The main function that adds inline image preview to the node */
+/** The main function that adds inline image preview to the node */
 function addInlineImagePreview(currentInput: MarkdownTextInputElement, targetNode: TreeNode, text: string, ranges: MarkdownRange[], markdownStyle: PartialMarkdownStyle) {
   const linkRange = ranges.find((r) => r.type === 'link');
   let imageHref = '';
@@ -153,10 +102,9 @@ function addInlineImagePreview(currentInput: MarkdownTextInputElement, targetNod
     const heightSize = height ? `${height}px` : 'auto';
 
     Object.assign(targetNode.element.style, {
+      ...inlineImageDefaultStyles,
       backgroundImage: `url("${imageHref}")`,
-      backgroundPosition: `bottom left`,
       backgroundSize: `${widthSize} ${heightSize}`,
-      backgroundRepeat: `no-repeat`,
       paddingBottom: `${imageMarginTop + paddingValue}px`,
     });
   });

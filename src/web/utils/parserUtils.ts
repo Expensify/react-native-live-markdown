@@ -157,6 +157,13 @@ function addParagraph(node: TreeNode, text: string | null = null, length: number
   return pNode;
 }
 
+function addBlockWrapper(targetNode: TreeNode, length: number, markdownStyle: PartialMarkdownStyle) {
+  const span = document.createElement('span') as HTMLMarkdownElement;
+  span.setAttribute('data-type', 'block');
+  addStyleToBlock(span, 'block', markdownStyle);
+  return appendNode(span, targetNode, 'block', length);
+}
+
 /** Builds HTML DOM structure based on passed text and markdown ranges */
 function parseRangesToHTMLNodes(
   text: string,
@@ -225,10 +232,7 @@ function parseRangesToHTMLNodes(
       // wrap all elements before the first block type markdown range with a span element
       const blockRange = getFirstBlockMarkdownRange([range, ...lineMarkdownRanges]);
       if (!wasBlockGenerated && blockRange) {
-        const span = document.createElement('span') as HTMLMarkdownElement;
-        span.setAttribute('data-type', 'block');
-        addStyleToBlock(span, 'block', markdownStyle);
-        currentParentNode = appendNode(span, currentParentNode, 'block', line.text.substring(lastRangeEndIndex - line.start, blockRange.start + blockRange.length - line.start).length);
+        currentParentNode = addBlockWrapper(currentParentNode, line.text.substring(lastRangeEndIndex - line.start, blockRange.start + blockRange.length - line.start).length, markdownStyle);
         wasBlockGenerated = true;
       }
       // add text before the markdown range
