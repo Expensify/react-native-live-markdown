@@ -28,13 +28,11 @@ function getRuntime() {
   if ('HermesInternal' in global) {
     const version =
       // @ts-expect-error this is fine
-      // eslint-disable-next-line es/no-optional-chaining
       global.HermesInternal?.getRuntimeProperties?.()['OSS Release Version'];
     return `Hermes (${version})`;
   }
   if ('_v8runtime' in global) {
     // @ts-expect-error this is fine
-    // eslint-disable-next-line no-underscore-dangle
     const version = global._v8runtime().version;
     return `V8 (${version})`;
   }
@@ -96,7 +94,7 @@ export default function App() {
         ref={ref}
         markdownStyle={markdownStyle}
         placeholder="Type here..."
-        onSelectionChange={(e) => setSelection(e.nativeEvent.selection)}
+        onSelectionChange={e => setSelection(e.nativeEvent.selection)}
         selection={selection}
         id={TEST_CONST.INPUT_ID}
       />
