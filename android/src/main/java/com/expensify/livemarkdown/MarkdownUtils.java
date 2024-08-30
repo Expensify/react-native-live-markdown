@@ -1,16 +1,11 @@
 package com.expensify.livemarkdown;
 
-import static com.facebook.infer.annotation.ThreadConfined.UI;
-
 import android.content.res.AssetManager;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 
 import androidx.annotation.NonNull;
 
-import com.facebook.infer.annotation.Assertions;
-import com.facebook.infer.annotation.ThreadConfined;
-import com.facebook.react.bridge.UiThreadUtil;
 import com.facebook.react.views.text.internal.span.CustomLineHeightSpan;
 import com.facebook.soloader.SoLoader;
 
@@ -94,6 +89,9 @@ public class MarkdownUtils {
         int length = range.getInt("length");
         int depth = range.optInt("depth", 1);
         int end = start + length;
+        if (length == 0 || end > input.length()) {
+          continue;
+        }
         applyRange(ssb, type, start, end, depth);
       }
     } catch (JSONException e) {

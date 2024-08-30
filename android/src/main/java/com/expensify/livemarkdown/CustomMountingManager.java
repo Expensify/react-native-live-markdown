@@ -20,8 +20,8 @@ import com.facebook.react.fabric.mounting.MountingManager;
 import com.facebook.react.uimanager.PixelUtil;
 import com.facebook.react.uimanager.ViewManagerRegistry;
 import com.facebook.react.views.text.TextAttributeProps;
+import com.facebook.react.views.text.TextLayoutManagerMapBuffer;
 import com.facebook.react.views.text.internal.span.TextInlineViewPlaceholderSpan;
-import com.facebook.react.views.text.TextLayoutManager;
 import com.facebook.yoga.YogaMeasureMode;
 import com.facebook.yoga.YogaMeasureOutput;
 
@@ -43,6 +43,7 @@ public class CustomMountingManager extends MountingManager {
 
     AssetManager assetManager = context.getAssets();
     MarkdownUtils.maybeInitializeRuntime(assetManager);
+
     this.markdownUtils = new MarkdownUtils(assetManager);
     this.markdownUtils.setMarkdownStyle(new MarkdownStyle(decoratorProps, context));
   }
