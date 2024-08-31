@@ -3,7 +3,7 @@ import ExpensiMark from 'expensify-common/dist/ExpensiMark';
 import {unescapeText} from './utils';
 
 type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'emoji' | 'mention-here' | 'mention-user' | 'mention-report' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax';
-type Range = {
+type MarkdownRange = {
   type: MarkdownType;
   start: number;
   length: number;
@@ -87,7 +87,7 @@ function parseTokensToTree(tokens: Token[]): StackItem {
   return stack[0]!;
 }
 
-function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
+function parseTreeToTextAndRanges(tree: StackItem): [string, MarkdownRange[]] {
   let text = '';
 
   function processChildren(node: StackItem | string) {
@@ -109,7 +109,7 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
     ranges.push({type, start, length: end - start});
   }
 
-  const ranges: Range[] = [];
+  const ranges: MarkdownRange[] = [];
   function dfs(node: StackItem | string) {
     if (typeof node === 'string') {
       text += node;
@@ -226,12 +226,12 @@ function getTagPriority(tag: string) {
   }
 }
 
-function sortRanges(ranges: Range[]) {
+function sortRanges(ranges: MarkdownRange[]) {
   // sort ranges by start position, then by length, then by tag hierarchy
   return ranges.sort((a, b) => a.start - b.start || b.length - a.length || getTagPriority(b.type) - getTagPriority(a.type) || 0);
 }
 
-function groupRanges(ranges: Range[]) {
+function groupRanges(ranges: MarkdownRange[]) {
   const lastVisibleRangeIndex: {[key in MarkdownType]?: number} = {};
 
   return ranges.reduce((acc, range) => {
@@ -250,10 +250,10 @@ function groupRanges(ranges: Range[]) {
     }
 
     return acc;
-  }, [] as Range[]);
+  }, [] as MarkdownRange[]);
 }
 
-function parseExpensiMarkToRanges(markdown: string): Range[] {
+function parseExpensiMarkToRanges(markdown: string): MarkdownRange[] {
   try {
     const html = parseMarkdownToHTML(markdown);
     const tokens = parseHTMLToTokens(html);
@@ -276,4 +276,4 @@ function parseExpensiMarkToRanges(markdown: string): Range[] {
 }
 
 globalThis.parseExpensiMarkToRanges = parseExpensiMarkToRanges;
-export type {MarkdownType, Range};
+export type {MarkdownType, MarkdownRange};
