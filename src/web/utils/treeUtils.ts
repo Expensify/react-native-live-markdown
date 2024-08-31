@@ -1,5 +1,5 @@
 import type {HTMLMarkdownElement} from '../../MarkdownTextInput.web';
-import type {MarkdownRange, MarkdownType} from './parserUtils';
+import type {MarkdownRange, MarkdownType} from '../../commonTypes';
 
 type NodeType = MarkdownType | 'line' | 'text' | 'br' | 'root';
 
