@@ -2,7 +2,7 @@ export {};
 
 type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'emoji' | 'mention-here' | 'mention-user' | 'mention-report' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax';
 
-type Range = {
+type MarkdownRange = {
   type: MarkdownType;
   start: number;
   length: number;
@@ -11,5 +11,5 @@ type Range = {
 
 declare global {
   // eslint-disable-next-line no-var
-  var parseExpensiMarkToRanges: (markdown: string) => Range[];
+  var parseExpensiMarkToRanges: (markdown: string) => MarkdownMarkdownRange[];
 }
