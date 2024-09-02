@@ -1164,7 +1164,7 @@ PODS:
     - React-logger (= 0.74.5)
     - React-perflogger (= 0.74.5)
     - React-utils (= 0.74.5)
-  - RNLiveMarkdown (0.1.125):
+  - RNLiveMarkdown (0.1.127):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1184,9 +1184,9 @@ PODS:
     - React-utils
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNLiveMarkdown/common (= 0.1.125)
+    - RNLiveMarkdown/common (= 0.1.127)
     - Yoga
-  - RNLiveMarkdown/common (0.1.125):
+  - RNLiveMarkdown/common (0.1.127):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1422,9 +1422,9 @@ SPEC CHECKSUMS:
   React-perflogger: ed4e0c65781521e0424f2e5e40b40cc7879d737e
   React-RCTActionSheet: 49d53ff03bb5688ca4606c55859053a0cd129ea5
   React-RCTAnimation: 07b4923885c52c397c4ec103924bf6e53b42c73e
-  React-RCTAppDelegate: 316e295076734baf9bdf1bfac7d92ab647aed930
+  React-RCTAppDelegate: fc766c91b215650b9dd0dc7e19cb846165662d9f
   React-RCTBlob: 85c57b0d5e667ff8a472163ba3af0628171a64bb
-  React-RCTFabric: 97c1465ded4dc92841f5376a39e43e1b2c455f40
+  React-RCTFabric: 7058f9ea5584364af58ba384312c7c3880631d28
   React-RCTImage: b965c85bec820e2a9c154b1fb00a2ecdd59a9c92
   React-RCTLinking: 75f04a5f27c26c4e73a39c50df470820d219df79
   React-RCTNetwork: c1a9143f4d5778efc92da40d83969d03912ccc24
@@ -1440,10 +1440,10 @@ SPEC CHECKSUMS:
   React-runtimescheduler: cfbe85c3510c541ec6dc815c7729b41304b67961
   React-utils: f242eb7e7889419d979ca0e1c02ccc0ea6e43b29
   ReactCommon: f7da14a8827b72704169a48c929bcde802698361
-  RNLiveMarkdown: 79d67ef1cc94b3fdb3baab3a50a5f19054746085
+  RNLiveMarkdown: 92fd38ec8e25d08438949fc76a47bed823dfb2ea
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
   Yoga: 2246eea72aaf1b816a68a35e6e4b74563653ae09
 
-PODFILE CHECKSUM: 29bf1d7535c2bdaae02164f4bbb5570b52cbb398
+PODFILE CHECKSUM: 9b81b0f7bfba9e6fb4fa10efe8319f7860794e08
 
 COCOAPODS: 1.14.3
