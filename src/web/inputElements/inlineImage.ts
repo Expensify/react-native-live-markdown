@@ -6,33 +6,27 @@ import type {TreeNode} from '../utils/treeUtils';
 import {createLoadingIndicator} from './loadingIndicator';
 
 const inlineImageDefaultStyles = {
-  backgroundPosition: `bottom left`,
-  backgroundRepeat: `no-repeat`,
+  position: 'absolute',
+  bottom: 0,
+  left: 0,
 };
 
-function getImageMeta(url: string, callback: (err: string | Event | null, img?: HTMLImageElement) => void) {
+function createImageElement(url: string, callback: (err: string | Event | null, img?: HTMLImageElement) => void) {
   const img = new Image();
   img.onload = () => callback(null, img);
   img.onerror = (err) => callback(err);
   img.src = url;
 }
 
-/** Replaces element in the tree, that is beeing builded, with the element from the currently rendered input (with previous state) */
-function replaceElementInTreeNode(targetNode: TreeNode, newElement: HTMLMarkdownElement) {
-  // Clear newElement from its children
-  [...newElement.children].forEach((child) => {
-    child.remove();
+/** Adds already loaded image element from current input content */
+function addLoadedImageFromCurrentInput(targetNode: TreeNode, newElement: HTMLMarkdownElement) {
+  const paddingBottom = `${newElement.parentElement?.style.paddingBottom}`;
+  targetNode.element.appendChild(newElement);
+  Object.assign(targetNode.element.style, {
+    paddingBottom,
   });
-  newElement.remove();
 
-  // Move all children from targetNode to newElement
-  [...targetNode.element.children].forEach((child) => {
-    newElement.appendChild(child);
-  });
-  targetNode.element.remove();
-
-  targetNode.parentNode?.element.appendChild(newElement);
-  return {...targetNode, element: newElement};
+  return targetNode;
 }
 
 /** The main function that adds inline image preview to the node */
@@ -43,10 +37,11 @@ function addInlineImagePreview(currentInput: MarkdownTextInputElement, targetNod
     imageHref = text.substring(linkRange.start, linkRange.start + linkRange.length);
   }
 
-  // If the inline image markdown with the same href is already loaded, replace the targetNode with the already loaded preview
-  const alreadyLoadedPreview = currentInput.querySelector(`[data-image-href="${imageHref}"]`);
+  // If the inline image markdown with the same href exists in the current input, use it instead of creating new one.
+  // Prevents from image flickering and layout jumps
+  const alreadyLoadedPreview = currentInput.querySelector(`img[src="${imageHref}"]`);
   if (alreadyLoadedPreview) {
-    return replaceElementInTreeNode(targetNode, alreadyLoadedPreview as HTMLMarkdownElement);
+    return addLoadedImageFromCurrentInput(targetNode, alreadyLoadedPreview as HTMLMarkdownElement);
   }
 
   // Add a loading spinner
@@ -55,8 +50,8 @@ function addInlineImagePreview(currentInput: MarkdownTextInputElement, targetNod
     targetNode.element.appendChild(spinner);
   }
 
-  const maxWidth = parseStyleToNumber(`${markdownStyle.inlineImage?.maxWidth}`);
-  const maxHeight = parseStyleToNumber(`${markdownStyle.inlineImage?.maxHeight}`);
+  const maxWidth = markdownStyle.inlineImage?.maxWidth;
+  const maxHeight = markdownStyle.inlineImage?.maxHeight;
   const imageMarginTop = parseStyleToNumber(`${markdownStyle.inlineImage?.marginTop}`);
   const imageMarginBottom = parseStyleToNumber(`${markdownStyle.inlineImage?.marginBottom}`);
 
@@ -66,46 +61,30 @@ function addInlineImagePreview(currentInput: MarkdownTextInputElement, targetNod
     paddingBottom: markdownStyle.loadingIndicatorContainer?.height || markdownStyle.loadingIndicator?.height || (!!markdownStyle.loadingIndicator && '30px') || undefined,
   });
 
-  getImageMeta(imageHref, (_err, img) => {
-    if (!img || _err) {
+  createImageElement(imageHref, (err, img) => {
+    if (!img || err) {
       return;
     }
 
     // Verify if the current spinner is for the loaded image. If not, it means that the response came after the user changed the image url
     const currentSpinner = currentInput.querySelector('[data-type="spinner"]');
-    if (currentSpinner !== spinner) {
-      return;
-    }
-
     // Remove the spinner
     if (currentSpinner) {
       currentSpinner.remove();
     }
 
-    targetNode.element.setAttribute('data-image-href', imageHref);
-
-    // Calcate the image preview size and apply styles
-    const {naturalWidth, naturalHeight} = img;
-    let width: number | null = null;
-    let height: number | null = null;
-
-    let paddingValue = 0;
-    if (naturalWidth > naturalHeight) {
-      width = Math.min(maxWidth, naturalWidth);
-      paddingValue = (width / naturalWidth) * naturalHeight;
-    } else {
-      height = Math.min(maxHeight, naturalHeight);
-      paddingValue = height;
-    }
-
-    const widthSize = width ? `${width}px` : 'auto';
-    const heightSize = height ? `${height}px` : 'auto';
-
-    Object.assign(targetNode.element.style, {
+    // Set the image styles
+    Object.assign(img.style, {
       ...inlineImageDefaultStyles,
-      backgroundImage: `url("${imageHref}")`,
-      backgroundSize: `${widthSize} ${heightSize}`,
-      paddingBottom: `${imageMarginTop + paddingValue}px`,
+      maxHeight,
+      maxWidth,
+    });
+
+    targetNode.element.appendChild(img);
+
+    // Set paddingBottom to the height of the image so it's displayed under the block
+    Object.assign(targetNode.element.style, {
+      paddingBottom: `${img.clientHeight + imageMarginTop}px`,
     });
   });
 
