@@ -1,7 +1,7 @@
 import type {MarkdownTextInputElement} from '../../MarkdownTextInput.web';
+import type {MarkdownRange} from '../../commonTypes';
 import type {PartialMarkdownStyle} from '../../styleUtils';
 import {addInlineImagePreview} from '../inputElements/inlineImage';
-import type {MarkdownRange} from './parserUtils';
 import type {NodeType, TreeNode} from './treeUtils';
 
 function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownStyle: PartialMarkdownStyle) {

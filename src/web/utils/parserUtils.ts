@@ -4,29 +4,7 @@ import type {NodeType, TreeNode} from './treeUtils';
 import type {PartialMarkdownStyle} from '../../styleUtils';
 import {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition} from './cursorUtils';
 import {addStyleToBlock, extendBlockStructure, getFirstBlockMarkdownRange, isBlockMarkdownType} from './blockUtils';
-
-type MarkdownType =
-  | 'bold'
-  | 'italic'
-  | 'strikethrough'
-  | 'emoji'
-  | 'link'
-  | 'code'
-  | 'pre'
-  | 'blockquote'
-  | 'h1'
-  | 'syntax'
-  | 'mention-here'
-  | 'mention-user'
-  | 'mention-report'
-  | 'inline-image';
-
-type MarkdownRange = {
-  type: MarkdownType;
-  start: number;
-  length: number;
-  depth?: number;
-};
+import type {MarkdownRange} from '../../commonTypes';
 
 type Paragraph = {
   text: string;
@@ -314,8 +292,7 @@ function updateInputStructure(
     const selection = getCurrentCursorPosition(target);
     cursorPosition = selection ? selection.start : null;
   }
-  const ranges = global.parseExpensiMarkToRanges(text);
-  const markdownRanges: MarkdownRange[] = ranges as MarkdownRange[];
+  const markdownRanges = global.parseExpensiMarkToRanges(text);
   if (!text || targetElement.innerHTML === '<br>' || (targetElement && targetElement.innerHTML === '\n')) {
     targetElement.innerHTML = '';
     targetElement.innerText = '';
@@ -341,5 +318,3 @@ function updateInputStructure(
 }
 
 export {updateInputStructure, parseRangesToHTMLNodes};
-
-export type {MarkdownRange, MarkdownType};
