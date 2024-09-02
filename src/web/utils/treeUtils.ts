@@ -21,7 +21,7 @@ function addNodeToTree(element: HTMLMarkdownElement, parentTreeNode: TreeNode, t
     const lastParentChild = parentTreeNode.childNodes[parentChildrenCount - 1];
     if (lastParentChild) {
       startIndex = lastParentChild.start + lastParentChild.length;
-      startIndex += lastParentChild.isGeneratingNewline || element.style.display === 'block' ? 1 : 0;
+      startIndex += lastParentChild.isGeneratingNewline || (type !== 'block' && element.style.display === 'block') ? 1 : 0;
     }
   }
 
