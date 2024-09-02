@@ -14,6 +14,8 @@ const inlineImageDefaultStyles = {
 function createImageElement(url: string, callback: (err: string | Event | null, img?: HTMLElement) => void) {
   const imageContainer = document.createElement('span');
   imageContainer.contentEditable = 'false';
+  imageContainer.setAttribute('data-type', 'inline-container');
+
   const img = new Image();
   imageContainer.appendChild(img);
 
@@ -23,15 +25,10 @@ function createImageElement(url: string, callback: (err: string | Event | null, 
   img.src = url;
 }
 
-/** Adds already loaded image element from current input content */
-function addLoadedImageFromCurrentInput(targetNode: TreeNode, newElement: HTMLMarkdownElement) {
-  const imageContainer = newElement.parentElement;
-  if (!imageContainer) {
-    return targetNode;
-  }
-
-  const paddingBottom = `${imageContainer.parentElement?.style.paddingBottom}`;
-  targetNode.element.appendChild(imageContainer);
+/** Adds already loaded image element from current input content to the tree node */
+function updateImageTreeNode(targetNode: TreeNode, newElement: HTMLMarkdownElement) {
+  const paddingBottom = `${newElement.parentElement?.style.paddingBottom}`;
+  targetNode.element.appendChild(newElement);
   Object.assign(targetNode.element.style, {
     paddingBottom,
   });
@@ -49,8 +46,9 @@ function addInlineImagePreview(currentInput: MarkdownTextInputElement, targetNod
   // If the inline image markdown with the same href exists in the current input, use it instead of creating new one.
   // Prevents from image flickering and layout jumps
   const alreadyLoadedPreview = currentInput.querySelector(`img[src="${imageHref}"]`);
-  if (alreadyLoadedPreview) {
-    return addLoadedImageFromCurrentInput(targetNode, alreadyLoadedPreview as HTMLMarkdownElement);
+  const loadedImageContainer = alreadyLoadedPreview?.parentElement;
+  if (loadedImageContainer && loadedImageContainer.getAttribute('data-type') === 'inline-container') {
+    return updateImageTreeNode(targetNode, loadedImageContainer as HTMLMarkdownElement);
   }
 
   // Add a loading spinner
