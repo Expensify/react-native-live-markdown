@@ -10,6 +10,7 @@ const EXAMPLE_CONTENT = [
   '@here',
   '@someone@swmansion.com',
   '#mention-report',
+  '![demo image](https://picsum.photos/id/1069/200/300)',
 ].join('\n');
 
 const INPUT_ID = 'MarkdownInput_Example';

@@ -55,8 +55,8 @@ function makeDefaultMarkdownStyle(): MarkdownStyle {
       backgroundColor: 'pink',
     },
     inlineImage: {
-      maxWidth: 200,
-      maxHeight: 200,
+      maxWidth: 150,
+      maxHeight: 150,
       marginTop: 5,
       marginBottom: 0,
     },

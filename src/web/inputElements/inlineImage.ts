@@ -1,7 +1,7 @@
 import type {HTMLMarkdownElement, MarkdownTextInputElement} from '../../MarkdownTextInput.web';
+import type {MarkdownRange} from '../../commonTypes';
 import {parseStyleToNumber} from '../../styleUtils';
 import type {PartialMarkdownStyle} from '../../styleUtils';
-import type {MarkdownRange} from '../utils/parserUtils';
 import type {TreeNode} from '../utils/treeUtils';
 import {createLoadingIndicator} from './loadingIndicator';
 
