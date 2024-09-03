@@ -25,14 +25,20 @@ public class MarkdownTextWatcher implements TextWatcher {
     if (mShouldSkip) {
       return;
     }
-    if (s instanceof SpannableStringBuilder) {
-      mMarkdownUtils.applyMarkdownFormatting((SpannableStringBuilder) s);
-      mShouldSkip = true;
-    }
+    // Set the flag to indicate text is being changed
+    mShouldSkip = true;
   }
 
   @Override
   public void afterTextChanged(Editable editable) {
-    mShouldSkip = false;
-  }
-}
+      if (!mShouldSkip) {
+          return;
+      }
+      
+      if (editable instanceof SpannableStringBuilder) {
+          mMarkdownUtils.applyMarkdownFormatting((SpannableStringBuilder) editable);
+      }
+      
+      // Reset the flag after formatting is applied
+      mShouldSkip = false;
+  }}
