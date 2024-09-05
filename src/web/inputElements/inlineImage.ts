@@ -11,7 +11,7 @@ const inlineImageDefaultStyles = {
   left: 0,
 };
 
-function createImageElement(url: string, callback: (err: string | Event | null, img?: HTMLElement) => void) {
+function createImageElement(url: string, callback: (img: HTMLElement) => void) {
   const imageContainer = document.createElement('span');
   imageContainer.contentEditable = 'false';
   imageContainer.setAttribute('data-type', 'inline-container');
@@ -20,8 +20,8 @@ function createImageElement(url: string, callback: (err: string | Event | null, 
   imageContainer.appendChild(img);
 
   img.contentEditable = 'false';
-  img.onload = () => callback(null, imageContainer);
-  img.onerror = (err) => callback(err);
+  img.onload = () => callback(imageContainer);
+  img.onerror = () => callback(imageContainer);
   img.src = url;
 }
 
@@ -68,10 +68,7 @@ function addInlineImagePreview(currentInput: MarkdownTextInputElement, targetNod
     paddingBottom: markdownStyle.loadingIndicatorContainer?.height || markdownStyle.loadingIndicator?.height || (!!markdownStyle.loadingIndicator && '30px') || undefined,
   });
 
-  createImageElement(imageHref, (err, imageContainer) => {
-    if (!imageContainer || err) {
-      return;
-    }
+  createImageElement(imageHref, (imageContainer) => {
     // Verify if the current spinner is for the loaded image. If not, it means that the response came after the user changed the image url
     const currentSpinner = currentInput.querySelector('[data-type="spinner"]');
     // Remove the spinner
