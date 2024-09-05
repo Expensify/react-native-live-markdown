@@ -296,9 +296,12 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         const newCursorPosition = Math.max(Math.max(contentSelection.current.end, 0) + (parsedText.length - previousText.length), 0);
 
         if (compositionRef.current) {
+          updateTextColor(divRef.current, parsedText);
+          updateSelection(e, {
+            start: newCursorPosition,
+            end: newCursorPosition,
+          });
           divRef.current.value = parsedText;
-          compositionRef.current = false;
-          contentSelection.current.end = newCursorPosition;
           return;
         }
 
