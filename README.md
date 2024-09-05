@@ -25,7 +25,7 @@ React Native Live Markdown requires [react-native-reanimated](https://github.com
 Then, install the iOS dependencies with CocoaPods:
 
 ```sh
-cd ios && pod install
+cd ios && bundler install && bundler exec pod install
 ```
 
 The library includes native code so you will need to re-build the native app.
