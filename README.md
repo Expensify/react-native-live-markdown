@@ -57,6 +57,11 @@ It is also possible to customize the styling of the formatted contents of `Markd
 ```tsx
 import type {MarkdownStyle} from '@expensify/react-native-live-markdown';
 
+const FONT_FAMILY_MONOSPACE = Platform.select({
+  ios: 'Courier',
+  default: 'monospace',
+});
+
 const markdownStyle: MarkdownStyle = {
   syntax: {
     color: 'gray',
@@ -67,6 +72,9 @@ const markdownStyle: MarkdownStyle = {
   h1: {
     fontSize: 25,
   },
+  emoji: {
+    fontSize: 20,
+  },
   blockquote: {
     borderColor: 'gray',
     borderWidth: 6,
@@ -74,12 +82,14 @@ const markdownStyle: MarkdownStyle = {
     paddingLeft: 6,
   },
   code: {
-    fontFamily: 'monospace',
+    fontFamily: FONT_FAMILY_MONOSPACE,
+    fontSize: 20,
     color: 'black',
     backgroundColor: 'lightgray',
   },
   pre: {
-    fontFamily: 'monospace',
+    fontFamily: FONT_FAMILY_MONOSPACE,
+    fontSize: 20,
     color: 'black',
     backgroundColor: 'lightgray',
   },
@@ -110,7 +120,7 @@ The style object can be passed to multiple `MarkdownTextInput` components using 
 
 ## Markdown flavors support
 
-Currently, `react-native-live-markdown` supports only [ExpensiMark](https://github.com/Expensify/expensify-common/blob/main/lib/ExpensiMark.js) flavor. We are working on CommonMark support as well as possibility to use other Markdown parsers.
+Currently, `react-native-live-markdown` supports only [ExpensiMark](https://github.com/Expensify/expensify-common/blob/main/lib/ExpensiMark.ts) flavor. We are working on CommonMark support as well as possibility to use other Markdown parsers.
 
 ## API reference
 
@@ -122,7 +132,7 @@ Currently, `react-native-live-markdown` supports only [ExpensiMark](https://gith
 
 ## Compatibility
 
-`react-native-live-markdown` requires React Native 0.71 or newer.
+`react-native-live-markdown` requires React Native 0.74 or newer.
 
 ## License
 

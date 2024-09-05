@@ -1,8 +1,8 @@
-export {};
+import type {MarkdownRange} from '../src/commonTypes';
 
-type Range = [string, number, number]; // style, location, length
+export {};
 
 declare global {
   // eslint-disable-next-line no-var
-  var parseExpensiMarkToRanges: (markdown: string) => Range[];
+  var parseExpensiMarkToRanges: (markdown: string) => MarkdownRange[];
 }

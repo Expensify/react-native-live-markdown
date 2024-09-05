@@ -8,6 +8,7 @@ import android.text.style.MetricAffectingSpan;
 
 import androidx.annotation.NonNull;
 
+import com.facebook.react.common.assets.ReactFontManager.TypefaceStyle;
 import com.facebook.react.views.text.ReactFontManager;
 
 public class MarkdownFontFamilySpan extends MetricAffectingSpan implements MarkdownSpan {
@@ -31,7 +32,12 @@ public class MarkdownFontFamilySpan extends MetricAffectingSpan implements Markd
   }
 
   private void apply(@NonNull TextPaint textPaint) {
-    int style = textPaint.getTypeface().getStyle();
+    int style = TypefaceStyle.NORMAL;
+    if (textPaint.getTypeface() != null) {
+      style = textPaint.getTypeface().getStyle();
+    } else {
+      style = TypefaceStyle.NORMAL;
+    }
     Typeface typeface = ReactFontManager.getInstance().getTypeface(mFontFamily, style, mAssetManager);
     textPaint.setTypeface(typeface);
     textPaint.setFlags(textPaint.getFlags() | Paint.SUBPIXEL_TEXT_FLAG);

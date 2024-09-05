@@ -7,6 +7,9 @@ interface MarkdownStyle {
   syntax: {
     color: ColorValue;
   };
+  emoji: {
+    fontSize: Float;
+  };
   link: {
     color: ColorValue;
   };
@@ -21,11 +24,13 @@ interface MarkdownStyle {
   };
   code: {
     fontFamily: string;
+    fontSize: Float;
     color: ColorValue;
     backgroundColor: ColorValue;
   };
   pre: {
     fontFamily: string;
+    fontSize: Float;
     color: ColorValue;
     backgroundColor: ColorValue;
   };
@@ -37,12 +42,18 @@ interface MarkdownStyle {
     color: ColorValue;
     backgroundColor: ColorValue;
   };
+  mentionReport: {
+    color: ColorValue;
+    backgroundColor: ColorValue;
+  };
 }
 
 interface NativeProps extends ViewProps {
   markdownStyle: MarkdownStyle;
 }
 
-export default codegenNativeComponent<NativeProps>('MarkdownTextInputDecoratorView');
+export default codegenNativeComponent<NativeProps>('MarkdownTextInputDecoratorView', {
+  interfaceOnly: true,
+});
 
 export type {MarkdownStyle};

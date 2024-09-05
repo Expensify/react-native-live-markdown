@@ -6,12 +6,9 @@ NS_ASSUME_NONNULL_BEGIN
 @interface RCTMarkdownUtils : NSObject
 
 @property (nonatomic) RCTMarkdownStyle *markdownStyle;
-@property (nonatomic) NSMutableArray<NSValue *> *blockquoteRanges;
-@property (weak, nonatomic) UIView<RCTBackedTextInputViewProtocol> *backedTextInputView;
+@property (nonatomic) NSMutableArray<NSDictionary *> *blockquoteRangesAndLevels;
 
-- (instancetype)initWithBackedTextInputView:(UIView<RCTBackedTextInputViewProtocol> *)backedTextInputView;
-
-- (NSAttributedString *)parseMarkdown:(nullable NSAttributedString *)input;
+- (NSAttributedString *)parseMarkdown:(nullable NSAttributedString *)input withAttributes:(nullable NSDictionary<NSAttributedStringKey, id>*)attributes;
 
 @end
 
