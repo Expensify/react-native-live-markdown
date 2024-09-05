@@ -32,6 +32,11 @@ def getExtOrIntegerDefault(name) {
   return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties["LiveMarkdown_" + name]).toInteger()
 }
 
+def safeAppExtGet(prop, fallback) {
+  def appProject = rootProject.allprojects.find { it.plugins.hasPlugin('com.android.application') }
+  appProject?.ext?.has(prop) ? appProject.ext.get(prop) : fallback
+}
+
 def supportsNamespace() {
   def parsed = com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION.tokenize('.')
   def major = parsed[0].toInteger()
@@ -39,6 +44,40 @@ def supportsNamespace() {
 
   // Namespace support was added in 7.3.0
   return (major == 7 && minor >= 3) || major >= 8
+}
+
+def resolveReactNativeDirectory() {
+  def reactNativeLocation = safeAppExtGet("REACT_NATIVE_NODE_MODULES_DIR", null)
+  if (reactNativeLocation != null) {
+    return file(reactNativeLocation)
+  }
+
+  // monorepo workaround
+  // react-native can be hoisted or in project's own node_modules
+  def reactNativeFromProjectNodeModules = file("${rootProject.projectDir}/../node_modules/react-native")
+  if (reactNativeFromProjectNodeModules.exists()) {
+    return reactNativeFromProjectNodeModules
+  }
+
+  def reactNativeFromLiveMarkdownMonorepo = file("${projectDir}/../../../node_modules/react-native")
+  if (reactNativeFromLiveMarkdownMonorepo.exists()) {
+    return reactNativeFromLiveMarkdownMonorepo
+  }
+
+  def reactNativeFromNodeModulesWithLiveMarkdown = file("${projectDir}/../../react-native")
+  if (reactNativeFromNodeModulesWithLiveMarkdown.exists()) {
+    return reactNativeFromNodeModulesWithLiveMarkdown
+  }
+
+  throw new GradleException("[react-native-live-markdown] Unable to resolve react-native location in node_modules. Your app should define `REACT_NATIVE_NODE_MODULES_DIR` extension property in `app/build.gradle` with a path to react-native in node_modules.")
+}
+
+def getReactNativeMinorVersion() {
+  def reactNativeRootDir = resolveReactNativeDirectory()
+  def reactNativeProperties = new Properties()
+  file("$reactNativeRootDir/ReactAndroid/gradle.properties").withInputStream { reactNativeProperties.load(it) }
+  def reactNativeVersion = reactNativeProperties.getProperty("VERSION_NAME")
+  return reactNativeVersion.split("\\.")[1].toInteger()
 }
 
 android {
@@ -57,13 +96,17 @@ android {
   defaultConfig {
     minSdkVersion getExtOrIntegerDefault("minSdkVersion")
     targetSdkVersion getExtOrIntegerDefault("targetSdkVersion")
+
+    buildConfigField "int", "REACT_NATIVE_MINOR_VERSION", getReactNativeMinorVersion().toString()
     buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
 
     consumerProguardFiles "proguard-rules.pro"
 
     externalNativeBuild {
       cmake {
-        arguments "-DANDROID_STL=c++_shared", "-DANDROID_TOOLCHAIN=clang"
+        arguments "-DANDROID_STL=c++_shared",
+          "-DANDROID_TOOLCHAIN=clang",
+          "-DREACT_NATIVE_MINOR_VERSION=${getReactNativeMinorVersion()}"
         abiFilters (*reactNativeArchitectures())
       }
     }
