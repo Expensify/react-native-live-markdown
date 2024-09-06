@@ -247,10 +247,6 @@ function moveCursor(isFocused: boolean, alwaysMoveCursorToTheEnd: boolean, curso
   }
 }
 
-function normalizeHTMLStructure(target: MarkdownTextInputElement) {
-  return target.innerHTML.split('z-index: 1;').join('').split(' style=""').join('');
-}
-
 function updateInputStructure(
   target: MarkdownTextInputElement,
   text: string,
@@ -278,14 +274,15 @@ function updateInputStructure(
   if (text) {
     const {dom, tree} = parseRangesToHTMLNodes(text, markdownRanges, markdownStyle);
 
-    if (shouldForceDOMUpdate || normalizeHTMLStructure(targetElement) !== dom.innerHTML) {
+    if (shouldForceDOMUpdate || targetElement.innerHTML !== dom.innerHTML) {
       targetElement.innerHTML = '';
       targetElement.innerText = '';
       targetElement.innerHTML = dom.innerHTML;
     }
 
-    targetElement.tree = tree;
     updateTreeElementRefs(tree, targetElement);
+    targetElement.tree = tree;
+
     moveCursor(isFocused, alwaysMoveCursorToTheEnd, cursorPosition, targetElement);
   }
 
