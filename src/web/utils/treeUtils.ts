@@ -41,6 +41,23 @@ function addNodeToTree(element: HTMLMarkdownElement, parentTreeNode: TreeNode, t
   return item;
 }
 
+function updateTreeElementRefs(treeRoot: TreeNode, element: HTMLMarkdownElement) {
+  const stack: TreeNode[] = [treeRoot];
+  while (stack.length > 0) {
+    const node = stack.pop() as TreeNode;
+    stack.push(...node.childNodes);
+
+    const currentElement = element.querySelector(`[data-id="${node.orderIndex}"]`) as HTMLMarkdownElement;
+    node.element = currentElement;
+
+    node.childNodes.forEach((child) => {
+      stack.push(child);
+    });
+  }
+
+  return treeRoot;
+}
+
 function findHTMLElementInTree(treeRoot: TreeNode, element: HTMLElement): TreeNode | null {
   if (element.hasAttribute?.('contenteditable')) {
     return treeRoot;
@@ -98,6 +115,6 @@ function getTreeNodeByIndex(treeRoot: TreeNode, index: number): TreeNode | null 
   return null;
 }
 
-export {addNodeToTree, findHTMLElementInTree, getTreeNodeByIndex};
+export {addNodeToTree, findHTMLElementInTree, getTreeNodeByIndex, updateTreeElementRefs};
 
 export type {TreeNode, NodeType};

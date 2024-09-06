@@ -1,5 +1,5 @@
 import type {HTMLMarkdownElement, MarkdownTextInputElement} from '../../MarkdownTextInput.web';
-import {addNodeToTree} from './treeUtils';
+import {addNodeToTree, updateTreeElementRefs} from './treeUtils';
 import type {NodeType, TreeNode} from './treeUtils';
 import type {PartialMarkdownStyle} from '../../styleUtils';
 import {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition} from './cursorUtils';
@@ -246,6 +246,11 @@ function moveCursor(isFocused: boolean, alwaysMoveCursorToTheEnd: boolean, curso
     setCursorPosition(target, cursorPosition);
   }
 }
+
+function normalizeHTMLStructure(target: MarkdownTextInputElement) {
+  return target.innerHTML.split('z-index: 1;').join('').split(' style=""').join('');
+}
+
 function updateInputStructure(
   target: MarkdownTextInputElement,
   text: string,
@@ -273,15 +278,14 @@ function updateInputStructure(
   if (text) {
     const {dom, tree} = parseRangesToHTMLNodes(text, markdownRanges, markdownStyle);
 
-    if (shouldForceDOMUpdate || targetElement.innerHTML !== dom.innerHTML) {
+    if (shouldForceDOMUpdate || normalizeHTMLStructure(targetElement) !== dom.innerHTML) {
       targetElement.innerHTML = '';
       targetElement.innerText = '';
-      Array.from(dom.children).forEach((child) => {
-        targetElement.appendChild(child);
-      });
+      targetElement.innerHTML = dom.innerHTML;
     }
 
     targetElement.tree = tree;
+    updateTreeElementRefs(tree, targetElement);
     moveCursor(isFocused, alwaysMoveCursorToTheEnd, cursorPosition, targetElement);
   }
 
