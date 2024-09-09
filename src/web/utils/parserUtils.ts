@@ -1,5 +1,5 @@
 import type {HTMLMarkdownElement, MarkdownTextInputElement} from '../../MarkdownTextInput.web';
-import {addNodeToTree} from './treeUtils';
+import {addNodeToTree, updateTreeElementRefs} from './treeUtils';
 import type {NodeType, TreeNode} from './treeUtils';
 import type {PartialMarkdownStyle} from '../../styleUtils';
 import {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition} from './cursorUtils';
@@ -246,6 +246,7 @@ function moveCursor(isFocused: boolean, alwaysMoveCursorToTheEnd: boolean, curso
     setCursorPosition(target, cursorPosition);
   }
 }
+
 function updateInputStructure(
   target: MarkdownTextInputElement,
   text: string,
@@ -276,12 +277,12 @@ function updateInputStructure(
     if (shouldForceDOMUpdate || targetElement.innerHTML !== dom.innerHTML) {
       targetElement.innerHTML = '';
       targetElement.innerText = '';
-      Array.from(dom.children).forEach((child) => {
-        targetElement.appendChild(child);
-      });
+      targetElement.innerHTML = dom.innerHTML;
     }
 
+    updateTreeElementRefs(tree, targetElement);
     targetElement.tree = tree;
+
     moveCursor(isFocused, alwaysMoveCursorToTheEnd, cursorPosition, targetElement);
   }
 
