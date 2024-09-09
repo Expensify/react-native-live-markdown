@@ -27,7 +27,7 @@ function createImageElement(url: string, callback: (img: HTMLElement) => void) {
 
 /** Adds already loaded image element from current input content to the tree node */
 function updateImageTreeNode(targetNode: TreeNode, newElement: HTMLMarkdownElement) {
-  const paddingBottom = `${newElement.parentElement?.style.paddingBottom}`;
+  const paddingBottom = `${newElement.style.height}`;
   targetNode.element.appendChild(newElement);
   Object.assign(targetNode.element.style, {
     paddingBottom,
@@ -90,9 +90,14 @@ function addInlineImagePreview(currentInput: MarkdownTextInputElement, targetNod
     });
 
     targetNode.element.appendChild(imageContainer);
+
+    const imageHeight = `${imageContainer.clientHeight + imageMarginTop}px`;
+    Object.assign(imageContainer.style, {
+      height: imageHeight,
+    });
     // Set paddingBottom to the height of the image so it's displayed under the block
     Object.assign(targetNode.element.style, {
-      paddingBottom: `${imageContainer.clientHeight + imageMarginTop}px`,
+      paddingBottom: imageHeight,
     });
   });
 
