@@ -1,6 +1,6 @@
 import type {HTMLMarkdownElement, MarkdownTextInputElement} from '../../MarkdownTextInput.web';
 import type {MarkdownRange} from '../../commonTypes';
-import {parseStyleToNumber} from '../../styleUtils';
+import {parseStringWithUnitToNumber} from '../../styleUtils';
 import type {PartialMarkdownStyle} from '../../styleUtils';
 import type {TreeNode} from '../utils/treeUtils';
 import {createLoadingIndicator} from './loadingIndicator';
@@ -59,8 +59,8 @@ function addInlineImagePreview(currentInput: MarkdownTextInputElement, targetNod
 
   const maxWidth = markdownStyle.inlineImage?.maxWidth;
   const maxHeight = markdownStyle.inlineImage?.maxHeight;
-  const imageMarginTop = parseStyleToNumber(`${markdownStyle.inlineImage?.marginTop}`);
-  const imageMarginBottom = parseStyleToNumber(`${markdownStyle.inlineImage?.marginBottom}`);
+  const imageMarginTop = parseStringWithUnitToNumber(`${markdownStyle.inlineImage?.marginTop}`);
+  const imageMarginBottom = parseStringWithUnitToNumber(`${markdownStyle.inlineImage?.marginBottom}`);
 
   Object.assign(targetNode.element.style, {
     display: 'block',

@@ -86,10 +86,10 @@ function mergeMarkdownStyleWithDefault(input: PartialMarkdownStyle | undefined):
   return output;
 }
 
-function parseStyleToNumber(style: string | null): number {
-  return style ? parseInt(style.replace('px', ''), 10) : 0;
+function parseStringWithUnitToNumber(value: string | null): number {
+  return value ? parseInt(value.replace('px', ''), 10) : 0;
 }
 
 export type {PartialMarkdownStyle};
 
-export {mergeMarkdownStyleWithDefault, parseStyleToNumber};
+export {mergeMarkdownStyleWithDefault, parseStringWithUnitToNumber};
