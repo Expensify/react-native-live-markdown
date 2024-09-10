@@ -225,12 +225,13 @@ function parseRangesToHTMLNodes(
 
       if (!disableInlineStyles) {
         addStyleToBlock(span, range.type, markdownStyle);
-        if (currentInput) {
-          currentParentNode = extendBlockStructure(currentInput, currentParentNode, range, lineMarkdownRanges, text, markdownStyle);
-        }
       }
 
       const spanNode = appendNode(span, currentParentNode, range.type, range.length);
+
+      if (!disableInlineStyles && currentInput) {
+        currentParentNode = extendBlockStructure(currentInput, currentParentNode, range, lineMarkdownRanges, text, markdownStyle);
+      }
 
       if (lineMarkdownRanges.length > 0 && nextRangeStartIndex < endOfCurrentRange && range.type !== 'syntax') {
         // tag nesting

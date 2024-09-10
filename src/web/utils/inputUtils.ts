@@ -69,7 +69,9 @@ function parseInnerHTMLToText(target: MarkdownTextInputElement, inputType: strin
       if (node.nodeType === Node.TEXT_NODE) {
         shouldAddNewline = false;
       } else {
-        if (shouldAddNewline) {
+        const firstChild = node.firstChild as HTMLElement;
+        const containsEmptyBlockElement = firstChild?.getAttribute?.('data-type') === 'block' && firstChild.textContent === '';
+        if (shouldAddNewline && !containsEmptyBlockElement) {
           text += '\n';
           shouldAddNewline = false;
         }

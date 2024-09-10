@@ -81,14 +81,15 @@ function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownSty
 }
 
 const BLOCK_MARKDOWN_TYPES = ['inline-image'];
+const FULL_LINE_MARKDOWN_TYPES = ['blockquote', 'h1'];
 
 function isBlockMarkdownType(type: NodeType) {
   return BLOCK_MARKDOWN_TYPES.includes(type);
 }
 
 function getFirstBlockMarkdownRange(ranges: MarkdownRange[]) {
-  const blockMarkdownRange = ranges.find((r) => isBlockMarkdownType(r.type) || r.type === 'blockquote');
-  return blockMarkdownRange?.type === 'blockquote' ? undefined : blockMarkdownRange;
+  const blockMarkdownRange = ranges.find((r) => isBlockMarkdownType(r.type) || FULL_LINE_MARKDOWN_TYPES.includes(r.type));
+  return FULL_LINE_MARKDOWN_TYPES.includes(blockMarkdownRange?.type || '') ? undefined : blockMarkdownRange;
 }
 
 function extendBlockStructure(
