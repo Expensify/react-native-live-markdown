@@ -31,6 +31,7 @@ module.exports = {
   root: true,
   rules: {
     'rulesdir/prefer-underscore-method': 'off',
+    'rulesdir/prefer-import-module-contents': 'off',
     'react/jsx-props-no-spreading': 'off',
     'react/require-default-props': 'off',
     'react/jsx-filename-extension': ['error', { extensions: ['.tsx', '.jsx'] }],
@@ -58,9 +59,11 @@ module.exports = {
       'error',
       { fixMixedExportsWithInlineTypeSpecifier: false },
     ],
+    'valid-jsdoc': 'off',
     'tsdoc/syntax': 'error',
     '@typescript-eslint/no-non-null-assertion': 'off',
     '@typescript-eslint/array-type': ['error', {default: 'array-simple'}],
     '@typescript-eslint/consistent-type-definitions': 'off',
+    'curly': ['error', 'all'],
   },
 };

@@ -7,7 +7,7 @@ import android.text.Spanned;
 import androidx.annotation.NonNull;
 
 import com.facebook.react.uimanager.PixelUtil;
-import com.facebook.react.views.text.CustomLineHeightSpan;
+import com.facebook.react.views.text.internal.span.CustomLineHeightSpan;
 import com.facebook.soloader.SoLoader;
 
 import org.json.JSONArray;
@@ -94,6 +94,9 @@ public class MarkdownUtils {
         int length = range.getInt("length");
         int depth = range.optInt("depth", 1);
         int end = start + length;
+        if (length == 0 || end > input.length()) {
+          continue;
+        }
         applyRange(ssb, type, start, end, depth);
       }
       redrawCall.apply();

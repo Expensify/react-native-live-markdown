@@ -3,6 +3,6 @@
   "compilerOptions": {
     "strict": true
   },
-  "include": ["src/App.tsx", "./index.ts"],
+  "include": ["src/App.tsx", "src/testConstants.ts", "./index.ts"],
   "exclude": ["node_modules"]
 }

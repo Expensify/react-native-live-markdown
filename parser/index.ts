@@ -1,10 +1,9 @@
-// @ts-expect-error - to review how it's implemented in ExpensiMark
 // eslint-disable-next-line import/no-unresolved
-import {ExpensiMark} from 'expensify-common/lib/ExpensiMark';
-import _ from 'underscore';
+import ExpensiMark from 'expensify-common/dist/ExpensiMark';
+import {unescapeText} from './utils';
 
 type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'emoji' | 'mention-here' | 'mention-user' | 'mention-report' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax';
-type Range = {
+type MarkdownRange = {
   type: MarkdownType;
   start: number;
   length: number;
@@ -14,7 +13,7 @@ type Token = ['TEXT' | 'HTML', string];
 type StackItem = {tag: string; children: Array<StackItem | string>};
 
 function parseMarkdownToHTML(markdown: string): string {
-  const parser = ExpensiMark;
+  const parser = new ExpensiMark();
   const html = parser.replace(markdown, {
     shouldKeepRawInput: true,
   });
@@ -50,7 +49,7 @@ function parseTokensToTree(tokens: Token[]): StackItem {
   const stack: StackItem[] = [{tag: '<>', children: []}];
   tokens.forEach(([type, payload]) => {
     if (type === 'TEXT') {
-      const text = _.unescape(payload);
+      const text = unescapeText(payload);
       const top = stack[stack.length - 1];
       top!.children.push(text);
     } else if (type === 'HTML') {
@@ -88,7 +87,7 @@ function parseTokensToTree(tokens: Token[]): StackItem {
   return stack[0]!;
 }
 
-function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
+function parseTreeToTextAndRanges(tree: StackItem): [string, MarkdownRange[]] {
   let text = '';
 
   function processChildren(node: StackItem | string) {
@@ -110,7 +109,7 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
     ranges.push({type, start, length: end - start});
   }
 
-  const ranges: Range[] = [];
+  const ranges: MarkdownRange[] = [];
   function dfs(node: StackItem | string) {
     if (typeof node === 'string') {
       text += node;
@@ -154,18 +153,19 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
       } else if (node.tag === '<h1>') {
         appendSyntax('# ');
         addChildrenWithStyle(node, 'h1');
+      } else if (node.tag === '<br />') {
+        text += '\n';
       } else if (node.tag.startsWith('<pre')) {
-        const content = _.unescape(node.tag.match(/data-code-raw="([^"]*)"/)![1]!); // always present
-
         appendSyntax('```');
+        const content = node.children.join('').replaceAll('&#32;', ' ');
         addChildrenWithStyle(content, 'pre');
         appendSyntax('```');
       } else if (node.tag.startsWith('<a href="')) {
         const rawHref = node.tag.match(/href="([^"]*)"/)![1]!; // always present
-        const href = _.unescape(rawHref);
+        const href = unescapeText(rawHref);
         const isLabeledLink = node.tag.match(/data-link-variant="([^"]*)"/)![1] === 'labeled';
         const dataRawHref = node.tag.match(/data-raw-href="([^"]*)"/);
-        const matchString = dataRawHref ? _.unescape(dataRawHref[1]!) : href;
+        const matchString = dataRawHref ? unescapeText(dataRawHref[1]!) : href;
         if (!isLabeledLink && node.children.length === 1 && typeof node.children[0] === 'string' && (node.children[0] === matchString || `mailto:${node.children[0]}` === href)) {
           addChildrenWithStyle(node.children[0], 'link');
         } else {
@@ -180,12 +180,26 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, Range[]] {
         const alt = node.tag.match(/alt="([^"]*)"/);
         const hasAlt = node.tag.match(/data-link-variant="([^"]*)"/)![1] === 'labeled';
         const rawLink = node.tag.match(/data-raw-href="([^"]*)"/);
-        const linkString = rawLink ? _.unescape(rawLink[1]!) : src;
+        const linkString = rawLink ? unescapeText(rawLink[1]!) : src;
 
         appendSyntax('!');
         if (hasAlt) {
           appendSyntax('[');
-          processChildren(_.unescape(alt?.[1] || ''));
+          processChildren(unescapeText(alt?.[1] || ''));
+          appendSyntax(']');
+        }
+        appendSyntax('(');
+        addChildrenWithStyle(linkString, 'link');
+        appendSyntax(')');
+      } else if (node.tag.startsWith('<video data-expensify-source="')) {
+        const src = node.tag.match(/data-expensify-source="([^"]*)"/)![1]!; // always present
+        const rawLink = node.tag.match(/data-raw-href="([^"]*)"/);
+        const hasAlt = node.tag.match(/data-link-variant="([^"]*)"/)![1] === 'labeled';
+        const linkString = rawLink ? unescapeText(rawLink[1]!) : src;
+        appendSyntax('!');
+        if (hasAlt) {
+          appendSyntax('[');
+          node.children.forEach((child) => processChildren(child));
           appendSyntax(']');
         }
         appendSyntax('(');
@@ -212,12 +226,12 @@ function getTagPriority(tag: string) {
   }
 }
 
-function sortRanges(ranges: Range[]) {
+function sortRanges(ranges: MarkdownRange[]) {
   // sort ranges by start position, then by length, then by tag hierarchy
   return ranges.sort((a, b) => a.start - b.start || b.length - a.length || getTagPriority(b.type) - getTagPriority(a.type) || 0);
 }
 
-function groupRanges(ranges: Range[]) {
+function groupRanges(ranges: MarkdownRange[]) {
   const lastVisibleRangeIndex: {[key in MarkdownType]?: number} = {};
 
   return ranges.reduce((acc, range) => {
@@ -236,10 +250,10 @@ function groupRanges(ranges: Range[]) {
     }
 
     return acc;
-  }, [] as Range[]);
+  }, [] as MarkdownRange[]);
 }
 
-function parseExpensiMarkToRanges(markdown: string): Range[] {
+function parseExpensiMarkToRanges(markdown: string): MarkdownRange[] {
   try {
     const html = parseMarkdownToHTML(markdown);
     const tokens = parseHTMLToTokens(html);
@@ -256,10 +270,10 @@ function parseExpensiMarkToRanges(markdown: string): Range[] {
     const groupedRanges = groupRanges(sortedRanges);
     return groupedRanges;
   } catch (error) {
-    console.error(error);
     // returning an empty array in case of error
     return [];
   }
 }
 
 globalThis.parseExpensiMarkToRanges = parseExpensiMarkToRanges;
+export type {MarkdownType, MarkdownRange};

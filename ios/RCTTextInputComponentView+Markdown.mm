@@ -47,16 +47,46 @@
   [self markdown__setAttributedString:attributedString];
 }
 
+- (BOOL)markdown__textOf:(NSAttributedString *)newText equals:(NSAttributedString *)oldText
+{
+  RCTMarkdownUtils *markdownUtils = [self getMarkdownUtils];
+  if (markdownUtils != nil) {
+    // Emoji characters are automatically assigned an AppleColorEmoji NSFont and the original font is moved to NSOriginalFont
+    // We need to remove these attributes before comparison
+    NSMutableAttributedString *newTextCopy = [newText mutableCopy];
+    NSMutableAttributedString *oldTextCopy = [oldText mutableCopy];
+    [newTextCopy removeAttribute:@"NSFont" range:NSMakeRange(0, newTextCopy.length)];
+    [oldTextCopy removeAttribute:@"NSFont" range:NSMakeRange(0, oldTextCopy.length)];
+    [oldTextCopy removeAttribute:@"NSOriginalFont" range:NSMakeRange(0, oldTextCopy.length)];
+    return [newTextCopy isEqualToAttributedString:oldTextCopy];
+  }
+
+  return [self markdown__textOf:newText equals:oldText];
+}
+
 + (void)load
 {
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
-    Class cls = [self class];
-    SEL originalSelector = @selector(_setAttributedString:);
-    SEL swizzledSelector = @selector(markdown__setAttributedString:);
-    Method originalMethod = class_getInstanceMethod(cls, originalSelector);
-    Method swizzledMethod = class_getInstanceMethod(cls, swizzledSelector);
-    method_exchangeImplementations(originalMethod, swizzledMethod);
+    {
+      // swizzle _setAttributedString
+      Class cls = [self class];
+      SEL originalSelector = @selector(_setAttributedString:);
+      SEL swizzledSelector = @selector(markdown__setAttributedString:);
+      Method originalMethod = class_getInstanceMethod(cls, originalSelector);
+      Method swizzledMethod = class_getInstanceMethod(cls, swizzledSelector);
+      method_exchangeImplementations(originalMethod, swizzledMethod);
+    }
+
+    {
+      // swizzle _textOf
+      Class cls = [self class];
+      SEL originalSelector = @selector(_textOf:equals:);
+      SEL swizzledSelector = @selector(markdown__textOf:equals:);
+      Method originalMethod = class_getInstanceMethod(cls, originalSelector);
+      Method swizzledMethod = class_getInstanceMethod(cls, swizzledSelector);
+      method_exchangeImplementations(originalMethod, swizzledMethod);
+    }
   });
 }
 

@@ -6,6 +6,8 @@ set(CMAKE_VERBOSE_MAKEFILE on)
 
 add_compile_options(-fvisibility=hidden -fexceptions -frtti)
 
+string(APPEND CMAKE_CXX_FLAGS " -DREACT_NATIVE_MINOR_VERSION=${REACT_NATIVE_MINOR_VERSION}")
+
 file(GLOB livemarkdown_SRC CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 
 add_library(${CMAKE_PROJECT_NAME} SHARED ${livemarkdown_SRC})
