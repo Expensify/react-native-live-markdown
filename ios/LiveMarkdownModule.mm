@@ -1,18 +1,28 @@
 #import "LiveMarkdownModule.h"
-#import <RNLiveMarkdown/MarkdownCommitHook.h>
+
 #import <RNLiveMarkdown/RuntimeDecorator.h>
 
+#ifdef RCT_NEW_ARCH_ENABLED
+#import <RNLiveMarkdown/MarkdownCommitHook.h>
+#endif // RCT_NEW_ARCH_ENABLED
+
 #import <React/RCTBridge+Private.h>
+
+#ifdef RCT_NEW_ARCH_ENABLED
 #import <React/RCTScheduler.h>
 #import <React/RCTSurfacePresenter.h>
+#endif // RCT_NEW_ARCH_ENABLED
+
 #import <jsi/jsi.h>
 
 using namespace facebook;
 
 @implementation LiveMarkdownModule {
   BOOL installed_;
-  std::shared_ptr<livemarkdown::MarkdownCommitHook> commitHook_;
+#ifdef RCT_NEW_ARCH_ENABLED
+  std::shared_ptr<expensify::livemarkdown::MarkdownCommitHook> commitHook_;
   __weak RCTSurfacePresenter *surfacePresenter_;
+#endif // RCT_NEW_ARCH_ENABLED
 }
 
 RCT_EXPORT_MODULE()
@@ -22,14 +32,17 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install)
   RCTCxxBridge *cxxBridge = (RCTCxxBridge *)[RCTBridge currentBridge];
   jsi::Runtime &rt = *(jsi::Runtime *)cxxBridge.runtime;
   expensify::livemarkdown::injectJSIBindings(rt);
-  
+
+#ifdef RCT_NEW_ARCH_ENABLED
   RCTScheduler *scheduler = [surfacePresenter_ scheduler];
-  commitHook_ = std::make_shared<livemarkdown::MarkdownCommitHook>(scheduler.uiManager);
+  commitHook_ = std::make_shared<expensify::livemarkdown::MarkdownCommitHook>(scheduler.uiManager);
   installed_ = YES;
-  
+#endif // RCT_NEW_ARCH_ENABLED
+
   return @(1);
 }
 
+#ifdef RCT_NEW_ARCH_ENABLED
 - (void)handleJavaScriptDidLoadNotification:(NSNotification *)notification
 {
   surfacePresenter_ = self.bridge.surfacePresenter;
@@ -67,7 +80,6 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install)
   [super invalidate];
 }
 
-#ifdef RCT_NEW_ARCH_ENABLED
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:(const facebook::react::ObjCTurboModule::InitParams &)params
 {
   return std::make_shared<facebook::react::NativeLiveMarkdownModuleSpecJSI>(params);

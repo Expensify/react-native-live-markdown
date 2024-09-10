@@ -11,6 +11,7 @@
 
 using namespace facebook::react;
 
+namespace expensify {
 namespace livemarkdown {
 
 MarkdownCommitHook::MarkdownCommitHook(
@@ -241,5 +242,6 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
 }
 
 } // namespace livemarkdown
+} // namespace expensify
 
 #endif // RCT_NEW_ARCH_ENABLED
