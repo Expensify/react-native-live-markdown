@@ -29,9 +29,15 @@ function createImageElement(url: string, callback: (img: HTMLElement) => void) {
 function updateImageTreeNode(targetNode: TreeNode, newElement: HTMLMarkdownElement) {
   const paddingBottom = `${newElement.style.height}`;
   targetNode.element.appendChild(newElement);
-  Object.assign(targetNode.element.style, {
+
+  let currentParent = targetNode.element;
+  while (currentParent.parentElement && !['line', 'block'].includes(currentParent.getAttribute('data-type') || '')) {
+    currentParent = currentParent.parentElement as HTMLMarkdownElement;
+  }
+  Object.assign(currentParent.style, {
     paddingBottom,
   });
+
   return targetNode;
 }
 
