@@ -1,11 +1,8 @@
 import * as React from 'react';
-
 import {Button, Platform, StyleSheet, Text, View} from 'react-native';
-
 import {MarkdownTextInput} from '@expensify/react-native-live-markdown';
 import type {TextInput} from 'react-native';
-
-const DEFAULT_TEXT = ['Hello, *world*!', 'https://expensify.com', '# Lorem ipsum', '> Hello world', '`foo`', '```\nbar\n```', '@here', '@someone@swmansion.com', '#room-mention'].join('\n');
+import * as TEST_CONST from './testConstants';
 
 function isWeb() {
   return Platform.OS === 'web';
@@ -31,13 +28,11 @@ function getRuntime() {
   if ('HermesInternal' in global) {
     const version =
       // @ts-expect-error this is fine
-      // eslint-disable-next-line es/no-optional-chaining
       global.HermesInternal?.getRuntimeProperties?.()['OSS Release Version'];
     return `Hermes (${version})`;
   }
   if ('_v8runtime' in global) {
     // @ts-expect-error this is fine
-    // eslint-disable-next-line no-underscore-dangle
     const version = global._v8runtime().version;
     return `V8 (${version})`;
   }
@@ -60,7 +55,7 @@ function getRandomColor() {
 }
 
 export default function App() {
-  const [value, setValue] = React.useState(DEFAULT_TEXT);
+  const [value, setValue] = React.useState(TEST_CONST.EXAMPLE_CONTENT);
   const [markdownStyle, setMarkdownStyle] = React.useState({});
   const [selection, setSelection] = React.useState({start: 0, end: 0});
 
@@ -99,8 +94,9 @@ export default function App() {
         ref={ref}
         markdownStyle={markdownStyle}
         placeholder="Type here..."
-        onSelectionChange={(e) => setSelection(e.nativeEvent.selection)}
+        onSelectionChange={e => setSelection(e.nativeEvent.selection)}
         selection={selection}
+        id={TEST_CONST.INPUT_ID}
       />
       {/* <Text>TextInput singleline</Text>
       <TextInput
@@ -119,6 +115,7 @@ export default function App() {
       /> */}
       <Text style={styles.text}>{JSON.stringify(value)}</Text>
       <Button
+        testID="focus"
         title="Focus"
         onPress={() => {
           if (!ref.current) {
@@ -128,6 +125,7 @@ export default function App() {
         }}
       />
       <Button
+        testID="blur"
         title="Blur"
         onPress={() => {
           if (!ref.current) {
@@ -137,15 +135,19 @@ export default function App() {
         }}
       />
       <Button
+        testID="reset"
         title="Reset"
         onPress={() => {
-          setValue(DEFAULT_TEXT);
+          setValue(TEST_CONST.EXAMPLE_CONTENT);
           setMarkdownStyle({});
         }}
       />
       <Button
+        testID="clear"
         title="Clear"
-        onPress={() => setValue('')}
+        onPress={() => {
+          setValue('');
+        }}
       />
       <Button
         title="Change style"

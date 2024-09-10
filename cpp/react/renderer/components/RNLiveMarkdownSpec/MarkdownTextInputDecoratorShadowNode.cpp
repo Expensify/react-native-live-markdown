@@ -11,7 +11,7 @@ namespace react {
 extern const char MarkdownTextInputDecoratorViewComponentName[] =
     "MarkdownTextInputDecoratorView";
 
-const ShadowNodeFragment::Value
+const OwningShadowNodeFragment
 MarkdownTextInputDecoratorShadowNode::updateFragmentState(
     ShadowNodeFragment const &fragment,
     ShadowNodeFamily::Shared const &family) {
@@ -24,12 +24,12 @@ MarkdownTextInputDecoratorShadowNode::updateFragmentState(
   // propagated on every clone we need it to clear the reference in the registry
   // when the view is removed from window it cannot be done in the destructor,
   // as multiple shadow nodes for the same family may be created
-  return ShadowNodeFragment::Value({
+  return OwningShadowNodeFragment{
       .props = fragment.props,
       .children = fragment.children,
       .state =
           std::make_shared<const ConcreteState>(newStateData, *fragment.state),
-  });
+  };
 }
 
 } // namespace react
