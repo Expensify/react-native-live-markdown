@@ -31,3 +31,11 @@
     transform: rotate(360deg);
   }
 }
+
+.react-native-live-markdown-input-multiline [contenteditable='false'] {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
