@@ -149,7 +149,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         if (text === null) {
           return {text: divRef.current.value, cursorPosition: null};
         }
-        const parsedText = updateInputStructure(target, text, cursorPosition, customMarkdownStyles, !multiline, shouldForceDOMUpdate);
+        const parsedText = updateInputStructure(target, text, cursorPosition, multiline, customMarkdownStyles, !multiline, shouldForceDOMUpdate);
         divRef.current.value = parsedText.text;
 
         if (history.current && shouldAddToHistory) {

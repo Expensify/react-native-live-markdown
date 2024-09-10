@@ -146,6 +146,7 @@ function addBlockWrapper(targetNode: TreeNode, length: number, markdownStyle: Pa
 function parseRangesToHTMLNodes(
   text: string,
   ranges: MarkdownRange[],
+  isMultiline = true,
   markdownStyle: PartialMarkdownStyle = {},
   disableInlineStyles = false,
   currentInput: MarkdownTextInputElement | null = null,
@@ -229,7 +230,7 @@ function parseRangesToHTMLNodes(
 
       const spanNode = appendNode(span, currentParentNode, range.type, range.length);
 
-      if (!disableInlineStyles && currentInput) {
+      if (isMultiline && !disableInlineStyles && currentInput) {
         currentParentNode = extendBlockStructure(currentInput, currentParentNode, range, lineMarkdownRanges, text, markdownStyle);
       }
 
@@ -280,6 +281,7 @@ function updateInputStructure(
   target: MarkdownTextInputElement,
   text: string,
   cursorPositionIndex: number | null,
+  isMultiline = true,
   markdownStyle: PartialMarkdownStyle = {},
   alwaysMoveCursorToTheEnd = false,
   shouldForceDOMUpdate = false,
@@ -301,7 +303,7 @@ function updateInputStructure(
 
   // We don't want to parse text with single '\n', because contentEditable represents it as invisible <br />
   if (text) {
-    const {dom, tree} = parseRangesToHTMLNodes(text, markdownRanges, markdownStyle, false, targetElement);
+    const {dom, tree} = parseRangesToHTMLNodes(text, markdownRanges, isMultiline, markdownStyle, false, targetElement);
 
     if (shouldForceDOMUpdate || targetElement.innerHTML !== dom.innerHTML) {
       targetElement.innerHTML = '';
