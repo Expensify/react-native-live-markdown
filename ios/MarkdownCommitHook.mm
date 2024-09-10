@@ -133,6 +133,7 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
                 initWithStruct:markdownProps.markdownStyle];
             RCTMarkdownUtils *utils = [[RCTMarkdownUtils alloc] init];
             [utils setMarkdownStyle:markdownStyle];
+            [utils setParserId:@(markdownProps.parserId)];
 
             // convert the attibuted string stored in state to
             // NSAttributedString
@@ -167,6 +168,54 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
                     AttributedStringBox{attributedString});
                 }
             }
+
+            // apply markdown
+            auto newString = [utils parseMarkdown:nsAttributedString
+                                   withAttributes:defaultNSTextAttributes];
+
+            // create a clone of the old TextInputState and update the
+            // attributed string box to point to the string with markdown
+            // applied
+            auto newStateData = std::make_shared<TextInputState>(stateData);
+            newStateData->attributedStringBox =
+                RCTAttributedStringBoxFromNSAttributedString(newString);
+
+            // clone the text input with the new state
+            return node.clone({
+                .state = std::make_shared<const ConcreteState<TextInputState>>(
+                    newStateData, textInputState),
+            });
+          });
+    } else if (stateData.attributedStringBox.getMode() ==
+            AttributedStringBox::Mode::OpaquePointer) {
+      rootNode = rootNode->cloneTree(
+          nodes.textInput->getFamily(),
+          [&nodes, &textInputState, &stateData,
+           fontSizeMultiplier](const ShadowNode &node) {
+            const auto &markdownProps = *std::static_pointer_cast<
+                MarkdownTextInputDecoratorViewProps const>(
+                nodes.decorator->getProps());
+            const auto &textInputProps =
+                *std::static_pointer_cast<TextInputProps const>(
+                    nodes.textInput->getProps());
+
+            const auto defaultTextAttributes =
+                textInputProps.getEffectiveTextAttributes(fontSizeMultiplier);
+            const auto defaultNSTextAttributes =
+                RCTNSTextAttributesFromTextAttributes(defaultTextAttributes);
+
+            // this can possibly be optimized
+            RCTMarkdownStyle *markdownStyle = [[RCTMarkdownStyle alloc]
+                initWithStruct:markdownProps.markdownStyle];
+            RCTMarkdownUtils *utils = [[RCTMarkdownUtils alloc] init];
+            [utils setMarkdownStyle:markdownStyle];
+            [utils setParserId:@(markdownProps.parserId)];
+
+            // convert the attibuted string stored in state to
+            // NSAttributedString
+            auto nsAttributedString =
+                RCTNSAttributedStringFromAttributedStringBox(
+                    stateData.attributedStringBox);
 
             // apply markdown
             auto newString = [utils parseMarkdown:nsAttributedString
