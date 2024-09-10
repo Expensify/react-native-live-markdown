@@ -120,7 +120,7 @@ The style object can be passed to multiple `MarkdownTextInput` components using 
 
 ## Markdown flavors support
 
-Currently, `react-native-live-markdown` supports only [ExpensiMark](https://github.com/Expensify/expensify-common/blob/main/lib/ExpensiMark.js) flavor. We are working on CommonMark support as well as possibility to use other Markdown parsers.
+Currently, `react-native-live-markdown` supports only [ExpensiMark](https://github.com/Expensify/expensify-common/blob/main/lib/ExpensiMark.ts) flavor. We are working on CommonMark support as well as possibility to use other Markdown parsers.
 
 ## API reference
 
@@ -132,7 +132,7 @@ Currently, `react-native-live-markdown` supports only [ExpensiMark](https://gith
 
 ## Compatibility
 
-`react-native-live-markdown` requires React Native 0.71 or newer.
+`react-native-live-markdown` requires React Native 0.74 or newer.
 
 ## License
 

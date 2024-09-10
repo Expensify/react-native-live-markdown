@@ -23,6 +23,23 @@
   [self markdown_setAttributedText:attributedText];
 }
 
+- (BOOL)markdown_textOf:(NSAttributedString *)newText equals:(NSAttributedString *)oldText
+{
+  RCTMarkdownUtils *markdownUtils = [self getMarkdownUtils];
+  if (markdownUtils != nil) {
+    // Emoji characters are automatically assigned an AppleColorEmoji NSFont and the original font is moved to NSOriginalFont
+    // We need to remove these attributes before comparison
+    NSMutableAttributedString *newTextCopy = [newText mutableCopy];
+    NSMutableAttributedString *oldTextCopy = [oldText mutableCopy];
+    [newTextCopy removeAttribute:@"NSFont" range:NSMakeRange(0, newTextCopy.length)];
+    [oldTextCopy removeAttribute:@"NSFont" range:NSMakeRange(0, oldTextCopy.length)];
+    [oldTextCopy removeAttribute:@"NSOriginalFont" range:NSMakeRange(0, oldTextCopy.length)];
+    return [newTextCopy isEqualToAttributedString:oldTextCopy];
+  }
+
+  return [self markdown_textOf:newText equals:oldText];
+}
+
 - (void)markdown_updateLocalData
 {
   RCTMarkdownUtils *markdownUtils = [self getMarkdownUtils];
@@ -65,6 +82,15 @@
       // swizzle updateLocalData
       SEL originalSelector = @selector(updateLocalData);
       SEL swizzledSelector = @selector(markdown_updateLocalData);
+      Method originalMethod = class_getInstanceMethod(cls, originalSelector);
+      Method swizzledMethod = class_getInstanceMethod(cls, swizzledSelector);
+      method_exchangeImplementations(originalMethod, swizzledMethod);
+    }
+
+    {
+      // swizzle textOf
+      SEL originalSelector = @selector(textOf:equals:);
+      SEL swizzledSelector = @selector(markdown_textOf:equals:);
       Method originalMethod = class_getInstanceMethod(cls, originalSelector);
       Method swizzledMethod = class_getInstanceMethod(cls, swizzledSelector);
       method_exchangeImplementations(originalMethod, swizzledMethod);
