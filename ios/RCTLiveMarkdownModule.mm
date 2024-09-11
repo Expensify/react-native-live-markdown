@@ -7,13 +7,15 @@
 #import "MarkdownShadowFamilyRegistry.h"
 #import "RCTLiveMarkdownModule.h"
 
+using namespace expensify::livemarkdown;
+
 // A turbomodule used to register the commit hook
 // I think this is the easiest way to access the UIManager, which we need to
 // actually register the hook
 
 @implementation RCTLiveMarkdownModule {
   BOOL installed_;
-  std::shared_ptr<livemarkdown::MarkdownCommitHook> commitHook_;
+  std::shared_ptr<MarkdownCommitHook> commitHook_;
   __weak RCTSurfacePresenter *surfacePresenter_;
 }
 
@@ -23,8 +25,7 @@ RCT_EXPORT_MODULE(@"LiveMarkdownModule")
   if (!installed_ && surfacePresenter_ != nil) {
     RCTScheduler *scheduler = [surfacePresenter_ scheduler];
 
-    commitHook_ =
-      std::make_shared<livemarkdown::MarkdownCommitHook>(scheduler.uiManager);
+    commitHook_ = std::make_shared<MarkdownCommitHook>(scheduler.uiManager);
     installed_ = YES;
   }
   return @1;

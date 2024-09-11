@@ -2,6 +2,9 @@
 
 #include "MarkdownShadowFamilyRegistry.h"
 
+namespace expensify {
+namespace livemarkdown {
+
 std::set<facebook::react::ShadowNodeFamily::Shared>
     MarkdownShadowFamilyRegistry::familiesToUpdate_;
 std::set<facebook::react::Tag> MarkdownShadowFamilyRegistry::forcedUpdates_;
@@ -54,5 +57,8 @@ bool MarkdownShadowFamilyRegistry::shouldForceUpdate(facebook::react::Tag tag) {
   }
   return false;
 }
+
+} // namespace livemarkdown
+} // namespace expensify
 
 #endif
