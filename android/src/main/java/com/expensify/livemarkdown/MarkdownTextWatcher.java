@@ -8,8 +8,8 @@ import androidx.annotation.NonNull;
 
 public class MarkdownTextWatcher implements TextWatcher {
   private final MarkdownUtils mMarkdownUtils;
-
   private boolean mShouldSkip = false;
+  private Editable mPreviousEditable;
 
   public MarkdownTextWatcher(@NonNull MarkdownUtils markdownUtils) {
     mMarkdownUtils = markdownUtils;
@@ -22,23 +22,17 @@ public class MarkdownTextWatcher implements TextWatcher {
 
   @Override
   public void onTextChanged(CharSequence s, int start, int before, int count) {
-    if (mShouldSkip) {
-      return;
-    }
-    // Set the flag to indicate text is being changed
-    mShouldSkip = true;
+   
   }
 
   @Override
   public void afterTextChanged(Editable editable) {
-      if (!mShouldSkip) {
-          return;
-      }
-      
       if (editable instanceof SpannableStringBuilder) {
+          if (mPreviousEditable != null && mPreviousEditable.toString().equals(editable.toString())) {
+              return;
+          }
           mMarkdownUtils.applyMarkdownFormatting((SpannableStringBuilder) editable);
-      }
-      
-      // Reset the flag after formatting is applied
-      mShouldSkip = false;
-  }}
+          mPreviousEditable = new SpannableStringBuilder(editable);
+      }      
+  }
+}
