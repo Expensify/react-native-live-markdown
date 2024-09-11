@@ -5,6 +5,7 @@ import type {PartialMarkdownStyle} from '../../styleUtils';
 import {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition} from './cursorUtils';
 import {addStyleToBlock, extendBlockStructure, getFirstBlockMarkdownRange, isBlockMarkdownType} from './blockUtils';
 import type {MarkdownRange} from '../../commonTypes';
+import {getAnimationCurrentTimes, updateAnimationsTime} from './animationUtils';
 
 type Paragraph = {
   text: string;
@@ -306,9 +307,11 @@ function updateInputStructure(
     const {dom, tree} = parseRangesToHTMLNodes(text, markdownRanges, isMultiline, markdownStyle, false, targetElement);
 
     if (shouldForceDOMUpdate || targetElement.innerHTML !== dom.innerHTML) {
+      const animationTimes = getAnimationCurrentTimes(targetElement);
       targetElement.innerHTML = '';
       targetElement.innerText = '';
       targetElement.innerHTML = dom.innerHTML;
+      updateAnimationsTime(targetElement, animationTimes);
     }
 
     updateTreeElementRefs(tree, targetElement);

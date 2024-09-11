@@ -58,7 +58,7 @@ function addInlineImagePreview(currentInput: MarkdownTextInputElement, targetNod
   }
 
   // Add a loading spinner
-  const spinner = createLoadingIndicator(currentInput, imageHref, markdownStyle);
+  const spinner = createLoadingIndicator(imageHref, markdownStyle);
   if (spinner) {
     targetNode.element.appendChild(spinner);
   }

@@ -1,4 +1,3 @@
-import type {HTMLMarkdownElement, MarkdownTextInputElement} from '../../MarkdownTextInput.web';
 import type {PartialMarkdownStyle} from '../../styleUtils';
 
 const spinnerDefaultStyles = {
@@ -15,25 +14,8 @@ const spinnerContainerDefaultStyles = {
   alignItems: 'center',
 };
 
-const keyframes = [{transform: 'rotate(0deg)'}, {transform: 'rotate(360deg)'}];
-
-const options = {
-  duration: 1000,
-  iterations: Infinity,
-};
-
 /** Creates animated loading spinner */
-function createLoadingIndicator(currentInput: MarkdownTextInputElement, url: string, markdownStyle: PartialMarkdownStyle) {
-  // Get current spinner animation progress if it exists
-  const currentSpinner = currentInput.querySelector(`[data-type="spinner"][data-url="${url}"]`)?.firstChild;
-  let currentTime: CSSNumberish = 0;
-  if (currentSpinner) {
-    const animation = (currentSpinner as HTMLMarkdownElement).getAnimations()[0];
-    if (animation) {
-      currentTime = animation.currentTime || 0;
-    }
-  }
-
+function createLoadingIndicator(url: string, markdownStyle: PartialMarkdownStyle) {
   const container = document.createElement('span');
   container.contentEditable = 'false';
 
@@ -63,8 +45,6 @@ function createLoadingIndicator(currentInput: MarkdownTextInputElement, url: str
   container.contentEditable = 'false';
   container.appendChild(spinner);
 
-  const animation2 = spinner.animate(keyframes, options);
-  animation2.currentTime = currentTime;
   return container;
 }
 
