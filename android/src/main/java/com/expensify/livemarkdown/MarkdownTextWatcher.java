@@ -9,9 +9,6 @@ import androidx.annotation.NonNull;
 public class MarkdownTextWatcher implements TextWatcher {
   private final MarkdownUtils mMarkdownUtils;
 
-  private boolean mShouldSkip = false;
-  private String mPreviousText;
-
   public MarkdownTextWatcher(@NonNull MarkdownUtils markdownUtils) {
     mMarkdownUtils = markdownUtils;
   }
@@ -29,12 +26,7 @@ public class MarkdownTextWatcher implements TextWatcher {
   @Override
   public void afterTextChanged(Editable editable) {
     if (editable instanceof SpannableStringBuilder) {
-      String currentText = editable.toString();
-      if (currentText.equals(mPreviousText)) {
-        return;
-      }
       mMarkdownUtils.applyMarkdownFormatting((SpannableStringBuilder) editable);
-      mPreviousText = currentText;
     }
   }
 }
