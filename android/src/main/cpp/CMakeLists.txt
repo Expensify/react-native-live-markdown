@@ -18,13 +18,13 @@ find_package(fbjni REQUIRED CONFIG)
 find_package(ReactAndroid REQUIRED CONFIG)
 find_package(hermes-engine REQUIRED CONFIG)
 
-if (REACT_NATIVE_MINOR_VERSION GREATER_EQUAL 76)
+if (ReactAndroid_VERSION_MINOR GREATER_EQUAL 76)
   target_link_libraries(${CMAKE_PROJECT_NAME}
           fbjni::fbjni
           ReactAndroid::jsi
           ReactAndroid::reactnative
           hermes-engine::libhermes)
-elseif (REACT_NATIVE_MINOR_VERSION GREATER_EQUAL 75)
+elseif (ReactAndroid_VERSION_MINOR GREATER_EQUAL 75)
   target_link_libraries(${CMAKE_PROJECT_NAME}
           fbjni::fbjni
           ReactAndroid::jsi
