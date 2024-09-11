@@ -3,6 +3,10 @@
   overflow: auto;
 }
 
+.react-native-live-markdown-input-multiline {
+  white-space: pre-wrap;
+}
+
 .react-native-live-markdown-input-singleline p {
   display: inline-block;
 }

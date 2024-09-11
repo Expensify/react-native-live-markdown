@@ -176,10 +176,11 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           flattenedStyle && {
             caretColor: (flattenedStyle as TextStyle).color || 'black',
           },
+          multiline && {whitespace: 'pre-wrap'},
           disabled && styles.disabledInputStyles,
           parseToReactDOMStyle(flattenedStyle),
         ]) as CSSProperties,
-      [flattenedStyle, disabled],
+      [flattenedStyle, multiline, disabled],
     );
 
     const undo = useCallback(
