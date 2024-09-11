@@ -3,6 +3,14 @@
   overflow: auto;
 }
 
+.react-native-live-markdown-input-singleline p {
+  display: inline-block;
+}
+
+.react-native-live-markdown-input-multiline p {
+  display: block;
+}
+
 .react-native-live-markdown-input-singleline::-webkit-scrollbar {
   display: none;
 }
