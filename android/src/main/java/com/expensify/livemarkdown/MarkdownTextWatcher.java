@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 
 public class MarkdownTextWatcher implements TextWatcher {
   private final MarkdownUtils mMarkdownUtils;
+  
   private boolean mShouldSkip = false;
   private String mPreviousText;
 
