@@ -28,12 +28,12 @@ public class MarkdownTextWatcher implements TextWatcher {
   @Override
   public void afterTextChanged(Editable editable) {
       if (editable instanceof SpannableStringBuilder) {
-          String currentEditable = editable.toString();
-          if (mPreviousEditable != null && mPreviousEditable.equals(currentEditable)) {
+          String currentText = editable.toString();
+          if (currentText.equals(mPreviousText)) {
               return;
           }
           mMarkdownUtils.applyMarkdownFormatting((SpannableStringBuilder) editable);
-          mPreviousEditable = currentEditable;
+          mPreviousText = currentText;
       }      
   }
 }
