@@ -99,7 +99,9 @@ public class MarkdownUtils {
         }
         applyRange(ssb, type, start, end, depth);
       }
-      redrawCall.apply();
+      if (redrawCall != null) {
+        redrawCall.apply();
+      }
     } catch (JSONException e) {
       // Do nothing
     }

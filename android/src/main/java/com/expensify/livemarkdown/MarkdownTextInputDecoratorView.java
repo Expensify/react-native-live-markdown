@@ -22,15 +22,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 
+import com.facebook.react.uimanager.LengthPercentage;
 import com.facebook.react.uimanager.PixelUtil;
 import com.facebook.react.uimanager.drawable.CSSBackgroundDrawable;
 import com.facebook.react.uimanager.style.BorderRadiusProp;
 import com.facebook.react.views.textinput.ReactEditText;
-import com.facebook.react.views.view.ReactViewBackgroundDrawable;
 import com.facebook.react.views.view.ReactViewBackgroundManager;
 
 import java.lang.reflect.Field;
-import java.util.Objects;
 
 public class MarkdownTextInputDecoratorView extends View {
 
@@ -97,7 +96,8 @@ public class MarkdownTextInputDecoratorView extends View {
       CSSBackgroundDrawable backgroundDrawable = (CSSBackgroundDrawable)backgroundDrawableField.get(backgroundManager);
       assert backgroundDrawable != null;
       mBackgroundColor = backgroundDrawable.getColor();
-      mBackgroundRadius = Objects.requireNonNull(backgroundDrawable.getBorderRadius().get(BorderRadiusProp.BORDER_RADIUS)).resolve(0, 0);
+      LengthPercentage lengthPercentage = backgroundDrawable.getBorderRadius().get(BorderRadiusProp.BORDER_RADIUS);
+      mBackgroundRadius = lengthPercentage == null ? 0 : lengthPercentage.resolve(0, 0);
     } catch (NoSuchFieldException | IllegalAccessException ignored) {}
 
     mReactEditText.setBackgroundColor(Color.TRANSPARENT);
@@ -136,15 +136,19 @@ public class MarkdownTextInputDecoratorView extends View {
   protected void onDraw(@NonNull Canvas canvas) {
     super.onDraw(canvas);
 
+    // MarkdownTextInputDecoratorView's position gets set to some strange values so we need to make sure that it's set to 0,0 before drawing
+    setX(0);
+    setY(0);
+
     Editable text = mReactEditText.getText();
     if (text == null) {
       return;
     }
 
     float left = mReactEditText.getLeft();
-    float top = mReactEditText.getTop() - getTop();
+    float top = mReactEditText.getTop();
     float right = mReactEditText.getRight();
-    float bottom = top + mReactEditText.getHeight();
+    float bottom = mReactEditText.getBottom();
     float radius = mBackgroundRadius;
     clipPath.addRoundRect(left, top, right, bottom, radius, radius, Path.Direction.CW);
     canvas.clipPath(clipPath, Region.Op.INTERSECT);
