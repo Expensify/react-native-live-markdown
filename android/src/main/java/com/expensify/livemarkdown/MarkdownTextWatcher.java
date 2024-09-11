@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 public class MarkdownTextWatcher implements TextWatcher {
   private final MarkdownUtils mMarkdownUtils;
   private boolean mShouldSkip = false;
-  private Editable mPreviousEditable;
+  private String mPreviousEditable;
 
   public MarkdownTextWatcher(@NonNull MarkdownUtils markdownUtils) {
     mMarkdownUtils = markdownUtils;
@@ -28,11 +28,12 @@ public class MarkdownTextWatcher implements TextWatcher {
   @Override
   public void afterTextChanged(Editable editable) {
       if (editable instanceof SpannableStringBuilder) {
-          if (mPreviousEditable != null && mPreviousEditable.toString().equals(editable.toString())) {
+          String currentEditable = editable.toString();
+          if (mPreviousEditable != null && mPreviousEditable.equals(currentEditable)) {
               return;
           }
           mMarkdownUtils.applyMarkdownFormatting((SpannableStringBuilder) editable);
-          mPreviousEditable = new SpannableStringBuilder(editable);
+          mPreviousEditable = currentEditable;
       }      
   }
 }
