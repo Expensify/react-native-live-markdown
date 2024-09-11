@@ -31,7 +31,7 @@ public class MarkdownTextWatcher implements TextWatcher {
     if (editable instanceof SpannableStringBuilder) {
       String currentText = editable.toString();
       if (currentText.equals(mPreviousText)) {
-          return;
+        return;
       }
       mMarkdownUtils.applyMarkdownFormatting((SpannableStringBuilder) editable);
       mPreviousText = currentText;
