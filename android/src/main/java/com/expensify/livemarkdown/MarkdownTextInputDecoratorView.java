@@ -3,6 +3,7 @@ package com.expensify.livemarkdown;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Canvas;
@@ -22,11 +23,14 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 
 import com.facebook.react.uimanager.PixelUtil;
+import com.facebook.react.uimanager.drawable.CSSBackgroundDrawable;
+import com.facebook.react.uimanager.style.BorderRadiusProp;
 import com.facebook.react.views.textinput.ReactEditText;
 import com.facebook.react.views.view.ReactViewBackgroundDrawable;
 import com.facebook.react.views.view.ReactViewBackgroundManager;
 
 import java.lang.reflect.Field;
+import java.util.Objects;
 
 public class MarkdownTextInputDecoratorView extends View {
 
@@ -57,6 +61,7 @@ public class MarkdownTextInputDecoratorView extends View {
   private int mBackgroundColor = Color.TRANSPARENT;
   private float mBackgroundRadius = 0;
 
+  @SuppressLint("VisibleForTests")
   @Override
   protected void onAttachedToWindow() {
     super.onAttachedToWindow();
@@ -87,12 +92,12 @@ public class MarkdownTextInputDecoratorView extends View {
       backgroundManagerField.setAccessible(true);
       ReactViewBackgroundManager backgroundManager = (ReactViewBackgroundManager)backgroundManagerField.get(mReactEditText);
 
-      Field backgroundDrawableField = ReactViewBackgroundManager.class.getDeclaredField("mReactBackgroundDrawable");
+      Field backgroundDrawableField = ReactViewBackgroundManager.class.getDeclaredField("mCSSBackgroundDrawable");
       backgroundDrawableField.setAccessible(true);
-      ReactViewBackgroundDrawable backgroundDrawable = (ReactViewBackgroundDrawable)backgroundDrawableField.get(backgroundManager);
+      CSSBackgroundDrawable backgroundDrawable = (CSSBackgroundDrawable)backgroundDrawableField.get(backgroundManager);
       assert backgroundDrawable != null;
       mBackgroundColor = backgroundDrawable.getColor();
-      mBackgroundRadius = backgroundDrawable.getFullBorderRadius();
+      mBackgroundRadius = Objects.requireNonNull(backgroundDrawable.getBorderRadius().get(BorderRadiusProp.BORDER_RADIUS)).resolve(0, 0);
     } catch (NoSuchFieldException | IllegalAccessException ignored) {}
 
     mReactEditText.setBackgroundColor(Color.TRANSPARENT);
