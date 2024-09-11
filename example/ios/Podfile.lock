@@ -1497,7 +1497,7 @@ PODS:
     - React-logger (= 0.75.2)
     - React-perflogger (= 0.75.2)
     - React-utils (= 0.75.2)
-  - RNLiveMarkdown (0.1.128):
+  - RNLiveMarkdown (0.1.135):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1517,9 +1517,9 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNLiveMarkdown/common (= 0.1.128)
+    - RNLiveMarkdown/common (= 0.1.135)
     - Yoga
-  - RNLiveMarkdown/common (0.1.128):
+  - RNLiveMarkdown/common (0.1.135):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1805,10 +1805,10 @@ SPEC CHECKSUMS:
   React-utils: 81a715d9c0a2a49047e77a86f3a2247408540deb
   ReactCodegen: 60973d382704c793c605b9be0fc7f31cb279442f
   ReactCommon: 6ef348087d250257c44c0204461c03f036650e9b
-  RNLiveMarkdown: 44cc9af8742cfd5355733d29fa54e64e4edf0f0d
+  RNLiveMarkdown: 77f3338039cf98111a753256849b90567a41fc53
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
   Yoga: 2a45d7e59592db061217551fd3bbe2dd993817ae
 
 PODFILE CHECKSUM: 9b81b0f7bfba9e6fb4fa10efe8319f7860794e08
 
-COCOAPODS: 1.14.3
+COCOAPODS: 1.15.2

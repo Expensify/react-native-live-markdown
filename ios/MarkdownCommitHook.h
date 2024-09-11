@@ -11,6 +11,7 @@
 
 using namespace facebook::react;
 
+namespace expensify {
 namespace livemarkdown {
 
 struct MarkdownTextInputDecoratorPair {
@@ -38,5 +39,6 @@ private:
 };
 
 } // namespace livemarkdown
+} // namespace expensify
 
 #endif // RCT_NEW_ARCH_ENABLED

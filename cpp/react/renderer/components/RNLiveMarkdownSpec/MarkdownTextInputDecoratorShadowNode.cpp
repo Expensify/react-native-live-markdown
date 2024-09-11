@@ -5,6 +5,8 @@
 #include "MarkdownShadowFamilyRegistry.h"
 #include "MarkdownTextInputDecoratorShadowNode.h"
 
+using namespace expensify::livemarkdown;
+
 namespace facebook {
 namespace react {
 
