@@ -6,7 +6,6 @@ function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownSty
   switch (type) {
     case 'line':
       Object.assign(node.style, {
-        display: 'block',
         margin: '0',
         padding: '0',
         position: 'relative',
@@ -52,7 +51,6 @@ function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownSty
       Object.assign(node.style, {
         ...markdownStyle.pre,
         backgroundColor: 'transparent',
-        padding: '0px',
       });
       Object.assign((node.parentNode as HTMLElement).style, {
         padding: '5px',

@@ -8,8 +8,24 @@
 #include <react/renderer/components/RNLiveMarkdownSpec/Props.h>
 #include <react/renderer/components/view/ConcreteViewShadowNode.h>
 
+using namespace expensify::livemarkdown;
+
 namespace facebook {
 namespace react {
+
+struct OwningShadowNodeFragment {
+  Props::Shared props;
+  ShadowNode::SharedListOfShared children;
+  State::Shared state;
+  
+  operator ShadowNodeFragment() const {
+    return ShadowNodeFragment {
+      .props = props,
+      .children = children,
+      .state = state
+    };
+  }
+};
 
 JSI_EXPORT extern const char MarkdownTextInputDecoratorViewComponentName[];
 
@@ -22,8 +38,7 @@ public:
   MarkdownTextInputDecoratorShadowNode(ShadowNodeFragment const &fragment,
                                        ShadowNodeFamily::Shared const &family,
                                        ShadowNodeTraits traits)
-      : ConcreteViewShadowNode(static_cast<ShadowNodeFragment>(
-                                   updateFragmentState(fragment, family)),
+      : ConcreteViewShadowNode(updateFragmentState(fragment, family),
                                family, traits) {}
 
   MarkdownTextInputDecoratorShadowNode(ShadowNode const &sourceShadowNode,
@@ -37,7 +52,7 @@ public:
   }
 
 private:
-  static const ShadowNodeFragment::Value
+  static const OwningShadowNodeFragment
   updateFragmentState(ShadowNodeFragment const &fragment,
                       ShadowNodeFamily::Shared const &family);
 };

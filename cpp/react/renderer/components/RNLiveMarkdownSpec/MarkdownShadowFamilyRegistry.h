@@ -6,6 +6,9 @@
 #include <mutex>
 #include <set>
 
+namespace expensify {
+namespace livemarkdown {
+
 // A registry to store pointers to the ShadowNodeFamilies of markdown
 // decorators. The only place we can _legally_ access the family of shadow node
 // is in the constructor and we need it inside commit hook. To achieve it, we
@@ -31,5 +34,8 @@ private:
   static std::set<facebook::react::Tag> forcedUpdates_;
   static std::mutex mutex_;
 };
+
+} // namespace livemarkdown
+} // namespace expensify
 
 #endif

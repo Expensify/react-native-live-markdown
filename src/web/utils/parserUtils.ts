@@ -1,20 +1,12 @@
 import type {HTMLMarkdownElement, MarkdownTextInputElement} from '../../MarkdownTextInput.web';
-import {addNodeToTree} from './treeUtils';
+import {addNodeToTree, updateTreeElementRefs} from './treeUtils';
 import type {NodeType, TreeNode} from './treeUtils';
 import type {PartialMarkdownStyle} from '../../styleUtils';
 import {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition} from './cursorUtils';
 import {addStyleToBlock} from './blockUtils';
-import BrowserUtils from './browserUtils';
+import type {MarkdownRange, MarkdownType} from '../../commonTypes';
 import {handleCustomStyles} from './webStyleUtils';
-
-type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'emoji' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax' | 'mention-here' | 'mention-user' | 'mention-report';
-
-type MarkdownRange = {
-  type: MarkdownType;
-  start: number;
-  length: number;
-  depth?: number;
-};
+import BrowserUtils from './browserUtils';
 
 type Paragraph = {
   text: string;
@@ -148,7 +140,7 @@ function addParagraph(node: TreeNode, text: string | null = null, length: number
 /** Builds HTML DOM structure based on passed text and markdown ranges */
 function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownStyle: PartialMarkdownStyle = {}, disableInlineStyles = false) {
   const rootElement: HTMLMarkdownElement = document.createElement('span') as HTMLMarkdownElement;
-  const textLength = text.replace(/\n/g, '\\n').length;
+  const textLength = text.length;
   const rootNode: TreeNode = {
     element: rootElement,
     start: 0,
@@ -211,6 +203,7 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
       // create markdown span element
       const span = document.createElement('span') as HTMLMarkdownElement;
       span.setAttribute('data-type', range.type);
+      // tutaj był spanNode - to moze byc problematyczne
       const spanNode = appendNode(span, currentParentNode, range.type, range.length);
       if (!disableInlineStyles) {
         addStyleToBlock(span, range.type, markdownStyle);
@@ -225,7 +218,8 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
         addTextToElement(spanNode, text.substring(range.start, endOfCurrentRange));
         if (range.type === 'pre') {
           // this property is used for code block background - only chromium displays single \n at the end of a block as a new line, hence this if check
-          span.setAttribute('data-content', text.substring(range.start, BrowserUtils.isChromium ? endOfCurrentRange : endOfCurrentRange));
+          span.setAttribute('data-content', text.substring(range.start, BrowserUtils.isChromium ? endOfCurrentRange - 1 : endOfCurrentRange));
+          console.log('test:', JSON.stringify(text.substring(range.start, BrowserUtils.isChromium ? endOfCurrentRange - 1 : endOfCurrentRange)));
         }
         currentParentNode.element.value = (currentParentNode.element.value || '') + (spanNode.element.value || '');
         lastRangeEndIndex = endOfCurrentRange;
@@ -259,6 +253,7 @@ function moveCursor(isFocused: boolean, alwaysMoveCursorToTheEnd: boolean, curso
     setCursorPosition(target, cursorPosition);
   }
 }
+
 function updateInputStructure(
   target: MarkdownTextInputElement,
   text: string,
@@ -276,8 +271,7 @@ function updateInputStructure(
     const selection = getCurrentCursorPosition(target);
     cursorPosition = selection ? selection.start : null;
   }
-  const ranges = global.parseExpensiMarkToRanges(text);
-  const markdownRanges: MarkdownRange[] = ranges as MarkdownRange[];
+  const markdownRanges = global.parseExpensiMarkToRanges(text);
   if (!text || targetElement.innerHTML === '<br>' || (targetElement && targetElement.innerHTML === '\n')) {
     targetElement.innerHTML = '';
     targetElement.innerText = '';
@@ -290,17 +284,16 @@ function updateInputStructure(
     if (shouldForceDOMUpdate || targetElement.innerHTML !== dom.innerHTML) {
       targetElement.innerHTML = '';
       targetElement.innerText = '';
-      Array.from(dom.children).forEach((child) => {
-        targetElement.appendChild(child);
-      });
+      targetElement.innerHTML = dom.innerHTML;
     }
 
+    updateTreeElementRefs(tree, targetElement);
     targetElement.tree = tree;
+
     moveCursor(isFocused, alwaysMoveCursorToTheEnd, cursorPosition, targetElement);
   }
 
   handleCustomStyles(target, markdownStyle);
-
   return {text, cursorPosition: cursorPosition || 0};
 }
 

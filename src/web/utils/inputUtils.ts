@@ -32,6 +32,10 @@ function getElementHeight(node: HTMLDivElement, styles: CSSProperties, numberOfL
   return styles.height ? `${styles.height}px` : 'auto';
 }
 
+function normalizeValue(value: string) {
+  return value.replaceAll('\r\n', '\n');
+}
+
 // Parses the HTML structure of a MarkdownTextInputElement to a plain text string. Used for getting the correct value of the input element.
 function parseInnerHTMLToText(target: MarkdownTextInputElement): string {
   // Returns the parent of a given node that is higher in the hierarchy and is of a different type than 'text', 'br' or 'line'
@@ -61,11 +65,16 @@ function parseInnerHTMLToText(target: MarkdownTextInputElement): string {
     // If we are operating on the nodes that are children of the MarkdownTextInputElement, we need to add a newline after each
     const isTopComponent = node.parentElement?.contentEditable === 'true';
     if (isTopComponent) {
-      if (shouldAddNewline) {
-        text += '\n';
+      // Replaced text is beeing added as text node, so we need to not add the newline before and after it
+      if (node.nodeType === Node.TEXT_NODE) {
         shouldAddNewline = false;
+      } else {
+        if (shouldAddNewline) {
+          text += '\n';
+          shouldAddNewline = false;
+        }
+        shouldAddNewline = true;
       }
-      shouldAddNewline = true;
     }
 
     if (node.nodeType === Node.TEXT_NODE) {
@@ -73,7 +82,7 @@ function parseInnerHTMLToText(target: MarkdownTextInputElement): string {
       text += node.textContent;
     } else if (node.nodeName === 'BR') {
       const parentNode = getTopParentNode(node);
-      if (parentNode && parentNode.parentElement?.contentEditable !== 'true') {
+      if (parentNode && parentNode.parentElement?.contentEditable !== 'true' && !!(node as HTMLElement).getAttribute('data-id')) {
         // Parse br elements into newlines only if their parent is not a child of the MarkdownTextInputElement (a paragraph when writing or a div when pasting).
         // It prevents adding extra newlines when entering text
         text += '\n';
@@ -91,7 +100,7 @@ function parseInnerHTMLToText(target: MarkdownTextInputElement): string {
     }
   }
 
-  return text;
+  return text.replaceAll('\r\n', '\n');
 }
 
-export {isEventComposing, getPlaceholderValue, getElementHeight, parseInnerHTMLToText};
+export {isEventComposing, getPlaceholderValue, getElementHeight, parseInnerHTMLToText, normalizeValue};

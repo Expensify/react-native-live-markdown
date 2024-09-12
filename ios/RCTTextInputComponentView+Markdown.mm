@@ -8,6 +8,8 @@
 
 #import "MarkdownShadowFamilyRegistry.h"
 
+using namespace expensify::livemarkdown;
+
 @implementation RCTTextInputComponentView (Markdown)
 
 - (void)setMarkdownUtils:(RCTMarkdownUtils *)markdownUtils {
@@ -51,7 +53,14 @@
 {
   RCTMarkdownUtils *markdownUtils = [self getMarkdownUtils];
   if (markdownUtils != nil) {
-    return [newText isEqualToAttributedString:oldText];
+    // Emoji characters are automatically assigned an AppleColorEmoji NSFont and the original font is moved to NSOriginalFont
+    // We need to remove these attributes before comparison
+    NSMutableAttributedString *newTextCopy = [newText mutableCopy];
+    NSMutableAttributedString *oldTextCopy = [oldText mutableCopy];
+    [newTextCopy removeAttribute:@"NSFont" range:NSMakeRange(0, newTextCopy.length)];
+    [oldTextCopy removeAttribute:@"NSFont" range:NSMakeRange(0, oldTextCopy.length)];
+    [oldTextCopy removeAttribute:@"NSOriginalFont" range:NSMakeRange(0, oldTextCopy.length)];
+    return [newTextCopy isEqualToAttributedString:oldTextCopy];
   }
 
   return [self markdown__textOf:newText equals:oldText];

@@ -37,6 +37,9 @@ function makeDefaultMarkdownStyle(): MarkdownStyle {
       backgroundColor: 'lightgray',
     },
     pre: {
+      borderColor: 'gray',
+      borderRadius: 4,
+      padding: 5,
       fontFamily: FONT_FAMILY_MONOSPACE,
       fontSize: 20,
       color: 'black',

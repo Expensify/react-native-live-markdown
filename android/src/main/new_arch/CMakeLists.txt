@@ -19,7 +19,7 @@ set(RN_DIR ${LIB_ANDROID_DIR}/../example/node_modules/react-native)
 
 add_library(
   ${LIB_TARGET_NAME}
-  SHARED 
+  SHARED
   ${LIB_MODULE_SRCS}
   ${LIB_CUSTOM_SRCS}
   ${LIB_CODEGEN_SRCS}
@@ -36,34 +36,53 @@ target_include_directories(
 
 find_package(ReactAndroid REQUIRED CONFIG)
 
-target_link_libraries(
-  ${LIB_TARGET_NAME}
-  ReactAndroid::rrc_text
-  ReactAndroid::rrc_textinput
-  ReactAndroid::react_render_textlayoutmanager
-  ReactAndroid::react_render_imagemanager
-  fabricjni
-  fbjni
-  folly_runtime
-  glog
-  jsi
-  react_codegen_rncore
-  react_debug
-  react_nativemodule_core
-  react_render_core
-  react_render_debug
-  react_render_graphics
-  react_render_mapbuffer
-  ReactAndroid::react_render_uimanager
-  ReactAndroid::react_render_scheduler
-  react_utils
-  runtimeexecutor
-  rrc_view
-  turbomodulejsijni
-  yoga
-  android
-  log
-)
+if (ReactAndroid_VERSION_MINOR GREATER_EQUAL 76)
+  target_link_libraries(
+    ${LIB_TARGET_NAME}
+    ReactAndroid::reactnative
+    ReactAndroid::jsi
+    fbjni::fbjni
+  )
+elseif (ReactAndroid_VERSION_MINOR GREATER_EQUAL 75)
+  target_link_libraries(
+    ${LIB_TARGET_NAME}
+    ReactAndroid::rrc_text
+    ReactAndroid::rrc_textinput
+    ReactAndroid::react_render_textlayoutmanager
+    ReactAndroid::react_render_imagemanager
+    ReactAndroid::reactnativejni
+    ReactAndroid::mapbufferjni
+    fabricjni
+    fbjni
+    folly_runtime
+    glog
+    jsi
+    react_codegen_rncore
+    react_debug
+    react_nativemodule_core
+    react_render_core
+    react_render_debug
+    react_render_graphics
+    react_render_mapbuffer
+    ReactAndroid::react_render_uimanager
+    ReactAndroid::react_render_scheduler
+    react_utils
+    runtimeexecutor
+    rrc_view
+    turbomodulejsijni
+    yoga
+    android
+    log
+    mapbufferjni
+    reactnativejni
+    react_render_consistency
+    react_performance_timeline
+    react_render_observers_events
+    react_featureflags
+  )
+else ()
+  message(FATAL_ERROR "react-native-live-markdown requires react-native 0.75 or newer.")
+endif ()
 
 target_compile_options(
   ${LIB_TARGET_NAME}
