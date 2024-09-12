@@ -2,6 +2,7 @@ const LOCAL_URL = 'http://localhost:19006/';
 
 const EXAMPLE_CONTENT = [
   'Hello, *world*!',
+  '😀🍕🍔',
   'https://expensify.com',
   '# header1',
   '> blockquote',
