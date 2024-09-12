@@ -149,7 +149,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         if (text === null) {
           return {text: divRef.current.value, cursorPosition: null};
         }
-        const parsedText = updateInputStructure(target, text, cursorPosition, customMarkdownStyles, !multiline, shouldForceDOMUpdate);
+        const parsedText = updateInputStructure(target, text, cursorPosition, customMarkdownStyles, false, shouldForceDOMUpdate);
         divRef.current.value = parsedText.text;
 
         if (history.current && shouldAddToHistory) {
@@ -158,7 +158,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
         return parsedText;
       },
-      [multiline],
+      [],
     );
 
     const processedMarkdownStyle = useMemo(() => {
@@ -176,10 +176,11 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           flattenedStyle && {
             caretColor: (flattenedStyle as TextStyle).color || 'black',
           },
+          {whiteSpace: multiline ? 'pre-wrap' : 'nowrap'},
           disabled && styles.disabledInputStyles,
           parseToReactDOMStyle(flattenedStyle),
         ]) as CSSProperties,
-      [flattenedStyle, disabled],
+      [flattenedStyle, multiline, disabled],
     );
 
     const undo = useCallback(
@@ -683,7 +684,6 @@ const styles = StyleSheet.create({
     fontFamily: 'sans-serif',
     // @ts-expect-error it works on web
     boxSizing: 'border-box',
-    whiteSpace: 'pre-wrap',
     overflowY: 'auto',
     overflowX: 'auto',
     overflowWrap: 'break-word',
