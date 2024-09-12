@@ -9,6 +9,8 @@
 
 #import "MarkdownShadowFamilyRegistry.h"
 
+using namespace expensify::livemarkdown;
+
 @implementation RCTTextInputComponentView (Markdown)
 
 - (void)setMarkdownUtils:(RCTMarkdownUtils *)markdownUtils {
