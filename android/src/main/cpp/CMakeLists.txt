@@ -18,8 +18,18 @@ find_package(fbjni REQUIRED CONFIG)
 find_package(ReactAndroid REQUIRED CONFIG)
 find_package(hermes-engine REQUIRED CONFIG)
 
-target_link_libraries(${CMAKE_PROJECT_NAME}
-        fbjni::fbjni
-        ReactAndroid::jsi
-        ReactAndroid::reactnativejni
-        hermes-engine::libhermes)
+if (ReactAndroid_VERSION_MINOR GREATER_EQUAL 76)
+  target_link_libraries(${CMAKE_PROJECT_NAME}
+          fbjni::fbjni
+          ReactAndroid::jsi
+          ReactAndroid::reactnative
+          hermes-engine::libhermes)
+elseif (ReactAndroid_VERSION_MINOR GREATER_EQUAL 75)
+  target_link_libraries(${CMAKE_PROJECT_NAME}
+          fbjni::fbjni
+          ReactAndroid::jsi
+          ReactAndroid::reactnativejni
+          hermes-engine::libhermes)
+else ()
+  message(FATAL_ERROR "react-native-live-markdown requires react-native 0.75 or newer.")
+endif ()

@@ -8,6 +8,8 @@
 #include <react/renderer/components/RNLiveMarkdownSpec/Props.h>
 #include <react/renderer/components/view/ConcreteViewShadowNode.h>
 
+using namespace expensify::livemarkdown;
+
 namespace facebook {
 namespace react {
 
