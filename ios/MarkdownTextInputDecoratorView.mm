@@ -110,12 +110,17 @@
   _markdownStyle = markdownStyle;
   [_markdownUtils setMarkdownStyle:markdownStyle];
 
-  // apply new styles
+  if (_textView != nil) {
+    // We want to use `textStorage` for applying markdown when possible. Currently it's only available for UITextView
+    [_textView textDidChange];
+  } else {
+    // apply new styles
 #ifdef RCT_NEW_ARCH_ENABLED
-  [_textInput _setAttributedString:_backedTextInputView.attributedText];
+    [_textInput _setAttributedString:_backedTextInputView.attributedText];
 #else
-  [_textInput setAttributedText:_textInput.attributedText];
+    [_textInput setAttributedText:_textInput.attributedText];
 #endif /* RCT_NEW_ARCH_ENABLED */
+  }
 }
 
 @end

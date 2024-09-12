@@ -4,6 +4,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@interface RCTUITextView (Private)
+- (void)textDidChange;
+@end
+
 @interface RCTUITextView (Markdown)
 
 @property(nonatomic, nullable, getter=getMarkdownUtils) RCTMarkdownUtils *markdownUtils;
