@@ -12181,10 +12181,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"html-entities@npm:^2.3.2, html-entities@npm:^2.5.2":
+"html-entities@npm:2.5.2":
   version: 2.5.2
   resolution: "html-entities@npm:2.5.2"
   checksum: b23f4a07d33d49ade1994069af4e13d31650e3fb62621e92ae10ecdf01d1a98065c78fd20fdc92b4c7881612210b37c275f2c9fba9777650ab0d6f2ceb3b99b6
+  languageName: node
+  linkType: hard
+
+"html-entities@patch:html-entities@npm%3A2.5.2#./.yarn/patches/html-entities-npm-2.5.2-0b6113e376.patch::locator=%40expensify%2Freact-native-live-markdown%40workspace%3A.":
+  version: 2.5.2
+  resolution: "html-entities@patch:html-entities@npm%3A2.5.2#./.yarn/patches/html-entities-npm-2.5.2-0b6113e376.patch::version=2.5.2&hash=fad713&locator=%40expensify%2Freact-native-live-markdown%40workspace%3A."
+  checksum: a775286539015cd77eabf44d64273956b94e81083544646efe6d63d28284042c0d1d7185cadec8d70efc7e8d57a818fc2fd4fad091acdfef754ee03b4af628fb
   languageName: node
   linkType: hard
 
