@@ -24,3 +24,20 @@
   display: block; /* For Firefox */
   content: attr(placeholder);
 }
+
+@keyframes react-native-live-markdown-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.react-native-live-markdown-input-multiline [contenteditable='false'] {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}

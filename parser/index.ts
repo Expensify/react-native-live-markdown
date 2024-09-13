@@ -2,7 +2,21 @@
 import ExpensiMark from 'expensify-common/dist/ExpensiMark';
 import {unescapeText} from './utils';
 
-type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'emoji' | 'mention-here' | 'mention-user' | 'mention-report' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax';
+type MarkdownType =
+  | 'bold'
+  | 'italic'
+  | 'strikethrough'
+  | 'emoji'
+  | 'mention-here'
+  | 'mention-user'
+  | 'mention-report'
+  | 'link'
+  | 'code'
+  | 'pre'
+  | 'blockquote'
+  | 'h1'
+  | 'syntax'
+  | 'inline-image';
 type MarkdownRange = {
   type: MarkdownType;
   start: number;
@@ -181,6 +195,10 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, MarkdownRange[]] {
         const hasAlt = node.tag.match(/data-link-variant="([^"]*)"/)![1] === 'labeled';
         const rawLink = node.tag.match(/data-raw-href="([^"]*)"/);
         const linkString = rawLink ? unescapeText(rawLink[1]!) : src;
+
+        const start = text.length;
+        const length = 3 + (hasAlt ? 2 + unescapeText(alt?.[1] || '').length : 0) + linkString.length;
+        ranges.push({type: 'inline-image', start, length});
 
         appendSyntax('!');
         if (hasAlt) {

@@ -52,7 +52,7 @@ test.describe('markdown content styling', () => {
 
   test('blockquote', async ({page, browserName}) => {
     const blockquoteStyle =
-      'border-color: gray; border-width: 6px; margin-left: 6px; padding-left: 6px; border-left-style: solid; display: inline-block; max-width: 100%; box-sizing: border-box;';
+      'border-color: gray; border-width: 6px; margin-left: 6px; padding-left: 6px; border-left-style: solid; display: inline-block; max-width: 100%; box-sizing: border-box; overflow-wrap: anywhere;';
 
     // Firefox border properties are serialized slightly differently
     const browserStyle = browserName === 'firefox' ? blockquoteStyle.replace('border-left-style: solid', 'border-left: 6px solid gray') : blockquoteStyle;
