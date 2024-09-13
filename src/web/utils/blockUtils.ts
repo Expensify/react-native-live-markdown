@@ -1,12 +1,14 @@
+import type {MarkdownTextInputElement} from '../../MarkdownTextInput.web';
+import type {MarkdownRange} from '../../commonTypes';
 import type {PartialMarkdownStyle} from '../../styleUtils';
-import type {NodeType} from './treeUtils';
+import {addInlineImagePreview} from '../inputElements/inlineImage';
+import type {NodeType, TreeNode} from './treeUtils';
 
 function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownStyle: PartialMarkdownStyle) {
   const node = targetElement;
   switch (type) {
     case 'line':
       Object.assign(node.style, {
-        display: 'block',
         margin: '0',
         padding: '0',
       });
@@ -55,6 +57,7 @@ function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownSty
         display: 'inline-block',
         maxWidth: '100%',
         boxSizing: 'border-box',
+        overflowWrap: 'anywhere',
       });
       break;
     case 'h1':
@@ -63,10 +66,47 @@ function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownSty
         fontWeight: 'bold',
       });
       break;
+    case 'block':
+      Object.assign(node.style, {
+        display: 'block',
+        margin: '0',
+        padding: '0',
+        position: 'relative',
+      });
+      break;
     default:
       break;
   }
 }
 
-// eslint-disable-next-line import/prefer-default-export
-export {addStyleToBlock};
+const BLOCK_MARKDOWN_TYPES = ['inline-image'];
+const FULL_LINE_MARKDOWN_TYPES = ['blockquote', 'h1'];
+
+function isBlockMarkdownType(type: NodeType) {
+  return BLOCK_MARKDOWN_TYPES.includes(type);
+}
+
+function getFirstBlockMarkdownRange(ranges: MarkdownRange[]) {
+  const blockMarkdownRange = ranges.find((r) => isBlockMarkdownType(r.type) || FULL_LINE_MARKDOWN_TYPES.includes(r.type));
+  return FULL_LINE_MARKDOWN_TYPES.includes(blockMarkdownRange?.type || '') ? undefined : blockMarkdownRange;
+}
+
+function extendBlockStructure(
+  currentInput: MarkdownTextInputElement,
+  targetNode: TreeNode,
+  currentRange: MarkdownRange,
+  ranges: MarkdownRange[],
+  text: string,
+  markdownStyle: PartialMarkdownStyle,
+) {
+  switch (currentRange.type) {
+    case 'inline-image':
+      return addInlineImagePreview(currentInput, targetNode, text, ranges, markdownStyle);
+    default:
+      break;
+  }
+
+  return targetNode;
+}
+
+export {addStyleToBlock, extendBlockStructure, isBlockMarkdownType, getFirstBlockMarkdownRange};

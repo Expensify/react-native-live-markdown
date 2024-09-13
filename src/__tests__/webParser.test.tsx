@@ -16,7 +16,7 @@ const toBeParsedAsHTML = function (actual: string, expectedHTML: string) {
   let expected = expectedHTML;
   const markdownRanges = parseExpensiMark(actual);
 
-  const actualDOM = parseRangesToHTMLNodes(actual, markdownRanges, {}, true).dom;
+  const actualDOM = parseRangesToHTMLNodes(actual, markdownRanges, true, {}, true).dom;
   const actualHTML = actualDOM.innerHTML;
 
   if (actualHTML === expected) {

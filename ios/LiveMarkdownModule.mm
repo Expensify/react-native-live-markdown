@@ -16,11 +16,16 @@
 #import <jsi/jsi.h>
 
 using namespace facebook;
+using namespace expensify::livemarkdown;
+
+// A turbomodule used to register the commit hook
+// I think this is the easiest way to access the UIManager, which we need to
+// actually register the hook
 
 @implementation LiveMarkdownModule {
   BOOL installed_;
 #ifdef RCT_NEW_ARCH_ENABLED
-  std::shared_ptr<expensify::livemarkdown::MarkdownCommitHook> commitHook_;
+  std::shared_ptr<MarkdownCommitHook> commitHook_;
   __weak RCTSurfacePresenter *surfacePresenter_;
 #endif // RCT_NEW_ARCH_ENABLED
 }
@@ -35,7 +40,7 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install)
 
 #ifdef RCT_NEW_ARCH_ENABLED
   RCTScheduler *scheduler = [surfacePresenter_ scheduler];
-  commitHook_ = std::make_shared<expensify::livemarkdown::MarkdownCommitHook>(scheduler.uiManager);
+  commitHook_ = std::make_shared<MarkdownCommitHook>(scheduler.uiManager);
   installed_ = YES;
 #endif // RCT_NEW_ARCH_ENABLED
 

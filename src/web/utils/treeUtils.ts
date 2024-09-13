@@ -1,7 +1,7 @@
 import type {HTMLMarkdownElement} from '../../MarkdownTextInput.web';
 import type {MarkdownRange, MarkdownType} from '../../commonTypes';
 
-type NodeType = MarkdownType | 'line' | 'text' | 'br' | 'root';
+type NodeType = MarkdownType | 'line' | 'text' | 'br' | 'block' | 'root';
 
 type TreeNode = Omit<MarkdownRange, 'type'> & {
   element: HTMLMarkdownElement;
@@ -21,7 +21,7 @@ function addNodeToTree(element: HTMLMarkdownElement, parentTreeNode: TreeNode, t
     const lastParentChild = parentTreeNode.childNodes[parentChildrenCount - 1];
     if (lastParentChild) {
       startIndex = lastParentChild.start + lastParentChild.length;
-      startIndex += lastParentChild.isGeneratingNewline || element.style.display === 'block' ? 1 : 0;
+      startIndex += lastParentChild.isGeneratingNewline || (type !== 'block' && element.style.display === 'block') ? 1 : 0;
     }
   }
 
@@ -39,6 +39,23 @@ function addNodeToTree(element: HTMLMarkdownElement, parentTreeNode: TreeNode, t
   element.setAttribute('data-id', item.orderIndex);
   parentTreeNode.childNodes.push(item);
   return item;
+}
+
+function updateTreeElementRefs(treeRoot: TreeNode, element: HTMLMarkdownElement) {
+  const stack: TreeNode[] = [treeRoot];
+  while (stack.length > 0) {
+    const node = stack.pop() as TreeNode;
+    stack.push(...node.childNodes);
+
+    const currentElement = element.querySelector(`[data-id="${node.orderIndex}"]`) as HTMLMarkdownElement;
+    node.element = currentElement;
+
+    node.childNodes.forEach((child) => {
+      stack.push(child);
+    });
+  }
+
+  return treeRoot;
 }
 
 function findHTMLElementInTree(treeRoot: TreeNode, element: HTMLElement): TreeNode | null {
@@ -98,6 +115,6 @@ function getTreeNodeByIndex(treeRoot: TreeNode, index: number): TreeNode | null 
   return null;
 }
 
-export {addNodeToTree, findHTMLElementInTree, getTreeNodeByIndex};
+export {addNodeToTree, findHTMLElementInTree, getTreeNodeByIndex, updateTreeElementRefs};
 
 export type {TreeNode, NodeType};

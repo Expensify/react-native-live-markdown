@@ -45,10 +45,6 @@ function setCursorPosition(target: MarkdownTextInputElement, startIndex: number,
     selection.setBaseAndExtent(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
   }
 
-  // Update the focused elements zIndex to make sure they are on top and the cursor is beeing set correctly
-  startTreeNode.element.style.zIndex = '1';
-  endTreeNode.element.style.zIndex = '1';
-
   scrollIntoView(startTreeNode);
 }
 

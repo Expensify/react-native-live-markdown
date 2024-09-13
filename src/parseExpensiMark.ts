@@ -183,6 +183,10 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, MarkdownRange[]] {
         const rawLink = node.tag.match(/data-raw-href="([^"]*)"/);
         const linkString = rawLink ? unescapeText(rawLink[1]!) : src;
 
+        const start = text.length;
+        const length = 3 + (hasAlt ? 2 + unescapeText(alt?.[1] || '').length : 0) + linkString.length;
+        ranges.push({type: 'inline-image', start, length});
+
         appendSyntax('!');
         if (hasAlt) {
           appendSyntax('[');
