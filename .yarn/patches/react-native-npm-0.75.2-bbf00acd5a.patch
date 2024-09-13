@@ -1,0 +1,28 @@
+diff --git a/ReactCommon/react/renderer/components/textinput/platform/android/react/renderer/components/androidtextinput/AndroidTextInputComponentDescriptor.h b/ReactCommon/react/renderer/components/textinput/platform/android/react/renderer/components/androidtextinput/AndroidTextInputComponentDescriptor.h
+index 6ee6c1e73c192c714ef726b527cc1e900390798c..32a3c9ac036abb89c905b6cf3599624b0e92e12e 100644
+--- a/ReactCommon/react/renderer/components/textinput/platform/android/react/renderer/components/androidtextinput/AndroidTextInputComponentDescriptor.h
++++ b/ReactCommon/react/renderer/components/textinput/platform/android/react/renderer/components/androidtextinput/AndroidTextInputComponentDescriptor.h
+@@ -80,10 +80,6 @@ class AndroidTextInputComponentDescriptor final
+     auto& textInputShadowNode =
+         static_cast<AndroidTextInputShadowNode&>(shadowNode);
+ 
+-    // `ParagraphShadowNode` uses `TextLayoutManager` to measure text content
+-    // and communicate text rendering metrics to mounting layer.
+-    textInputShadowNode.setTextLayoutManager(textLayoutManager_);
+-
+     textInputShadowNode.setContextContainer(
+         const_cast<ContextContainer*>(getContextContainer().get()));
+ 
+diff --git a/ReactCommon/react/renderer/components/textinput/platform/android/react/renderer/components/androidtextinput/AndroidTextInputShadowNode.cpp b/ReactCommon/react/renderer/components/textinput/platform/android/react/renderer/components/androidtextinput/AndroidTextInputShadowNode.cpp
+index d15c7b32bbcf044ad7238dfe3c6a834c7cff5037..8356c1b864a4cb580b96011b7acfcf3fbbd3bcb1 100644
+--- a/ReactCommon/react/renderer/components/textinput/platform/android/react/renderer/components/androidtextinput/AndroidTextInputShadowNode.cpp
++++ b/ReactCommon/react/renderer/components/textinput/platform/android/react/renderer/components/androidtextinput/AndroidTextInputShadowNode.cpp
+@@ -33,6 +33,8 @@ AndroidTextInputShadowNode::AndroidTextInputShadowNode(
+     : ConcreteViewShadowNode(sourceShadowNode, fragment) {
+   auto& sourceTextInputShadowNode =
+       static_cast<const AndroidTextInputShadowNode&>(sourceShadowNode);
++  
++  setTextLayoutManager(sourceTextInputShadowNode.textLayoutManager_);
+ 
+   if (ReactNativeFeatureFlags::enableCleanTextInputYogaNode()) {
+     if (!fragment.children && !fragment.props &&

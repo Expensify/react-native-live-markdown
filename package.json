@@ -102,7 +102,9 @@
     "@types/react": "17.0.21",
     "link@^2.1.1": "patch:link@npm%3A2.1.1#./.yarn/patches/link-npm-2.1.1-1c9fea076e.patch",
     "html-entities@^2.5.2": "patch:html-entities@npm%3A2.5.2#./.yarn/patches/html-entities-npm-2.5.2-0b6113e376.patch",
-    "html-entities@^2.3.2": "patch:html-entities@npm%3A2.5.2#./.yarn/patches/html-entities-npm-2.5.2-0b6113e376.patch"
+    "html-entities@^2.3.2": "patch:html-entities@npm%3A2.5.2#./.yarn/patches/html-entities-npm-2.5.2-0b6113e376.patch",
+    "react-native@0.74.5": "patch:react-native@npm%3A0.75.2#./.yarn/patches/react-native-npm-0.75.2-bbf00acd5a.patch",
+    "react-native@0.75.2": "patch:react-native@npm%3A0.75.2#./.yarn/patches/react-native-npm-0.75.2-bbf00acd5a.patch"
   },
   "peerDependencies": {
     "expensify-common": ">=2.0.85",
