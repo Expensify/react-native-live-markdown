@@ -149,8 +149,6 @@ public class MarkdownUtils {
           depth);
         setSpan(ssb, span, start, end);
         break;
-      default:
-        throw new IllegalStateException("Unsupported type: " + type);
     }
   }
 
