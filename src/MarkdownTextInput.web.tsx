@@ -28,6 +28,7 @@ const useClientEffect = typeof window === 'undefined' ? useEffect : useLayoutEff
 
 interface MarkdownTextInputProps extends TextInputProps {
   markdownStyle?: MarkdownStyle;
+  maxParsableTextLength?: number;
   onClick?: (e: MouseEvent<HTMLDivElement>) => void;
   dir?: string;
   disabled?: boolean;
@@ -79,6 +80,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       numberOfLines,
       multiline = false,
       markdownStyle,
+      maxParsableTextLength = null,
       onBlur,
       onChange,
       onChangeText,
@@ -149,7 +151,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         if (text === null) {
           return {text: divRef.current.value, cursorPosition: null};
         }
-        const parsedText = updateInputStructure(target, text, cursorPosition, multiline, customMarkdownStyles, false, shouldForceDOMUpdate);
+        const parsedText = updateInputStructure(target, text, cursorPosition, maxParsableTextLength, multiline, customMarkdownStyles, false, shouldForceDOMUpdate);
         divRef.current.value = parsedText.text;
 
         if (history.current && shouldAddToHistory) {
@@ -158,7 +160,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
         return parsedText;
       },
-      [multiline],
+      [maxParsableTextLength, multiline],
     );
 
     const processedMarkdownStyle = useMemo(() => {

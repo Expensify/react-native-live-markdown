@@ -282,6 +282,7 @@ function updateInputStructure(
   target: MarkdownTextInputElement,
   text: string,
   cursorPositionIndex: number | null,
+  maxParsableTextLength: number | null,
   isMultiline = true,
   markdownStyle: PartialMarkdownStyle = {},
   alwaysMoveCursorToTheEnd = false,
@@ -296,7 +297,7 @@ function updateInputStructure(
     const selection = getCurrentCursorPosition(target);
     cursorPosition = selection ? selection.start : null;
   }
-  const markdownRanges = global.parseExpensiMarkToRanges(text);
+  const markdownRanges = maxParsableTextLength !== null && text.length <= maxParsableTextLength ? global.parseExpensiMarkToRanges(text) : [];
   if (!text || targetElement.innerHTML === '<br>' || (targetElement && targetElement.innerHTML === '\n')) {
     targetElement.innerHTML = '';
     targetElement.innerText = '';
