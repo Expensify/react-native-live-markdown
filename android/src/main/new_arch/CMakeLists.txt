@@ -34,51 +34,43 @@ target_include_directories(
         ${LIB_CPP_DIR}
 )
 
+find_package(fbjni REQUIRED CONFIG)
 find_package(ReactAndroid REQUIRED CONFIG)
+
+target_link_libraries(
+        ${LIB_TARGET_NAME}
+        fbjni::fbjni
+        ReactAndroid::jsi
+)
 
 if (ReactAndroid_VERSION_MINOR GREATER_EQUAL 76)
   target_link_libraries(
           ${LIB_TARGET_NAME}
           ReactAndroid::reactnative
-          ReactAndroid::jsi
-          fbjni::fbjni
   )
 elseif (ReactAndroid_VERSION_MINOR GREATER_EQUAL 75)
   target_link_libraries(
           ${LIB_TARGET_NAME}
+          ReactAndroid::fabricjni
+          ReactAndroid::folly_runtime
+          ReactAndroid::glog
+          ReactAndroid::react_debug
+          ReactAndroid::react_nativemodule_core
+          ReactAndroid::react_performance_timeline
+          ReactAndroid::react_render_consistency
+          ReactAndroid::react_render_core
+          ReactAndroid::react_render_debug
+          ReactAndroid::react_render_graphics
+          ReactAndroid::react_render_imagemanager
+          ReactAndroid::react_render_mapbuffer
+          ReactAndroid::react_render_observers_events
+          ReactAndroid::react_render_textlayoutmanager
+          ReactAndroid::reactnativejni
           ReactAndroid::rrc_text
           ReactAndroid::rrc_textinput
-          ReactAndroid::react_render_textlayoutmanager
-          ReactAndroid::react_render_imagemanager
-          ReactAndroid::reactnativejni
-          ReactAndroid::mapbufferjni
-          fabricjni
-          fbjni
-          folly_runtime
-          glog
-          jsi
-          react_codegen_rncore
-          react_debug
-          react_nativemodule_core
-          react_render_core
-          react_render_debug
-          react_render_graphics
-          react_render_mapbuffer
-          ReactAndroid::react_render_uimanager
-          ReactAndroid::react_render_scheduler
-          react_utils
-          runtimeexecutor
-          rrc_view
-          turbomodulejsijni
-          yoga
-          android
-          log
-          mapbufferjni
-          reactnativejni
-          react_render_consistency
-          react_performance_timeline
-          react_render_observers_events
-          react_featureflags
+          ReactAndroid::rrc_view
+          ReactAndroid::runtimeexecutor
+          ReactAndroid::yoga
   )
 else ()
   message(FATAL_ERROR "react-native-live-markdown requires react-native 0.75 or newer.")
