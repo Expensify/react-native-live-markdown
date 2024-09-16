@@ -23,13 +23,15 @@ if (ReactAndroid_VERSION_MINOR GREATER_EQUAL 76)
           fbjni::fbjni
           ReactAndroid::jsi
           ReactAndroid::reactnative
-          hermes-engine::libhermes)
+          hermes-engine::libhermes
+  )
 elseif (ReactAndroid_VERSION_MINOR GREATER_EQUAL 75)
   target_link_libraries(${CMAKE_PROJECT_NAME}
           fbjni::fbjni
           ReactAndroid::jsi
           ReactAndroid::reactnativejni
-          hermes-engine::libhermes)
+          hermes-engine::libhermes
+  )
 else ()
   message(FATAL_ERROR "react-native-live-markdown requires react-native 0.75 or newer.")
 endif ()
