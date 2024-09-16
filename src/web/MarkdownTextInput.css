@@ -18,6 +18,10 @@
   display: none;
 }
 
+.react-native-live-markdown-input-singleline span[data-type="text"] {
+  vertical-align: middle;
+}
+
 .react-native-live-markdown-input-singleline:empty::before,
 .react-native-live-markdown-input-multiline:empty::before {
   pointer-events: none;
