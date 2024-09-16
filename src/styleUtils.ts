@@ -61,6 +61,7 @@ function makeDefaultMarkdownStyle(): MarkdownStyle {
       maxHeight: 150,
       marginTop: 5,
       marginBottom: 0,
+      borderRadius: 5,
     },
     loadingIndicator: {
       primaryColor: 'gray',

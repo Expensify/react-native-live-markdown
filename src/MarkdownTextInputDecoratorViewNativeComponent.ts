@@ -53,6 +53,7 @@ interface MarkdownStyle {
     maxHeight: Float;
     marginTop: Float;
     marginBottom: Float;
+    borderRadius: Float;
   };
   loadingIndicatorContainer?: {
     backgroundColor?: ColorValue;

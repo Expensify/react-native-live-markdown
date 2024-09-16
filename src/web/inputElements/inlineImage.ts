@@ -87,12 +87,13 @@ function addInlineImagePreview(currentInput: MarkdownTextInputElement, targetNod
       ...inlineImageDefaultStyles,
     });
 
-    const {minHeight, minWidth, maxHeight, maxWidth} = markdownStyle.inlineImage || {};
+    const {minHeight, minWidth, maxHeight, maxWidth, borderRadius} = markdownStyle.inlineImage || {};
     Object.assign(img.style, {
       minHeight,
       minWidth,
       maxHeight,
       maxWidth,
+      borderRadius,
     });
 
     targetNode.element.appendChild(imageContainer);
