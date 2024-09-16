@@ -26,8 +26,8 @@ function createImageElement(url: string, callback: (img: HTMLElement) => void) {
 }
 
 /** Adds already loaded image element from current input content to the tree node */
-function updateImageTreeNode(targetNode: TreeNode, newElement: HTMLMarkdownElement) {
-  const paddingBottom = `${newElement.style.height}`;
+function updateImageTreeNode(targetNode: TreeNode, newElement: HTMLMarkdownElement, imageMarginTop = 0) {
+  const paddingBottom = `${parseStringWithUnitToNumber(newElement.style.height) + imageMarginTop}px`;
   targetNode.element.appendChild(newElement);
 
   let currentParent = targetNode.element;
@@ -49,12 +49,15 @@ function addInlineImagePreview(currentInput: MarkdownTextInputElement, targetNod
     imageHref = text.substring(linkRange.start, linkRange.start + linkRange.length);
   }
 
+  const imageMarginTop = parseStringWithUnitToNumber(`${markdownStyle.inlineImage?.marginTop}`);
+  const imageMarginBottom = parseStringWithUnitToNumber(`${markdownStyle.inlineImage?.marginBottom}`);
+
   // If the inline image markdown with the same href exists in the current input, use it instead of creating new one.
   // Prevents from image flickering and layout jumps
   const alreadyLoadedPreview = currentInput.querySelector(`img[src="${imageHref}"]`);
   const loadedImageContainer = alreadyLoadedPreview?.parentElement;
   if (loadedImageContainer && loadedImageContainer.getAttribute('data-type') === 'inline-container') {
-    return updateImageTreeNode(targetNode, loadedImageContainer as HTMLMarkdownElement);
+    return updateImageTreeNode(targetNode, loadedImageContainer as HTMLMarkdownElement, imageMarginTop);
   }
 
   // Add a loading spinner
@@ -62,11 +65,6 @@ function addInlineImagePreview(currentInput: MarkdownTextInputElement, targetNod
   if (spinner) {
     targetNode.element.appendChild(spinner);
   }
-
-  const maxWidth = markdownStyle.inlineImage?.maxWidth;
-  const maxHeight = markdownStyle.inlineImage?.maxHeight;
-  const imageMarginTop = parseStringWithUnitToNumber(`${markdownStyle.inlineImage?.marginTop}`);
-  const imageMarginBottom = parseStringWithUnitToNumber(`${markdownStyle.inlineImage?.marginBottom}`);
 
   Object.assign(targetNode.element.style, {
     display: 'block',
@@ -82,28 +80,30 @@ function addInlineImagePreview(currentInput: MarkdownTextInputElement, targetNod
       currentSpinner.remove();
     }
 
+    const img = imageContainer.firstChild as HTMLImageElement;
+
     // Set the image styles
     Object.assign(imageContainer.style, {
       ...inlineImageDefaultStyles,
-      maxHeight,
-      maxWidth,
     });
 
-    const img = imageContainer.firstChild as HTMLImageElement;
+    const {minHeight, minWidth, maxHeight, maxWidth, borderRadius} = markdownStyle.inlineImage || {};
     Object.assign(img.style, {
+      minHeight,
+      minWidth,
       maxHeight,
       maxWidth,
+      borderRadius,
     });
 
     targetNode.element.appendChild(imageContainer);
 
-    const imageHeight = `${imageContainer.clientHeight + imageMarginTop}px`;
     Object.assign(imageContainer.style, {
-      height: imageHeight,
+      height: `${imageContainer.clientHeight}px`,
     });
     // Set paddingBottom to the height of the image so it's displayed under the block
     Object.assign(targetNode.element.style, {
-      paddingBottom: imageHeight,
+      paddingBottom: `${imageContainer.clientHeight + imageMarginTop}px`,
     });
   });
 
