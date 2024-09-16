@@ -49,8 +49,6 @@ function addInlineImagePreview(currentInput: MarkdownTextInputElement, targetNod
     imageHref = text.substring(linkRange.start, linkRange.start + linkRange.length);
   }
 
-  const maxWidth = markdownStyle.inlineImage?.maxWidth;
-  const maxHeight = markdownStyle.inlineImage?.maxHeight;
   const imageMarginTop = parseStringWithUnitToNumber(`${markdownStyle.inlineImage?.marginTop}`);
   const imageMarginBottom = parseStringWithUnitToNumber(`${markdownStyle.inlineImage?.marginBottom}`);
 
@@ -82,15 +80,17 @@ function addInlineImagePreview(currentInput: MarkdownTextInputElement, targetNod
       currentSpinner.remove();
     }
 
+    const img = imageContainer.firstChild as HTMLImageElement;
+
     // Set the image styles
     Object.assign(imageContainer.style, {
       ...inlineImageDefaultStyles,
-      maxHeight,
-      maxWidth,
     });
 
-    const img = imageContainer.firstChild as HTMLImageElement;
+    const {minHeight, minWidth, maxHeight, maxWidth} = markdownStyle.inlineImage || {};
     Object.assign(img.style, {
+      minHeight,
+      minWidth,
       maxHeight,
       maxWidth,
     });

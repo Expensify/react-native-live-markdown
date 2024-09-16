@@ -47,6 +47,8 @@ interface MarkdownStyle {
     backgroundColor: ColorValue;
   };
   inlineImage: {
+    minWidth: Float;
+    minHeight: Float;
     maxWidth: Float;
     maxHeight: Float;
     marginTop: Float;
