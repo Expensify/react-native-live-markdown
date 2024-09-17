@@ -296,7 +296,10 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         }
 
         const prevSelection = contentSelection.current ?? {start: 0, end: 0};
-        const newCursorPosition = Math.max(Math.max(contentSelection.current.end, 0) + (parsedText.length - previousText.length), 0);
+        const newCursorPosition =
+          inputType === 'deleteContentForward' && contentSelection.current.start === contentSelection.current.end
+            ? Math.max(contentSelection.current.start, 0) // Don't move the caret when deleting forward with no characters selected
+            : Math.max(Math.max(contentSelection.current.end, 0) + (parsedText.length - previousText.length), 0);
 
         if (compositionRef.current) {
           updateTextColor(divRef.current, parsedText);
