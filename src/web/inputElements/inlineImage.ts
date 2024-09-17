@@ -5,24 +5,34 @@ import type {PartialMarkdownStyle} from '../../styleUtils';
 import type {TreeNode} from '../utils/treeUtils';
 import {createLoadingIndicator} from './loadingIndicator';
 
+const INLINE_IMAGE_PREVIEW_DEBOUNCE_TIME_MS = 300;
+
 const inlineImageDefaultStyles = {
   position: 'absolute',
   bottom: 0,
   left: 0,
 };
 
+let timeout: NodeJS.Timeout | null = null;
+
 function createImageElement(url: string, callback: (img: HTMLElement, err?: string | Event) => void) {
-  const imageContainer = document.createElement('span');
-  imageContainer.contentEditable = 'false';
-  imageContainer.setAttribute('data-type', 'inline-container');
+  if (timeout) {
+    clearTimeout(timeout);
+  }
 
-  const img = new Image();
-  imageContainer.appendChild(img);
+  timeout = setTimeout(() => {
+    const imageContainer = document.createElement('span');
+    imageContainer.contentEditable = 'false';
+    imageContainer.setAttribute('data-type', 'inline-container');
 
-  img.contentEditable = 'false';
-  img.onload = () => callback(imageContainer);
-  img.onerror = (err) => callback(imageContainer, err);
-  img.src = url;
+    const img = new Image();
+    imageContainer.appendChild(img);
+
+    img.contentEditable = 'false';
+    img.onload = () => callback(imageContainer);
+    img.onerror = (err) => callback(imageContainer, err);
+    img.src = url;
+  }, INLINE_IMAGE_PREVIEW_DEBOUNCE_TIME_MS);
 }
 
 /** Adds already loaded image element from current input content to the tree node */
@@ -56,6 +66,7 @@ function addInlineImagePreview(currentInput: MarkdownTextInputElement, targetNod
   // Prevents from image flickering and layout jumps
   const alreadyLoadedPreview = currentInput.querySelector(`img[src="${imageHref}"]`);
   const loadedImageContainer = alreadyLoadedPreview?.parentElement;
+
   if (loadedImageContainer && loadedImageContainer.getAttribute('data-type') === 'inline-container') {
     return updateImageTreeNode(targetNode, loadedImageContainer as HTMLMarkdownElement, imageMarginTop);
   }
