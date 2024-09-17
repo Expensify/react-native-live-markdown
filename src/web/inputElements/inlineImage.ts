@@ -38,7 +38,7 @@ function createImageElement(url: string, callback: (img: HTMLElement, err?: stri
 /** Adds already loaded image element from current input content to the tree node */
 function updateImageTreeNode(targetNode: TreeNode, newElement: HTMLMarkdownElement, imageMarginTop = 0) {
   const paddingBottom = `${parseStringWithUnitToNumber(newElement.style.height) + imageMarginTop}px`;
-  targetNode.element.appendChild(newElement);
+  targetNode.element.appendChild(newElement.cloneNode(true));
 
   let currentParent = targetNode.element;
   while (currentParent.parentElement && !['line', 'block'].includes(currentParent.getAttribute('data-type') || '')) {
