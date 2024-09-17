@@ -98,6 +98,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       onContentSizeChange,
       id,
       inputMode,
+      onTouchStart,
     },
     ref,
   ) => {
@@ -676,6 +677,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         dir={dir}
         inputMode={inputMode}
         onSelect={updateSelection}
+        onTouchStart={onTouchStart}
       />
     );
   },
