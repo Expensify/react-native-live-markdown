@@ -13,14 +13,15 @@ const inlineImageDefaultStyles = {
   left: 0,
 };
 
-let timeout: NodeJS.Timeout | null = null;
+const timeoutMap = new Map<string, NodeJS.Timeout>();
 
-function createImageElement(url: string, callback: (img: HTMLElement, err?: string | Event) => void) {
-  if (timeout) {
-    clearTimeout(timeout);
+function createImageElement(targetNode: TreeNode, url: string, callback: (img: HTMLElement, err?: string | Event) => void) {
+  if (timeoutMap.has(targetNode.orderIndex)) {
+    clearTimeout(timeoutMap.get(targetNode.orderIndex));
+    timeoutMap.delete(targetNode.orderIndex);
   }
 
-  timeout = setTimeout(() => {
+  const timeout = setTimeout(() => {
     const imageContainer = document.createElement('span');
     imageContainer.contentEditable = 'false';
     imageContainer.setAttribute('data-type', 'inline-container');
@@ -32,7 +33,9 @@ function createImageElement(url: string, callback: (img: HTMLElement, err?: stri
     img.onload = () => callback(imageContainer);
     img.onerror = (err) => callback(imageContainer, err);
     img.src = url;
+    timeoutMap.delete(targetNode.orderIndex);
   }, INLINE_IMAGE_PREVIEW_DEBOUNCE_TIME_MS);
+  timeoutMap.set(targetNode.orderIndex, timeout);
 }
 
 /** Adds already loaded image element from current input content to the tree node */
@@ -83,7 +86,7 @@ function addInlineImagePreview(currentInput: MarkdownTextInputElement, targetNod
     paddingBottom: markdownStyle.loadingIndicatorContainer?.height || markdownStyle.loadingIndicator?.height || (!!markdownStyle.loadingIndicator && '30px') || undefined,
   });
 
-  createImageElement(imageHref, (imageContainer, err) => {
+  createImageElement(targetNode, imageHref, (imageContainer, err) => {
     // Verify if the current spinner is for the loaded image. If not, it means that the response came after the user changed the image url
     const currentSpinner = currentInput.querySelector('[data-type="spinner"]');
     // Remove the spinner
