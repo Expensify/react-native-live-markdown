@@ -9,9 +9,10 @@ import type {
   TextInputKeyPressEventData,
   TextInputFocusEventData,
   TextInputContentSizeChangeEventData,
+  GestureResponderEvent,
 } from 'react-native';
 import React, {useEffect, useRef, useCallback, useMemo, useLayoutEffect} from 'react';
-import type {CSSProperties, MutableRefObject, ReactEventHandler, FocusEventHandler, MouseEvent, KeyboardEvent, SyntheticEvent, ClipboardEventHandler} from 'react';
+import type {CSSProperties, MutableRefObject, ReactEventHandler, FocusEventHandler, MouseEvent, KeyboardEvent, SyntheticEvent, ClipboardEventHandler, TouchEvent} from 'react';
 import {StyleSheet} from 'react-native';
 import {updateInputStructure} from './web/utils/parserUtils';
 import InputHistory from './web/InputHistory';
@@ -591,6 +592,14 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       divRef.current = r as MarkdownTextInputElement;
     };
 
+    const handleTouchStart = (event: TouchEvent<HTMLDivElement>) => {
+      if (!onTouchStart) {
+        return;
+      }
+      const e = event as unknown as GestureResponderEvent;
+      onTouchStart(e);
+    };
+
     useClientEffect(
       function parseAndStyleValue() {
         if (!divRef.current || value === divRef.current.value) {
@@ -677,7 +686,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         dir={dir}
         inputMode={inputMode}
         onSelect={updateSelection}
-        onTouchStart={onTouchStart}
+        onTouchStart={handleTouchStart}
       />
     );
   },
