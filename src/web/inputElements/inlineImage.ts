@@ -5,30 +5,40 @@ import type {PartialMarkdownStyle} from '../../styleUtils';
 import type {TreeNode} from '../utils/treeUtils';
 import {createLoadingIndicator} from './loadingIndicator';
 
+const INLINE_IMAGE_PREVIEW_DEBOUNCE_TIME_MS = 300;
+
 const inlineImageDefaultStyles = {
   position: 'absolute',
   bottom: 0,
   left: 0,
 };
 
-function createImageElement(url: string, callback: (img: HTMLElement) => void) {
-  const imageContainer = document.createElement('span');
-  imageContainer.contentEditable = 'false';
-  imageContainer.setAttribute('data-type', 'inline-container');
+let timeout: NodeJS.Timeout | null = null;
 
-  const img = new Image();
-  imageContainer.appendChild(img);
+function createImageElement(url: string, callback: (img: HTMLElement, err?: string | Event) => void) {
+  if (timeout) {
+    clearTimeout(timeout);
+  }
 
-  img.contentEditable = 'false';
-  img.onload = () => callback(imageContainer);
-  img.onerror = () => callback(imageContainer);
-  img.src = url;
+  timeout = setTimeout(() => {
+    const imageContainer = document.createElement('span');
+    imageContainer.contentEditable = 'false';
+    imageContainer.setAttribute('data-type', 'inline-container');
+
+    const img = new Image();
+    imageContainer.appendChild(img);
+
+    img.contentEditable = 'false';
+    img.onload = () => callback(imageContainer);
+    img.onerror = (err) => callback(imageContainer, err);
+    img.src = url;
+  }, INLINE_IMAGE_PREVIEW_DEBOUNCE_TIME_MS);
 }
 
 /** Adds already loaded image element from current input content to the tree node */
 function updateImageTreeNode(targetNode: TreeNode, newElement: HTMLMarkdownElement, imageMarginTop = 0) {
   const paddingBottom = `${parseStringWithUnitToNumber(newElement.style.height) + imageMarginTop}px`;
-  targetNode.element.appendChild(newElement);
+  targetNode.element.appendChild(newElement.cloneNode(true));
 
   let currentParent = targetNode.element;
   while (currentParent.parentElement && !['line', 'block'].includes(currentParent.getAttribute('data-type') || '')) {
@@ -56,6 +66,7 @@ function addInlineImagePreview(currentInput: MarkdownTextInputElement, targetNod
   // Prevents from image flickering and layout jumps
   const alreadyLoadedPreview = currentInput.querySelector(`img[src="${imageHref}"]`);
   const loadedImageContainer = alreadyLoadedPreview?.parentElement;
+
   if (loadedImageContainer && loadedImageContainer.getAttribute('data-type') === 'inline-container') {
     return updateImageTreeNode(targetNode, loadedImageContainer as HTMLMarkdownElement, imageMarginTop);
   }
@@ -72,7 +83,7 @@ function addInlineImagePreview(currentInput: MarkdownTextInputElement, targetNod
     paddingBottom: markdownStyle.loadingIndicatorContainer?.height || markdownStyle.loadingIndicator?.height || (!!markdownStyle.loadingIndicator && '30px') || undefined,
   });
 
-  createImageElement(imageHref, (imageContainer) => {
+  createImageElement(imageHref, (imageContainer, err) => {
     // Verify if the current spinner is for the loaded image. If not, it means that the response came after the user changed the image url
     const currentSpinner = currentInput.querySelector('[data-type="spinner"]');
     // Remove the spinner
@@ -81,20 +92,27 @@ function addInlineImagePreview(currentInput: MarkdownTextInputElement, targetNod
     }
 
     const img = imageContainer.firstChild as HTMLImageElement;
-
-    // Set the image styles
-    Object.assign(imageContainer.style, {
-      ...inlineImageDefaultStyles,
-    });
-
     const {minHeight, minWidth, maxHeight, maxWidth, borderRadius} = markdownStyle.inlineImage || {};
-    Object.assign(img.style, {
+    const imgStyle = {
       minHeight,
       minWidth,
       maxHeight,
       maxWidth,
       borderRadius,
+    };
+
+    // Set the image styles
+    Object.assign(imageContainer.style, {
+      ...inlineImageDefaultStyles,
+      ...(err && {
+        ...imgStyle,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }),
     });
+
+    Object.assign(img.style, !err && imgStyle);
 
     targetNode.element.appendChild(imageContainer);
 
