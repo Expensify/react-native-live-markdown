@@ -11,7 +11,7 @@ const inlineImageDefaultStyles = {
   left: 0,
 };
 
-function createImageElement(url: string, callback: (img: HTMLElement) => void) {
+function createImageElement(url: string, callback: (img: HTMLElement, err?: string | Event) => void) {
   const imageContainer = document.createElement('span');
   imageContainer.contentEditable = 'false';
   imageContainer.setAttribute('data-type', 'inline-container');
@@ -21,7 +21,7 @@ function createImageElement(url: string, callback: (img: HTMLElement) => void) {
 
   img.contentEditable = 'false';
   img.onload = () => callback(imageContainer);
-  img.onerror = () => callback(imageContainer);
+  img.onerror = (err) => callback(imageContainer, err);
   img.src = url;
 }
 
@@ -72,7 +72,7 @@ function addInlineImagePreview(currentInput: MarkdownTextInputElement, targetNod
     paddingBottom: markdownStyle.loadingIndicatorContainer?.height || markdownStyle.loadingIndicator?.height || (!!markdownStyle.loadingIndicator && '30px') || undefined,
   });
 
-  createImageElement(imageHref, (imageContainer) => {
+  createImageElement(imageHref, (imageContainer, err) => {
     // Verify if the current spinner is for the loaded image. If not, it means that the response came after the user changed the image url
     const currentSpinner = currentInput.querySelector('[data-type="spinner"]');
     // Remove the spinner
@@ -81,20 +81,27 @@ function addInlineImagePreview(currentInput: MarkdownTextInputElement, targetNod
     }
 
     const img = imageContainer.firstChild as HTMLImageElement;
-
-    // Set the image styles
-    Object.assign(imageContainer.style, {
-      ...inlineImageDefaultStyles,
-    });
-
     const {minHeight, minWidth, maxHeight, maxWidth, borderRadius} = markdownStyle.inlineImage || {};
-    Object.assign(img.style, {
+    const imgStyle = {
       minHeight,
       minWidth,
       maxHeight,
       maxWidth,
       borderRadius,
+    };
+
+    // Set the image styles
+    Object.assign(imageContainer.style, {
+      ...inlineImageDefaultStyles,
+      ...(err && {
+        ...imgStyle,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }),
     });
+
+    Object.assign(img.style, !err && imgStyle);
 
     targetNode.element.appendChild(imageContainer);
 
