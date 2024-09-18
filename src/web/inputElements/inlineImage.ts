@@ -5,30 +5,43 @@ import type {PartialMarkdownStyle} from '../../styleUtils';
 import type {TreeNode} from '../utils/treeUtils';
 import {createLoadingIndicator} from './loadingIndicator';
 
+const INLINE_IMAGE_PREVIEW_DEBOUNCE_TIME_MS = 300;
+
 const inlineImageDefaultStyles = {
   position: 'absolute',
   bottom: 0,
   left: 0,
 };
 
-function createImageElement(url: string, callback: (img: HTMLElement) => void) {
-  const imageContainer = document.createElement('span');
-  imageContainer.contentEditable = 'false';
-  imageContainer.setAttribute('data-type', 'inline-container');
+const timeoutMap = new Map<string, NodeJS.Timeout>();
 
-  const img = new Image();
-  imageContainer.appendChild(img);
+function createImageElement(targetNode: TreeNode, url: string, callback: (img: HTMLElement, err?: string | Event) => void) {
+  if (timeoutMap.has(targetNode.orderIndex)) {
+    clearTimeout(timeoutMap.get(targetNode.orderIndex));
+    timeoutMap.delete(targetNode.orderIndex);
+  }
 
-  img.contentEditable = 'false';
-  img.onload = () => callback(imageContainer);
-  img.onerror = () => callback(imageContainer);
-  img.src = url;
+  const timeout = setTimeout(() => {
+    const imageContainer = document.createElement('span');
+    imageContainer.contentEditable = 'false';
+    imageContainer.setAttribute('data-type', 'inline-container');
+
+    const img = new Image();
+    imageContainer.appendChild(img);
+
+    img.contentEditable = 'false';
+    img.onload = () => callback(imageContainer);
+    img.onerror = (err) => callback(imageContainer, err);
+    img.src = url;
+    timeoutMap.delete(targetNode.orderIndex);
+  }, INLINE_IMAGE_PREVIEW_DEBOUNCE_TIME_MS);
+  timeoutMap.set(targetNode.orderIndex, timeout);
 }
 
 /** Adds already loaded image element from current input content to the tree node */
-function updateImageTreeNode(targetNode: TreeNode, newElement: HTMLMarkdownElement) {
-  const paddingBottom = `${newElement.style.height}`;
-  targetNode.element.appendChild(newElement);
+function updateImageTreeNode(targetNode: TreeNode, newElement: HTMLMarkdownElement, imageMarginTop = 0) {
+  const paddingBottom = `${parseStringWithUnitToNumber(newElement.style.height) + imageMarginTop}px`;
+  targetNode.element.appendChild(newElement.cloneNode(true));
 
   let currentParent = targetNode.element;
   while (currentParent.parentElement && !['line', 'block'].includes(currentParent.getAttribute('data-type') || '')) {
@@ -49,12 +62,16 @@ function addInlineImagePreview(currentInput: MarkdownTextInputElement, targetNod
     imageHref = text.substring(linkRange.start, linkRange.start + linkRange.length);
   }
 
+  const imageMarginTop = parseStringWithUnitToNumber(`${markdownStyle.inlineImage?.marginTop}`);
+  const imageMarginBottom = parseStringWithUnitToNumber(`${markdownStyle.inlineImage?.marginBottom}`);
+
   // If the inline image markdown with the same href exists in the current input, use it instead of creating new one.
   // Prevents from image flickering and layout jumps
   const alreadyLoadedPreview = currentInput.querySelector(`img[src="${imageHref}"]`);
   const loadedImageContainer = alreadyLoadedPreview?.parentElement;
+
   if (loadedImageContainer && loadedImageContainer.getAttribute('data-type') === 'inline-container') {
-    return updateImageTreeNode(targetNode, loadedImageContainer as HTMLMarkdownElement);
+    return updateImageTreeNode(targetNode, loadedImageContainer as HTMLMarkdownElement, imageMarginTop);
   }
 
   // Add a loading spinner
@@ -63,18 +80,13 @@ function addInlineImagePreview(currentInput: MarkdownTextInputElement, targetNod
     targetNode.element.appendChild(spinner);
   }
 
-  const maxWidth = markdownStyle.inlineImage?.maxWidth;
-  const maxHeight = markdownStyle.inlineImage?.maxHeight;
-  const imageMarginTop = parseStringWithUnitToNumber(`${markdownStyle.inlineImage?.marginTop}`);
-  const imageMarginBottom = parseStringWithUnitToNumber(`${markdownStyle.inlineImage?.marginBottom}`);
-
   Object.assign(targetNode.element.style, {
     display: 'block',
     marginBottom: `${imageMarginBottom}px`,
     paddingBottom: markdownStyle.loadingIndicatorContainer?.height || markdownStyle.loadingIndicator?.height || (!!markdownStyle.loadingIndicator && '30px') || undefined,
   });
 
-  createImageElement(imageHref, (imageContainer) => {
+  createImageElement(targetNode, imageHref, (imageContainer, err) => {
     // Verify if the current spinner is for the loaded image. If not, it means that the response came after the user changed the image url
     const currentSpinner = currentInput.querySelector('[data-type="spinner"]');
     // Remove the spinner
@@ -82,28 +94,37 @@ function addInlineImagePreview(currentInput: MarkdownTextInputElement, targetNod
       currentSpinner.remove();
     }
 
+    const img = imageContainer.firstChild as HTMLImageElement;
+    const {minHeight, minWidth, maxHeight, maxWidth, borderRadius} = markdownStyle.inlineImage || {};
+    const imgStyle = {
+      minHeight,
+      minWidth,
+      maxHeight,
+      maxWidth,
+      borderRadius,
+    };
+
     // Set the image styles
     Object.assign(imageContainer.style, {
       ...inlineImageDefaultStyles,
-      maxHeight,
-      maxWidth,
+      ...(err && {
+        ...imgStyle,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }),
     });
 
-    const img = imageContainer.firstChild as HTMLImageElement;
-    Object.assign(img.style, {
-      maxHeight,
-      maxWidth,
-    });
+    Object.assign(img.style, !err && imgStyle);
 
     targetNode.element.appendChild(imageContainer);
 
-    const imageHeight = `${imageContainer.clientHeight + imageMarginTop}px`;
     Object.assign(imageContainer.style, {
-      height: imageHeight,
+      height: `${imageContainer.clientHeight}px`,
     });
     // Set paddingBottom to the height of the image so it's displayed under the block
     Object.assign(targetNode.element.style, {
-      paddingBottom: imageHeight,
+      paddingBottom: `${imageContainer.clientHeight + imageMarginTop}px`,
     });
   });
 
