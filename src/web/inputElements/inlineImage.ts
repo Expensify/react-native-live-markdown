@@ -119,17 +119,31 @@ function addInlineImagePreview(currentInput: MarkdownTextInputElement, targetNod
 
     targetNode.element.appendChild(imageContainer);
 
+    const imageClientHeight = Math.max(img.clientHeight, imageContainer.clientHeight);
     Object.assign(imageContainer.style, {
-      height: `${imageContainer.clientHeight}px`,
+      height: `${imageClientHeight}px`,
     });
     // Set paddingBottom to the height of the image so it's displayed under the block
     Object.assign(targetNode.element.style, {
-      paddingBottom: `${imageContainer.clientHeight + imageMarginTop}px`,
+      paddingBottom: `${imageClientHeight + imageMarginTop}px`,
     });
   });
 
   return targetNode;
 }
 
+function forceRefreshAllImages(currentInput: MarkdownTextInputElement) {
+  currentInput.querySelectorAll('img').forEach((img) => {
+    // force image reload only if broken image icon is displayed
+    if (img.naturalWidth > 0) {
+      return;
+    }
+
+    const url = img.src;
+    // eslint-disable-next-line no-param-reassign
+    img.src = `${url}#`;
+  });
+}
+
 // eslint-disable-next-line import/prefer-default-export
-export {addInlineImagePreview};
+export {addInlineImagePreview, forceRefreshAllImages};
