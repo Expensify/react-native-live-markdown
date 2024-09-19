@@ -27,7 +27,7 @@ function getImagePreviewElement(targetElement: HTMLMarkdownElement) {
 function createImageElement(targetNode: TreeNode, url: string, callback: (img: HTMLElement, err?: string | Event) => void) {
   if (timeoutMap.has(targetNode.orderIndex)) {
     const mapItem = timeoutMap.get(targetNode.orderIndex);
-    // Check if the image url has been changed, if not early return so the image can load asynchronously
+    // Check if the image URL has been changed, if not, early return so the image can be loaded asynchronously
     const currentElement = document.querySelector(`[data-type="block"][data-id="${targetNode.orderIndex}"]`) as HTMLMarkdownElement;
     if (mapItem?.url === url && currentElement && getImagePreviewElement(currentElement)) {
       return;
@@ -108,7 +108,7 @@ function addInlineImagePreview(currentInput: MarkdownTextInputElement, targetNod
   createImageElement(targetNode, imageHref, (imageContainer, err) => {
     let targetElement = targetNode.element;
 
-    // Update the target element if input structure was updated while the image was loading and its content haven't changed
+    // Update the target element if the input structure was changed while the image was loading and its content hasn't changed
     if (!targetElement.isConnected) {
       const currentElement = currentInput.querySelector(`[data-type="block"][data-id="${targetNode.orderIndex}"]`) as HTMLMarkdownElement;
 
@@ -117,7 +117,7 @@ function addInlineImagePreview(currentInput: MarkdownTextInputElement, targetNod
       if (currentElementURL && targetElementURL && currentElementURL === targetElementURL) {
         targetElement = currentElement;
       } else {
-        return; // Cancel expired image preview if the content has changed befo
+        return; // Prevent adding expired image previews to the input structure
       }
     }
 
