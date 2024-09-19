@@ -13,11 +13,27 @@ const inlineImageDefaultStyles = {
   left: 0,
 };
 
-const timeoutMap = new Map<string, NodeJS.Timeout>();
+type DebouncePreviewItem = {
+  timeout: NodeJS.Timeout;
+  url: string;
+};
+
+const timeoutMap = new Map<string, DebouncePreviewItem>();
+
+function getImagePreviewElement(targetElement: HTMLMarkdownElement) {
+  return Array.from(targetElement?.childNodes || []).find((el) => (el as HTMLElement)?.contentEditable === 'false');
+}
 
 function createImageElement(targetNode: TreeNode, url: string, callback: (img: HTMLElement, err?: string | Event) => void) {
   if (timeoutMap.has(targetNode.orderIndex)) {
-    clearTimeout(timeoutMap.get(targetNode.orderIndex));
+    const mapItem = timeoutMap.get(targetNode.orderIndex);
+    // Check if the image url has been changed, if not early return so the image can load asynchronously
+    const currentElement = document.querySelector(`[data-type="block"][data-id="${targetNode.orderIndex}"]`) as HTMLMarkdownElement;
+    if (mapItem?.url === url && currentElement && getImagePreviewElement(currentElement)) {
+      return;
+    }
+
+    clearTimeout(mapItem?.timeout);
     timeoutMap.delete(targetNode.orderIndex);
   }
 
@@ -35,7 +51,10 @@ function createImageElement(targetNode: TreeNode, url: string, callback: (img: H
     img.src = url;
     timeoutMap.delete(targetNode.orderIndex);
   }, INLINE_IMAGE_PREVIEW_DEBOUNCE_TIME_MS);
-  timeoutMap.set(targetNode.orderIndex, timeout);
+  timeoutMap.set(targetNode.orderIndex, {
+    timeout,
+    url,
+  });
 }
 
 /** Adds already loaded image element from current input content to the tree node */
@@ -87,8 +106,21 @@ function addInlineImagePreview(currentInput: MarkdownTextInputElement, targetNod
   });
 
   createImageElement(targetNode, imageHref, (imageContainer, err) => {
+    let targetElement = targetNode.element;
+
+    // Update the target element if input structure was updated while the image was loading and its content haven't changed
+    if (!targetElement.isConnected) {
+      const currentElement = currentInput.querySelector(`[data-type="block"][data-id="${targetNode.orderIndex}"]`) as HTMLMarkdownElement;
+      if (getImagePreviewElement(currentElement)?.textContent === getImagePreviewElement(targetNode.element)?.textContent) {
+        targetElement = currentElement;
+      } else {
+        return; // Cancel expired image preview if the content has changed befo
+      }
+    }
+
     // Verify if the current spinner is for the loaded image. If not, it means that the response came after the user changed the image url
     const currentSpinner = currentInput.querySelector('[data-type="spinner"]');
+
     // Remove the spinner
     if (currentSpinner) {
       currentSpinner.remove();
@@ -117,14 +149,14 @@ function addInlineImagePreview(currentInput: MarkdownTextInputElement, targetNod
 
     Object.assign(img.style, !err && imgStyle);
 
-    targetNode.element.appendChild(imageContainer);
+    targetElement.appendChild(imageContainer);
 
     const imageClientHeight = Math.max(img.clientHeight, imageContainer.clientHeight);
     Object.assign(imageContainer.style, {
       height: `${imageClientHeight}px`,
     });
     // Set paddingBottom to the height of the image so it's displayed under the block
-    Object.assign(targetNode.element.style, {
+    Object.assign(targetElement.style, {
       paddingBottom: `${imageClientHeight + imageMarginTop}px`,
     });
   });
