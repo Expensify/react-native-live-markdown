@@ -112,9 +112,9 @@ function addInlineImagePreview(currentInput: MarkdownTextInputElement, targetNod
     if (!targetElement.isConnected) {
       const currentElement = currentInput.querySelector(`[data-type="block"][data-id="${targetNode.orderIndex}"]`) as HTMLMarkdownElement;
 
-      const currentElementSpinner = getImagePreviewElement(currentElement);
-      const targetElementSpinner = getImagePreviewElement(targetNode.element);
-      if (currentElementSpinner && targetElementSpinner && currentElementSpinner.getAttribute('data-url') && targetElementSpinner.getAttribute('data-url')) {
+      const currentElementURL = getImagePreviewElement(currentElement)?.getAttribute('data-url');
+      const targetElementURL = getImagePreviewElement(targetNode.element)?.getAttribute('data-url');
+      if (currentElementURL && targetElementURL && currentElementURL === targetElementURL) {
         targetElement = currentElement;
       } else {
         return; // Cancel expired image preview if the content has changed befo
@@ -122,7 +122,7 @@ function addInlineImagePreview(currentInput: MarkdownTextInputElement, targetNod
     }
 
     // Verify if the current spinner is for the loaded image. If not, it means that the response came after the user changed the image url
-    const currentSpinner = currentInput.querySelector('[data-type="spinner"]');
+    const currentSpinner = currentInput.querySelector(`[data-type="spinner"][data-url="${imageHref}"]`);
 
     // Remove the spinner
     if (currentSpinner) {
