@@ -6,7 +6,6 @@ import {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition} from './cu
 import {addStyleToBlock} from './blockUtils';
 import type {MarkdownRange, MarkdownType} from '../../commonTypes';
 import {handleCustomStyles} from './webStyleUtils';
-import BrowserUtils from './browserUtils';
 
 type Paragraph = {
   text: string;
@@ -203,7 +202,6 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
       // create markdown span element
       const span = document.createElement('span') as HTMLMarkdownElement;
       span.setAttribute('data-type', range.type);
-      // tutaj był spanNode - to moze byc problematyczne
       const spanNode = appendNode(span, currentParentNode, range.type, range.length);
       if (!disableInlineStyles) {
         addStyleToBlock(span, range.type, markdownStyle);
@@ -218,8 +216,7 @@ function parseRangesToHTMLNodes(text: string, ranges: MarkdownRange[], markdownS
         addTextToElement(spanNode, text.substring(range.start, endOfCurrentRange));
         if (range.type === 'pre') {
           // this property is used for code block background - only chromium displays single \n at the end of a block as a new line, hence this if check
-          span.setAttribute('data-content', text.substring(range.start, BrowserUtils.isChromium ? endOfCurrentRange - 1 : endOfCurrentRange));
-          console.log('test:', JSON.stringify(text.substring(range.start, BrowserUtils.isChromium ? endOfCurrentRange - 1 : endOfCurrentRange)));
+          span.setAttribute('data-content', text.substring(range.start, endOfCurrentRange));
         }
         currentParentNode.element.value = (currentParentNode.element.value || '') + (spanNode.element.value || '');
         lastRangeEndIndex = endOfCurrentRange;

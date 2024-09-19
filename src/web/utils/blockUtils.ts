@@ -45,15 +45,16 @@ function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownSty
       });
       break;
     case 'code':
-      Object.assign(node.style, markdownStyle.code);
+      Object.assign(node.style, {...markdownStyle.code, lineHeight: 1.5});
       break;
     case 'pre':
       Object.assign(node.style, {
         ...markdownStyle.pre,
         backgroundColor: 'transparent',
+        padding: 0,
       });
       Object.assign((node.parentNode as HTMLElement).style, {
-        padding: '5px',
+        padding: '3px',
       });
       break;
 

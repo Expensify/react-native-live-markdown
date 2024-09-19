@@ -109,7 +109,7 @@ function generateCodeBlocksRules(target: MarkdownTextInputElement, styleTag: HTM
 
   const lineHeight = line.getBoundingClientRect()?.height;
   const preStyles = markdownStyle.pre;
-  const padding = preStyles?.padding ?? 5;
+  const padding = preStyles?.padding ?? 3;
 
   const rules: Rule[] = [
     {

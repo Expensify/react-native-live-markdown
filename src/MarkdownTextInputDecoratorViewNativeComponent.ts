@@ -27,6 +27,11 @@ interface MarkdownStyle {
     fontSize: Float;
     color: ColorValue;
     backgroundColor: ColorValue;
+    borderColor: ColorValue;
+    borderWidth: Float;
+    borderRadius: Float;
+    borderStyle: string;
+    padding: Float;
   };
   pre: {
     fontFamily: string;
