@@ -21,7 +21,7 @@ type DebouncePreviewItem = {
 const timeoutMap = new Map<string, DebouncePreviewItem>();
 
 function getImagePreviewElement(targetElement: HTMLMarkdownElement) {
-  return Array.from(targetElement?.childNodes || []).find((el) => (el as HTMLElement)?.contentEditable === 'false');
+  return Array.from(targetElement?.childNodes || []).find((el) => (el as HTMLElement)?.contentEditable === 'false') as HTMLMarkdownElement | undefined;
 }
 
 function createImageElement(targetNode: TreeNode, url: string, callback: (img: HTMLElement, err?: string | Event) => void) {
@@ -111,7 +111,10 @@ function addInlineImagePreview(currentInput: MarkdownTextInputElement, targetNod
     // Update the target element if input structure was updated while the image was loading and its content haven't changed
     if (!targetElement.isConnected) {
       const currentElement = currentInput.querySelector(`[data-type="block"][data-id="${targetNode.orderIndex}"]`) as HTMLMarkdownElement;
-      if (getImagePreviewElement(currentElement)?.textContent === getImagePreviewElement(targetNode.element)?.textContent) {
+
+      const currentElementSpinner = getImagePreviewElement(currentElement);
+      const targetElementSpinner = getImagePreviewElement(targetNode.element);
+      if (currentElementSpinner && targetElementSpinner && currentElementSpinner.getAttribute('data-url') && targetElementSpinner.getAttribute('data-url')) {
         targetElement = currentElement;
       } else {
         return; // Cancel expired image preview if the content has changed befo
