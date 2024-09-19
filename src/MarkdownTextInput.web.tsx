@@ -659,14 +659,14 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
     useEffect(() => {
       const handleReconnect = () => {
-        forceRefreshAllImages(divRef.current as MarkdownTextInputElement);
+        forceRefreshAllImages(divRef.current as MarkdownTextInputElement, processedMarkdownStyle);
       };
 
       window.addEventListener('online', handleReconnect);
       return () => {
         window.removeEventListener('online', handleReconnect);
       };
-    }, []);
+    }, [processedMarkdownStyle]);
 
     return (
       // eslint-disable-next-line jsx-a11y/no-static-element-interactions
