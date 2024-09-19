@@ -9,9 +9,10 @@ import type {
   TextInputKeyPressEventData,
   TextInputFocusEventData,
   TextInputContentSizeChangeEventData,
+  GestureResponderEvent,
 } from 'react-native';
 import React, {useEffect, useRef, useCallback, useMemo, useLayoutEffect, useState} from 'react';
-import type {CSSProperties, MutableRefObject, ReactEventHandler, FocusEventHandler, MouseEvent, KeyboardEvent, SyntheticEvent, ClipboardEventHandler} from 'react';
+import type {CSSProperties, MutableRefObject, ReactEventHandler, FocusEventHandler, MouseEvent, KeyboardEvent, SyntheticEvent, ClipboardEventHandler, TouchEvent} from 'react';
 import {StyleSheet} from 'react-native';
 import {updateInputStructure} from './web/utils/parserUtils';
 import InputHistory from './web/InputHistory';
@@ -100,6 +101,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       onContentSizeChange,
       id,
       inputMode,
+      onTouchStart,
     },
     ref,
   ) => {
@@ -151,7 +153,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         if (text === null) {
           return {text: divRef.current.value, cursorPosition: null};
         }
-        const parsedText = updateInputStructure(target, text, cursorPosition, customMarkdownStyles, false, shouldForceDOMUpdate);
+        const parsedText = updateInputStructure(target, text, cursorPosition, multiline, customMarkdownStyles, false, shouldForceDOMUpdate);
         divRef.current.value = parsedText.text;
 
         if (history.current && shouldAddToHistory) {
@@ -160,7 +162,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
         return parsedText;
       },
-      [],
+      [multiline],
     );
 
     const processedMarkdownStyle = useMemo(() => {
@@ -289,14 +291,19 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
         updateTextColor(divRef.current, e.target.textContent ?? '');
         const previousText = divRef.current.value;
-        const parsedText = normalizeValue(inputType === 'pasteText' ? pasteContent.current || '' : parseInnerHTMLToText(e.target as MarkdownTextInputElement));
+        const parsedText = normalizeValue(
+          inputType === 'pasteText' ? pasteContent.current || '' : parseInnerHTMLToText(e.target as MarkdownTextInputElement, inputType, contentSelection.current.start),
+        );
 
         if (pasteContent.current) {
           pasteContent.current = null;
         }
 
         const prevSelection = contentSelection.current ?? {start: 0, end: 0};
-        const newCursorPosition = Math.max(Math.max(contentSelection.current.end, 0) + (parsedText.length - previousText.length), 0);
+        const newCursorPosition =
+          inputType === 'deleteContentForward' && contentSelection.current.start === contentSelection.current.end
+            ? Math.max(contentSelection.current.start, 0) // Don't move the caret when deleting forward with no characters selected
+            : Math.max(Math.max(contentSelection.current.end, 0) + (parsedText.length - previousText.length), 0);
 
         if (compositionRef.current) {
           updateTextColor(divRef.current, parsedText);
@@ -587,6 +594,14 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       divRef.current = r as MarkdownTextInputElement;
     };
 
+    const handleTouchStart = (event: TouchEvent<HTMLDivElement>) => {
+      if (!onTouchStart) {
+        return;
+      }
+      const e = event as unknown as GestureResponderEvent;
+      onTouchStart(e);
+    };
+
     useClientEffect(
       function parseAndStyleValue() {
         if (!divRef.current || value === divRef.current.value) {
@@ -678,6 +693,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         dir={dir}
         inputMode={inputMode}
         onSelect={updateSelection}
+        onTouchStart={handleTouchStart}
       />
     );
   },

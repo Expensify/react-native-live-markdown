@@ -1,7 +1,7 @@
 import type {HTMLMarkdownElement} from '../../MarkdownTextInput.web';
 import type {MarkdownRange, MarkdownType} from '../../commonTypes';
 
-type NodeType = MarkdownType | 'line' | 'text' | 'br' | 'root';
+type NodeType = MarkdownType | 'line' | 'text' | 'br' | 'block' | 'root';
 
 type TreeNode = Omit<MarkdownRange, 'type'> & {
   element: HTMLMarkdownElement;
@@ -21,7 +21,7 @@ function addNodeToTree(element: HTMLMarkdownElement, parentTreeNode: TreeNode, t
     const lastParentChild = parentTreeNode.childNodes[parentChildrenCount - 1];
     if (lastParentChild) {
       startIndex = lastParentChild.start + lastParentChild.length;
-      startIndex += lastParentChild.isGeneratingNewline || element.style.display === 'block' ? 1 : 0;
+      startIndex += lastParentChild.isGeneratingNewline || (type !== 'block' && element.style.display === 'block') ? 1 : 0;
     }
   }
 

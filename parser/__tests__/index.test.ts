@@ -401,6 +401,7 @@ describe('trailing whitespace', () => {
 describe('inline image', () => {
   test('with alt text', () => {
     expect('![test](https://example.com/image.png)').toBeParsedAs([
+      {type: 'inline-image', start: 0, length: 38},
       {type: 'syntax', start: 0, length: 1},
       {type: 'syntax', start: 1, length: 1},
       {type: 'syntax', start: 6, length: 1},
@@ -412,6 +413,7 @@ describe('inline image', () => {
 
   test('without alt text', () => {
     expect('![](https://example.com/image.png)').toBeParsedAs([
+      {type: 'inline-image', start: 0, length: 34},
       {type: 'syntax', start: 0, length: 1},
       {type: 'syntax', start: 1, length: 1},
       {type: 'syntax', start: 2, length: 1},
@@ -423,6 +425,7 @@ describe('inline image', () => {
 
   test('with same alt text as src', () => {
     expect('![https://example.com/image.png](https://example.com/image.png)').toBeParsedAs([
+      {type: 'inline-image', start: 0, length: 63},
       {type: 'syntax', start: 0, length: 1},
       {type: 'syntax', start: 1, length: 1},
       {type: 'syntax', start: 31, length: 1},
@@ -434,12 +437,14 @@ describe('inline image', () => {
 
   test('text containing images', () => {
     expect('An image of a banana: ![banana](https://example.com/banana.png) an image of a developer: ![dev](https://example.com/developer.png)').toBeParsedAs([
+      {type: 'inline-image', start: 22, length: 41},
       {type: 'syntax', start: 22, length: 1},
       {type: 'syntax', start: 23, length: 1},
       {type: 'syntax', start: 30, length: 1},
       {type: 'syntax', start: 31, length: 1},
       {type: 'link', start: 32, length: 30},
       {type: 'syntax', start: 62, length: 1},
+      {type: 'inline-image', start: 89, length: 41},
       {type: 'syntax', start: 89, length: 1},
       {type: 'syntax', start: 90, length: 1},
       {type: 'syntax', start: 94, length: 1},
@@ -451,6 +456,7 @@ describe('inline image', () => {
 
   test('with alt text containing markdown', () => {
     expect('![# fake-heading *bold* _italic_ ~strike~ [:-)]](https://example.com/image.png)').toBeParsedAs([
+      {type: 'inline-image', start: 0, length: 79},
       {type: 'syntax', start: 0, length: 1},
       {type: 'syntax', start: 1, length: 1},
       {type: 'syntax', start: 47, length: 1},
@@ -462,6 +468,7 @@ describe('inline image', () => {
 
   test('text containing image and autolink', () => {
     expect('An image of a banana: ![banana](https://example.com/banana.png) an autolink: example.com').toBeParsedAs([
+      {type: 'inline-image', start: 22, length: 41},
       {type: 'syntax', start: 22, length: 1},
       {type: 'syntax', start: 23, length: 1},
       {type: 'syntax', start: 30, length: 1},
@@ -482,6 +489,7 @@ describe('inline image', () => {
 
   test('trying to inject additional attributes', () => {
     expect('![test" onerror="alert(\'xss\')](https://example.com/image.png)').toBeParsedAs([
+      {type: 'inline-image', start: 0, length: 61},
       {type: 'syntax', start: 0, length: 1},
       {type: 'syntax', start: 1, length: 1},
       {type: 'syntax', start: 29, length: 1},
@@ -493,6 +501,7 @@ describe('inline image', () => {
 
   test('inline code in alt', () => {
     expect('![`code`](https://example.com/image.png)').toBeParsedAs([
+      {type: 'inline-image', start: 0, length: 40},
       {type: 'syntax', start: 0, length: 1},
       {type: 'syntax', start: 1, length: 1},
       {type: 'syntax', start: 8, length: 1},
@@ -504,6 +513,7 @@ describe('inline image', () => {
 
   test('blockquote in alt', () => {
     expect('![```test```](https://example.com/image.png)').toBeParsedAs([
+      {type: 'inline-image', start: 0, length: 44},
       {type: 'syntax', start: 0, length: 1},
       {type: 'syntax', start: 1, length: 1},
       {type: 'syntax', start: 12, length: 1},
@@ -515,6 +525,7 @@ describe('inline image', () => {
 
   test('image without alt text', () => {
     expect('!(https://example.com/image.png)').toBeParsedAs([
+      {type: 'inline-image', start: 0, length: 32},
       {type: 'syntax', start: 0, length: 1},
       {type: 'syntax', start: 1, length: 1},
       {type: 'link', start: 2, length: 29},
@@ -526,6 +537,7 @@ describe('inline image', () => {
     expect('# ![](example.com)').toBeParsedAs([
       {type: 'syntax', start: 0, length: 2},
       {type: 'h1', start: 2, length: 16},
+      {type: 'inline-image', start: 2, length: 16},
       {type: 'syntax', start: 2, length: 1},
       {type: 'syntax', start: 3, length: 1},
       {type: 'syntax', start: 4, length: 1},
