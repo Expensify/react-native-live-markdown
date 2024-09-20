@@ -111,6 +111,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     const history = useRef<InputHistory>();
     const dimensions = useRef<Dimensions | null>(null);
     const pasteContent = useRef<string | null>(null);
+    const hasJustFocused = useRef<boolean>(false);
 
     if (!history.current) {
       history.current = new InputHistory(100, 150, value || '');
@@ -260,6 +261,19 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         }
       },
       [handleSelectionChange, updateRefSelectionVariables],
+    );
+
+    const handleOnSelect = useCallback(
+      (e) => {
+        updateSelection(e);
+
+        // If the input has just been focused, we need to scroll the cursor into view
+        if (divRef.current && contentSelection.current && hasJustFocused.current) {
+          setCursorPosition(divRef.current, contentSelection.current?.start, contentSelection.current?.end, true);
+          hasJustFocused.current = false;
+        }
+      },
+      [updateSelection],
     );
 
     const handleContentSizeChange = useCallback(() => {
@@ -457,6 +471,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
     const handleFocus: FocusEventHandler<HTMLDivElement> = useCallback(
       (event) => {
+        hasJustFocused.current = true;
         const e = event as unknown as NativeSyntheticEvent<TextInputFocusEventData>;
         const hostNode = e.target as unknown as HTMLDivElement;
         currentlyFocusedField.current = hostNode;
@@ -692,7 +707,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         spellCheck={spellCheck}
         dir={dir}
         inputMode={inputMode}
-        onSelect={updateSelection}
+        onSelect={handleOnSelect}
         onTouchStart={handleTouchStart}
       />
     );
