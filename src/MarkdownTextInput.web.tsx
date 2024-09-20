@@ -464,9 +464,15 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           if (contentSelection.current) {
             setCursorPosition(divRef.current, contentSelection.current.start, contentSelection.current.end);
           } else {
-            const valueLength = value ? value.length : divRef.current.value.length;
+            const valueLength = value ? value.length : (divRef.current.value || '').length;
             setCursorPosition(divRef.current, valueLength, null);
           }
+        }
+
+        if (divRef.current) {
+          divRef.current.scrollIntoView({
+            block: 'nearest',
+          });
         }
 
         if (onFocus) {
