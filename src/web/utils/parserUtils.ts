@@ -266,7 +266,7 @@ function parseRangesToHTMLNodes(
   return {dom: rootElement, tree: rootNode};
 }
 
-function moveCursor(isFocused: boolean, alwaysMoveCursorToTheEnd: boolean, cursorPosition: number | null, target: MarkdownTextInputElement) {
+function moveCursor(isFocused: boolean, alwaysMoveCursorToTheEnd: boolean, cursorPosition: number | null, target: MarkdownTextInputElement, shouldScrollIntoView = false) {
   if (!isFocused) {
     return;
   }
@@ -274,7 +274,7 @@ function moveCursor(isFocused: boolean, alwaysMoveCursorToTheEnd: boolean, curso
   if (alwaysMoveCursorToTheEnd || cursorPosition === null) {
     moveCursorToEnd(target);
   } else if (cursorPosition !== null) {
-    setCursorPosition(target, cursorPosition);
+    setCursorPosition(target, cursorPosition, null, shouldScrollIntoView);
   }
 }
 
@@ -286,6 +286,7 @@ function updateInputStructure(
   markdownStyle: PartialMarkdownStyle = {},
   alwaysMoveCursorToTheEnd = false,
   shouldForceDOMUpdate = false,
+  shouldScrollIntoView = false,
 ) {
   const targetElement = target;
 
@@ -317,7 +318,7 @@ function updateInputStructure(
     updateTreeElementRefs(tree, targetElement);
     targetElement.tree = tree;
 
-    moveCursor(isFocused, alwaysMoveCursorToTheEnd, cursorPosition, targetElement);
+    moveCursor(isFocused, alwaysMoveCursorToTheEnd, cursorPosition, targetElement, shouldScrollIntoView);
   }
 
   return {text, cursorPosition: cursorPosition || 0};
