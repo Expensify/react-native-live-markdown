@@ -23,6 +23,7 @@ import './web/MarkdownTextInput.css';
 import type {MarkdownStyle} from './MarkdownTextInputDecoratorViewNativeComponent';
 import {getElementHeight, getPlaceholderValue, isEventComposing, normalizeValue, parseInnerHTMLToText} from './web/utils/inputUtils';
 import {parseToReactDOMStyle, processMarkdownStyle} from './web/utils/webStyleUtils';
+import {forceRefreshAllImages} from './web/inputElements/inlineImage';
 
 const useClientEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
 
@@ -664,6 +665,17 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       updateRefSelectionVariables(newSelection);
       setCursorPosition(divRef.current, newSelection.start, newSelection.end);
     }, [selection, updateRefSelectionVariables]);
+
+    useEffect(() => {
+      const handleReconnect = () => {
+        forceRefreshAllImages(divRef.current as MarkdownTextInputElement, processedMarkdownStyle);
+      };
+
+      window.addEventListener('online', handleReconnect);
+      return () => {
+        window.removeEventListener('online', handleReconnect);
+      };
+    }, [processedMarkdownStyle]);
 
     return (
       // eslint-disable-next-line jsx-a11y/no-static-element-interactions
