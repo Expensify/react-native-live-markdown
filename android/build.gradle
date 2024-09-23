@@ -152,6 +152,7 @@ android {
       "**/libjsi.so",
       "**/libreactnativejni.so",
       "**/libreact_nativemodule_core.so",
+      "**/libruntimeexecutor.so",
       "**/libworklets.so",
     ]
   }
