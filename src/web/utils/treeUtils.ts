@@ -43,16 +43,22 @@ function addNodeToTree(element: HTMLMarkdownElement, parentTreeNode: TreeNode, t
 
 function updateTreeElementRefs(treeRoot: TreeNode, element: HTMLMarkdownElement) {
   const stack: TreeNode[] = [treeRoot];
+  const treeElements = element.querySelectorAll('[data-id], [data-id] *') as NodeListOf<HTMLMarkdownElement>;
+  const treeElementsMapByDataID: Record<string, HTMLMarkdownElement> = {};
+  treeElements.forEach((el) => {
+    if (!el.getAttribute('data-id')) {
+      return;
+    }
+    treeElementsMapByDataID[el.getAttribute('data-id') || ''] = el;
+  });
   while (stack.length > 0) {
     const node = stack.pop() as TreeNode;
     stack.push(...node.childNodes);
 
-    const currentElement = element.querySelector(`[data-id="${node.orderIndex}"]`) as HTMLMarkdownElement;
-    node.element = currentElement;
-
-    node.childNodes.forEach((child) => {
-      stack.push(child);
-    });
+    const currentElement = treeElementsMapByDataID[node.orderIndex];
+    if (currentElement) {
+      node.element = currentElement;
+    }
   }
 
   return treeRoot;
