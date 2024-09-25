@@ -25,42 +25,41 @@ public class MarkdownStyle {
 
   @ColorInt
   private final int mBlockquoteBorderColor;
-
   private final float mBlockquoteBorderWidth;
-
   private final float mBlockquoteMarginLeft;
-
   private final float mBlockquotePaddingLeft;
 
   private final String mCodeFontFamily;
-
   private final float mCodeFontSize;
-
   @ColorInt
   private final int mCodeColor;
-
   @ColorInt
   private final int mCodeBackgroundColor;
+  @ColorInt
+  private final int mCodeBorderColor;
+  private final float mCodeBorderWidth;
+  private final float mCodeBorderRadius;
+  private final float mCodePadding;
 
   private final String mPreFontFamily;
-
   private final float mPreFontSize;
-
   @ColorInt
   private final int mPreColor;
-
   @ColorInt
   private final int mPreBackgroundColor;
+  @ColorInt
+  private final int mPreBorderColor;
+  private final float mPreBorderWidth;
+  private final float mPreBorderRadius;
+  private final float mPrePadding;
 
   @ColorInt
   private final int mMentionHereColor;
-
   @ColorInt
   private final int mMentionHereBackgroundColor;
 
   @ColorInt
   private final int mMentionUserColor;
-
   @ColorInt
   private final int mMentionUserBackgroundColor;
 
@@ -83,10 +82,18 @@ public class MarkdownStyle {
     mCodeFontSize = parseFloat(map, "code", "fontSize");
     mCodeColor = parseColor(map, "code", "color", context);
     mCodeBackgroundColor = parseColor(map, "code", "backgroundColor", context);
+    mCodeBorderColor = parseColor(map, "code", "borderColor", context);
+    mCodeBorderWidth = parseFloat(map, "code", "borderWidth");
+    mCodeBorderRadius = parseFloat(map, "code", "borderRadius");
+    mCodePadding = parseFloat(map, "code", "padding");
     mPreFontFamily = parseString(map, "pre", "fontFamily");
     mPreFontSize = parseFloat(map, "pre", "fontSize");
     mPreColor = parseColor(map, "pre", "color", context);
     mPreBackgroundColor = parseColor(map, "pre", "backgroundColor", context);
+    mPreBorderColor = parseColor(map, "pre", "borderColor", context);
+    mPreBorderWidth = parseFloat(map, "pre", "borderWidth");
+    mPreBorderRadius = parseFloat(map, "pre", "borderRadius");
+    mPrePadding = parseFloat(map, "pre", "padding");
     mMentionHereColor = parseColor(map, "mentionHere", "color", context);
     mMentionHereBackgroundColor = parseColor(map, "mentionHere", "backgroundColor", context);
     mMentionUserColor = parseColor(map, "mentionUser", "color", context);
@@ -99,14 +106,11 @@ public class MarkdownStyle {
     ReadableMap style = map.getMap(key);
     Objects.requireNonNull(style);
     Dynamic value = style.getDynamic(prop);
-    switch (value.getType()) {
-      case Number:
-        return ColorPropConverter.getColor(value.asDouble(), context);
-      case Map:
-        return ColorPropConverter.getColor(value.asMap(), context);
-      default:
-        throw new JSApplicationCausedNativeException("ColorValue: the value must be a number or Object.");
-    }
+    return switch (value.getType()) {
+      case Number -> ColorPropConverter.getColor(value.asDouble(), context);
+      case Map -> ColorPropConverter.getColor(value.asMap(), context);
+      default -> throw new JSApplicationCausedNativeException("ColorValue: the value must be a number or Object.");
+    };
   }
 
   private static float parseFloat(@NonNull ReadableMap map, @NonNull String key, @NonNull String prop) {
@@ -175,6 +179,23 @@ public class MarkdownStyle {
     return mCodeBackgroundColor;
   }
 
+  @ColorInt
+  public int getCodeBorderColor() {
+    return mCodeBorderColor;
+  }
+
+  public float getCodeBorderWidth() {
+    return mCodeBorderWidth;
+  }
+
+  public float getCodeBorderRadius() {
+    return mCodeBorderRadius;
+  }
+
+  public float getCodePadding() {
+    return mCodePadding;
+  }
+
   public String getPreFontFamily() {
     return mPreFontFamily;
   }
@@ -191,6 +212,23 @@ public class MarkdownStyle {
   @ColorInt
   public int getPreBackgroundColor() {
     return mPreBackgroundColor;
+  }
+
+  @ColorInt
+  public int getPreBorderColor() {
+    return mPreBorderColor;
+  }
+
+  public float getPreBorderWidth() {
+    return mPreBorderWidth;
+  }
+
+  public float getPreBorderRadius() {
+    return mPreBorderRadius;
+  }
+
+  public float getPrePadding() {
+    return mPrePadding;
   }
 
   @ColorInt
