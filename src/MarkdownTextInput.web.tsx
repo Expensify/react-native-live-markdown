@@ -141,18 +141,13 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     const parseText = useCallback(
       (
         target: MarkdownTextInputElement,
-        textValue: string | null,
-        maxLen: number | null = null,
+        text: string | null,
         customMarkdownStyles: MarkdownStyle,
         cursorPosition: number | null = null,
         shouldAddToHistory = true,
         shouldForceDOMUpdate = false,
         shouldScrollIntoView = false,
       ): ParseTextResult => {
-        let text = textValue ?? null;
-        if (textValue !== null && typeof maxLen === 'number' && textValue?.length > maxLen) {
-          text = textValue.slice(0, maxLen);
-        }
         if (!divRef.current) {
           return {text: text || '', cursorPosition: null};
         }
@@ -175,10 +170,10 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     const processedMarkdownStyle = useMemo(() => {
       const newMarkdownStyle = processMarkdownStyle(markdownStyle);
       if (divRef.current) {
-        parseText(divRef.current, divRef.current.value, maxLength, newMarkdownStyle, null, false, false);
+        parseText(divRef.current, divRef.current.value, newMarkdownStyle, null, false, false);
       }
       return newMarkdownStyle;
-    }, [markdownStyle, parseText, maxLength]);
+    }, [markdownStyle, parseText]);
 
     const inputStyles = useMemo(
       () =>
@@ -204,9 +199,9 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         }
         const item = history.current.undo();
         const undoValue = item ? item.text : null;
-        return parseText(target, undoValue, maxLength, processedMarkdownStyle, item ? item.cursorPosition : null, false);
+        return parseText(target, undoValue, processedMarkdownStyle, item ? item.cursorPosition : null, false);
       },
-      [parseText, processedMarkdownStyle, maxLength],
+      [parseText, processedMarkdownStyle],
     );
 
     const redo = useCallback(
@@ -219,9 +214,9 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         }
         const item = history.current.redo();
         const redoValue = item ? item.text : null;
-        return parseText(target, redoValue, maxLength, processedMarkdownStyle, item ? item.cursorPosition : null, false);
+        return parseText(target, redoValue, processedMarkdownStyle, item ? item.cursorPosition : null, false);
       },
-      [parseText, processedMarkdownStyle, maxLength],
+      [parseText, processedMarkdownStyle],
     );
 
     // Placeholder text color logic
@@ -311,12 +306,20 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
         updateTextColor(divRef.current, e.target.textContent ?? '');
         const previousText = divRef.current.value;
-        const parsedText = normalizeValue(
+        let parsedText = normalizeValue(
           inputType === 'pasteText' ? pasteContent.current || '' : parseInnerHTMLToText(e.target as MarkdownTextInputElement, inputType, contentSelection.current.start),
         );
 
         if (pasteContent.current) {
           pasteContent.current = null;
+        }
+
+        if (typeof maxLength === 'number' && parsedText.length > maxLength) {
+          if (inputType === 'pasteText') {
+            parsedText = parsedText.slice(0, maxLength);
+          } else {
+            parsedText = previousText;
+          }
         }
 
         const prevSelection = contentSelection.current ?? {start: 0, end: 0};
@@ -334,7 +337,6 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           divRef.current.value = parsedText;
           return;
         }
-
         let newInputUpdate: ParseTextResult;
         switch (inputType) {
           case 'historyUndo':
@@ -344,7 +346,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
             newInputUpdate = redo(divRef.current);
             break;
           default:
-            newInputUpdate = parseText(divRef.current, parsedText, maxLength, processedMarkdownStyle, newCursorPosition, true, !inputType, inputType === 'pasteText');
+            newInputUpdate = parseText(divRef.current, parsedText, processedMarkdownStyle, newCursorPosition, true, !inputType, inputType === 'pasteText');
         }
         const {text, cursorPosition} = newInputUpdate;
         updateTextColor(divRef.current, text);
@@ -636,15 +638,16 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         }
 
         if (value === undefined) {
-          parseText(divRef.current, divRef.current.value, maxLength, processedMarkdownStyle);
+          parseText(divRef.current, divRef.current.value, processedMarkdownStyle);
           return;
         }
         const normalizedValue = normalizeValue(value);
+
         divRef.current.value = normalizedValue;
-        parseText(divRef.current, normalizedValue, maxLength, processedMarkdownStyle, null, true, false, true);
+        parseText(divRef.current, normalizedValue, processedMarkdownStyle, null, true, false, true);
         updateTextColor(divRef.current, value);
       },
-      [multiline, processedMarkdownStyle, value, maxLength],
+      [multiline, processedMarkdownStyle, value],
     );
 
     useClientEffect(
