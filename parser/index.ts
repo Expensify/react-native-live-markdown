@@ -34,8 +34,6 @@ function parseMarkdownToHTML(markdown: string): string {
   return html as string;
 }
 
-const MAX_PARSABLE_LENGTH = 15000;
-
 function parseHTMLToTokens(html: string): Token[] {
   const tokens: Token[] = [];
   let left = 0;
@@ -274,11 +272,6 @@ function groupRanges(ranges: MarkdownRange[]) {
 }
 
 function parseExpensiMarkToRanges(markdown: string): MarkdownRange[] {
-  // this is a temporary fix to prevent parsing very large markdown strings
-  // TODO: move this logic to the app once https://github.com/Expensify/react-native-live-markdown/pull/439 is merged
-  if (markdown.length > MAX_PARSABLE_LENGTH) {
-    return [];
-  }
   try {
     const html = parseMarkdownToHTML(markdown);
     const tokens = parseHTMLToTokens(html);
