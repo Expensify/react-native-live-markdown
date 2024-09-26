@@ -101,6 +101,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       id,
       inputMode,
       onTouchStart,
+      maxLength,
     },
     ref,
   ) => {
@@ -139,12 +140,17 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     const parseText = useCallback(
       (
         target: MarkdownTextInputElement,
-        text: string | null,
+        textValue: string | null,
+        maxLen: number | null = null,
         customMarkdownStyles: MarkdownStyle,
         cursorPosition: number | null = null,
         shouldAddToHistory = true,
         shouldForceDOMUpdate = false,
       ): ParseTextResult => {
+        let text = textValue ?? null;
+        if (textValue !== null && typeof maxLen === 'number' && textValue?.length > maxLen) {
+          text = textValue.slice(0, maxLen);
+        }
         if (!divRef.current) {
           return {text: text || '', cursorPosition: null};
         }
@@ -167,10 +173,10 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     const processedMarkdownStyle = useMemo(() => {
       const newMarkdownStyle = processMarkdownStyle(markdownStyle);
       if (divRef.current) {
-        parseText(divRef.current, divRef.current.value, newMarkdownStyle, null, false);
+        parseText(divRef.current, divRef.current.value, maxLength, newMarkdownStyle, null, false, false);
       }
       return newMarkdownStyle;
-    }, [markdownStyle, parseText]);
+    }, [markdownStyle, parseText, maxLength]);
 
     const inputStyles = useMemo(
       () =>
@@ -196,9 +202,9 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         }
         const item = history.current.undo();
         const undoValue = item ? item.text : null;
-        return parseText(target, undoValue, processedMarkdownStyle, item ? item.cursorPosition : null, false);
+        return parseText(target, undoValue, maxLength, processedMarkdownStyle, item ? item.cursorPosition : null, false);
       },
-      [parseText, processedMarkdownStyle],
+      [parseText, processedMarkdownStyle, maxLength],
     );
 
     const redo = useCallback(
@@ -211,9 +217,9 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         }
         const item = history.current.redo();
         const redoValue = item ? item.text : null;
-        return parseText(target, redoValue, processedMarkdownStyle, item ? item.cursorPosition : null, false);
+        return parseText(target, redoValue, maxLength, processedMarkdownStyle, item ? item.cursorPosition : null, false);
       },
-      [parseText, processedMarkdownStyle],
+      [parseText, processedMarkdownStyle, maxLength],
     );
 
     // Placeholder text color logic
@@ -323,7 +329,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
             newInputUpdate = redo(divRef.current);
             break;
           default:
-            newInputUpdate = parseText(divRef.current, parsedText, processedMarkdownStyle, newCursorPosition, true, !inputType);
+            newInputUpdate = parseText(divRef.current, parsedText, maxLength, processedMarkdownStyle, newCursorPosition, true, !inputType);
         }
         const {text, cursorPosition} = newInputUpdate;
         updateTextColor(divRef.current, text);
@@ -375,7 +381,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
         handleContentSizeChange();
       },
-      [updateTextColor, updateSelection, onChange, onChangeText, handleContentSizeChange, undo, redo, parseText, processedMarkdownStyle, setEventProps],
+      [updateTextColor, updateSelection, onChange, onChangeText, handleContentSizeChange, undo, redo, parseText, processedMarkdownStyle, setEventProps, maxLength],
     );
 
     const insertText = useCallback(
@@ -608,15 +614,15 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         }
 
         if (value === undefined) {
-          parseText(divRef.current, divRef.current.value, processedMarkdownStyle);
+          parseText(divRef.current, divRef.current.value, maxLength, processedMarkdownStyle);
           return;
         }
         const normalizedValue = normalizeValue(value);
         divRef.current.value = normalizedValue;
-        parseText(divRef.current, normalizedValue, processedMarkdownStyle);
+        parseText(divRef.current, normalizedValue, maxLength, processedMarkdownStyle);
         updateTextColor(divRef.current, value);
       },
-      [multiline, processedMarkdownStyle, value],
+      [multiline, processedMarkdownStyle, value, maxLength],
     );
 
     useClientEffect(
