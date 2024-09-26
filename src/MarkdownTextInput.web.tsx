@@ -113,6 +113,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     const history = useRef<InputHistory>();
     const dimensions = useRef<Dimensions | null>(null);
     const pasteContent = useRef<string | null>(null);
+    const hasJustBeenFocused = useRef<boolean>(false);
 
     if (!history.current) {
       history.current = new InputHistory(100, 150, value || '');
@@ -146,6 +147,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         cursorPosition: number | null = null,
         shouldAddToHistory = true,
         shouldForceDOMUpdate = false,
+        shouldScrollIntoView = false,
       ): ParseTextResult => {
         let text = textValue ?? null;
         if (textValue !== null && typeof maxLen === 'number' && textValue?.length > maxLen) {
@@ -158,7 +160,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         if (text === null) {
           return {text: divRef.current.value, cursorPosition: null};
         }
-        const parsedText = updateInputStructure(target, text, cursorPosition, multiline, customMarkdownStyles, false, shouldForceDOMUpdate);
+        const parsedText = updateInputStructure(target, text, cursorPosition, multiline, customMarkdownStyles, false, shouldForceDOMUpdate, shouldScrollIntoView);
         divRef.current.value = parsedText.text;
 
         if (history.current && shouldAddToHistory) {
@@ -268,6 +270,19 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       [handleSelectionChange, updateRefSelectionVariables],
     );
 
+    const handleOnSelect = useCallback(
+      (e) => {
+        updateSelection(e);
+
+        // If the input has just been focused, we need to scroll the cursor into view
+        if (divRef.current && contentSelection.current && hasJustBeenFocused.current) {
+          setCursorPosition(divRef.current, contentSelection.current?.start, contentSelection.current?.end, true);
+          hasJustBeenFocused.current = false;
+        }
+      },
+      [updateSelection],
+    );
+
     const handleContentSizeChange = useCallback(() => {
       if (!divRef.current || !multiline || !onContentSizeChange) {
         return;
@@ -329,7 +344,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
             newInputUpdate = redo(divRef.current);
             break;
           default:
-            newInputUpdate = parseText(divRef.current, parsedText, maxLength, processedMarkdownStyle, newCursorPosition, true, !inputType);
+            newInputUpdate = parseText(divRef.current, parsedText, maxLength, processedMarkdownStyle, newCursorPosition, true, !inputType, inputType === 'pasteText');
         }
         const {text, cursorPosition} = newInputUpdate;
         updateTextColor(divRef.current, text);
@@ -463,6 +478,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
     const handleFocus: FocusEventHandler<HTMLDivElement> = useCallback(
       (event) => {
+        hasJustBeenFocused.current = true;
         const e = event as unknown as NativeSyntheticEvent<TextInputFocusEventData>;
         const hostNode = e.target as unknown as HTMLDivElement;
         currentlyFocusedField.current = hostNode;
@@ -471,9 +487,15 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           if (contentSelection.current) {
             setCursorPosition(divRef.current, contentSelection.current.start, contentSelection.current.end);
           } else {
-            const valueLength = value ? value.length : divRef.current.value.length;
+            const valueLength = value ? value.length : (divRef.current.value || '').length;
             setCursorPosition(divRef.current, valueLength, null);
           }
+        }
+
+        if (divRef.current) {
+          divRef.current.scrollIntoView({
+            block: 'nearest',
+          });
         }
 
         if (onFocus) {
@@ -619,7 +641,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         }
         const normalizedValue = normalizeValue(value);
         divRef.current.value = normalizedValue;
-        parseText(divRef.current, normalizedValue, maxLength, processedMarkdownStyle);
+        parseText(divRef.current, normalizedValue, maxLength, processedMarkdownStyle, null, true, false, true);
         updateTextColor(divRef.current, value);
       },
       [multiline, processedMarkdownStyle, value, maxLength],
@@ -703,7 +725,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         spellCheck={spellCheck}
         dir={dir}
         inputMode={inputMode}
-        onSelect={updateSelection}
+        onSelect={handleOnSelect}
         onTouchStart={handleTouchStart}
       />
     );
