@@ -315,11 +315,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         }
 
         if (typeof maxLength === 'number' && parsedText.length > maxLength) {
-          if (inputType === 'pasteText') {
-            parsedText = parsedText.slice(0, maxLength);
-          } else {
-            parsedText = previousText;
-          }
+          parsedText = previousText;
         }
 
         const prevSelection = contentSelection.current ?? {start: 0, end: 0};
@@ -408,17 +404,23 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         }
 
         const previousText = divRef.current.value;
-        const newText = `${divRef.current.value.substring(0, contentSelection.current.start)}${text}${divRef.current.value.substring(contentSelection.current.end)}`;
+        let insertedText = text;
+        let availableLength = text.length;
+        if (typeof maxLength === 'number') {
+          availableLength = maxLength - previousText.length;
+          insertedText = text.slice(0, Math.max(availableLength, 0));
+        }
+        const newText = `${divRef.current.value.substring(0, contentSelection.current.start)}${insertedText}${divRef.current.value.substring(contentSelection.current.end)}`;
         if (previousText === newText) {
           document.execCommand('delete');
         }
 
-        pasteContent.current = newText;
+        pasteContent.current = availableLength > 0 ? newText : previousText;
         (e.nativeEvent as MarkdownNativeEvent).inputType = 'pasteText';
 
         handleOnChangeText(e);
       },
-      [handleOnChangeText],
+      [handleOnChangeText, maxLength],
     );
 
     const handleKeyPress = useCallback(
