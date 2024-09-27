@@ -12,6 +12,19 @@ type TreeNode = Omit<MarkdownRange, 'type'> & {
   isGeneratingNewline: boolean;
 };
 
+function createRootTreeNode(target: HTMLMarkdownElement, length = 0): TreeNode {
+  return {
+    element: target,
+    start: 0,
+    length,
+    parentNode: null,
+    childNodes: [],
+    type: 'root',
+    orderIndex: '',
+    isGeneratingNewline: false,
+  };
+}
+
 function addNodeToTree(element: HTMLMarkdownElement, parentTreeNode: TreeNode, type: NodeType, length: number | null = null) {
   const contentLength = length || (element.nodeName === 'BR' || type === 'br' ? 1 : element.value?.length) || 0;
   const isGeneratingNewline = type === 'line' && !(element.childNodes.length === 1 && (element.childNodes[0] as HTMLElement)?.getAttribute?.('data-type') === 'br');
@@ -115,6 +128,6 @@ function getTreeNodeByIndex(treeRoot: TreeNode, index: number): TreeNode | null 
   return null;
 }
 
-export {addNodeToTree, findHTMLElementInTree, getTreeNodeByIndex, updateTreeElementRefs};
+export {addNodeToTree, findHTMLElementInTree, getTreeNodeByIndex, updateTreeElementRefs, createRootTreeNode};
 
 export type {TreeNode, NodeType};
