@@ -49,7 +49,7 @@ export default function App() {
         onSelectionChange={e => setSelection(e.nativeEvent.selection)}
         selection={selection}
         id={TEST_CONST.INPUT_ID}
-        maxLength={100}
+        maxLength={30000}
       />
       <Text style={styles.text}>{JSON.stringify(value)}</Text>
       <Button
