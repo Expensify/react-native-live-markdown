@@ -155,7 +155,17 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         if (text === null) {
           return {text: divRef.current.value, cursorPosition: null};
         }
-        const parsedText = updateInputStructure(target, text, cursorPosition, multiline, customMarkdownStyles, false, shouldForceDOMUpdate, shouldScrollIntoView);
+        const parsedText = updateInputStructure(
+          target,
+          text,
+          maxLength ?? text.length + 1,
+          cursorPosition,
+          multiline,
+          customMarkdownStyles,
+          false,
+          shouldForceDOMUpdate,
+          shouldScrollIntoView,
+        );
         divRef.current.value = parsedText.text;
 
         if (history.current && shouldAddToHistory) {
@@ -164,7 +174,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
         return parsedText;
       },
-      [multiline],
+      [multiline, maxLength],
     );
 
     const processedMarkdownStyle = useMemo(() => {
@@ -646,10 +656,13 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         const normalizedValue = normalizeValue(value);
 
         divRef.current.value = normalizedValue;
-        parseText(divRef.current, normalizedValue, processedMarkdownStyle, null, true, false, true);
+        const parsedTextResult = parseText(divRef.current, normalizedValue, processedMarkdownStyle, null, true, false, true);
+        if (parsedTextResult.text !== normalizedValue && onChangeText) {
+          onChangeText(parsedTextResult.text);
+        }
         updateTextColor(divRef.current, value);
       },
-      [multiline, processedMarkdownStyle, value],
+      [multiline, processedMarkdownStyle, value, maxLength],
     );
 
     useClientEffect(

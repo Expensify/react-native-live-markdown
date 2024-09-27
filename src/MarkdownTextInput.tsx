@@ -36,15 +36,32 @@ function processMarkdownStyle(input: PartialMarkdownStyle | undefined): Markdown
   return processColorsInMarkdownStyle(mergeMarkdownStyleWithDefault(input));
 }
 
-const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>((props, ref) => {
+const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(({value, maxLength, onChangeText, ...props}, ref) => {
   const IS_FABRIC = 'nativeFabricUIManager' in global;
 
   const markdownStyle = React.useMemo(() => processMarkdownStyle(props.markdownStyle), [props.markdownStyle]);
+
+  const processedText = React.useMemo(() => {
+    if (typeof maxLength === 'number') {
+      return value?.slice(0, maxLength);
+    }
+    return value;
+  }, [value, maxLength]);
+
+  React.useLayoutEffect(() => {
+    if (typeof maxLength !== 'number' || !value || value.length <= maxLength || !onChangeText) {
+      return;
+    }
+    onChangeText(value.slice(0, maxLength));
+  }, [value, maxLength, onChangeText]);
 
   return (
     <>
       <TextInput
         {...props}
+        value={processedText}
+        onChangeText={onChangeText}
+        maxLength={maxLength}
         ref={ref}
       />
       <MarkdownTextInputDecoratorViewNativeComponent

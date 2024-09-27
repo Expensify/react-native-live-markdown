@@ -280,7 +280,8 @@ function moveCursor(isFocused: boolean, alwaysMoveCursorToTheEnd: boolean, curso
 
 function updateInputStructure(
   target: MarkdownTextInputElement,
-  text: string,
+  textValue: string,
+  maxLength: number,
   cursorPositionIndex: number | null,
   isMultiline = true,
   markdownStyle: PartialMarkdownStyle = {},
@@ -289,6 +290,7 @@ function updateInputStructure(
   shouldScrollIntoView = false,
 ) {
   const targetElement = target;
+  const text = textValue.length > maxLength ? textValue.slice(0, maxLength) : textValue;
 
   // in case the cursorPositionIndex is larger than text length, cursorPosition will be null, i.e: move the caret to the end
   let cursorPosition: number | null = cursorPositionIndex !== null && cursorPositionIndex <= text.length ? cursorPositionIndex : null;
