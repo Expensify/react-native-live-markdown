@@ -95,7 +95,7 @@ function createImageElement(currentInput: MarkdownTextInputElement, targetNode: 
   if (timeoutMap.has(targetNode.orderIndex)) {
     const mapItem = timeoutMap.get(targetNode.orderIndex);
     // Check if the image URL has been changed, if not, early return so the image can be loaded asynchronously
-    const currentElement = document.querySelector(`[data-type="block"][data-id="${targetNode.orderIndex}"]`) as HTMLMarkdownElement;
+    const currentElement = currentInput.querySelector(`[data-type="block"][data-id="${targetNode.orderIndex}"]`) as HTMLMarkdownElement;
     if (mapItem?.url === url && currentElement && getImagePreviewElement(currentElement)) {
       return;
     }
