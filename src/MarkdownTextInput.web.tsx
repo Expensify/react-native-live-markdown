@@ -341,6 +341,9 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
             end: newCursorPosition,
           });
           divRef.current.value = parsedText;
+          if (onChangeText) {
+            onChangeText(parsedText);
+          }
           return;
         }
         let newInputUpdate: ParseTextResult;
