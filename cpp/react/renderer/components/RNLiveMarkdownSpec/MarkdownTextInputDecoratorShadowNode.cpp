@@ -1,4 +1,4 @@
-#if defined(RCT_NEW_ARCH_ENABLED) || defined(ANDROID)
+#ifdef RCT_NEW_ARCH_ENABLED
 
 #include "MarkdownTextInputDecoratorShadowNode.h"
 
@@ -34,4 +34,4 @@ MarkdownTextInputDecoratorShadowNode::updateFragmentState(
 } // namespace react
 } // namespace facebook
 
-#endif
+#endif // RCT_NEW_ARCH_ENABLED

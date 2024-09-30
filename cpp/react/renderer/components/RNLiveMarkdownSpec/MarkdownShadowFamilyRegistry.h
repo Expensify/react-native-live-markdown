@@ -1,5 +1,5 @@
 #pragma once
-#if defined(RCT_NEW_ARCH_ENABLED) || defined(ANDROID)
+#ifdef RCT_NEW_ARCH_ENABLED
 
 #include <react/renderer/core/ShadowNodeFamily.h>
 
@@ -38,4 +38,4 @@ private:
 } // namespace livemarkdown
 } // namespace expensify
 
-#endif
+#endif // RCT_NEW_ARCH_ENABLED
