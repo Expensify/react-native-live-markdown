@@ -34,7 +34,7 @@ jobs:
 
            - name: Set up git for OSBotify
              run: |
-               git config --global user.signingkey 367811D53E34168C
+               git config --global user.signingkey AEE1036472A782AB
                git config --global commit.gpgsign true
                git config --global user.name OSBotify
                git config --global user.email infra+osbotify@expensify.com
