@@ -416,11 +416,13 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         const previousText = divRef.current.value;
         let insertedText = text;
         let availableLength = text.length;
+        const prefix = divRef.current.value.substring(0, contentSelection.current.start);
+        const suffix = divRef.current.value.substring(contentSelection.current.end);
         if (typeof maxLength === 'number') {
-          availableLength = maxLength - previousText.length;
+          availableLength = maxLength - prefix.length - suffix.length;
           insertedText = text.slice(0, Math.max(availableLength, 0));
         }
-        const newText = `${divRef.current.value.substring(0, contentSelection.current.start)}${insertedText}${divRef.current.value.substring(contentSelection.current.end)}`;
+        const newText = `${prefix}${insertedText}${suffix}`;
         if (previousText === newText) {
           document.execCommand('delete');
         }
