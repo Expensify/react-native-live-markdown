@@ -41,19 +41,22 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(({
 
   const markdownStyle = React.useMemo(() => processMarkdownStyle(props.markdownStyle), [props.markdownStyle]);
 
+  const onChangeTextRef = React.useRef(onChangeText);
+  onChangeTextRef.current = onChangeText;
+
   const processedText = React.useMemo(() => {
-    if (typeof maxLength === 'number') {
+    if (maxLength !== undefined) {
       return value?.slice(0, maxLength);
     }
     return value;
   }, [value, maxLength]);
 
   React.useLayoutEffect(() => {
-    if (typeof maxLength !== 'number' || !value || value.length <= maxLength || !onChangeText) {
+    if (maxLength === undefined || !value || value.length <= maxLength || !onChangeTextRef.current) {
       return;
     }
-    onChangeText(value.slice(0, maxLength));
-  }, [value, maxLength, onChangeText]);
+    onChangeTextRef.current(value.slice(0, maxLength));
+  }, [value, maxLength]);
 
   return (
     <>

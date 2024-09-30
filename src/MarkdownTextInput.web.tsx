@@ -324,7 +324,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           pasteContent.current = null;
         }
 
-        if (typeof maxLength === 'number' && parsedText.length > maxLength) {
+        if (maxLength !== undefined && parsedText.length > maxLength) {
           parsedText = previousText;
         }
 
@@ -418,7 +418,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         let availableLength = text.length;
         const prefix = divRef.current.value.substring(0, contentSelection.current.start);
         const suffix = divRef.current.value.substring(contentSelection.current.end);
-        if (typeof maxLength === 'number') {
+        if (maxLength !== undefined) {
           availableLength = maxLength - prefix.length - suffix.length;
           insertedText = text.slice(0, Math.max(availableLength, 0));
         }
