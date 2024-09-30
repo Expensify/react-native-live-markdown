@@ -2,7 +2,7 @@ import type {MarkdownTextInputElement} from '../../MarkdownTextInput.web';
 import {findHTMLElementInTree, getTreeNodeByIndex} from './treeUtils';
 import type {TreeNode} from './treeUtils';
 
-function setCursorPosition(target: MarkdownTextInputElement, startIndex: number, endIndex: number | null = null) {
+function setCursorPosition(target: MarkdownTextInputElement, startIndex: number, endIndex: number | null = null, shouldScrollIntoView = false) {
   // We don't want to move the cursor if the target is not focused
   if (!target.tree || target !== document.activeElement) {
     return;
@@ -45,16 +45,31 @@ function setCursorPosition(target: MarkdownTextInputElement, startIndex: number,
     selection.setBaseAndExtent(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
   }
 
-  scrollIntoView(startTreeNode);
+  if (shouldScrollIntoView) {
+    scrollIntoView(target, endTreeNode);
+  }
 }
 
-function scrollIntoView(node: TreeNode) {
+function scrollIntoView(target: MarkdownTextInputElement, node: TreeNode) {
+  const targetElement = target;
   if (node.type === 'br' && node.parentNode?.parentNode?.type === 'line') {
     // If the node is a line break, scroll to the parent paragraph, because Safari doesn't support scrollIntoView on br elements
     node.parentNode.parentNode.element.scrollIntoView({
       block: 'nearest',
     });
   } else {
+    const selection = window.getSelection();
+    if (selection && selection.rangeCount > 0) {
+      const range = selection.getRangeAt(0);
+      const caretRect = range.getBoundingClientRect();
+      const targetRect = target.getBoundingClientRect();
+
+      // In case the caret is below the visible input area, scroll to the end of the node
+      if (caretRect.top + caretRect.height > targetRect.top + targetRect.height) {
+        targetElement.scrollTop = caretRect.top + caretRect.height - targetRect.top - targetRect.height + target.scrollTop;
+      }
+    }
+
     node.element.scrollIntoView({
       block: 'nearest',
     });
