@@ -2,6 +2,7 @@
 #include "MarkdownGlobal.h"
 
 using namespace facebook;
+using namespace worklets;
 
 namespace expensify {
 namespace livemarkdown {
@@ -13,7 +14,7 @@ void injectJSIBindings(jsi::Runtime &rt) {
       jsi::PropNameID::forAscii(rt, "jsi_setMarkdownRuntime"),
       1,
       [](jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) -> jsi::Value {
-        setMarkdownRuntime(reanimated::extractWorkletRuntime(rt, args[0]));
+        setMarkdownRuntime(extractWorkletRuntime(rt, args[0]));
         return jsi::Value::undefined();
       }));
 
@@ -22,7 +23,7 @@ void injectJSIBindings(jsi::Runtime &rt) {
       jsi::PropNameID::forAscii(rt, "jsi_registerMarkdownWorklet"),
       1,
       [](jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) -> jsi::Value {
-        auto parserId = registerMarkdownWorklet(reanimated::extractShareableOrThrow<ShareableWorklet>(rt, args[0]));
+        auto parserId = registerMarkdownWorklet(extractShareableOrThrow<ShareableWorklet>(rt, args[0]));
         return jsi::Value(parserId);
       }));
 

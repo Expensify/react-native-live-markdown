@@ -2,10 +2,10 @@
 
 #include <jsi/jsi.h>
 
-#include "WorkletRuntime.h"
+#include <worklets/WorkletRuntime/WorkletRuntime.h>
 
 using namespace facebook;
-using namespace reanimated;
+using namespace worklets;
 
 namespace expensify {
 namespace livemarkdown {
