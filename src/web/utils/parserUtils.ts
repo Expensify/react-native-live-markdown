@@ -242,10 +242,6 @@ function parseRangesToHTMLNodes(
       } else {
         // adding markdown tag
         addTextToElement(spanNode, text.substring(range.start, endOfCurrentRange));
-        if (range.type === 'pre') {
-          // this property is used for code block background - only chromium displays single \n at the end of a block as a new line, hence this if check
-          span.setAttribute('data-content', text.substring(range.start, endOfCurrentRange));
-        }
         currentParentNode.element.value = (currentParentNode.element.value || '') + (spanNode.element.value || '');
         lastRangeEndIndex = endOfCurrentRange;
         // tag unnesting and adding text after the tag
@@ -310,7 +306,7 @@ function updateInputStructure(
   if (text) {
     const {dom, tree} = parseRangesToHTMLNodes(text, markdownRanges, isMultiline, markdownStyle, false, targetElement);
 
-    if (shouldForceDOMUpdate || targetElement.innerHTML !== dom.innerHTML) {
+    if (shouldForceDOMUpdate || targetElement.innerHTML.replaceAll(/ data-content="([^"]*)"/g, '') !== dom.innerHTML) {
       const animationTimes = getAnimationCurrentTimes(targetElement);
       targetElement.innerHTML = '';
       targetElement.innerText = '';

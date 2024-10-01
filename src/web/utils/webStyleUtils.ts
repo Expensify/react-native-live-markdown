@@ -116,7 +116,7 @@ function generateCodeBlocksRules(target: MarkdownTextInputElement, styleTag: HTM
       selector: `.${target.uniqueId} *[data-type='pre']::before`,
       properties: {
         top: `${Math.floor(lineHeight)}px`,
-        padding: `${(padding - 1)?.toString()}px`,
+        padding: `${(padding - 2)?.toString()}px`,
         'background-color': `${(preStyles?.backgroundColor as string) ?? 'lightgray'}`,
         'border-radius': `${preStyles?.borderRadius?.toString() ?? '4'}px`,
         'border-color': `${preStyles?.borderColor ?? 'grey'}`,

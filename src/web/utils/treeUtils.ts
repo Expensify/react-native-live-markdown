@@ -1,5 +1,6 @@
 import type {HTMLMarkdownElement} from '../../MarkdownTextInput.web';
 import type {MarkdownRange, MarkdownType} from '../../commonTypes';
+import {parseInnerHTMLToText} from './inputUtils';
 
 type NodeType = MarkdownType | 'line' | 'text' | 'br' | 'block' | 'root';
 
@@ -53,6 +54,10 @@ function updateTreeElementRefs(treeRoot: TreeNode, element: HTMLMarkdownElement)
     node.childNodes.forEach((child) => {
       stack.push(child);
     });
+
+    if (currentElement?.dataset.type === 'pre') {
+      currentElement.setAttribute('data-content', parseInnerHTMLToText(currentElement, '', 0));
+    }
   }
 
   return treeRoot;

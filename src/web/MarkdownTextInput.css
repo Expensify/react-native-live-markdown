@@ -38,21 +38,20 @@
   position: absolute;
   z-index: -1;
   left: 0;
-  max-width: 100%;
+  max-width: calc(100% + 2px);
   box-sizing: border-box;
 }
 
 *[data-type='line'] *[data-type='syntax']:has(+ *[data-type='pre']) {
-  display: block;
+  display: grid;
+}
+
+*[data-type='line'] *[data-type='syntax']:has(+ *[data-type='pre']) > *:last-child {
+  display: none;
 }
 
 *[data-type='line'] *[data-type='pre'] + *[data-type='syntax'] {
-  display: inline-block;
-}
-
-*[data-type='line'] *[data-type='pre'] + *[data-type='syntax'] + *[data-type='text'] {
-  display: inline-block;
-  max-width: 100%;
+  display: grid;
 }
 
 @keyframes react-native-live-markdown-spin {

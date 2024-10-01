@@ -97,7 +97,10 @@ function mergeMarkdownStyleWithDefault(input: PartialMarkdownStyle | undefined):
   return output;
 }
 
-function parseStringWithUnitToNumber(value: string | null): number {
+function parseStringWithUnitToNumber(value: string | number | null): number {
+  if (typeof value === 'number') {
+    return value;
+  }
   return value ? parseInt(value.replace('px', ''), 10) : 0;
 }
 

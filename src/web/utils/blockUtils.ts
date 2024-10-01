@@ -1,5 +1,6 @@
 import type {MarkdownTextInputElement} from '../../MarkdownTextInput.web';
 import type {MarkdownRange} from '../../commonTypes';
+import {parseStringWithUnitToNumber} from '../../styleUtils';
 import type {PartialMarkdownStyle} from '../../styleUtils';
 import {addInlineImagePreview} from '../inputElements/inlineImage';
 import type {NodeType, TreeNode} from './treeUtils';
@@ -57,7 +58,7 @@ function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownSty
         padding: 0,
       });
       Object.assign((node.parentNode as HTMLElement).style, {
-        padding: '3px',
+        padding: `${parseStringWithUnitToNumber(markdownStyle.pre?.padding ?? 2).toString()}px`,
       });
       break;
 
