@@ -79,3 +79,6 @@ lib/
 
 # react-native-live-markdown
 .build_complete
+
+# GitHub GPG Keys
+.github/OSBotify-private-key.asc
