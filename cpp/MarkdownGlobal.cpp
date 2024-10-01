@@ -32,7 +32,7 @@ void unregisterMarkdownWorklet(const int parserId) {
 
 std::shared_ptr<ShareableWorklet> getMarkdownWorklet(const int parserId) {
   const auto &worklet = globalMarkdownShareableWorklets[parserId];
-  assert(worklet != nullptr); // TODO: fix crash on worklet hot reload
+  assert(worklet != nullptr);
   return worklet;
 }
 

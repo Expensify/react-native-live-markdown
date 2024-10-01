@@ -68,13 +68,13 @@ using namespace facebook::react;
     const auto &oldViewProps = *std::static_pointer_cast<MarkdownTextInputDecoratorViewProps const>(_props);
     const auto &newViewProps = *std::static_pointer_cast<MarkdownTextInputDecoratorViewProps const>(props);
 
-    // TODO: if (oldViewProps.markdownStyle != newViewProps.markdownStyle)
-    RCTMarkdownStyle *markdownStyle = [[RCTMarkdownStyle alloc] initWithStruct:newViewProps.markdownStyle];
-    [_view setMarkdownStyle:markdownStyle];
-    
     if (oldViewProps.parserId != newViewProps.parserId) {
       [_view setParserId:@(newViewProps.parserId)];
     }
+
+    // TODO: if (oldViewProps.markdownStyle != newViewProps.markdownStyle)
+    RCTMarkdownStyle *markdownStyle = [[RCTMarkdownStyle alloc] initWithStruct:newViewProps.markdownStyle];
+    [_view setMarkdownStyle:markdownStyle];
 
     [super updateProps:props oldProps:oldProps];
 }
