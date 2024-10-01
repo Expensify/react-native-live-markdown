@@ -1,5 +1,5 @@
 import type {HTMLMarkdownElement, MarkdownTextInputElement} from '../../MarkdownTextInput.web';
-import {addNodeToTree, updateTreeElementRefs} from './treeUtils';
+import {addNodeToTree, createRootTreeNode, updateTreeElementRefs} from './treeUtils';
 import type {NodeType, TreeNode} from './treeUtils';
 import type {PartialMarkdownStyle} from '../../styleUtils';
 import {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition} from './cursorUtils';
@@ -154,16 +154,8 @@ function parseRangesToHTMLNodes(
 ) {
   const rootElement: HTMLMarkdownElement = document.createElement('span') as HTMLMarkdownElement;
   const textLength = text.length;
-  const rootNode: TreeNode = {
-    element: rootElement,
-    start: 0,
-    length: textLength,
-    parentNode: null,
-    childNodes: [],
-    type: 'root',
-    orderIndex: '',
-    isGeneratingNewline: false,
-  };
+  const rootNode: TreeNode = createRootTreeNode(rootElement, textLength);
+
   let currentParentNode: TreeNode = rootNode;
   let lines = splitTextIntoLines(text);
 
@@ -320,6 +312,8 @@ function updateInputStructure(
     targetElement.tree = tree;
 
     moveCursor(isFocused, alwaysMoveCursorToTheEnd, cursorPosition, targetElement, shouldScrollIntoView);
+  } else {
+    targetElement.tree = createRootTreeNode(targetElement);
   }
 
   return {text, cursorPosition: cursorPosition || 0};
