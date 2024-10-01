@@ -1,5 +1,5 @@
 import type {HTMLMarkdownElement, MarkdownTextInputElement} from '../../MarkdownTextInput.web';
-import {addNodeToTree, updateTreeElementRefs} from './treeUtils';
+import {addNodeToTree, createRootTreeNode, updateTreeElementRefs} from './treeUtils';
 import type {NodeType, TreeNode} from './treeUtils';
 import type {PartialMarkdownStyle} from '../../styleUtils';
 import {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition} from './cursorUtils';
@@ -155,16 +155,8 @@ function parseRangesToHTMLNodes(
 ) {
   const rootElement: HTMLMarkdownElement = document.createElement('span') as HTMLMarkdownElement;
   const textLength = text.length;
-  const rootNode: TreeNode = {
-    element: rootElement,
-    start: 0,
-    length: textLength,
-    parentNode: null,
-    childNodes: [],
-    type: 'root',
-    orderIndex: '',
-    isGeneratingNewline: false,
-  };
+  const rootNode: TreeNode = createRootTreeNode(rootElement, textLength);
+
   let currentParentNode: TreeNode = rootNode;
   let lines = splitTextIntoLines(text);
 
@@ -266,7 +258,7 @@ function parseRangesToHTMLNodes(
   return {dom: rootElement, tree: rootNode};
 }
 
-function moveCursor(isFocused: boolean, alwaysMoveCursorToTheEnd: boolean, cursorPosition: number | null, target: MarkdownTextInputElement) {
+function moveCursor(isFocused: boolean, alwaysMoveCursorToTheEnd: boolean, cursorPosition: number | null, target: MarkdownTextInputElement, shouldScrollIntoView = false) {
   if (!isFocused) {
     return;
   }
@@ -274,7 +266,7 @@ function moveCursor(isFocused: boolean, alwaysMoveCursorToTheEnd: boolean, curso
   if (alwaysMoveCursorToTheEnd || cursorPosition === null) {
     moveCursorToEnd(target);
   } else if (cursorPosition !== null) {
-    setCursorPosition(target, cursorPosition);
+    setCursorPosition(target, cursorPosition, null, shouldScrollIntoView);
   }
 }
 
@@ -286,6 +278,7 @@ function updateInputStructure(
   markdownStyle: PartialMarkdownStyle = {},
   alwaysMoveCursorToTheEnd = false,
   shouldForceDOMUpdate = false,
+  shouldScrollIntoView = false,
 ) {
   const targetElement = target;
 
@@ -317,7 +310,9 @@ function updateInputStructure(
     updateTreeElementRefs(tree, targetElement);
     targetElement.tree = tree;
 
-    moveCursor(isFocused, alwaysMoveCursorToTheEnd, cursorPosition, targetElement);
+    moveCursor(isFocused, alwaysMoveCursorToTheEnd, cursorPosition, targetElement, shouldScrollIntoView);
+  } else {
+    targetElement.tree = createRootTreeNode(targetElement);
   }
 
   handleCustomStyles(target, markdownStyle);

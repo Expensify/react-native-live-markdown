@@ -92,7 +92,7 @@ function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownSty
 }
 
 const BLOCK_MARKDOWN_TYPES = ['inline-image'];
-const FULL_LINE_MARKDOWN_TYPES = ['blockquote', 'h1'];
+const FULL_LINE_MARKDOWN_TYPES = ['blockquote'];
 
 function isBlockMarkdownType(type: NodeType) {
   return BLOCK_MARKDOWN_TYPES.includes(type);
