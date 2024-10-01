@@ -7,6 +7,11 @@ import type {NodeType, TreeNode} from './treeUtils';
 
 function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownStyle: PartialMarkdownStyle) {
   const node = targetElement;
+
+  const defaultPrePadding = markdownStyle.pre?.padding ?? 2;
+  const preHorizontalPadding = parseStringWithUnitToNumber(markdownStyle.pre?.paddingHorizontal ?? defaultPrePadding).toString();
+  const preVerticalPadding = parseStringWithUnitToNumber(markdownStyle.pre?.paddingVertical ?? defaultPrePadding).toString();
+
   switch (type) {
     case 'line':
       Object.assign(node.style, {
@@ -58,7 +63,7 @@ function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownSty
         padding: 0,
       });
       Object.assign((node.parentNode as HTMLElement).style, {
-        padding: `${parseStringWithUnitToNumber(markdownStyle.pre?.padding ?? 2).toString()}px`,
+        padding: `${preVerticalPadding}px ${preHorizontalPadding}px`,
       });
       break;
 

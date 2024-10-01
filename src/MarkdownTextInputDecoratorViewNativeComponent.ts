@@ -41,6 +41,8 @@ interface MarkdownStyle {
     borderColor: string;
     borderRadius: Float;
     padding: Float;
+    paddingVertical?: Float;
+    paddingHorizontal?: Float;
   };
   mentionHere: {
     color: ColorValue;

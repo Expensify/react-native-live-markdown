@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type {TextStyle} from 'react-native';
 import type {MarkdownStyle} from '../../MarkdownTextInputDecoratorViewNativeComponent';
-import {mergeMarkdownStyleWithDefault} from '../../styleUtils';
+import {mergeMarkdownStyleWithDefault, parseStringWithUnitToNumber} from '../../styleUtils';
 import type {PartialMarkdownStyle} from '../../styleUtils';
 import type {MarkdownTextInputElement} from '../../MarkdownTextInput.web';
 
@@ -101,6 +101,10 @@ function addStylesheetRules(rules: Rule[], styleSheet: CSSStyleSheet) {
   });
 }
 
+function property(e: HTMLElement, p: string) {
+  return parseFloat(window.getComputedStyle(e).getPropertyValue(p).replace('px', ''));
+}
+
 function generateCodeBlocksRules(target: MarkdownTextInputElement, styleTag: HTMLStyleElement, markdownStyle: PartialMarkdownStyle) {
   const line = target.querySelector('*[data-type="line"]:has(> *[data-type="pre"]) > span:first-child');
   if (!line) {
@@ -109,35 +113,49 @@ function generateCodeBlocksRules(target: MarkdownTextInputElement, styleTag: HTM
 
   const lineHeight = line.getBoundingClientRect()?.height;
   const preStyles = markdownStyle.pre;
-  const padding = preStyles?.padding ?? 3;
+  const padding = preStyles?.padding ?? 2;
+  const horizontalPadding = parseStringWithUnitToNumber(preStyles?.paddingHorizontal ?? padding);
+  const verticalPadding = parseStringWithUnitToNumber(preStyles?.paddingVertical ?? padding);
+
+  const contentWidth =
+    target.offsetWidth - property(target, 'border-left-width') - property(target, 'border-left-width') - property(target, 'padding-left') - property(target, 'padding-right');
 
   const rules: Rule[] = [
     {
       selector: `.${target.uniqueId} *[data-type='pre']::before`,
       properties: {
         top: `${Math.floor(lineHeight)}px`,
-        padding: `${(padding - 2)?.toString()}px`,
+        padding: `${verticalPadding.toString()}px ${horizontalPadding.toString()}px`,
         'background-color': `${(preStyles?.backgroundColor as string) ?? 'lightgray'}`,
         'border-radius': `${preStyles?.borderRadius?.toString() ?? '4'}px`,
         'border-color': `${preStyles?.borderColor ?? 'grey'}`,
+        'min-width': `min(calc(100% + 1.5px), ${contentWidth}px)`,
+        'max-width': `${contentWidth}px`,
       },
     },
     {
       selector: `.${target.uniqueId} *[data-type='line'] *[data-type='syntax']:has(+ *[data-type='pre'])`,
       properties: {
-        transform: `translate(-${padding}px, -${padding}px)`,
+        transform: `translate(-${horizontalPadding}px, -${verticalPadding}px)`,
       },
     },
     {
       selector: `.${target.uniqueId} *[data-type='line'] *[data-type='pre'] + *[data-type='syntax']`,
       properties: {
-        transform: `translate(-${padding}px, ${padding}px)`,
+        transform: `translate(-${horizontalPadding}px, ${verticalPadding}px)`,
       },
     },
     {
       selector: `.${target.uniqueId} *[data-type='line'] *[data-type='pre'] + *[data-type='syntax'] + *[data-type='text']`,
       properties: {
-        transform: `translate(-${padding}px, ${padding}px)`,
+        transform: `translate(-${horizontalPadding}px, ${verticalPadding}px)`,
+      },
+    },
+    {
+      selector: `.${target.uniqueId} *[data-type='line']:has(> *[data-type='pre']) > *:nth-child(n+3)`,
+      properties: {
+        display: 'inline-block',
+        transform: `translate(-${horizontalPadding}px, ${verticalPadding}px)`,
       },
     },
   ];
