@@ -18,19 +18,23 @@ std::shared_ptr<WorkletRuntime> getMarkdownRuntime() {
 }
 
 std::unordered_map<int, std::shared_ptr<ShareableWorklet>> globalMarkdownShareableWorklets;
+std::mutex globalMarkdownShareableWorkletsMutex;
 int nextParserId = 1;
 
 const int registerMarkdownWorklet(const std::shared_ptr<ShareableWorklet> &markdownWorklet) {
   auto parserId = nextParserId++;
+  std::unique_lock<std::mutex> lock(globalMarkdownShareableWorkletsMutex);
   globalMarkdownShareableWorklets[parserId] = markdownWorklet;
   return parserId;
 }
 
 void unregisterMarkdownWorklet(const int parserId) {
+  std::unique_lock<std::mutex> lock(globalMarkdownShareableWorkletsMutex);
   globalMarkdownShareableWorklets.erase(parserId);
 }
 
 std::shared_ptr<ShareableWorklet> getMarkdownWorklet(const int parserId) {
+  std::unique_lock<std::mutex> lock(globalMarkdownShareableWorkletsMutex);
   const auto &worklet = globalMarkdownShareableWorklets[parserId];
   assert(worklet != nullptr);
   return worklet;
