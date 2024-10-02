@@ -80,3 +80,6 @@ lib/
 # react-native-live-markdown
 android/src/main/assets/react-native-live-markdown-parser.js
 .build_complete
+
+# GitHub GPG Keys
+.github/OSBotify-private-key.asc
