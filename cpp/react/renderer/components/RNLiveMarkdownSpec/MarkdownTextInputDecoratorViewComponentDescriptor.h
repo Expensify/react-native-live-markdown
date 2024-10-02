@@ -1,5 +1,4 @@
 #pragma once
-#ifdef RCT_NEW_ARCH_ENABLED
 
 #include "MarkdownTextInputDecoratorShadowNode.h"
 #include <react/debug/react_native_assert.h>
@@ -16,5 +15,3 @@ public:
 
 } // namespace react
 } // namespace facebook
-
-#endif // RCT_NEW_ARCH_ENABLED

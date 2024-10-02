@@ -1,5 +1,3 @@
-#ifdef RCT_NEW_ARCH_ENABLED
-
 #include "MarkdownTextInputDecoratorShadowNode.h"
 
 using namespace expensify::livemarkdown;
@@ -33,5 +31,3 @@ MarkdownTextInputDecoratorShadowNode::updateFragmentState(
 
 } // namespace react
 } // namespace facebook
-
-#endif // RCT_NEW_ARCH_ENABLED

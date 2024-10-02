@@ -1,5 +1,3 @@
-#ifdef RCT_NEW_ARCH_ENABLED
-
 #include "MarkdownShadowFamilyRegistry.h"
 
 namespace expensify {
@@ -60,5 +58,3 @@ bool MarkdownShadowFamilyRegistry::shouldForceUpdate(facebook::react::Tag tag) {
 
 } // namespace livemarkdown
 } // namespace expensify
-
-#endif // RCT_NEW_ARCH_ENABLED

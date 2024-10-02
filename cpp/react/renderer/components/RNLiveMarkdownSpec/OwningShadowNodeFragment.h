@@ -1,5 +1,4 @@
 #pragma once
-#ifdef RCT_NEW_ARCH_ENABLED
 
 #include <react/renderer/core/Props.h>
 #include <react/renderer/core/ShadowNode.h>
@@ -27,5 +26,3 @@ struct OwningShadowNodeFragment {
 
 } // namespace livemarkdown
 } // namespace expensify
-
-#endif // RCT_NEW_ARCH_ENABLED

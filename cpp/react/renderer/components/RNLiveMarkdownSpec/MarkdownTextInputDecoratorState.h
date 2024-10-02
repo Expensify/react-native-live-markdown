@@ -1,5 +1,4 @@
 #pragma once
-#ifdef RCT_NEW_ARCH_ENABLED
 
 #include <react/renderer/core/ShadowNodeFamily.h>
 
@@ -33,5 +32,3 @@ public:
 
 } // namespace react
 } // namespace facebook
-
-#endif // RCT_NEW_ARCH_ENABLED
