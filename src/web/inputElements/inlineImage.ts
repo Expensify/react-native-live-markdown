@@ -154,7 +154,7 @@ function addInlineImagePreview(
   let imageHref = '';
   if (linkRange) {
     imageHref = text.substring(linkRange.start, linkRange.start + linkRange.length);
-    if (addAuthTokenToImageURLCallback && imagePreviewAuthRequiredURLs && imagePreviewAuthRequiredURLs.find((url) => imageHref.includes(url))) {
+    if (addAuthTokenToImageURLCallback && imagePreviewAuthRequiredURLs && imagePreviewAuthRequiredURLs.find((url) => imageHref.startsWith(url))) {
       imageHref = addAuthTokenToImageURLCallback(imageHref);
     }
   }
