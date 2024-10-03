@@ -22,10 +22,6 @@ public class MarkdownUtils {
     SoLoader.loadLibrary("livemarkdown");
   }
 
-  private synchronized static String parseMarkdown(String input, int parserId) {
-    return nativeParseMarkdown(input, parserId);
-  }
-
   private static native String nativeParseMarkdown(String input, int parserId);
 
   public MarkdownUtils(@NonNull AssetManager assetManager) {
@@ -59,7 +55,7 @@ public class MarkdownUtils {
     if (input.equals(mPrevInput) && mParserId == mPrevParserId) {
       output = mPrevOutput;
     } else {
-      output = parseMarkdown(input, mParserId);
+      output = nativeParseMarkdown(input, mParserId);
       mPrevInput = input;
       mPrevOutput = output;
       mPrevParserId = mParserId;
