@@ -1,16 +1,26 @@
 import type {MarkdownTextInputElement} from '../../MarkdownTextInput.web';
 import type {MarkdownRange} from '../../commonTypes';
+import {parseStringWithUnitToNumber} from '../../styleUtils';
 import type {PartialMarkdownStyle} from '../../styleUtils';
 import {addInlineImagePreview} from '../inputElements/inlineImage';
 import type {NodeType, TreeNode} from './treeUtils';
 
 function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownStyle: PartialMarkdownStyle) {
   const node = targetElement;
+
+  const defaultPrePadding = markdownStyle.pre?.padding ?? 2;
+  const preHorizontalPadding = parseStringWithUnitToNumber(markdownStyle.pre?.paddingHorizontal ?? defaultPrePadding).toString();
+  const preVerticalPadding = parseStringWithUnitToNumber(markdownStyle.pre?.paddingVertical ?? defaultPrePadding).toString();
+
   switch (type) {
     case 'line':
       Object.assign(node.style, {
         margin: '0',
         padding: '0',
+        position: 'relative',
+        width: 'fit-content',
+        maxWidth: '100%',
+        boxSizing: 'border-box',
       });
       break;
     case 'syntax':
@@ -44,10 +54,17 @@ function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownSty
       });
       break;
     case 'code':
-      Object.assign(node.style, markdownStyle.code);
+      Object.assign(node.style, {...markdownStyle.code, lineHeight: 1.5});
       break;
     case 'pre':
-      Object.assign(node.style, markdownStyle.pre);
+      Object.assign(node.style, {
+        ...markdownStyle.pre,
+        backgroundColor: 'transparent',
+        padding: 0,
+      });
+      Object.assign((node.parentNode as HTMLElement).style, {
+        padding: `${preVerticalPadding}px ${preHorizontalPadding}px`,
+      });
       break;
 
     case 'blockquote':

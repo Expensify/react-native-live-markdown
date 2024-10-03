@@ -18,7 +18,7 @@
   display: none;
 }
 
-.react-native-live-markdown-input-singleline span[data-type="text"] {
+.react-native-live-markdown-input-singleline span[data-type='text'] {
   vertical-align: middle;
 }
 
@@ -27,6 +27,30 @@
   pointer-events: none;
   display: block; /* For Firefox */
   content: attr(placeholder);
+}
+
+*[data-type='pre']::before {
+  margin: 0;
+  display: block;
+  color: transparent;
+  border: 1px solid grey;
+  content: attr(data-content);
+  position: absolute;
+  z-index: -1;
+  left: 0;
+  box-sizing: border-box;
+}
+
+*[data-type='line'] *[data-type='syntax']:has(+ *[data-type='pre']) {
+  display: grid;
+}
+
+*[data-type='line'] *[data-type='syntax']:has(+ *[data-type='pre']) > *:last-child {
+  display: none;
+}
+
+*[data-type='line'] *[data-type='pre'] + *[data-type='syntax'] {
+  display: grid;
 }
 
 @keyframes react-native-live-markdown-spin {
