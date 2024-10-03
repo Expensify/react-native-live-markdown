@@ -1,3 +1,5 @@
+'worklet';
+
 import ExpensiMark from 'expensify-common/dist/ExpensiMark';
 import {unescapeText} from 'expensify-common/dist/utils';
 import type {MarkdownType, MarkdownRange} from './commonTypes';
@@ -6,8 +8,6 @@ type Token = ['TEXT' | 'HTML', string];
 type StackItem = {tag: string; children: Array<StackItem | string>};
 
 function parseMarkdownToHTML(markdown: string): string {
-  'worklet';
-
   const parser = new ExpensiMark();
   const html = parser.replace(markdown, {
     shouldKeepRawInput: true,
@@ -16,8 +16,6 @@ function parseMarkdownToHTML(markdown: string): string {
 }
 
 function parseHTMLToTokens(html: string): Token[] {
-  'worklet';
-
   const tokens: Token[] = [];
   let left = 0;
   // eslint-disable-next-line no-constant-condition
@@ -43,8 +41,6 @@ function parseHTMLToTokens(html: string): Token[] {
 }
 
 function parseTokensToTree(tokens: Token[]): StackItem {
-  'worklet';
-
   const stack: StackItem[] = [{tag: '<>', children: []}];
   tokens.forEach(([type, payload]) => {
     if (type === 'TEXT') {
@@ -87,8 +83,6 @@ function parseTokensToTree(tokens: Token[]): StackItem {
 }
 
 function parseTreeToTextAndRanges(tree: StackItem): [string, MarkdownRange[]] {
-  'worklet';
-
   let text = '';
 
   function processChildren(node: StackItem | string) {
@@ -221,8 +215,6 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, MarkdownRange[]] {
 
 // getTagPriority returns a priority for a tag, higher priority means the tag should be processed first
 function getTagPriority(tag: string) {
-  'worklet';
-
   switch (tag) {
     case 'blockquote':
       return 2;
@@ -234,15 +226,11 @@ function getTagPriority(tag: string) {
 }
 
 function sortRanges(ranges: MarkdownRange[]) {
-  'worklet';
-
   // sort ranges by start position, then by length, then by tag hierarchy
   return ranges.sort((a, b) => a.start - b.start || b.length - a.length || getTagPriority(b.type) - getTagPriority(a.type) || 0);
 }
 
 function groupRanges(ranges: MarkdownRange[]) {
-  'worklet';
-
   const lastVisibleRangeIndex: {[key in MarkdownType]?: number} = {};
 
   return ranges.reduce((acc, range) => {
@@ -265,8 +253,6 @@ function groupRanges(ranges: MarkdownRange[]) {
 }
 
 function parseExpensiMark(markdown: string): MarkdownRange[] {
-  'worklet';
-
   try {
     const html = parseMarkdownToHTML(markdown);
     const tokens = parseHTMLToTokens(html);
