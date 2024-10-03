@@ -1,5 +1,5 @@
 import type {MarkdownTextInputElement} from '../../MarkdownTextInput.web';
-import type {ExtendBlockStructureProps, MarkdownRange} from '../../commonTypes';
+import type {InlineImagesInputProps, MarkdownRange} from '../../commonTypes';
 import type {PartialMarkdownStyle} from '../../styleUtils';
 import {addInlineImagePreview} from '../inputElements/inlineImage';
 import type {NodeType, TreeNode} from './treeUtils';
@@ -98,11 +98,11 @@ function extendBlockStructure(
   ranges: MarkdownRange[],
   text: string,
   markdownStyle: PartialMarkdownStyle,
-  extendBlockStructureProps: ExtendBlockStructureProps,
+  inlineImagesProps: InlineImagesInputProps,
 ) {
   switch (currentRange.type) {
     case 'inline-image':
-      return addInlineImagePreview(currentInput, targetNode, text, ranges, markdownStyle, extendBlockStructureProps);
+      return addInlineImagePreview(currentInput, targetNode, text, ranges, markdownStyle, inlineImagesProps);
     default:
       break;
   }

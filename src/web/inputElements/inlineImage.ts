@@ -1,5 +1,5 @@
 import type {HTMLMarkdownElement, MarkdownTextInputElement} from '../../MarkdownTextInput.web';
-import type {ExtendBlockStructureProps, MarkdownRange} from '../../commonTypes';
+import type {InlineImagesInputProps, MarkdownRange} from '../../commonTypes';
 import {parseStringWithUnitToNumber} from '../../styleUtils';
 import type {PartialMarkdownStyle} from '../../styleUtils';
 import type {TreeNode} from '../utils/treeUtils';
@@ -147,9 +147,9 @@ function addInlineImagePreview(
   text: string,
   ranges: MarkdownRange[],
   markdownStyle: PartialMarkdownStyle,
-  extendBlockStructureProps: ExtendBlockStructureProps,
+  inlineImagesProps: InlineImagesInputProps,
 ) {
-  const {addAuthTokenToImageURLCallback, imagePreviewAuthRequiredURLs} = extendBlockStructureProps;
+  const {addAuthTokenToImageURLCallback, imagePreviewAuthRequiredURLs} = inlineImagesProps;
   const linkRange = ranges.find((r) => r.type === 'link');
   let imageHref = '';
   if (linkRange) {

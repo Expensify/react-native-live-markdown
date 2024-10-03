@@ -21,9 +21,9 @@ interface MarkdownRange {
   depth?: number;
 }
 
-type ExtendBlockStructureProps = {
+type InlineImagesInputProps = {
   addAuthTokenToImageURLCallback?: (url: string) => string;
   imagePreviewAuthRequiredURLs?: string[];
 };
 
-export type {MarkdownType, MarkdownRange, ExtendBlockStructureProps};
+export type {MarkdownType, MarkdownRange, InlineImagesInputProps};

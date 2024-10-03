@@ -23,13 +23,13 @@ import type {MarkdownStyle} from './MarkdownTextInputDecoratorViewNativeComponen
 import {getElementHeight, getPlaceholderValue, isEventComposing, normalizeValue, parseInnerHTMLToText} from './web/utils/inputUtils';
 import {parseToReactDOMStyle, processMarkdownStyle} from './web/utils/webStyleUtils';
 import {forceRefreshAllImages} from './web/inputElements/inlineImage';
-import type {ExtendBlockStructureProps} from './commonTypes';
+import type {InlineImagesInputProps} from './commonTypes';
 
 require('../parser/react-native-live-markdown-parser.js');
 
 const useClientEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
 
-interface MarkdownTextInputProps extends TextInputProps, ExtendBlockStructureProps {
+interface MarkdownTextInputProps extends TextInputProps, InlineImagesInputProps {
   markdownStyle?: MarkdownStyle;
   onClick?: (e: MouseEvent<HTMLDivElement>) => void;
   dir?: string;
