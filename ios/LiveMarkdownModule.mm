@@ -48,6 +48,7 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install)
 }
 
 #ifdef RCT_NEW_ARCH_ENABLED
+
 - (void)handleJavaScriptDidLoadNotification:(NSNotification *)notification
 {
   surfacePresenter_ = self.bridge.surfacePresenter;
@@ -79,16 +80,18 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install)
   surfacePresenter_ = surfacePresenter;
 }
 
+- (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
+    (const facebook::react::ObjCTurboModule::InitParams &)params {
+  return std::make_shared<facebook::react::NativeLiveMarkdownModuleSpecJSI>(
+      params);
+}
+
 - (void)invalidate {
   MarkdownShadowFamilyRegistry::reset();
   [[NSNotificationCenter defaultCenter] removeObserver:self];
   [super invalidate];
 }
 
-- (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:(const facebook::react::ObjCTurboModule::InitParams &)params
-{
-  return std::make_shared<facebook::react::NativeLiveMarkdownModuleSpecJSI>(params);
-}
 #endif // RCT_NEW_ARCH_ENABLED
 
 @end
