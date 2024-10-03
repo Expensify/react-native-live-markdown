@@ -76,14 +76,14 @@ index 4429f932b368e8bf89158ee40d4cfa1539771169..19158582abae27d72e240ea54f8c0d2f
 +task prepareWorkletsHeadersForPrefabs(type: Copy) {
 +    from("$projectDir/src/main/cpp")
 +    from("$projectDir/../Common/cpp")
-+    include("**/*.h")
++    include("worklets/**/*.h")
 +    into(workletsPrefabHeadersDir)
 +}
 +
 +task prepareReanimatedHeadersForPrefabs(type: Copy) {
 +    from("$projectDir/src/main/cpp")
 +    from("$projectDir/../Common/cpp")
-+    include("**/*.h")
++    include("reanimated/**/*.h")
 +    into(reanimatedPrefabHeadersDir)
  }
  

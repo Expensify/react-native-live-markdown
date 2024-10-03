@@ -17666,7 +17666,7 @@ __metadata:
 
 "react-native-reanimated@patch:react-native-reanimated@npm%3A3.16.0-nightly-20240929-c4bb3a543#./.yarn/patches/react-native-reanimated-npm-3.16.0-nightly-20240929-c4bb3a543-0d5ade5027.patch::locator=%40expensify%2Freact-native-live-markdown%40workspace%3A.":
   version: 3.16.0-nightly-20240929-c4bb3a543
-  resolution: "react-native-reanimated@patch:react-native-reanimated@npm%3A3.16.0-nightly-20240929-c4bb3a543#./.yarn/patches/react-native-reanimated-npm-3.16.0-nightly-20240929-c4bb3a543-0d5ade5027.patch::version=3.16.0-nightly-20240929-c4bb3a543&hash=6d943e&locator=%40expensify%2Freact-native-live-markdown%40workspace%3A."
+  resolution: "react-native-reanimated@patch:react-native-reanimated@npm%3A3.16.0-nightly-20240929-c4bb3a543#./.yarn/patches/react-native-reanimated-npm-3.16.0-nightly-20240929-c4bb3a543-0d5ade5027.patch::version=3.16.0-nightly-20240929-c4bb3a543&hash=81263f&locator=%40expensify%2Freact-native-live-markdown%40workspace%3A."
   dependencies:
     "@babel/plugin-transform-arrow-functions": ^7.0.0-0
     "@babel/plugin-transform-class-properties": ^7.0.0-0
@@ -17683,7 +17683,7 @@ __metadata:
     "@babel/core": ^7.0.0-0
     react: "*"
     react-native: "*"
-  checksum: 055070103efed92dd4ce3f5556ade08c97c2ab33308b55eccd2be2fa856483f9611b6e7b12e795d49642c2188be7db65df33e5e833b4cd7b1980f3711dbecd7e
+  checksum: 6faa90c8e760bb8c4606ee879b75fa9eafc4785f0a4841b245a2a1090cb202de15631864f6356cfc33e1817c32ffdb58dc400853c69027c213914f1deaca8bcc
   languageName: node
   linkType: hard
 
