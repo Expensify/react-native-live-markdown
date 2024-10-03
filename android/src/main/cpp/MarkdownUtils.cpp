@@ -11,7 +11,6 @@ namespace livemarkdown {
       jni::alias_ref<jhybridobject> jThis,
       jni::alias_ref<jni::JString> input,
       int parserId) {
-
     auto markdownRuntime = expensify::livemarkdown::getMarkdownRuntime();
     jsi::Runtime &rt = markdownRuntime->getJSIRuntime();
 
