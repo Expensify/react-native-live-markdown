@@ -92,7 +92,7 @@
     "react": "18.3.1",
     "react-native": "0.75.3",
     "react-native-builder-bob": "^0.20.0",
-    "react-native-reanimated": "3.16.0-nightly-20240929-c4bb3a543",
+    "react-native-reanimated": "3.16.0-nightly-20241003-18a6355cb",
     "react-native-web": "^0.19.10",
     "release-it": "^15.0.0",
     "turbo": "^1.10.7",
@@ -102,8 +102,7 @@
     "@types/react": "17.0.21",
     "link@^2.1.1": "patch:link@npm%3A2.1.1#./.yarn/patches/link-npm-2.1.1-1c9fea076e.patch",
     "html-entities@^2.5.2": "patch:html-entities@npm%3A2.5.2#./.yarn/patches/html-entities-npm-2.5.2-0b6113e376.patch",
-    "html-entities@^2.3.2": "patch:html-entities@npm%3A2.5.2#./.yarn/patches/html-entities-npm-2.5.2-0b6113e376.patch",
-    "react-native-reanimated@3.16.0-nightly-20240929-c4bb3a543": "patch:react-native-reanimated@npm%3A3.16.0-nightly-20240929-c4bb3a543#./.yarn/patches/react-native-reanimated-npm-3.16.0-nightly-20240929-c4bb3a543-0d5ade5027.patch"
+    "html-entities@^2.3.2": "patch:html-entities@npm%3A2.5.2#./.yarn/patches/html-entities-npm-2.5.2-0b6113e376.patch"
   },
   "peerDependencies": {
     "expensify-common": ">=2.0.85",

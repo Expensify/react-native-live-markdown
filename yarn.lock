@@ -2888,7 +2888,7 @@ __metadata:
     prettier: 2.8.8
     react: 18.3.1
     react-native: 0.75.3
-    react-native-reanimated: 3.16.0-nightly-20240929-c4bb3a543
+    react-native-reanimated: 3.16.0-nightly-20241003-18a6355cb
     react-test-renderer: 18.3.1
     typescript: 5.0.4
   languageName: unknown
@@ -2932,7 +2932,7 @@ __metadata:
     react: 18.3.1
     react-native: 0.75.3
     react-native-builder-bob: ^0.20.0
-    react-native-reanimated: 3.16.0-nightly-20240929-c4bb3a543
+    react-native-reanimated: 3.16.0-nightly-20241003-18a6355cb
     react-native-web: ^0.19.10
     release-it: ^15.0.0
     turbo: ^1.10.7
@@ -17641,9 +17641,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-reanimated@npm:3.16.0-nightly-20240929-c4bb3a543":
-  version: 3.16.0-nightly-20240929-c4bb3a543
-  resolution: "react-native-reanimated@npm:3.16.0-nightly-20240929-c4bb3a543"
+"react-native-reanimated@npm:3.16.0-nightly-20241003-18a6355cb":
+  version: 3.16.0-nightly-20241003-18a6355cb
+  resolution: "react-native-reanimated@npm:3.16.0-nightly-20241003-18a6355cb"
   dependencies:
     "@babel/plugin-transform-arrow-functions": ^7.0.0-0
     "@babel/plugin-transform-class-properties": ^7.0.0-0
@@ -17660,30 +17660,7 @@ __metadata:
     "@babel/core": ^7.0.0-0
     react: "*"
     react-native: "*"
-  checksum: fbbfbbd14f667c7f18c91a4f3d8f6a77a79b4a099495c92316e080966af300c1962605617ae5e3602f134b0ea8ba4770f002260aff02348b099f59277117219e
-  languageName: node
-  linkType: hard
-
-"react-native-reanimated@patch:react-native-reanimated@npm%3A3.16.0-nightly-20240929-c4bb3a543#./.yarn/patches/react-native-reanimated-npm-3.16.0-nightly-20240929-c4bb3a543-0d5ade5027.patch::locator=%40expensify%2Freact-native-live-markdown%40workspace%3A.":
-  version: 3.16.0-nightly-20240929-c4bb3a543
-  resolution: "react-native-reanimated@patch:react-native-reanimated@npm%3A3.16.0-nightly-20240929-c4bb3a543#./.yarn/patches/react-native-reanimated-npm-3.16.0-nightly-20240929-c4bb3a543-0d5ade5027.patch::version=3.16.0-nightly-20240929-c4bb3a543&hash=81263f&locator=%40expensify%2Freact-native-live-markdown%40workspace%3A."
-  dependencies:
-    "@babel/plugin-transform-arrow-functions": ^7.0.0-0
-    "@babel/plugin-transform-class-properties": ^7.0.0-0
-    "@babel/plugin-transform-classes": ^7.0.0-0
-    "@babel/plugin-transform-nullish-coalescing-operator": ^7.0.0-0
-    "@babel/plugin-transform-optional-chaining": ^7.0.0-0
-    "@babel/plugin-transform-shorthand-properties": ^7.0.0-0
-    "@babel/plugin-transform-template-literals": ^7.0.0-0
-    "@babel/plugin-transform-unicode-regex": ^7.0.0-0
-    "@babel/preset-typescript": ^7.16.7
-    convert-source-map: ^2.0.0
-    invariant: ^2.2.4
-  peerDependencies:
-    "@babel/core": ^7.0.0-0
-    react: "*"
-    react-native: "*"
-  checksum: 6faa90c8e760bb8c4606ee879b75fa9eafc4785f0a4841b245a2a1090cb202de15631864f6356cfc33e1817c32ffdb58dc400853c69027c213914f1deaca8bcc
+  checksum: 68945a3ea58e63e6269d2131e3024fe0a422f63717668bff36379954ab2804add0aaad855e45952469e429b4f1cc84f5ff2c7c9e85e5ea2a4b376acb132f3adb
   languageName: node
   linkType: hard
 
