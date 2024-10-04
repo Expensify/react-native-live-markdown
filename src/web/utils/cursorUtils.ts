@@ -27,13 +27,15 @@ function setCursorPosition(target: MarkdownTextInputElement, startIndex: number,
   if (startTreeNode.type === 'br') {
     range.setStartBefore(startTreeNode.element);
   } else {
-    range.setStart(startTreeNode.element.childNodes[0] as ChildNode, start - startTreeNode.start);
+    const startElement = startTreeNode.element;
+    range.setStart((startElement.childNodes[0] || startElement) as ChildNode, start - startTreeNode.start);
   }
 
   if (endTreeNode.type === 'br') {
     range.setEndBefore(endTreeNode.element);
   } else {
-    range.setEnd(endTreeNode.element.childNodes[0] as ChildNode, (end || start) - endTreeNode.start);
+    const endElement = endTreeNode.element;
+    range.setEnd((endElement.childNodes[0] || endElement) as ChildNode, (end || start) - endTreeNode.start);
   }
 
   if (!end) {

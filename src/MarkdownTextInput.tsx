@@ -10,7 +10,7 @@ import type {MarkdownStyle} from './MarkdownTextInputDecoratorViewNativeComponen
 import NativeLiveMarkdownModule from './NativeLiveMarkdownModule';
 import {mergeMarkdownStyleWithDefault} from './styleUtils';
 import type {PartialMarkdownStyle} from './styleUtils';
-import type {MarkdownRange} from './commonTypes';
+import type {InlineImagesInputProps, MarkdownRange} from './commonTypes';
 
 declare global {
   // eslint-disable-next-line no-var
@@ -51,7 +51,7 @@ function unregisterParser(parserId: number) {
   global.jsi_unregisterMarkdownWorklet(parserId);
 }
 
-interface MarkdownTextInputProps extends TextInputProps {
+interface MarkdownTextInputProps extends TextInputProps, InlineImagesInputProps {
   markdownStyle?: PartialMarkdownStyle;
   parser: (value: string) => MarkdownRange[];
 }
