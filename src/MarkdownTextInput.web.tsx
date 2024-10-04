@@ -23,12 +23,13 @@ import type {MarkdownStyle} from './MarkdownTextInputDecoratorViewNativeComponen
 import {getElementHeight, getPlaceholderValue, isEventComposing, normalizeValue, parseInnerHTMLToText} from './web/utils/inputUtils';
 import {parseToReactDOMStyle, processMarkdownStyle} from './web/utils/webStyleUtils';
 import {forceRefreshAllImages} from './web/inputElements/inlineImage';
+import type {InlineImagesInputProps} from './commonTypes';
 
 require('../parser/react-native-live-markdown-parser.js');
 
 const useClientEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
 
-interface MarkdownTextInputProps extends TextInputProps {
+interface MarkdownTextInputProps extends TextInputProps, InlineImagesInputProps {
   markdownStyle?: MarkdownStyle;
   onClick?: (e: MouseEvent<HTMLDivElement>) => void;
   dir?: string;
@@ -101,6 +102,8 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       id,
       inputMode,
       onTouchStart,
+      addAuthTokenToImageURLCallback,
+      imagePreviewAuthRequiredURLs,
     },
     ref,
   ) => {
@@ -154,7 +157,10 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         if (text === null) {
           return {text: divRef.current.value, cursorPosition: null};
         }
-        const parsedText = updateInputStructure(target, text, cursorPosition, multiline, customMarkdownStyles, false, shouldForceDOMUpdate, shouldScrollIntoView);
+        const parsedText = updateInputStructure(target, text, cursorPosition, multiline, customMarkdownStyles, false, shouldForceDOMUpdate, shouldScrollIntoView, {
+          addAuthTokenToImageURLCallback,
+          imagePreviewAuthRequiredURLs,
+        });
         divRef.current.value = parsedText.text;
 
         if (history.current && shouldAddToHistory) {
@@ -163,7 +169,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
         return parsedText;
       },
-      [multiline],
+      [addAuthTokenToImageURLCallback, imagePreviewAuthRequiredURLs, multiline],
     );
 
     const processedMarkdownStyle = useMemo(() => {

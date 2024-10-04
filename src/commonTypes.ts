@@ -21,4 +21,9 @@ interface MarkdownRange {
   depth?: number;
 }
 
-export type {MarkdownType, MarkdownRange};
+type InlineImagesInputProps = {
+  addAuthTokenToImageURLCallback?: (url: string) => string;
+  imagePreviewAuthRequiredURLs?: string[];
+};
+
+export type {MarkdownType, MarkdownRange, InlineImagesInputProps};
