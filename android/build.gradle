@@ -186,3 +186,7 @@ if (isNewArchitectureEnabled()) {
     codegenJavaPackageName = "com.expensify.livemarkdown"
   }
 }
+
+tasks.withType(JavaCompile).configureEach {
+  options.compilerArgs << "-Xlint:all" << "-Werror"
+}

@@ -17,8 +17,10 @@ import java.util.List;
 import java.util.Map;
 
 public class LiveMarkdownPackage extends TurboReactPackage {
+  @NonNull
   @Override
-  public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
+  @SuppressWarnings("rawtypes")
+  public List<ViewManager> createViewManagers(@NonNull ReactApplicationContext reactContext) {
     List<ViewManager> viewManagers = new ArrayList<>();
     viewManagers.add(new MarkdownTextInputDecoratorViewManager());
     return viewManagers;
@@ -27,6 +29,7 @@ public class LiveMarkdownPackage extends TurboReactPackage {
   @Override
   public ReactModuleInfoProvider getReactModuleInfoProvider() {
     return new ReactModuleInfoProvider() {
+      @NonNull
       @Override
       public Map<String, ReactModuleInfo> getReactModuleInfos() {
         return Map.of(LiveMarkdownModule.NAME, new ReactModuleInfo(
