@@ -13,7 +13,7 @@ public abstract class MarkdownTextInputDecoratorViewManagerSpec<T extends View> 
   private final ViewManagerDelegate<T> mDelegate;
 
   public MarkdownTextInputDecoratorViewManagerSpec() {
-    mDelegate = new MarkdownTextInputDecoratorViewManagerDelegate(this);
+    mDelegate = new MarkdownTextInputDecoratorViewManagerDelegate<>(this);
   }
 
   @Nullable
