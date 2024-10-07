@@ -4,6 +4,7 @@
 #import <RNLiveMarkdown/RCTTextInputComponentView+Markdown.h>
 #import <RNLiveMarkdown/RCTMarkdownUtils.h>
 #import <React/RCTUITextField.h>
+#import <React/RCTUITextView.h>
 #import <objc/message.h>
 
 #import "MarkdownShadowFamilyRegistry.h"
@@ -17,7 +18,7 @@ using namespace expensify::livemarkdown;
 
   if (markdownUtils != nil) {
     // force Markdown formatting on first render because `_setAttributedText` is called before `setMarkdownUtils`
-    RCTUITextField *backedTextInputView = [self getBackedTextInputView];
+    auto backedTextInputView = [self getBackedTextInputView];
     backedTextInputView.attributedText = [markdownUtils parseMarkdown:backedTextInputView.attributedText withAttributes:backedTextInputView.defaultTextAttributes];
   }
 }
@@ -26,15 +27,14 @@ using namespace expensify::livemarkdown;
   return objc_getAssociatedObject(self, @selector(getMarkdownUtils));
 }
 
-- (RCTUITextField *)getBackedTextInputView {
-  RCTUITextField *backedTextInputView = [self valueForKey:@"_backedTextInputView"];
-  return backedTextInputView;
+- (id<RCTBackedTextInputViewProtocol>)getBackedTextInputView {
+  return [self valueForKey:@"_backedTextInputView"];
 }
 
 - (void)markdown__setAttributedString:(NSAttributedString *)attributedString
 {
-  RCTMarkdownUtils *markdownUtils = [self getMarkdownUtils];
-  RCTUITextField *backedTextInputView = [self getBackedTextInputView];
+  auto markdownUtils = [self getMarkdownUtils];
+  auto backedTextInputView = [self getBackedTextInputView];
   if (markdownUtils != nil && backedTextInputView != nil) {
     attributedString = [markdownUtils parseMarkdown:attributedString withAttributes:backedTextInputView.defaultTextAttributes];
   } else {
