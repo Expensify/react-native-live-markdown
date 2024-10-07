@@ -102,6 +102,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
       id,
       inputMode,
       onTouchStart,
+      maxLength,
       addAuthTokenToImageURLCallback,
       imagePreviewAuthRequiredURLs,
     },
@@ -175,7 +176,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     const processedMarkdownStyle = useMemo(() => {
       const newMarkdownStyle = processMarkdownStyle(markdownStyle);
       if (divRef.current) {
-        parseText(divRef.current, divRef.current.value, newMarkdownStyle, null, false);
+        parseText(divRef.current, divRef.current.value, newMarkdownStyle, null, false, false);
       }
       return newMarkdownStyle;
     }, [markdownStyle, parseText]);
@@ -311,12 +312,16 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
         updateTextColor(divRef.current, e.target.textContent ?? '');
         const previousText = divRef.current.value;
-        const parsedText = normalizeValue(
+        let parsedText = normalizeValue(
           inputType === 'pasteText' ? pasteContent.current || '' : parseInnerHTMLToText(e.target as MarkdownTextInputElement, inputType, contentSelection.current.start),
         );
 
         if (pasteContent.current) {
           pasteContent.current = null;
+        }
+
+        if (maxLength !== undefined && parsedText.length > maxLength) {
+          parsedText = previousText;
         }
 
         const prevSelection = contentSelection.current ?? {start: 0, end: 0};
@@ -337,7 +342,6 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           }
           return;
         }
-
         let newInputUpdate: ParseTextResult;
         switch (inputType) {
           case 'historyUndo':
@@ -399,7 +403,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
         handleContentSizeChange();
       },
-      [updateTextColor, updateSelection, onChange, onChangeText, handleContentSizeChange, undo, redo, parseText, processedMarkdownStyle, setEventProps],
+      [updateTextColor, updateSelection, onChange, onChangeText, handleContentSizeChange, undo, redo, parseText, processedMarkdownStyle, setEventProps, maxLength],
     );
 
     const insertText = useCallback(
@@ -409,17 +413,25 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         }
 
         const previousText = divRef.current.value;
-        const newText = `${divRef.current.value.substring(0, contentSelection.current.start)}${text}${divRef.current.value.substring(contentSelection.current.end)}`;
+        let insertedText = text;
+        let availableLength = text.length;
+        const prefix = divRef.current.value.substring(0, contentSelection.current.start);
+        const suffix = divRef.current.value.substring(contentSelection.current.end);
+        if (maxLength !== undefined) {
+          availableLength = maxLength - prefix.length - suffix.length;
+          insertedText = text.slice(0, Math.max(availableLength, 0));
+        }
+        const newText = `${prefix}${insertedText}${suffix}`;
         if (previousText === newText) {
           document.execCommand('delete');
         }
 
-        pasteContent.current = newText;
+        pasteContent.current = availableLength > 0 ? newText : previousText;
         (e.nativeEvent as MarkdownNativeEvent).inputType = 'pasteText';
 
         handleOnChangeText(e);
       },
-      [handleOnChangeText],
+      [handleOnChangeText, maxLength],
     );
 
     const handleKeyPress = useCallback(
@@ -643,11 +655,13 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
           return;
         }
         const normalizedValue = normalizeValue(value);
+
         divRef.current.value = normalizedValue;
         parseText(divRef.current, normalizedValue, processedMarkdownStyle, null, true, false, true);
+
         updateTextColor(divRef.current, value);
       },
-      [multiline, processedMarkdownStyle, value],
+      [multiline, processedMarkdownStyle, value, maxLength],
     );
 
     useClientEffect(
