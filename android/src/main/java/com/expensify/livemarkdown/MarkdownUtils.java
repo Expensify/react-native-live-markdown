@@ -23,7 +23,7 @@ public class MarkdownUtils {
     SoLoader.loadLibrary("livemarkdown");
   }
 
-  private static native String nativeParseMarkdown(String input, int parserId);
+  private static synchronized native String nativeParseMarkdown(String input, int parserId);
 
   public MarkdownUtils(@NonNull AssetManager assetManager) {
     mAssetManager = assetManager;
