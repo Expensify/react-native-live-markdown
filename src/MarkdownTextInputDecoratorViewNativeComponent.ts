@@ -27,12 +27,20 @@ interface MarkdownStyle {
     fontSize: Float;
     color: ColorValue;
     backgroundColor: ColorValue;
+    borderColor: ColorValue;
+    borderWidth: Float;
+    borderRadius: Float;
+    padding: Float;
   };
   pre: {
     fontFamily: string;
     fontSize: Float;
     color: ColorValue;
     backgroundColor: ColorValue;
+    borderColor: ColorValue;
+    borderWidth: Float;
+    borderRadius: Float;
+    padding: Float;
   };
   mentionHere: {
     color: ColorValue;
