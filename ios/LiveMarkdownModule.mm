@@ -52,7 +52,6 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install)
 - (void)handleJavaScriptDidLoadNotification:(NSNotification *)notification
 {
   surfacePresenter_ = self.bridge.surfacePresenter;
-  [self install];
 }
 
 - (void)setBridge:(RCTBridge *)bridge
