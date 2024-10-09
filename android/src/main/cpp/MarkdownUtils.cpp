@@ -11,15 +11,15 @@ namespace livemarkdown {
       jni::alias_ref<jhybridobject> jThis,
       jni::alias_ref<jni::JString> input,
       int parserId) {
-    auto markdownRuntime = expensify::livemarkdown::getMarkdownRuntime();
+    const auto markdownRuntime = expensify::livemarkdown::getMarkdownRuntime();
     jsi::Runtime &rt = markdownRuntime->getJSIRuntime();
 
-    auto markdownWorklet = expensify::livemarkdown::getMarkdownWorklet(parserId);
+    const auto markdownWorklet = expensify::livemarkdown::getMarkdownWorklet(parserId);
 
-    auto text = jsi::String::createFromUtf8(rt, input->toStdString());
-    auto result = markdownRuntime->runGuarded(markdownWorklet, text);
+    const auto text = jsi::String::createFromUtf8(rt, input->toStdString());
+    const auto result = markdownRuntime->runGuarded(markdownWorklet, text);
 
-    auto json = rt.global().getPropertyAsObject(rt, "JSON").getPropertyAsFunction(rt, "stringify").call(rt, result).asString(rt).utf8(rt);
+    const auto json = rt.global().getPropertyAsObject(rt, "JSON").getPropertyAsFunction(rt, "stringify").call(rt, result).asString(rt).utf8(rt);
     return jni::make_jstring(json);
   }
 
