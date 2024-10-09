@@ -34,7 +34,7 @@ RCT_EXPORT_MODULE()
 
 RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install)
 {
-  RCTCxxBridge *cxxBridge = (RCTCxxBridge *)[RCTBridge currentBridge];
+  RCTCxxBridge *cxxBridge = (RCTCxxBridge *)self.bridge;
   jsi::Runtime &rt = *(jsi::Runtime *)cxxBridge.runtime;
   expensify::livemarkdown::injectJSIBindings(rt);
 
