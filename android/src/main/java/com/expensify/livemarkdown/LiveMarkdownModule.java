@@ -28,7 +28,7 @@ public class LiveMarkdownModule extends NativeLiveMarkdownModuleSpec {
       mNativeProxy.createCommitHook(uiManager);
     }
 
-    long jsiRuntime = Objects.requireNonNull(getReactApplicationContext().getJavaScriptContextHolder()).get();
+    long jsiRuntime = Objects.requireNonNull(getReactApplicationContext().getJavaScriptContextHolder(), "[react-native-live-markdown] JavaScriptContextHolder is null").get();
     injectJSIBindings(jsiRuntime);
 
     return true;
