@@ -20,7 +20,7 @@ npm install @expensify/react-native-live-markdown react-native-reanimated expens
 npx expo install @expensify/react-native-live-markdown react-native-reanimated expensify-common
 ```
 
-React Native Live Markdown requires [react-native-reanimated](https://github.com/software-mansion/react-native-reanimated) 3.15.0 or newer and [expensify-common](https://github.com/Expensify/expensify-common) 2.0.76 or newer.
+React Native Live Markdown requires [react-native-reanimated](https://github.com/software-mansion/react-native-reanimated) 3.16.0 or newer and [expensify-common](https://github.com/Expensify/expensify-common) 2.0.98 or newer.
 
 Then, install the iOS dependencies with CocoaPods:
 
