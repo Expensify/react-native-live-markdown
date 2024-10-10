@@ -88,7 +88,7 @@
   }
 }
 
-- (void)willMoveToWindow:(NSWindow *)newWindow
+- (void)willMoveToWindow:(RCTUIWindow *)newWindow
 {
   if (_textInput != nil) {
     [_textInput setMarkdownUtils:nil];
