@@ -1,4 +1,3 @@
-#import <objc/runtime.h>
 #import <RNLiveMarkdown/MarkdownLayoutManager.h>
 
 @implementation MarkdownLayoutManager
@@ -9,7 +8,7 @@
   [self enumerateLineFragmentsForGlyphRange:glyphsToShow usingBlock:^(CGRect rect, CGRect usedRect, NSTextContainer * _Nonnull textContainer, NSRange glyphRange, BOOL * _Nonnull stop) {
     __block BOOL isBlockquote = NO;
     __block int currentDepth = 0;
-    RCTMarkdownUtils *markdownUtils = objc_getAssociatedObject(self, @selector(markdownUtils));
+    RCTMarkdownUtils *markdownUtils = [self valueForKey:@"markdownUtils"];
     [markdownUtils.blockquoteRangesAndLevels enumerateObjectsUsingBlock:^(NSDictionary *item, NSUInteger idx, BOOL * _Nonnull stop) {
       NSRange range = [[item valueForKey:@"range"] rangeValue];
       currentDepth = [[item valueForKey:@"depth"] unsignedIntegerValue];
