@@ -85,7 +85,7 @@ using namespace facebook;
 }
 
 - (void)applyRangeToAttributedString:(NSMutableAttributedString *)attributedString type:(const std::string)type start:(const int)start length:(const int)length depth:(const int)depth {
-    if (start == 0 || start + length > attributedString.length) {
+    if (length == 0 || start + length > attributedString.length) {
         return;
     }
 
