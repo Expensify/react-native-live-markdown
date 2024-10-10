@@ -16,10 +16,9 @@
 {
   RCTMarkdownUtils *markdownUtils = [self getMarkdownUtils];
   if (markdownUtils != nil) {
-    NSRange range = self.selectedRange;
-    NSAttributedString *attributedText = [markdownUtils parseMarkdown:self.attributedText withAttributes:self.defaultTextAttributes];
-    [self breakUndoCoalescing];
-    [self.textStorage setAttributedString:attributedText ?: [NSAttributedString new]];
+    NSRange range = [self selectedTextRange];
+    NSAttributedString *attributedString = [markdownUtils parseMarkdown:self.attributedText withAttributes:self.defaultTextAttributes];
+    [self.textStorage setAttributedString:attributedString ?: [NSAttributedString new]];
     [super setSelectedRange:range]; // prevents cursor from jumping at the end when typing in the middle of the text
     self.typingAttributes = self.defaultTextAttributes; // removes indent in new line when typing after blockquote
   }
