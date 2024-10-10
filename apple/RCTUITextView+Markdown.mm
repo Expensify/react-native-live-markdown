@@ -16,9 +16,10 @@
 {
   RCTMarkdownUtils *markdownUtils = [self getMarkdownUtils];
   if (markdownUtils != nil) {
-    UITextRange *range = self.selectedTextRange;
-    super.attributedText = [markdownUtils parseMarkdown:self.attributedText withAttributes:self.defaultTextAttributes];
-    [super setSelectedTextRange:range]; // prevents cursor from jumping at the end when typing in the middle of the text
+    NSRange range = [self selectedTextRange];
+    NSAttributedString *attributedString = [markdownUtils parseMarkdown:self.attributedText withAttributes:self.defaultTextAttributes];
+    [self.textStorage setAttributedString:attributedString ?: [NSAttributedString new]];
+    [super setSelectedRange:range]; // prevents cursor from jumping at the end when typing in the middle of the text
     self.typingAttributes = self.defaultTextAttributes; // removes indent in new line when typing after blockquote
   }
 
@@ -35,7 +36,7 @@
     SEL swizzledSelector = @selector(markdown_textDidChange);
     Method originalMethod = class_getInstanceMethod(cls, originalSelector);
     Method swizzledMethod = class_getInstanceMethod(cls, swizzledSelector);
-    method_exchangeImplementations(originalMethod, swizzledMethod);
+    // method_exchangeImplementations(originalMethod, swizzledMethod);
   });
 }
 
