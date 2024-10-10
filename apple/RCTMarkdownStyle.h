@@ -1,4 +1,4 @@
-#import <React/RCTUIKit.h> // [macOS]
+#import <React/RCTUIKit.h>
 
 #ifdef RCT_NEW_ARCH_ENABLED
 #import <react/renderer/components/RNLiveMarkdownSpec/Props.h>
