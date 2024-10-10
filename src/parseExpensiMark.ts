@@ -1,6 +1,6 @@
 'worklet';
 
-import ExpensiMark from 'expensify-common/dist/ExpensiMark';
+import {ExpensiMark} from 'expensify-common';
 import {unescapeText} from 'expensify-common/dist/utils';
 import type {MarkdownType, MarkdownRange} from './commonTypes';
 
@@ -253,6 +253,7 @@ function groupRanges(ranges: MarkdownRange[]) {
 }
 
 function parseExpensiMark(markdown: string): MarkdownRange[] {
+  const x = new ExpensiMark();
   try {
     const html = parseMarkdownToHTML(markdown);
     const tokens = parseHTMLToTokens(html);
