@@ -411,7 +411,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
 
         handleContentSizeChange();
       },
-      [updateTextColor, updateSelection, onChange, onChangeText, handleContentSizeChange, undo, redo, parseText, processedMarkdownStyle, setEventProps, maxLength],
+      [parser, updateTextColor, updateSelection, onChange, onChangeText, handleContentSizeChange, undo, redo, parseText, processedMarkdownStyle, setEventProps, maxLength],
     );
 
     const insertText = useCallback(
