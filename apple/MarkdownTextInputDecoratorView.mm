@@ -78,11 +78,11 @@
     CGSize contentSize = _textView.contentSize;
     CGRect textBounds = [layoutManager usedRectForTextContainer:_textView.textContainer];
     contentSize.height = textBounds.size.height + _textView.textContainerInset.top + _textView.textContainerInset.bottom;
-    // [_textView setContentSize:contentSize];
+    // [_textView setContentSize:contentSize]; // TODO
 
-//    layoutManager.allowsNonContiguousLayout = NO; // workaround for onScroll issue
-//    object_setClass(layoutManager, [MarkdownLayoutManager class]);
-//    objc_setAssociatedObject(layoutManager, @selector(markdownUtils), _markdownUtils, OBJC_ASSOCIATION_RETAIN);
+    layoutManager.allowsNonContiguousLayout = NO; // workaround for onScroll issue
+    object_setClass(layoutManager, [MarkdownLayoutManager class]);
+    objc_setAssociatedObject(layoutManager, @selector(markdownUtils), _markdownUtils, OBJC_ASSOCIATION_RETAIN);
   } else {
     react_native_assert(false && "Cannot enable Markdown for this type of TextInput.");
   }
@@ -99,10 +99,10 @@
   if (_textView != nil) {
     [_textView setMarkdownUtils:nil];
     NSLayoutManager *layoutManager = _textView.layoutManager;
-//    if (layoutManager != nil && [object_getClass(layoutManager) isEqual:[MarkdownLayoutManager class]]) {
-//      objc_setAssociatedObject(layoutManager, @selector(markdownUtils), nil, OBJC_ASSOCIATION_RETAIN);
-//      object_setClass(layoutManager, [NSLayoutManager class]);
-//    }
+    if (layoutManager != nil && [object_getClass(layoutManager) isEqual:[MarkdownLayoutManager class]]) {
+      objc_setAssociatedObject(layoutManager, @selector(markdownUtils), nil, OBJC_ASSOCIATION_RETAIN);
+      object_setClass(layoutManager, [NSLayoutManager class]);
+    }
   }
 }
 
