@@ -47,7 +47,7 @@
     id<RCTBackedTextInputViewProtocol> backedTextInputView = self.backedTextInputView;
     NSAttributedString *oldAttributedText = backedTextInputView.attributedText;
     NSAttributedString *newAttributedText = [markdownUtils parseMarkdown:oldAttributedText withAttributes:backedTextInputView.defaultTextAttributes];
-    UITextRange *range = backedTextInputView.selectedTextRange;
+    NSRange range = backedTextInputView.selectedTextRange;
 
     // update attributed text without emitting onSelectionChange event
     id<RCTBackedTextInputDelegate> delegate = backedTextInputView.textInputDelegate;

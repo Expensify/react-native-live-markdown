@@ -18,13 +18,8 @@
   RCTMarkdownUtils *markdownUtils = [self getMarkdownUtils];
   if (markdownUtils != nil) {
     RCTUITextField *backedTextInputView = [self valueForKey:@"_backedTextInputView"];
-<<<<<<<< HEAD:apple/RCTBackedTextFieldDelegateAdapter+Markdown.m
     NSRange range = backedTextInputView.selectedRange;
-    backedTextInputView.attributedText = [markdownUtils parseMarkdown:backedTextInputView.attributedText];
-========
-    UITextRange *range = backedTextInputView.selectedTextRange;
     backedTextInputView.attributedText = [markdownUtils parseMarkdown:backedTextInputView.attributedText withAttributes:backedTextInputView.defaultTextAttributes];
->>>>>>>> main:apple/RCTBackedTextFieldDelegateAdapter+Markdown.mm
     [backedTextInputView setSelectedTextRange:range notifyDelegate:YES];
   }
 

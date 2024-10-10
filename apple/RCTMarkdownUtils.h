@@ -6,7 +6,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface RCTMarkdownUtils : NSObject
 
 @property (nonatomic) RCTMarkdownStyle *markdownStyle;
-@property (nonatomic) NSMutableArray<NSValue *> *blockquoteRangesAndLevels;
+@property (nonatomic) NSMutableArray<NSDictionary *> *blockquoteRangesAndLevels;
 
 - (NSAttributedString *)parseMarkdown:(nullable NSAttributedString *)input withAttributes:(nullable NSDictionary<NSAttributedStringKey, id>*)attributes;
 

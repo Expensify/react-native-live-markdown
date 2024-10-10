@@ -197,7 +197,7 @@ static void RCTApplyBaselineOffset(NSMutableAttributedString *attributedText)
       return;
     }
 
-    maximumFontLineHeight = MAX(font.lineHeight, maximumFontLineHeight);
+    maximumFontLineHeight = MAX(UIFontLineHeight(font), maximumFontLineHeight); // [macOS]
   }];
 
   if (maximumLineHeight < maximumFontLineHeight) {
