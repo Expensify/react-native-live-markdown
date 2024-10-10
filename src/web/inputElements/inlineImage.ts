@@ -20,6 +20,13 @@ type DebouncePreviewItem = {
 
 const timeoutMap = new Map<string, DebouncePreviewItem>();
 
+function createSeparatorElement() {
+  const separator = document.createElement('span');
+  separator.contentEditable = 'false';
+  separator.setAttribute('data-type', 'image-block-separator');
+  return separator;
+}
+
 function getImagePreviewElement(targetElement: HTMLMarkdownElement) {
   return Array.from(targetElement?.childNodes || []).find((el) => (el as HTMLElement)?.contentEditable === 'false') as HTMLMarkdownElement | undefined;
 }
@@ -158,6 +165,9 @@ function addInlineImagePreview(
       imageHref = addAuthTokenToImageURLCallback(imageHref);
     }
   }
+
+  // Add an empty span to fix issues connected with removing the image from the inner HTML when editing the input
+  targetNode.parentNode?.element.appendChild(createSeparatorElement());
 
   const imageMarginTop = parseStringWithUnitToNumber(`${markdownStyle.inlineImage?.marginTop}`);
   const imageMarginBottom = parseStringWithUnitToNumber(`${markdownStyle.inlineImage?.marginBottom}`);
