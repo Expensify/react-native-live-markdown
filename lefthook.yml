@@ -6,8 +6,6 @@ pre-commit:
       run: npx eslint {staged_files}
     types_root:
       run: npx tsc --project tsconfig.json --noEmit
-    types_parser:
-      run: npx tsc --project ./parser/tsconfig.json --noEmit
     types_example:
       run: npx tsc --project ./example/tsconfig.json --noEmit
     types_WebExample:

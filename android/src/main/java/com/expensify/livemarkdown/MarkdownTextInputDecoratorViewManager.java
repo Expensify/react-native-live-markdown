@@ -28,4 +28,10 @@ public class MarkdownTextInputDecoratorViewManager extends MarkdownTextInputDeco
     MarkdownStyle markdownStyle = new MarkdownStyle(value, view.getContext());
     view.setMarkdownStyle(markdownStyle);
   }
+
+  @Override
+  @ReactProp(name = "parserId")
+  public void setParserId(@NonNull MarkdownTextInputDecoratorView view, int parserId) {
+    view.setParserId(parserId);
+  }
 }

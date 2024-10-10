@@ -18,11 +18,9 @@ Pod::Spec.new do |s|
   s.platforms    = { :ios => "11.0", :visionos => "1.0" }
   s.source       = { :git => "https://github.com/expensify/react-native-live-markdown.git", :tag => "#{s.version}" }
 
-  s.source_files = "apple/**/*.{h,m,mm}"
+  s.source_files = "apple/**/*.{h,m,mm}", "cpp/**/*.{h,cpp}"
 
-  s.resources = "parser/react-native-live-markdown-parser.js"
-
-  s.dependency "hermes-engine"
+  s.dependency "RNReanimated/worklets"
 
   s.xcconfig = {
     "OTHER_CFLAGS" => "$(inherited) -DREACT_NATIVE_MINOR_VERSION=#{react_native_minor_version}"

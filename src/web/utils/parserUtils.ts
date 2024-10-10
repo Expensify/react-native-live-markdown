@@ -272,6 +272,7 @@ function moveCursor(isFocused: boolean, alwaysMoveCursorToTheEnd: boolean, curso
 }
 
 function updateInputStructure(
+  parserFunction: (input: string) => MarkdownRange[],
   target: MarkdownTextInputElement,
   text: string,
   cursorPositionIndex: number | null,
@@ -291,7 +292,7 @@ function updateInputStructure(
     const selection = getCurrentCursorPosition(target);
     cursorPosition = selection ? selection.start : null;
   }
-  const markdownRanges = global.parseExpensiMarkToRanges(text);
+  const markdownRanges = parserFunction(text);
   if (!text || targetElement.innerHTML === '<br>' || (targetElement && targetElement.innerHTML === '\n')) {
     targetElement.innerHTML = '';
     targetElement.innerText = '';

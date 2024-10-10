@@ -1,18 +1,16 @@
 #import <RNLiveMarkdown/RCTMarkdownUtils.h>
+#import <RNLiveMarkdown/MarkdownGlobal.h>
 #import "react_native_assert.h"
 #import <React/RCTAssert.h>
 #import <React/RCTFont.h>
-
 #include <jsi/jsi.h>
-#include <hermes/hermes.h>
-
-using namespace facebook;
 
 @implementation RCTMarkdownUtils {
   NSString *_prevInputString;
   NSAttributedString *_prevAttributedString;
   NSDictionary<NSAttributedStringKey, id> *_prevTextAttributes;
   __weak RCTMarkdownStyle *_prevMarkdownStyle;
+  __weak NSNumber *_prevParserId;
 }
 
 - (NSAttributedString *)parseMarkdown:(nullable NSAttributedString *)input withAttributes:(nullable NSDictionary<NSAttributedStringKey,id> *)attributes
@@ -23,29 +21,20 @@ using namespace facebook;
         }
 
         NSString *inputString = [input string];
-        if ([inputString isEqualToString:_prevInputString] && [attributes isEqualToDictionary:_prevTextAttributes] && [_markdownStyle isEqual:_prevMarkdownStyle]) {
+        if ([inputString isEqualToString:_prevInputString] && [attributes isEqualToDictionary:_prevTextAttributes] && [_markdownStyle isEqual:_prevMarkdownStyle] && [_parserId isEqualToNumber:_prevParserId]) {
             return _prevAttributedString;
         }
 
-        static std::shared_ptr<jsi::Runtime> runtime;
         static std::mutex runtimeMutex;
         auto lock = std::lock_guard<std::mutex>(runtimeMutex);
 
-        if (runtime == nullptr) {
-            NSString *path = [[NSBundle mainBundle] pathForResource:@"react-native-live-markdown-parser" ofType:@"js"];
-            assert(path != nil && "[react-native-live-markdown] Markdown parser bundle not found");
-            NSString *content = [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:NULL];
-            assert(content != nil && "[react-native-live-markdown] Markdown parser bundle is empty");
-            runtime = facebook::hermes::makeHermesRuntime();
-            auto codeBuffer = std::make_shared<const jsi::StringBuffer>([content UTF8String]);
-            runtime->evaluateJavaScript(codeBuffer, "evaluateJavaScript");
-        }
+        auto markdownRuntime = expensify::livemarkdown::getMarkdownRuntime();
+        jsi::Runtime &rt = markdownRuntime->getJSIRuntime();
 
-        jsi::Runtime &rt = *runtime;
+        auto markdownWorklet = expensify::livemarkdown::getMarkdownWorklet([_parserId intValue]);
+
         auto text = jsi::String::createFromUtf8(rt, [inputString UTF8String]);
-
-        auto func = rt.global().getPropertyAsFunction(rt, "parseExpensiMarkToRanges");
-        auto output = func.call(rt, text);
+        auto output = markdownRuntime->runGuarded(markdownWorklet, text);
         if (output.isUndefined()) {
           return input;
         }
@@ -79,6 +68,7 @@ using namespace facebook;
         _prevAttributedString = attributedString;
         _prevTextAttributes = attributes;
         _prevMarkdownStyle = _markdownStyle;
+        _prevParserId = _parserId;
 
         return attributedString;
     }
