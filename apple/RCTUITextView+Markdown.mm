@@ -36,7 +36,7 @@
     SEL swizzledSelector = @selector(markdown_textDidChange);
     Method originalMethod = class_getInstanceMethod(cls, originalSelector);
     Method swizzledMethod = class_getInstanceMethod(cls, swizzledSelector);
-    method_exchangeImplementations(originalMethod, swizzledMethod);
+    // method_exchangeImplementations(originalMethod, swizzledMethod);
   });
 }
 
