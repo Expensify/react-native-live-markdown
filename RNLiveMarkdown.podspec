@@ -18,7 +18,7 @@ Pod::Spec.new do |s|
   s.platforms    = { :ios => "11.0", :visionos => "1.0" }
   s.source       = { :git => "https://github.com/expensify/react-native-live-markdown.git", :tag => "#{s.version}" }
 
-  s.source_files = "ios/**/*.{h,m,mm}"
+  s.source_files = "apple/**/*.{h,m,mm}"
 
   s.resources = "parser/react-native-live-markdown-parser.js"
 
