@@ -1,5 +1,5 @@
 #import <React/RCTBaseTextInputView.h>
-#import <react-native-live-markdown/RCTMarkdownUtils.h>
+#import <RNLiveMarkdown/RCTMarkdownUtils.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -8,6 +8,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, nullable, getter=getMarkdownUtils) RCTMarkdownUtils *markdownUtils;
 
 - (void)markdown_setAttributedText:(NSAttributedString *)attributedText;
+
+- (BOOL)markdown_textOf:(NSAttributedString *)newText equals:(NSAttributedString *)oldText;
 
 - (void)markdown_updateLocalData;
 

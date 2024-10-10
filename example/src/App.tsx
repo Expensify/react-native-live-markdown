@@ -1,112 +1,59 @@
 import * as React from 'react';
-
-import {Button, Platform, StyleSheet, Text, View} from 'react-native';
-
+import {Button, StyleSheet, Text, View} from 'react-native';
 import {MarkdownTextInput} from '@expensify/react-native-live-markdown';
 import type {TextInput} from 'react-native';
-
-const DEFAULT_TEXT = ['Hello, *world*!', 'https://expensify.com', '# Lorem ipsum', '> Hello world', '`foo`', '```\nbar\n```', '@here', '@someone@swmansion.com'].join('\n');
-
-function isWeb() {
-  return Platform.OS === 'web';
-}
-
-function getPlatform() {
-  if (isWeb()) {
-    return 'web';
-  }
-  // @ts-expect-error it works
-  return Platform.constants.systemName || Platform.constants.Brand;
-}
-
-function getPlatformVersion() {
-  return Platform.Version;
-}
-
-function getBundle() {
-  return __DEV__ ? 'dev' : 'production';
-}
-
-function getRuntime() {
-  if ('HermesInternal' in global) {
-    const version =
-      // @ts-expect-error this is fine
-      // eslint-disable-next-line es/no-optional-chaining
-      global.HermesInternal?.getRuntimeProperties?.()['OSS Release Version'];
-    return `Hermes (${version})`;
-  }
-  if ('_v8runtime' in global) {
-    // @ts-expect-error this is fine
-    // eslint-disable-next-line no-underscore-dangle
-    const version = global._v8runtime().version;
-    return `V8 (${version})`;
-  }
-  return 'JSC';
-}
-
-function getArchitecture() {
-  return 'nativeFabricUIManager' in global ? 'Fabric' : 'Paper';
-}
-
-function getReactNativeVersion() {
-  const {major, minor, patch} = Platform.constants.reactNativeVersion;
-  return `${major}.${minor}.${patch}`;
-}
+import * as TEST_CONST from './testConstants';
+import {PlatformInfo} from './PlatformInfo';
 
 export default function App() {
-  const [value, setValue] = React.useState(DEFAULT_TEXT);
+  const [value, setValue] = React.useState(TEST_CONST.EXAMPLE_CONTENT);
+  const [textColorState, setTextColorState] = React.useState(false);
+  const [linkColorState, setLinkColorState] = React.useState(false);
+  const [textFontSizeState, setTextFontSizeState] = React.useState(false);
+  const [emojiFontSizeState, setEmojiFontSizeState] = React.useState(false);
+  const [selection, setSelection] = React.useState({start: 0, end: 0});
+
+  const style = React.useMemo(() => {
+    return {
+      color: textColorState ? 'gray' : 'black',
+      fontSize: textFontSizeState ? 15 : 20,
+    };
+  }, [textColorState, textFontSizeState]);
+
+  const markdownStyle = React.useMemo(() => {
+    return {
+      emoji: {
+        fontSize: emojiFontSizeState ? 15 : 20,
+      },
+      link: {
+        color: linkColorState ? 'red' : 'blue',
+      },
+    };
+  }, [emojiFontSizeState, linkColorState]);
 
   // TODO: use MarkdownTextInput ref instead of TextInput ref
   const ref = React.useRef<TextInput>(null);
 
   return (
     <View style={styles.container}>
-      <View style={styles.platform}>
-        <Text>
-          Platform: {getPlatform()} {getPlatformVersion()}
-        </Text>
-        <Text>Bundle: {getBundle()}</Text>
-        {!isWeb() && (
-          <>
-            <Text>Architecture: {getArchitecture()}</Text>
-            <Text>RN version: {getReactNativeVersion()}</Text>
-            <Text>RN runtime: {getRuntime()}</Text>
-          </>
-        )}
-      </View>
-      {/* <Text>MarkdownTextInput singleline</Text>
-      <MarkdownTextInput
-        autoCapitalize="none"
-        value={value}
-        onChangeText={setValue}
-        style={styles.input}
-      /> */}
-      <Text>MarkdownTextInput multiline</Text>
+      <PlatformInfo />
       <MarkdownTextInput
         multiline
         autoCapitalize="none"
         value={value}
         onChangeText={setValue}
-        style={styles.input}
+        style={[styles.input, style]}
         ref={ref}
+        markdownStyle={markdownStyle}
+        placeholder="Type here..."
+        onSelectionChange={e => setSelection(e.nativeEvent.selection)}
+        selection={selection}
+        id={TEST_CONST.INPUT_ID}
+        maxLength={30000}
       />
-      {/* <Text>TextInput singleline</Text>
-      <TextInput
-        autoCapitalize="none"
-        value={value}
-        onChangeText={setValue}
-        style={styles.input}
-      /> */}
-      {/* <Text>TextInput multiline</Text>
-      <TextInput
-        multiline
-        autoCapitalize="none"
-        value={value}
-        onChangeText={setValue}
-        style={styles.input}
-      /> */}
       <Text style={styles.text}>{JSON.stringify(value)}</Text>
       <Button
+        testID="focus"
         title="Focus"
         onPress={() => {
           if (!ref.current) {
@@ -116,6 +63,7 @@ export default function App() {
         }}
       />
       <Button
+        testID="blur"
         title="Blur"
         onPress={() => {
           if (!ref.current) {
@@ -125,12 +73,58 @@ export default function App() {
         }}
       />
       <Button
+        testID="reset"
         title="Reset"
-        onPress={() => setValue(DEFAULT_TEXT)}
+        onPress={() => {
+          setValue(TEST_CONST.EXAMPLE_CONTENT);
+          setTextColorState(false);
+          setLinkColorState(false);
+          setTextFontSizeState(false);
+          setEmojiFontSizeState(false);
+          setSelection({start: 0, end: 0});
+        }}
       />
       <Button
+        testID="clear"
         title="Clear"
-        onPress={() => setValue('')}
+        onPress={() => {
+          setValue('');
+        }}
+      />
+      <Button
+        title="Toggle text color"
+        onPress={() => setTextColorState(prev => !prev)}
+      />
+      <Button
+        title="Toggle link color"
+        onPress={() => setLinkColorState(prev => !prev)}
+      />
+      <Button
+        title="Toggle text font size"
+        onPress={() => setTextFontSizeState(prev => !prev)}
+      />
+      <Button
+        title="Toggle emoji font size"
+        onPress={() => setEmojiFontSizeState(prev => !prev)}
+      />
+      <Button
+        title="Toggle all"
+        onPress={() => {
+          setTextColorState(prev => !prev);
+          setLinkColorState(prev => !prev);
+          setTextFontSizeState(prev => !prev);
+          setEmojiFontSizeState(prev => !prev);
+        }}
+      />
+      <Button
+        title="Change selection"
+        onPress={() => {
+          if (!ref.current) {
+            return;
+          }
+          ref.current.focus();
+          setSelection({start: 0, end: 20});
+        }}
       />
     </View>
   );
@@ -141,10 +135,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     marginTop: 60,
-  },
-  platform: {
-    alignItems: 'center',
-    marginBottom: 20,
   },
   input: {
     fontSize: 20,

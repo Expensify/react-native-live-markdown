@@ -58,7 +58,7 @@ By default, the example is configured to build with the old architecture. To run
 2. For iOS, run:
 
    ```sh
-   RCT_NEW_ARCH_ENABLED=1 yarn pod-install example/ios
+   cd example/ios && bundler install && RCT_NEW_ARCH_ENABLED=1 bundler exec pod install
    yarn example ios
    ```
 
@@ -149,3 +149,16 @@ When you're sending a pull request:
 - Review the documentation to make sure it looks good.
 - Follow the pull request template when opening a pull request.
 - For pull requests that change the API or implementation, discuss with maintainers first by opening an issue.
+
+### Testing with Expensify/App (or other projects)
+It's possible to locally develop this repo such with live-reload in another React Native project. These instructions are for Expensify/App, but they can be adapted to other repos as well.
+
+1. Clone this repo
+2. Run `yarn install`
+3. Run `yarn build:watch`
+4. In Expensify/App, run `npm install`.
+   - _Note:_ There is a patch for the `link` dev dependency in this repo. If you want these steps to work reliably, you'll likely need to copy that patch over.
+5. In Expensify/App, run `npx link publish --watch ~/react-native-live-markdown --litmus .build_complete`
+6. In E/App, run the app with `npm run web`/`npm run ios`/etc...
+
+The end result should be that you can make a change directly in this repo, and your changes will live-reload in E/App.

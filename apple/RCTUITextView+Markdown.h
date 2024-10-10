@@ -1,7 +1,11 @@
 #import <React/RCTUITextView.h>
-#import <react-native-live-markdown/RCTMarkdownUtils.h>
+#import <RNLiveMarkdown/RCTMarkdownUtils.h>
 
 NS_ASSUME_NONNULL_BEGIN
+
+@interface RCTUITextView (Private)
+- (void)textDidChange;
+@end
 
 @interface RCTUITextView (Markdown)
 

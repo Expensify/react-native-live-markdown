@@ -1,21 +1,18 @@
 package com.expensify.livemarkdown;
 
-import static com.facebook.infer.annotation.ThreadConfined.UI;
-
 import android.content.res.AssetManager;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 
 import androidx.annotation.NonNull;
 
-import com.facebook.infer.annotation.Assertions;
-import com.facebook.infer.annotation.ThreadConfined;
-import com.facebook.react.bridge.UiThreadUtil;
-import com.facebook.react.views.text.CustomLineHeightSpan;
+import com.expensify.livemarkdown.spans.*;
+import com.facebook.react.views.text.internal.span.CustomLineHeightSpan;
 import com.facebook.soloader.SoLoader;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,9 +25,7 @@ public class MarkdownUtils {
 
   private static boolean IS_RUNTIME_INITIALIZED = false;
 
-  @ThreadConfined(UI)
-  public static void maybeInitializeRuntime(AssetManager assetManager) {
-    UiThreadUtil.assertOnUiThread();
+  public static synchronized void maybeInitializeRuntime(AssetManager assetManager) {
     if (IS_RUNTIME_INITIALIZED) {
       return;
     }
@@ -49,9 +44,7 @@ public class MarkdownUtils {
 
   private static native void nativeInitializeRuntime(String code);
 
-  @ThreadConfined(UI)
-  private static String parseMarkdown(String input) {
-    UiThreadUtil.assertOnUiThread();
+  private synchronized static String parseMarkdown(String input) {
     return nativeParseMarkdown(input);
   }
 
@@ -91,18 +84,23 @@ public class MarkdownUtils {
     try {
       JSONArray ranges = new JSONArray(output);
       for (int i = 0; i < ranges.length(); i++) {
-        JSONArray range = ranges.getJSONArray(i);
-        String type = range.getString(0);
-        int start = range.getInt(1);
-        int end = start + range.getInt(2);
-        applyRange(ssb, type, start, end);
+        JSONObject range = ranges.getJSONObject(i);
+        String type = range.getString("type");
+        int start = range.getInt("start");
+        int length = range.getInt("length");
+        int depth = range.optInt("depth", 1);
+        int end = start + length;
+        if (length == 0 || end > input.length()) {
+          continue;
+        }
+        applyRange(ssb, type, start, end, depth);
       }
     } catch (JSONException e) {
       // Do nothing
     }
   }
 
-  private void applyRange(SpannableStringBuilder ssb, String type, int start, int end) {
+  private void applyRange(SpannableStringBuilder ssb, String type, int start, int end, int depth) {
     switch (type) {
       case "bold":
         setSpan(ssb, new MarkdownBoldSpan(), start, end);
@@ -113,6 +111,9 @@ public class MarkdownUtils {
       case "strikethrough":
         setSpan(ssb, new MarkdownStrikethroughSpan(), start, end);
         break;
+      case "emoji":
+        setSpan(ssb, new MarkdownEmojiSpan(mMarkdownStyle.getEmojiFontSize()), start, end);
+        break;
       case "mention-here":
         setSpan(ssb, new MarkdownForegroundColorSpan(mMarkdownStyle.getMentionHereColor()), start, end);
         setSpan(ssb, new MarkdownBackgroundColorSpan(mMarkdownStyle.getMentionHereBackgroundColor()), start, end);
@@ -121,6 +122,10 @@ public class MarkdownUtils {
         // TODO: change mention color when it mentions current user
         setSpan(ssb, new MarkdownForegroundColorSpan(mMarkdownStyle.getMentionUserColor()), start, end);
         setSpan(ssb, new MarkdownBackgroundColorSpan(mMarkdownStyle.getMentionUserBackgroundColor()), start, end);
+        break;
+      case "mention-report":
+        setSpan(ssb, new MarkdownForegroundColorSpan(mMarkdownStyle.getMentionReportColor()), start, end);
+        setSpan(ssb, new MarkdownBackgroundColorSpan(mMarkdownStyle.getMentionReportBackgroundColor()), start, end);
         break;
       case "syntax":
         setSpan(ssb, new MarkdownForegroundColorSpan(mMarkdownStyle.getSyntaxColor()), start, end);
@@ -131,11 +136,13 @@ public class MarkdownUtils {
         break;
       case "code":
         setSpan(ssb, new MarkdownFontFamilySpan(mMarkdownStyle.getCodeFontFamily(), mAssetManager), start, end);
+        setSpan(ssb, new MarkdownFontSizeSpan(mMarkdownStyle.getCodeFontSize()), start, end);
         setSpan(ssb, new MarkdownForegroundColorSpan(mMarkdownStyle.getCodeColor()), start, end);
         setSpan(ssb, new MarkdownBackgroundColorSpan(mMarkdownStyle.getCodeBackgroundColor()), start, end);
         break;
       case "pre":
         setSpan(ssb, new MarkdownFontFamilySpan(mMarkdownStyle.getPreFontFamily(), mAssetManager), start, end);
+        setSpan(ssb, new MarkdownFontSizeSpan(mMarkdownStyle.getPreFontSize()), start, end);
         setSpan(ssb, new MarkdownForegroundColorSpan(mMarkdownStyle.getPreColor()), start, end);
         setSpan(ssb, new MarkdownBackgroundColorSpan(mMarkdownStyle.getPreBackgroundColor()), start, end);
         break;
@@ -154,11 +161,10 @@ public class MarkdownUtils {
           mMarkdownStyle.getBlockquoteBorderColor(),
           mMarkdownStyle.getBlockquoteBorderWidth(),
           mMarkdownStyle.getBlockquoteMarginLeft(),
-          mMarkdownStyle.getBlockquotePaddingLeft());
+          mMarkdownStyle.getBlockquotePaddingLeft(),
+          depth);
         setSpan(ssb, span, start, end);
         break;
-      default:
-        throw new IllegalStateException("Unsupported type: " + type);
     }
   }
 

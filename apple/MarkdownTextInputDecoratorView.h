@@ -1,4 +1,4 @@
-#import <react-native-live-markdown/RCTMarkdownStyle.h>
+#import <RNLiveMarkdown/RCTMarkdownStyle.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

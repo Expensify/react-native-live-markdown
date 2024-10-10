@@ -1,73 +1,19 @@
+import {StyleSheet, TextInput, processColor} from 'react-native';
 import React from 'react';
-import {Platform, StyleSheet, TextInput, processColor} from 'react-native';
 import type {TextInputProps} from 'react-native';
-
-import type * as MarkdownTextInputDecoractorView from './MarkdownTextInputDecoratorViewNativeComponent';
 import MarkdownTextInputDecoratorViewNativeComponent from './MarkdownTextInputDecoratorViewNativeComponent';
+import type {MarkdownStyle} from './MarkdownTextInputDecoratorViewNativeComponent';
+import NativeLiveMarkdownModule from './NativeLiveMarkdownModule';
+import {mergeMarkdownStyleWithDefault} from './styleUtils';
+import type {PartialMarkdownStyle} from './styleUtils';
+import type {InlineImagesInputProps} from './commonTypes';
 
-type MarkdownStyle = MarkdownTextInputDecoractorView.MarkdownStyle;
-
-const FONT_FAMILY_MONOSPACE = Platform.select({
-  ios: 'Courier',
-  macos: 'Courier',
-  default: 'monospace',
-});
-
-function makeDefaultMarkdownStyle(): MarkdownStyle {
-  return {
-    syntax: {
-      color: 'gray',
-    },
-    link: {
-      color: 'blue',
-    },
-    h1: {
-      fontSize: 25,
-    },
-    blockquote: {
-      borderColor: 'gray',
-      borderWidth: 6,
-      marginLeft: 6,
-      paddingLeft: 6,
-    },
-    code: {
-      fontFamily: FONT_FAMILY_MONOSPACE,
-      color: 'black',
-      backgroundColor: 'lightgray',
-    },
-    pre: {
-      fontFamily: FONT_FAMILY_MONOSPACE,
-      color: 'black',
-      backgroundColor: 'lightgray',
-    },
-    mentionHere: {
-      color: 'green',
-      backgroundColor: 'lime',
-    },
-    mentionUser: {
-      color: 'blue',
-      backgroundColor: 'cyan',
-    },
-  };
+if (NativeLiveMarkdownModule) {
+  NativeLiveMarkdownModule.install();
 }
 
-type PartialMarkdownStyle = Partial<{
-  [K in keyof MarkdownStyle]: Partial<MarkdownStyle[K]>;
-}>;
-
-function mergeMarkdownStyleWithDefault(input: PartialMarkdownStyle | undefined): MarkdownStyle {
-  const output = makeDefaultMarkdownStyle();
-
-  if (input !== undefined) {
-    Object.keys(input).forEach((key) => {
-      if (!(key in output)) {
-        return;
-      }
-      Object.assign(output[key as keyof MarkdownStyle], input[key as keyof MarkdownStyle]);
-    });
-  }
-
-  return output;
+interface MarkdownTextInputProps extends TextInputProps, InlineImagesInputProps {
+  markdownStyle?: PartialMarkdownStyle;
 }
 
 function processColorsInMarkdownStyle(input: MarkdownStyle): MarkdownStyle {
@@ -89,10 +35,6 @@ function processColorsInMarkdownStyle(input: MarkdownStyle): MarkdownStyle {
 
 function processMarkdownStyle(input: PartialMarkdownStyle | undefined): MarkdownStyle {
   return processColorsInMarkdownStyle(mergeMarkdownStyleWithDefault(input));
-}
-
-interface MarkdownTextInputProps extends TextInputProps {
-  markdownStyle?: PartialMarkdownStyle;
 }
 
 const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>((props, ref) => {

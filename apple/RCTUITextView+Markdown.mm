@@ -1,5 +1,5 @@
-#import <react-native-live-markdown/RCTUITextView+Markdown.h>
-#import <react-native-live-markdown/RCTMarkdownUtils.h>
+#import <RNLiveMarkdown/RCTUITextView+Markdown.h>
+#import <RNLiveMarkdown/RCTMarkdownUtils.h>
 #import <objc/message.h>
 
 @implementation RCTUITextView (Markdown)
@@ -17,7 +17,7 @@
   RCTMarkdownUtils *markdownUtils = [self getMarkdownUtils];
   if (markdownUtils != nil) {
     NSRange range = self.selectedRange;
-    NSAttributedString *attributedText = [markdownUtils parseMarkdown:self.attributedText];
+    NSAttributedString *attributedText = [markdownUtils parseMarkdown:self.attributedText withAttributes:self.defaultTextAttributes];
     [self breakUndoCoalescing];
     [self.textStorage setAttributedString:attributedText ?: [NSAttributedString new]];
     [super setSelectedRange:range]; // prevents cursor from jumping at the end when typing in the middle of the text

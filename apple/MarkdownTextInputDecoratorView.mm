@@ -1,15 +1,15 @@
 #import <React/RCTUITextField.h>
-#import <react/debug/react_native_assert.h>
+#import "react_native_assert.h"
 
-#import <react-native-live-markdown/MarkdownLayoutManager.h>
-#import <react-native-live-markdown/MarkdownTextInputDecoratorView.h>
-#import <react-native-live-markdown/RCTBackedTextFieldDelegateAdapter+Markdown.h>
-#import <react-native-live-markdown/RCTUITextView+Markdown.h>
+#import <RNLiveMarkdown/MarkdownLayoutManager.h>
+#import <RNLiveMarkdown/MarkdownTextInputDecoratorView.h>
+#import <RNLiveMarkdown/RCTBackedTextFieldDelegateAdapter+Markdown.h>
+#import <RNLiveMarkdown/RCTUITextView+Markdown.h>
 
 #ifdef RCT_NEW_ARCH_ENABLED
-#import <react-native-live-markdown/RCTTextInputComponentView+Markdown.h>
+#import <RNLiveMarkdown/RCTTextInputComponentView+Markdown.h>
 #else
-#import <react-native-live-markdown/RCTBaseTextInputView+Markdown.h>
+#import <RNLiveMarkdown/RCTBaseTextInputView+Markdown.h>
 #endif /* RCT_NEW_ARCH_ENABLED */
 
 #import <objc/runtime.h>
@@ -22,6 +22,7 @@
 #else
   __weak RCTBaseTextInputView *_textInput;
 #endif /* RCT_NEW_ARCH_ENABLED */
+  __weak UIView<RCTBackedTextInputViewProtocol> *_backedTextInputView;
   __weak RCTBackedTextFieldDelegateAdapter *_adapter;
   __weak RCTUITextView *_textView;
 }
@@ -51,26 +52,34 @@
 #ifdef RCT_NEW_ARCH_ENABLED
   react_native_assert([view isKindOfClass:[RCTTextInputComponentView class]] && "Previous sibling component is not an instance of RCTTextInputComponentView.");
   _textInput = (RCTTextInputComponentView *)view;
-  UIView<RCTBackedTextInputViewProtocol> *backedTextInputView = [_textInput valueForKey:@"_backedTextInputView"];
+  _backedTextInputView = [_textInput valueForKey:@"_backedTextInputView"];
 #else
   react_native_assert([view isKindOfClass:[RCTBaseTextInputView class]] && "Previous sibling component is not an instance of RCTBaseTextInputView.");
   _textInput = (RCTBaseTextInputView *)view;
-  RCTUIView<RCTBackedTextInputViewProtocol> *backedTextInputView = _textInput.backedTextInputView;
+  _backedTextInputView = _textInput.backedTextInputView;
 #endif /* RCT_NEW_ARCH_ENABLED */
 
-  _markdownUtils = [[RCTMarkdownUtils alloc] initWithBackedTextInputView:backedTextInputView];
+  _markdownUtils = [[RCTMarkdownUtils alloc] init];
   react_native_assert(_markdownStyle != nil);
   [_markdownUtils setMarkdownStyle:_markdownStyle];
 
   [_textInput setMarkdownUtils:_markdownUtils];
-  if ([backedTextInputView isKindOfClass:[RCTUITextField class]]) {
-    RCTUITextField *textField = (RCTUITextField *)backedTextInputView;
+  if ([_backedTextInputView isKindOfClass:[RCTUITextField class]]) {
+    RCTUITextField *textField = (RCTUITextField *)_backedTextInputView;
     _adapter = [textField valueForKey:@"textInputDelegateAdapter"];
     [_adapter setMarkdownUtils:_markdownUtils];
-  } else if ([backedTextInputView isKindOfClass:[RCTUITextView class]]) {
-    _textView = (RCTUITextView *)backedTextInputView;
+  } else if ([_backedTextInputView isKindOfClass:[RCTUITextView class]]) {
+    _textView = (RCTUITextView *)_backedTextInputView;
     [_textView setMarkdownUtils:_markdownUtils];
     NSLayoutManager *layoutManager = _textView.layoutManager; // switching to TextKit 1 compatibility mode
+
+    // Correct content height in TextKit 1 compatibility mode. (See https://github.com/Expensify/App/issues/41567)
+    // Consider removing this fix if it is no longer needed after migrating to TextKit 2.
+    CGSize contentSize = _textView.contentSize;
+    CGRect textBounds = [layoutManager usedRectForTextContainer:_textView.textContainer];
+    contentSize.height = textBounds.size.height + _textView.textContainerInset.top + _textView.textContainerInset.bottom;
+    [_textView setContentSize:contentSize];
+
     layoutManager.allowsNonContiguousLayout = NO; // workaround for onScroll issue
     object_setClass(layoutManager, [MarkdownLayoutManager class]);
     objc_setAssociatedObject(layoutManager, @selector(markdownUtils), _markdownUtils, OBJC_ASSOCIATION_RETAIN);
@@ -101,7 +110,18 @@
 {
   _markdownStyle = markdownStyle;
   [_markdownUtils setMarkdownStyle:markdownStyle];
-  [_textInput textInputDidChange]; // trigger attributed text update
+
+  if (_textView != nil) {
+    // We want to use `textStorage` for applying markdown when possible. Currently it's only available for UITextView
+    [_textView textDidChange];
+  } else {
+    // apply new styles
+#ifdef RCT_NEW_ARCH_ENABLED
+    [_textInput _setAttributedString:_backedTextInputView.attributedText];
+#else
+    [_textInput setAttributedText:_textInput.attributedText];
+#endif /* RCT_NEW_ARCH_ENABLED */
+  }
 }
 
 @end

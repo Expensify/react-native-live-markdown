@@ -1,17 +1,14 @@
 #import <React/RCTBackedTextInputViewProtocol.h>
-#import <react-native-live-markdown/RCTMarkdownStyle.h>
+#import <RNLiveMarkdown/RCTMarkdownStyle.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface RCTMarkdownUtils : NSObject
 
 @property (nonatomic) RCTMarkdownStyle *markdownStyle;
-@property (nonatomic) NSMutableArray<NSValue *> *blockquoteRanges;
-@property (weak, nonatomic) RCTUIView<RCTBackedTextInputViewProtocol> *backedTextInputView;
+@property (nonatomic) NSMutableArray<NSValue *> *blockquoteRangesAndLevels;
 
-- (instancetype)initWithBackedTextInputView:(RCTUIView<RCTBackedTextInputViewProtocol> *)backedTextInputView;
-
-- (NSAttributedString *)parseMarkdown:(nullable NSAttributedString *)input;
+- (NSAttributedString *)parseMarkdown:(nullable NSAttributedString *)input withAttributes:(nullable NSDictionary<NSAttributedStringKey, id>*)attributes;
 
 @end
 

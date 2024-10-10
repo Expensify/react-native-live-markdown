@@ -70,7 +70,6 @@ public class MarkdownTextInputDecoratorView extends View {
       mReactEditText = null;
       mTextWatcher = null;
       mMarkdownUtils = null;
-      mMarkdownStyle = null;
     }
   }
 
@@ -80,7 +79,10 @@ public class MarkdownTextInputDecoratorView extends View {
       mMarkdownUtils.setMarkdownStyle(mMarkdownStyle);
     }
     if (mReactEditText != null) {
+      int selectionStart = mReactEditText.getSelectionStart();
+      int selectionEnd = mReactEditText.getSelectionEnd();
       mReactEditText.setText(mReactEditText.getText()); // trigger update
+      mReactEditText.setSelection(selectionStart, selectionEnd);
     }
   }
 }

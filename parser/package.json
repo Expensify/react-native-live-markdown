@@ -6,13 +6,15 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "build": "esbuild index.ts --bundle --minify --outfile=react-native-live-markdown-parser.js",
-    "run": "node react-native-live-markdown-parser.js",
-    "postinstall": "patch-package"
+    "build": "esbuild index.ts --bundle --outfile=build/index.esbuild.js && babel build/index.esbuild.js --out-file build/index.babel.js && esbuild build/index.babel.js --bundle --minify --outfile=react-native-live-markdown-parser.js && rm -rf build",
+    "run": "node react-native-live-markdown-parser.js"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@babel/cli": "^7.24.7",
+    "@babel/core": "^7.24.7",
+    "@react-native/babel-preset": "0.73.21",
     "@types/underscore": "^1.11.15",
     "esbuild": "0.19.4",
     "esbuild-plugin-tsc": "^0.4.0",
@@ -20,8 +22,6 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "expensify-common": "git+ssh://git@github.com/Expensify/expensify-common.git#039f4c584655cb4b5e933c9058b84ead7c8c6aee",
-    "patch-package": "^8.0.0",
-    "underscore": "^1.13.6"
+    "expensify-common": "2.0.85"
   }
 }

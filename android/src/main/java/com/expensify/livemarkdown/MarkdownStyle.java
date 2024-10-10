@@ -21,6 +21,8 @@ public class MarkdownStyle {
 
   private final float mH1FontSize;
 
+  private final float mEmojiFontSize;
+
   @ColorInt
   private final int mBlockquoteBorderColor;
 
@@ -32,6 +34,8 @@ public class MarkdownStyle {
 
   private final String mCodeFontFamily;
 
+  private final float mCodeFontSize;
+
   @ColorInt
   private final int mCodeColor;
 
@@ -39,6 +43,8 @@ public class MarkdownStyle {
   private final int mCodeBackgroundColor;
 
   private final String mPreFontFamily;
+
+  private final float mPreFontSize;
 
   @ColorInt
   private final int mPreColor;
@@ -58,24 +64,35 @@ public class MarkdownStyle {
   @ColorInt
   private final int mMentionUserBackgroundColor;
 
+  @ColorInt
+  private final int mMentionReportColor;
+
+  @ColorInt
+  private final int mMentionReportBackgroundColor;
+
   public MarkdownStyle(@NonNull ReadableMap map, @NonNull Context context) {
     mSyntaxColor = parseColor(map, "syntax", "color", context);
     mLinkColor = parseColor(map, "link", "color", context);
     mH1FontSize = parseFloat(map, "h1", "fontSize");
+    mEmojiFontSize = parseFloat(map, "emoji", "fontSize");
     mBlockquoteBorderColor = parseColor(map, "blockquote", "borderColor", context);
     mBlockquoteBorderWidth = parseFloat(map, "blockquote", "borderWidth");
     mBlockquoteMarginLeft = parseFloat(map, "blockquote", "marginLeft");
     mBlockquotePaddingLeft = parseFloat(map, "blockquote", "paddingLeft");
     mCodeFontFamily = parseString(map, "code", "fontFamily");
+    mCodeFontSize = parseFloat(map, "code", "fontSize");
     mCodeColor = parseColor(map, "code", "color", context);
     mCodeBackgroundColor = parseColor(map, "code", "backgroundColor", context);
     mPreFontFamily = parseString(map, "pre", "fontFamily");
+    mPreFontSize = parseFloat(map, "pre", "fontSize");
     mPreColor = parseColor(map, "pre", "color", context);
     mPreBackgroundColor = parseColor(map, "pre", "backgroundColor", context);
     mMentionHereColor = parseColor(map, "mentionHere", "color", context);
     mMentionHereBackgroundColor = parseColor(map, "mentionHere", "backgroundColor", context);
     mMentionUserColor = parseColor(map, "mentionUser", "color", context);
     mMentionUserBackgroundColor = parseColor(map, "mentionUser", "backgroundColor", context);
+    mMentionReportColor = parseColor(map, "mentionReport", "color", context);
+    mMentionReportBackgroundColor = parseColor(map, "mentionReport", "backgroundColor", context);
   }
 
   private static int parseColor(@NonNull ReadableMap map, @NonNull String key, @NonNull String prop, @NonNull Context context) {
@@ -119,6 +136,10 @@ public class MarkdownStyle {
     return mH1FontSize;
   }
 
+  public float getEmojiFontSize() {
+    return mEmojiFontSize;
+  }
+
   @ColorInt
   public int getBlockquoteBorderColor() {
     return mBlockquoteBorderColor;
@@ -140,6 +161,10 @@ public class MarkdownStyle {
     return mCodeFontFamily;
   }
 
+  public float getCodeFontSize() {
+    return mCodeFontSize;
+  }
+
   @ColorInt
   public int getCodeColor() {
     return mCodeColor;
@@ -152,6 +177,10 @@ public class MarkdownStyle {
 
   public String getPreFontFamily() {
     return mPreFontFamily;
+  }
+
+  public float getPreFontSize() {
+    return mPreFontSize;
   }
 
   @ColorInt
@@ -182,5 +211,15 @@ public class MarkdownStyle {
   @ColorInt
   public int getMentionUserBackgroundColor() {
     return mMentionUserBackgroundColor;
+  }
+
+  @ColorInt
+  public int getMentionReportColor() {
+    return mMentionReportColor;
+  }
+
+  @ColorInt
+  public int getMentionReportBackgroundColor() {
+    return mMentionReportBackgroundColor;
   }
 }
