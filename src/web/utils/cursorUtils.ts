@@ -58,16 +58,12 @@ function scrollIntoView(target: MarkdownTextInputElement, node: TreeNode) {
   const currentLine = target.tree.childNodes[orderIndex]?.element;
   const scrollTargetElement = currentLine || node.element;
 
-  const selection = window.getSelection();
-  if (selection && selection.rangeCount > 0) {
-    const caretRect = scrollTargetElement.getBoundingClientRect();
-    const targetRect = target.getBoundingClientRect();
-
-    // In case the caret is below the visible input area, scroll to the end of the node
-    if (caretRect.top + caretRect.height > targetRect.top + targetRect.height) {
-      targetElement.scrollTop = caretRect.top - targetRect.top + target.scrollTop - targetRect.height + caretRect.height + 4;
-      return;
-    }
+  const caretRect = scrollTargetElement.getBoundingClientRect();
+  const targetRect = target.getBoundingClientRect();
+  // In case the caret is below the visible input area, scroll to the end of the node
+  if (caretRect.top + caretRect.height > targetRect.top + targetRect.height) {
+    targetElement.scrollTop = caretRect.top - targetRect.top + target.scrollTop - targetRect.height + caretRect.height + 4;
+    return;
   }
 
   scrollTargetElement.scrollIntoView({
