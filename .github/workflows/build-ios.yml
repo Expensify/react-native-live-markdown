@@ -4,7 +4,7 @@ on:
     paths:
       - .github/workflows/build-ios.yml
       - RNLiveMarkdown.podspec
-      - ios/**
+      - apple/**
       - cpp/**
       - example/package.json
       - example/ios/**
@@ -17,7 +17,7 @@ on:
     paths:
       - .github/workflows/build-ios.yml
       - RNLiveMarkdown.podspec
-      - ios/**
+      - apple/**
       - cpp/**
       - example/package.json
       - example/ios/**
