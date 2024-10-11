@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 
+import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.views.textinput.ReactEditText;
 
 public class MarkdownTextInputDecoratorView extends View {
@@ -54,8 +55,7 @@ public class MarkdownTextInputDecoratorView extends View {
     }
 
     if (previousSibling instanceof ReactEditText) {
-      AssetManager assetManager = getContext().getAssets();
-      mMarkdownUtils = new MarkdownUtils(assetManager);
+      mMarkdownUtils = new MarkdownUtils((ReactContext) getContext());
       mMarkdownUtils.setMarkdownStyle(mMarkdownStyle);
       mMarkdownUtils.setParserId(mParserId);
       mReactEditText = (ReactEditText) previousSibling;

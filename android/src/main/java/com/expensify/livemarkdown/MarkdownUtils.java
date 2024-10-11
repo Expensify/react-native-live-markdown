@@ -7,6 +7,8 @@ import android.text.Spanned;
 import androidx.annotation.NonNull;
 
 import com.expensify.livemarkdown.spans.*;
+import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.util.RNLog;
 import com.facebook.react.views.text.internal.span.CustomLineHeightSpan;
 import com.facebook.soloader.SoLoader;
 
@@ -14,8 +16,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Objects;
 
 public class MarkdownUtils {
@@ -25,10 +25,12 @@ public class MarkdownUtils {
 
   private static synchronized native String nativeParseMarkdown(String input, int parserId);
 
-  public MarkdownUtils(@NonNull AssetManager assetManager) {
-    mAssetManager = assetManager;
+  public MarkdownUtils(@NonNull ReactContext reactContext) {
+    mReactContext = reactContext;
+    mAssetManager = reactContext.getAssets();
   }
 
+  private final @NonNull ReactContext mReactContext;
   private final @NonNull AssetManager mAssetManager;
 
   private String mPrevInput;
@@ -77,7 +79,7 @@ public class MarkdownUtils {
         applyRange(ssb, type, start, end, depth);
       }
     } catch (JSONException e) {
-      // Do nothing
+      RNLog.w(mReactContext, "[react-native-live-markdown] Incorrect schema of worklet parser output: " + e.getMessage());
     }
   }
 

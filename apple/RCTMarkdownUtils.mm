@@ -33,44 +33,46 @@
 
         auto markdownWorklet = expensify::livemarkdown::getMarkdownWorklet([_parserId intValue]);
 
-        auto text = jsi::String::createFromUtf8(rt, [inputString UTF8String]);
-        auto output = markdownRuntime->runGuarded(markdownWorklet, text);
-        if (output.isUndefined()) {
-          return input;
+        try {
+            const auto &text = jsi::String::createFromUtf8(rt, [inputString UTF8String]);
+            const auto &output = markdownRuntime->runGuarded(markdownWorklet, text);
+            const auto &ranges = output.asObject(rt).asArray(rt);
+
+            NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:inputString attributes:attributes];
+            [attributedString beginEditing];
+
+            // If the attributed string ends with underlined text, blurring the single-line input imprints the underline style across the whole string.
+            // It looks like a bug in iOS, as there is no underline style to be found in the attributed string, especially after formatting.
+            // This is a workaround that applies the NSUnderlineStyleNone to the string before iterating over ranges which resolves this problem.
+            [attributedString addAttribute:NSUnderlineStyleAttributeName value:[NSNumber numberWithInteger:NSUnderlineStyleNone] range:NSMakeRange(0, attributedString.length)];
+
+            _blockquoteRangesAndLevels = [NSMutableArray new];
+
+            for (size_t i = 0, n = ranges.size(rt); i < n; ++i) {
+                const auto &item = ranges.getValueAtIndex(rt, i).asObject(rt);
+                const auto &type = item.getProperty(rt, "type").asString(rt).utf8(rt);
+                const auto &start = static_cast<int>(item.getProperty(rt, "start").asNumber());
+                const auto &length = static_cast<int>(item.getProperty(rt, "length").asNumber());
+                const auto &depth = item.hasProperty(rt, "depth") ? static_cast<int>(item.getProperty(rt, "depth").asNumber()) : 1;
+
+                [self applyRangeToAttributedString:attributedString type:type start:start length:length depth:depth];
+            }
+
+            RCTApplyBaselineOffset(attributedString);
+
+            [attributedString endEditing];
+
+            _prevInputString = inputString;
+            _prevAttributedString = attributedString;
+            _prevTextAttributes = attributes;
+            _prevMarkdownStyle = _markdownStyle;
+            _prevParserId = _parserId;
+
+            return attributedString;
+        } catch (const jsi::JSError &error) {
+            RCTLogWarn(@"[react-native-live-markdown] Incorrect schema of worklet parser output: %s", error.getMessage().c_str());
+            return input;
         }
-        const auto &ranges = output.asObject(rt).asArray(rt);
-
-        NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:inputString attributes:attributes];
-        [attributedString beginEditing];
-
-        // If the attributed string ends with underlined text, blurring the single-line input imprints the underline style across the whole string.
-        // It looks like a bug in iOS, as there is no underline style to be found in the attributed string, especially after formatting.
-        // This is a workaround that applies the NSUnderlineStyleNone to the string before iterating over ranges which resolves this problem.
-        [attributedString addAttribute:NSUnderlineStyleAttributeName value:[NSNumber numberWithInteger:NSUnderlineStyleNone] range:NSMakeRange(0, attributedString.length)];
-
-        _blockquoteRangesAndLevels = [NSMutableArray new];
-
-        for (size_t i = 0, n = ranges.size(rt); i < n; ++i) {
-            const auto &item = ranges.getValueAtIndex(rt, i).asObject(rt);
-            const auto &type = item.getProperty(rt, "type").asString(rt).utf8(rt);
-            const auto &start = static_cast<int>(item.getProperty(rt, "start").asNumber());
-            const auto &length = static_cast<int>(item.getProperty(rt, "length").asNumber());
-            const auto &depth = item.hasProperty(rt, "depth") ? static_cast<int>(item.getProperty(rt, "depth").asNumber()) : 1;
-
-            [self applyRangeToAttributedString:attributedString type:type start:start length:length depth:depth];
-        }
-
-        RCTApplyBaselineOffset(attributedString);
-
-        [attributedString endEditing];
-
-        _prevInputString = inputString;
-        _prevAttributedString = attributedString;
-        _prevTextAttributes = attributes;
-        _prevMarkdownStyle = _markdownStyle;
-        _prevParserId = _parserId;
-
-        return attributedString;
     }
 }
 
