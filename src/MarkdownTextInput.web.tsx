@@ -61,6 +61,7 @@ type MarkdownTextInputElement = HTMLDivElement &
   HTMLInputElement & {
     tree: TreeNode;
     selection: Selection;
+    imageElements: HTMLImageElement[];
   };
 
 type HTMLMarkdownElement = HTMLElement & {
