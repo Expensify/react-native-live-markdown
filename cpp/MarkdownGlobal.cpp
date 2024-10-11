@@ -22,6 +22,7 @@ std::mutex globalMarkdownShareableWorkletsMutex;
 int nextParserId = 1;
 
 const int registerMarkdownWorklet(const std::shared_ptr<ShareableWorklet> &markdownWorklet) {
+  assert(markdownWorklet != nullptr);
   auto parserId = nextParserId++;
   std::unique_lock<std::mutex> lock(globalMarkdownShareableWorkletsMutex);
   globalMarkdownShareableWorklets[parserId] = markdownWorklet;
