@@ -253,7 +253,6 @@ function groupRanges(ranges: MarkdownRange[]) {
 }
 
 function parseExpensiMark(markdown: string): MarkdownRange[] {
-  const x = new ExpensiMark();
   try {
     const html = parseMarkdownToHTML(markdown);
     const tokens = parseHTMLToTokens(html);
