@@ -71,7 +71,7 @@
             return attributedString;
         } catch (const jsi::JSError &error) {
             RCTLogWarn(@"[react-native-live-markdown] Incorrect schema of worklet parser output: %s", error.getMessage().c_str());
-            return input;
+            return [[NSAttributedString alloc] initWithString:inputString attributes:attributes];
         }
     }
 }
