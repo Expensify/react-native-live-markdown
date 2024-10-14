@@ -33,16 +33,18 @@ using namespace expensify::livemarkdown;
 
 - (void)markdown__setAttributedString:(NSAttributedString *)attributedString
 {
-  auto markdownUtils = [self getMarkdownUtils];
   auto backedTextInputView = [self getBackedTextInputView];
-  if (markdownUtils != nil && backedTextInputView != nil) {
-    attributedString = [markdownUtils parseMarkdown:attributedString withAttributes:backedTextInputView.defaultTextAttributes];
-  } else {
-    // If markdownUtils is undefined, the text input hasn't been mounted yet. It will
-    // update its state with the unformatted attributed string, we want to prevent displaying
-    // this state by applying markdown in the commit hook where we can read markdown styles
-    // from decorator props.
-    MarkdownShadowFamilyRegistry::forceNextStateUpdate((facebook::react::Tag)self.tag);
+  if (backedTextInputView != nil && ![backedTextInputView isKindOfClass:[RCTUITextView class]]) {
+    auto markdownUtils = [self getMarkdownUtils];
+    if (markdownUtils != nil) {
+      attributedString = [markdownUtils parseMarkdown:attributedString withAttributes:backedTextInputView.defaultTextAttributes];
+    } else {
+      // If markdownUtils is undefined, the text input hasn't been mounted yet. It will
+      // update its state with the unformatted attributed string, we want to prevent displaying
+      // this state by applying markdown in the commit hook where we can read markdown styles
+      // from decorator props.
+      MarkdownShadowFamilyRegistry::forceNextStateUpdate((facebook::react::Tag)self.tag);
+    }
   }
 
   // Call the original method

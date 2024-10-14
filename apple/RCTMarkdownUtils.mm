@@ -22,7 +22,19 @@ using namespace facebook;
     return _prevAttributedString;
   }
 
-  auto attributedString = [[NSMutableAttributedString alloc] initWithString:inputString attributes:attributes];
+  auto attributedString = [[NSMutableAttributedString alloc] initWithAttributedString:input];
+  auto fullRange = NSMakeRange(0, attributedString.length);
+
+  // `setAttributes:@{}` causes cursor jumping so we should remove attributes manually
+  if (attributedString.length > 0) {
+    auto originalAttributes = [attributedString attributesAtIndex:0 effectiveRange:NULL];
+    for (NSAttributedStringKey key in originalAttributes.allKeys) {
+      [attributedString removeAttribute:key range:fullRange];
+    }
+  }
+
+  [attributedString addAttributes:attributes range:fullRange];
+
   [self parseMarkdown:attributedString];
 
   _prevInputString = inputString;
@@ -66,11 +78,6 @@ using namespace facebook;
     const auto &ranges = output.asObject(rt).asArray(rt);
 
     [attributedString beginEditing];
-
-    // If the attributed string ends with underlined text, blurring the single-line input imprints the underline style across the whole string.
-    // It looks like a bug in iOS, as there is no underline style to be found in the attributed string, especially after formatting.
-    // This is a workaround that applies the NSUnderlineStyleNone to the string before iterating over ranges which resolves this problem.
-    [attributedString addAttribute:NSUnderlineStyleAttributeName value:[NSNumber numberWithInteger:NSUnderlineStyleNone] range:NSMakeRange(0, attributedString.length)];
 
     _blockquoteRangesAndLevels = [NSMutableArray new];
 
