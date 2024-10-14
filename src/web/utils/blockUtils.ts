@@ -1,8 +1,9 @@
+import type {InlineImagesInputProps} from '../../commonTypes';
 import type {MarkdownTextInputElement} from '../../MarkdownTextInput.web';
-import type {MarkdownRange} from '../../commonTypes';
 import {parseStringWithUnitToNumber} from '../../styleUtils';
 import type {PartialMarkdownStyle} from '../../styleUtils';
 import {addInlineImagePreview} from '../inputElements/inlineImage';
+import type {MarkdownRange} from './parserUtils';
 import type {NodeType, TreeNode} from './treeUtils';
 
 function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownStyle: PartialMarkdownStyle) {
@@ -115,10 +116,11 @@ function extendBlockStructure(
   ranges: MarkdownRange[],
   text: string,
   markdownStyle: PartialMarkdownStyle,
+  inlineImagesProps: InlineImagesInputProps,
 ) {
   switch (currentRange.type) {
     case 'inline-image':
-      return addInlineImagePreview(currentInput, targetNode, text, ranges, markdownStyle);
+      return addInlineImagePreview(currentInput, targetNode, text, ranges, markdownStyle, inlineImagesProps);
     default:
       break;
   }

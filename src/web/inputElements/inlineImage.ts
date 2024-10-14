@@ -1,5 +1,5 @@
 import type {HTMLMarkdownElement, MarkdownTextInputElement} from '../../MarkdownTextInput.web';
-import type {MarkdownRange} from '../../commonTypes';
+import type {InlineImagesInputProps, MarkdownRange} from '../../commonTypes';
 import {parseStringWithUnitToNumber} from '../../styleUtils';
 import type {PartialMarkdownStyle} from '../../styleUtils';
 import type {TreeNode} from '../utils/treeUtils';
@@ -141,11 +141,22 @@ function updateImageTreeNode(targetNode: TreeNode, newElement: HTMLMarkdownEleme
 }
 
 /** The main function that adds inline image preview to the node */
-function addInlineImagePreview(currentInput: MarkdownTextInputElement, targetNode: TreeNode, text: string, ranges: MarkdownRange[], markdownStyle: PartialMarkdownStyle) {
+function addInlineImagePreview(
+  currentInput: MarkdownTextInputElement,
+  targetNode: TreeNode,
+  text: string,
+  ranges: MarkdownRange[],
+  markdownStyle: PartialMarkdownStyle,
+  inlineImagesProps: InlineImagesInputProps,
+) {
+  const {addAuthTokenToImageURLCallback, imagePreviewAuthRequiredURLs} = inlineImagesProps;
   const linkRange = ranges.find((r) => r.type === 'link');
   let imageHref = '';
   if (linkRange) {
     imageHref = text.substring(linkRange.start, linkRange.start + linkRange.length);
+    if (addAuthTokenToImageURLCallback && imagePreviewAuthRequiredURLs && imagePreviewAuthRequiredURLs.find((url) => imageHref.startsWith(url))) {
+      imageHref = addAuthTokenToImageURLCallback(imageHref);
+    }
   }
 
   const imageMarginTop = parseStringWithUnitToNumber(`${markdownStyle.inlineImage?.marginTop}`);

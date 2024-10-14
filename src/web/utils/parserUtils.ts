@@ -5,7 +5,7 @@ import type {PartialMarkdownStyle} from '../../styleUtils';
 import {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition} from './cursorUtils';
 import {handleCustomStyles} from './webStyleUtils';
 import {addStyleToBlock, extendBlockStructure, getFirstBlockMarkdownRange, isBlockMarkdownType} from './blockUtils';
-import type {MarkdownRange, MarkdownType} from '../../commonTypes';
+import type {InlineImagesInputProps, MarkdownRange, MarkdownType} from '../../commonTypes';
 import {getAnimationCurrentTimes, updateAnimationsTime} from './animationUtils';
 
 type Paragraph = {
@@ -152,6 +152,7 @@ function parseRangesToHTMLNodes(
   markdownStyle: PartialMarkdownStyle = {},
   disableInlineStyles = false,
   currentInput: MarkdownTextInputElement | null = null,
+  inlineImagesProps: InlineImagesInputProps = {},
 ) {
   const rootElement: HTMLMarkdownElement = document.createElement('span') as HTMLMarkdownElement;
   const textLength = text.length;
@@ -224,7 +225,7 @@ function parseRangesToHTMLNodes(
       }
 
       if (isMultiline && !disableInlineStyles && currentInput) {
-        currentParentNode = extendBlockStructure(currentInput, currentParentNode, range, lineMarkdownRanges, text, markdownStyle);
+        currentParentNode = extendBlockStructure(currentInput, currentParentNode, range, lineMarkdownRanges, text, markdownStyle, inlineImagesProps);
       }
 
       if (lineMarkdownRanges.length > 0 && nextRangeStartIndex < endOfCurrentRange && range.type !== 'syntax') {
@@ -279,6 +280,7 @@ function updateInputStructure(
   alwaysMoveCursorToTheEnd = false,
   shouldForceDOMUpdate = false,
   shouldScrollIntoView = false,
+  inlineImagesProps: InlineImagesInputProps = {},
 ) {
   const targetElement = target;
 
@@ -297,7 +299,7 @@ function updateInputStructure(
 
   // We don't want to parse text with single '\n', because contentEditable represents it as invisible <br />
   if (text) {
-    const {dom, tree} = parseRangesToHTMLNodes(text, markdownRanges, isMultiline, markdownStyle, false, targetElement);
+    const {dom, tree} = parseRangesToHTMLNodes(text, markdownRanges, isMultiline, markdownStyle, false, targetElement, inlineImagesProps);
 
     if (shouldForceDOMUpdate || targetElement.innerHTML.replaceAll(/ data-content="([^"]*)"/g, '') !== dom.innerHTML) {
       const animationTimes = getAnimationCurrentTimes(targetElement);

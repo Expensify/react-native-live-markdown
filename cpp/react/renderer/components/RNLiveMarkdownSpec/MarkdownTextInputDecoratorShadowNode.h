@@ -1,5 +1,4 @@
 #pragma once
-#if defined(RCT_NEW_ARCH_ENABLED) || defined(ANDROID)
 
 #include "MarkdownShadowFamilyRegistry.h"
 #include "MarkdownTextInputDecoratorState.h"
@@ -45,5 +44,3 @@ private:
 
 } // namespace react
 } // namespace facebook
-
-#endif

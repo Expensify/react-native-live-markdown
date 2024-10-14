@@ -1,4 +1,4 @@
-package com.expensify.livemarkdown;
+package com.expensify.livemarkdown.spans;
 
 import android.graphics.Paint;
 import android.text.style.LineHeightSpan;

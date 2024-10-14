@@ -111,9 +111,13 @@ function findHTMLElementInTree(treeRoot: TreeNode, element: HTMLElement): TreeNo
 
 function getTreeNodeByIndex(treeRoot: TreeNode, index: number): TreeNode | null {
   let el: TreeNode | null = treeRoot;
-
   let i = 0;
   let newLineGenerated = false;
+
+  if (treeRoot.length === 0) {
+    return treeRoot;
+  }
+
   while (el && el.childNodes.length > 0 && i < el.childNodes.length) {
     const child = el.childNodes[i] as TreeNode;
 
