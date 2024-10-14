@@ -1,151 +1,263 @@
+import {
+  HeaderBackButton,
+  type HeaderBackButtonProps,
+} from '@react-navigation/elements';
+import type {
+  NavigationProp,
+  NavigationState,
+  PathConfigMap,
+} from '@react-navigation/native';
 import * as React from 'react';
-import {Button, StyleSheet, Text, View} from 'react-native';
-import {MarkdownTextInput} from '@expensify/react-native-live-markdown';
-import type {TextInput} from 'react-native';
-import * as TEST_CONST from './testConstants';
-import {PlatformInfo} from './PlatformInfo';
+import {
+  ActivityIndicator,
+  FlatList,
+  Linking,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 
-export default function App() {
-  const [value, setValue] = React.useState(TEST_CONST.EXAMPLE_CONTENT);
-  const [textColorState, setTextColorState] = React.useState(false);
-  const [linkColorState, setLinkColorState] = React.useState(false);
-  const [textFontSizeState, setTextFontSizeState] = React.useState(false);
-  const [emojiFontSizeState, setEmojiFontSizeState] = React.useState(false);
-  const [selection, setSelection] = React.useState({start: 0, end: 0});
+import {NavigationContainer, useNavigation} from '@react-navigation/native';
 
-  const style = React.useMemo(() => {
-    return {
-      color: textColorState ? 'gray' : 'black',
-      fontSize: textFontSizeState ? 15 : 20,
-    };
-  }, [textColorState, textFontSizeState]);
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+  createNativeStackNavigator,
+  type NativeStackNavigationProp,
+} from '@react-navigation/native-stack';
+import {
+  createStackNavigator,
+  type StackNavigationProp,
+} from '@react-navigation/stack';
+import {GestureHandlerRootView, RectButton} from 'react-native-gesture-handler';
+import {EXAMPLES} from './examples';
+import {useReducedMotion} from 'react-native-reanimated';
+import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
 
-  const markdownStyle = React.useMemo(() => {
-    return {
-      emoji: {
-        fontSize: emojiFontSizeState ? 15 : 20,
-      },
-      link: {
-        color: linkColorState ? 'red' : 'blue',
-      },
-    };
-  }, [emojiFontSizeState, linkColorState]);
+function noop() {
+  // do nothing
+}
 
-  // TODO: use MarkdownTextInput ref instead of TextInput ref
-  const ref = React.useRef<TextInput>(null);
+type RootStackParamList = {[P in keyof typeof EXAMPLES]: undefined} & {
+  Home: undefined;
+};
+
+interface HomeScreenProps {
+  navigation:
+    | StackNavigationProp<RootStackParamList, 'Home'>
+    | NativeStackNavigationProp<RootStackParamList, 'Home'>;
+}
+
+const EXAMPLES_NAMES = Object.keys(EXAMPLES);
+
+function HomeScreen({navigation}: HomeScreenProps) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [wasClicked, setWasClicked] = React.useState<string[]>([]);
 
   return (
-    <View style={styles.container}>
-      <PlatformInfo />
-      <MarkdownTextInput
-        multiline
-        autoCapitalize="none"
-        value={value}
-        onChangeText={setValue}
-        style={[styles.input, style]}
-        ref={ref}
-        markdownStyle={markdownStyle}
-        placeholder="Type here..."
-        onSelectionChange={e => setSelection(e.nativeEvent.selection)}
-        selection={selection}
-        id={TEST_CONST.INPUT_ID}
-      />
-      <Text style={styles.text}>{JSON.stringify(value)}</Text>
-      <Button
-        testID="focus"
-        title="Focus"
-        onPress={() => {
-          if (!ref.current) {
-            return;
+    <FlatList
+      data={EXAMPLES_NAMES}
+      initialNumToRender={EXAMPLES_NAMES.length}
+      renderItem={({item: name}) => (
+        <Item
+          icon={EXAMPLES[name]?.icon ?? 'ℹ️'}
+          title={EXAMPLES[name]?.title ?? ''}
+          onPress={() => {
+            navigation.navigate(name);
+            if (!wasClicked.includes(name)) {
+              setTimeout(() => setWasClicked([...wasClicked, name]), 500);
+            }
+          }}
+          wasClicked={wasClicked.includes(name)}
+        />
+      )}
+      renderScrollComponent={props => <ScrollView {...props} />}
+      ItemSeparatorComponent={ItemSeparator}
+      style={styles.list}
+    />
+  );
+}
+
+interface ItemProps {
+  icon?: string;
+  title: string;
+  onPress: () => void;
+  missingOnFabric?: boolean;
+  wasClicked?: boolean;
+}
+
+function Item({icon, title, onPress, wasClicked}: ItemProps) {
+  const Button = Platform.OS === 'macos' ? Pressable : RectButton;
+  return (
+    <Button
+      style={[styles.button, wasClicked && styles.visitedItem]}
+      onPress={onPress}>
+      {icon && <Text style={styles.title}>{icon + '  '}</Text>}
+      <Text style={styles.title}>{title}</Text>
+    </Button>
+  );
+}
+
+function ItemSeparator() {
+  return <View style={styles.separator} />;
+}
+
+const Stack =
+  Platform.OS === 'macos'
+    ? createStackNavigator<RootStackParamList>()
+    : createNativeStackNavigator<RootStackParamList>();
+
+const linking = {
+  prefixes: [],
+  config: {
+    screens: EXAMPLES_NAMES.reduce<PathConfigMap<RootStackParamList>>(
+      (acc, name) => {
+        acc[name] = name;
+        return acc;
+      },
+      {Home: ''},
+    ),
+  },
+};
+
+function BackButton(props: HeaderBackButtonProps) {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+
+  return (
+    <HeaderBackButton {...props} onPress={() => navigation.navigate('Home')} />
+  );
+}
+
+// copied from https://reactnavigation.org/docs/state-persistence/
+const PERSISTENCE_KEY = 'NAVIGATION_STATE_V1';
+
+export default function App() {
+  const [isReady, setIsReady] = React.useState(!__DEV__);
+  const [initialState, setInitialState] = React.useState();
+
+  React.useEffect(() => {
+    const restoreState = async () => {
+      try {
+        const initialUrl = await Linking.getInitialURL();
+
+        if (
+          Platform.OS !== 'web' &&
+          Platform.OS !== 'macos' &&
+          initialUrl == null
+        ) {
+          // Only restore state if there's no deep link and we're not on web
+          const savedStateString = await AsyncStorage.getItem(PERSISTENCE_KEY);
+          const state = savedStateString
+            ? JSON.parse(savedStateString)
+            : undefined;
+
+          if (state !== undefined) {
+            setInitialState(state);
           }
-          ref.current.focus();
-        }}
-      />
-      <Button
-        testID="blur"
-        title="Blur"
-        onPress={() => {
-          if (!ref.current) {
-            return;
-          }
-          ref.current.blur();
-        }}
-      />
-      <Button
-        testID="reset"
-        title="Reset"
-        onPress={() => {
-          setValue(TEST_CONST.EXAMPLE_CONTENT);
-          setTextColorState(false);
-          setLinkColorState(false);
-          setTextFontSizeState(false);
-          setEmojiFontSizeState(false);
-          setSelection({start: 0, end: 0});
-        }}
-      />
-      <Button
-        testID="clear"
-        title="Clear"
-        onPress={() => {
-          setValue('');
-        }}
-      />
-      <Button
-        title="Toggle text color"
-        onPress={() => setTextColorState(prev => !prev)}
-      />
-      <Button
-        title="Toggle link color"
-        onPress={() => setLinkColorState(prev => !prev)}
-      />
-      <Button
-        title="Toggle text font size"
-        onPress={() => setTextFontSizeState(prev => !prev)}
-      />
-      <Button
-        title="Toggle emoji font size"
-        onPress={() => setEmojiFontSizeState(prev => !prev)}
-      />
-      <Button
-        title="Toggle all"
-        onPress={() => {
-          setTextColorState(prev => !prev);
-          setLinkColorState(prev => !prev);
-          setTextFontSizeState(prev => !prev);
-          setEmojiFontSizeState(prev => !prev);
-        }}
-      />
-      <Button
-        title="Change selection"
-        onPress={() => {
-          if (!ref.current) {
-            return;
-          }
-          ref.current.focus();
-          setSelection({start: 0, end: 20});
-        }}
-      />
-    </View>
+        }
+      } finally {
+        setIsReady(true);
+      }
+    };
+
+    if (!isReady) {
+      restoreState().catch(noop);
+    }
+  }, [isReady]);
+
+  const persistNavigationState = React.useCallback(
+    (state?: NavigationState) => {
+      AsyncStorage.setItem(PERSISTENCE_KEY, JSON.stringify(state)).catch(noop);
+    },
+    [],
+  );
+
+  const shouldReduceMotion = useReducedMotion();
+
+  if (!isReady) {
+    return (
+      <View style={[styles.container, styles.center]}>
+        <ActivityIndicator />
+      </View>
+    );
+  }
+
+  return (
+    <GestureHandlerRootView style={styles.container}>
+      <SafeAreaProvider>
+        <BottomSheetModalProvider>
+          {/* <MarkdownPreviewExample /> */}
+          {/* <PlaygroundExample /> */}
+          <NavigationContainer
+            linking={linking}
+            initialState={initialState}
+            onStateChange={persistNavigationState}>
+            <Stack.Navigator>
+              <Stack.Screen
+                name="Home"
+                component={HomeScreen}
+                options={{
+                  headerTitle: 'React-native-live-markdown',
+                  title: 'Reanimated examples',
+                  headerLeft: Platform.OS === 'web' ? () => null : undefined,
+                }}
+              />
+              {EXAMPLES_NAMES.map(name => (
+                <Stack.Screen
+                  key={name}
+                  name={name}
+                  component={EXAMPLES[name]!.screen}
+                  options={{
+                    headerTitle: EXAMPLES[name]?.title ?? '',
+                    animation: shouldReduceMotion ? 'fade' : 'default',
+                    title: EXAMPLES[name]?.title ?? '',
+                    headerLeft: Platform.OS === 'web' ? BackButton : undefined,
+                  }}
+                />
+              ))}
+            </Stack.Navigator>
+          </NavigationContainer>
+        </BottomSheetModalProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  center: {
     alignItems: 'center',
-    marginTop: 60,
+    justifyContent: 'center',
   },
-  input: {
-    fontSize: 20,
-    width: 300,
-    padding: 5,
-    borderColor: 'gray',
-    borderWidth: 1,
-    textAlignVertical: 'top',
+  list: {
+    backgroundColor: '#EFEFF4',
   },
-  text: {
-    fontFamily: 'Courier New',
-    marginTop: 10,
-    height: 100,
+  separator: {
+    height: 1,
+    backgroundColor: '#DBDBE0',
+  },
+  button: {
+    flex: 1,
+    height: 60,
+    padding: 15,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'white',
+  },
+  disabledButton: {
+    backgroundColor: 'grey',
+    opacity: 0.5,
+  },
+  title: {
+    fontSize: 16,
+    color: 'black',
+  },
+  visitedItem: {
+    backgroundColor: '#e6f0f7',
   },
 });
