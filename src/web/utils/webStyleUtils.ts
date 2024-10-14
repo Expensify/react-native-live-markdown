@@ -129,7 +129,7 @@ function generateCodeBlocksRules(target: MarkdownTextInputElement, styleTag: HTM
         'background-color': `${(preStyles?.backgroundColor as string) ?? 'lightgray'}`,
         'border-radius': `${preStyles?.borderRadius?.toString() ?? '4'}px`,
         'border-color': `${preStyles?.borderColor ?? 'grey'}`,
-        'min-width': `min(calc(100% + 1.5px), ${contentWidth}px)`,
+        'min-width': `min(calc(100% + 2.5px), ${contentWidth}px)`,
         'max-width': `${contentWidth}px`,
       },
     },
@@ -152,7 +152,7 @@ function generateCodeBlocksRules(target: MarkdownTextInputElement, styleTag: HTM
       },
     },
     {
-      selector: `.${target.uniqueId} *[data-type='line']:has(> *[data-type='pre']) > *:nth-child(n+3)`,
+      selector: `.${target.uniqueId} *[data-type='line']:has(> *[data-type='pre']) > *:nth-child(n+4)`,
       properties: {
         display: 'inline-block',
         transform: `translate(-${horizontalPadding}px, ${verticalPadding}px)`,
