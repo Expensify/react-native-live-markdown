@@ -46,6 +46,30 @@ interface MarkdownStyle {
     color: ColorValue;
     backgroundColor: ColorValue;
   };
+  inlineImage: {
+    minWidth: Float;
+    minHeight: Float;
+    maxWidth: Float;
+    maxHeight: Float;
+    marginTop: Float;
+    marginBottom: Float;
+    borderRadius: Float;
+  };
+  loadingIndicatorContainer?: {
+    backgroundColor?: ColorValue;
+    borderWidth?: Float;
+    borderColor?: ColorValue;
+    borderRadius?: Float;
+    width?: Float;
+    height?: Float;
+  };
+  loadingIndicator?: {
+    primaryColor?: ColorValue;
+    secondaryColor?: ColorValue;
+    width?: Float;
+    height?: Float;
+    borderWidth?: Float;
+  };
 }
 
 interface NativeProps extends ViewProps {

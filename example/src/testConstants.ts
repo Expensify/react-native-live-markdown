@@ -2,6 +2,7 @@ const LOCAL_URL = 'http://localhost:19006/';
 
 const EXAMPLE_CONTENT = [
   'Hello, *world*!',
+  '😀🍕🍔',
   'https://expensify.com',
   '# header1',
   '> blockquote',
@@ -10,6 +11,7 @@ const EXAMPLE_CONTENT = [
   '@here',
   '@someone@swmansion.com',
   '#mention-report',
+  '![demo image](https://picsum.photos/id/1067/200/300)',
 ].join('\n');
 
 const INPUT_ID = 'MarkdownInput_Example';

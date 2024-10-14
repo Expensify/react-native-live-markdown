@@ -1,8 +1,3 @@
-#if defined(RCT_NEW_ARCH_ENABLED) || defined(ANDROID)
-
-#include <react/renderer/core/LayoutContext.h>
-
-#include "MarkdownShadowFamilyRegistry.h"
 #include "MarkdownTextInputDecoratorShadowNode.h"
 
 using namespace expensify::livemarkdown;
@@ -36,5 +31,3 @@ MarkdownTextInputDecoratorShadowNode::updateFragmentState(
 
 } // namespace react
 } // namespace facebook
-
-#endif
