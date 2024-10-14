@@ -1,8 +1,5 @@
-import {View, StyleSheet, Text} from 'react-native';
-import {useMemo} from 'react';
+import {View, StyleSheet, Text, ScrollView} from 'react-native';
 import {MarkdownTextInput} from '@expensify/react-native-live-markdown';
-import {ScrollView} from 'react-native-gesture-handler';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import React from 'react';
 
 type MarkdownExample = {
@@ -62,13 +59,9 @@ const MARKDOWN_EXAMPLES: MarkdownExample[] = [
 ];
 
 export function MarkdownPreviewExample() {
-  const {bottom} = useSafeAreaInsets();
-
-  const style = useMemo(() => ({paddingBottom: bottom}), [bottom]);
-
   return (
     <ScrollView>
-      <View style={[styles.container, style]}>
+      <View style={[styles.container]}>
         {MARKDOWN_EXAMPLES.map(({title, content}) => {
           return (
             <View style={styles.exampleWrapper} key={title}>
@@ -91,6 +84,7 @@ export function MarkdownPreviewExample() {
 const styles = StyleSheet.create({
   container: {
     paddingTop: 20,
+    paddingBottom: 50,
     gap: 20,
     alignItems: 'center',
   },

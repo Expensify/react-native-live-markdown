@@ -31,11 +31,7 @@ import {
   createStackNavigator,
   type StackNavigationProp,
 } from '@react-navigation/stack';
-import {GestureHandlerRootView, RectButton} from 'react-native-gesture-handler';
 import {EXAMPLES} from './examples';
-import {useReducedMotion} from 'react-native-reanimated';
-import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
-import {SafeAreaProvider} from 'react-native-safe-area-context';
 
 function noop() {
   // do nothing
@@ -90,14 +86,13 @@ interface ItemProps {
 }
 
 function Item({icon, title, onPress, wasClicked}: ItemProps) {
-  const Button = Platform.OS === 'macos' ? Pressable : RectButton;
   return (
-    <Button
+    <Pressable
       style={[styles.button, wasClicked && styles.visitedItem]}
       onPress={onPress}>
       {icon && <Text style={styles.title}>{icon + '  '}</Text>}
       <Text style={styles.title}>{title}</Text>
-    </Button>
+    </Pressable>
   );
 }
 
@@ -175,8 +170,6 @@ export default function App() {
     [],
   );
 
-  const shouldReduceMotion = useReducedMotion();
-
   if (!isReady) {
     return (
       <View style={[styles.container, styles.center]}>
@@ -186,43 +179,34 @@ export default function App() {
   }
 
   return (
-    <GestureHandlerRootView style={styles.container}>
-      <SafeAreaProvider>
-        <BottomSheetModalProvider>
-          {/* <MarkdownPreviewExample /> */}
-          {/* <PlaygroundExample /> */}
-          <NavigationContainer
-            linking={linking}
-            initialState={initialState}
-            onStateChange={persistNavigationState}>
-            <Stack.Navigator>
-              <Stack.Screen
-                name="Home"
-                component={HomeScreen}
-                options={{
-                  headerTitle: 'React-native-live-markdown',
-                  title: 'Reanimated examples',
-                  headerLeft: Platform.OS === 'web' ? () => null : undefined,
-                }}
-              />
-              {EXAMPLES_NAMES.map(name => (
-                <Stack.Screen
-                  key={name}
-                  name={name}
-                  component={EXAMPLES[name]!.screen}
-                  options={{
-                    headerTitle: EXAMPLES[name]?.title ?? '',
-                    animation: shouldReduceMotion ? 'fade' : 'default',
-                    title: EXAMPLES[name]?.title ?? '',
-                    headerLeft: Platform.OS === 'web' ? BackButton : undefined,
-                  }}
-                />
-              ))}
-            </Stack.Navigator>
-          </NavigationContainer>
-        </BottomSheetModalProvider>
-      </SafeAreaProvider>
-    </GestureHandlerRootView>
+    <NavigationContainer
+      linking={linking}
+      initialState={initialState}
+      onStateChange={persistNavigationState}>
+      <Stack.Navigator>
+        <Stack.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{
+            headerTitle: 'React-native-live-markdown',
+            title: 'React Native Live Markdown Examples',
+            headerLeft: Platform.OS === 'web' ? () => null : undefined,
+          }}
+        />
+        {EXAMPLES_NAMES.map(name => (
+          <Stack.Screen
+            key={name}
+            name={name}
+            component={EXAMPLES[name]!.screen}
+            options={{
+              headerTitle: EXAMPLES[name]?.title ?? '',
+              title: EXAMPLES[name]?.title ?? '',
+              headerLeft: Platform.OS === 'web' ? BackButton : undefined,
+            }}
+          />
+        ))}
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 

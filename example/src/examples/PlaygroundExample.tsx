@@ -1,51 +1,49 @@
 import * as React from 'react';
-import {Button, StyleSheet, Text, View} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ScrollView,
+} from 'react-native';
 import {MarkdownTextInput} from '@expensify/react-native-live-markdown';
 import {TextInput} from 'react-native';
 import * as TEST_CONST from '../testConstants';
-import {ColorPickerInput, IterableInput} from '../components';
-import {ScrollView} from 'react-native-gesture-handler';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 const FONT_SIZES = [24, 32, 8, 12, 16];
+const COLORS = ['black', 'red', 'cyan', 'magenta', 'orange'];
 
 export function PlaygroundExample() {
   const [value, setValue] = React.useState(TEST_CONST.EXAMPLE_CONTENT);
-  const [textColor, setTextColor] = React.useState('#000000');
-  const [linkColor, setLinkColor] = React.useState('#000000');
-  const [textFontSize, setTextFontSize] = React.useState(FONT_SIZES[0]);
-  const [emojiFontSize, setEmojiFontSize] = React.useState(FONT_SIZES[0]);
+  const [textColorIndex, setTextColorIndex] = React.useState(0);
+  const [linkColorIndex, setLinkColorIndex] = React.useState(0);
+  const [textFontSizeIndex, setTextFontSizeIndex] = React.useState(0);
+  const [emojiFontSizeIndex, setEmojiFontSizeIndex] = React.useState(0);
   const [selection, setSelection] = React.useState({start: 0, end: 0});
-  const {bottom} = useSafeAreaInsets();
 
   const style = React.useMemo(() => {
     return {
-      color: textColor,
-      fontSize: textFontSize,
+      color: COLORS[textColorIndex],
+      fontSize: FONT_SIZES[textFontSizeIndex],
     };
-  }, [textColor, textFontSize]);
+  }, [textColorIndex, textFontSizeIndex]);
 
   const markdownStyle = React.useMemo(() => {
     return {
       emoji: {
-        fontSize: emojiFontSize,
+        fontSize: FONT_SIZES[emojiFontSizeIndex],
       },
       link: {
-        color: linkColor,
+        color: COLORS[linkColorIndex],
       },
     };
-  }, [linkColor, emojiFontSize]);
-
-  const containerStyle = React.useMemo(
-    () => ({paddingBottom: bottom}),
-    [bottom],
-  );
+  }, [linkColorIndex, emojiFontSizeIndex]);
 
   const ref = React.useRef<TextInput>(null);
 
   return (
     <ScrollView>
-      <View style={[styles.container, containerStyle]}>
+      <View style={styles.container}>
         <MarkdownTextInput
           multiline
           autoCapitalize="none"
@@ -59,103 +57,212 @@ export function PlaygroundExample() {
           selection={selection}
           id={TEST_CONST.INPUT_ID}
         />
-        <LabelWrapper title="Text Color">
-          <ColorPickerInput color={textColor} onChangeColor={setTextColor} />
-        </LabelWrapper>
-        <LabelWrapper title="Link Color">
-          <ColorPickerInput color={linkColor} onChangeColor={setLinkColor} />
-        </LabelWrapper>
-        <LabelWrapper title="Text Font Size">
-          <IterableInput
-            data={FONT_SIZES}
-            initialIndex={0}
-            onChange={fontSize => setTextFontSize(fontSize)}
-            resolveTitle={fontSize => String(fontSize)}
-          />
-        </LabelWrapper>
-        <LabelWrapper title="Text Emoji Size">
-          <IterableInput
-            data={FONT_SIZES}
-            initialIndex={0}
-            onChange={fontSize => setEmojiFontSize(fontSize)}
-            resolveTitle={fontSize => String(fontSize)}
-          />
-        </LabelWrapper>
-        <Button
-          testID="focus"
-          title="Focus"
-          onPress={() => {
-            if (!ref.current) {
-              return;
-            }
-            ref.current.focus();
-          }}
-        />
-        <Button
-          testID="blur"
-          title="Blur"
-          onPress={() => {
-            if (!ref.current) {
-              return;
-            }
-            ref.current.blur();
-          }}
-        />
-        <Button
-          testID="reset"
-          title="Reset"
-          onPress={() => {
-            setValue(TEST_CONST.EXAMPLE_CONTENT);
-            setTextColor('#0000000');
-            setLinkColor('#0000000');
-            setTextFontSize(FONT_SIZES[0]);
-            setEmojiFontSize(FONT_SIZES[0]);
-            setSelection({start: 0, end: 0});
-          }}
-        />
-        <Button
-          testID="clear"
-          title="Clear"
-          onPress={() => {
-            setValue('');
-          }}
-        />
-        <Button
-          title="Change selection"
-          onPress={() => {
-            if (!ref.current) {
-              return;
-            }
-            ref.current.focus();
-            setSelection({start: 0, end: 20});
-          }}
-        />
+        <View style={styles.controlsGrid}>
+          <View style={styles.row}>
+            <View style={styles.col}>
+              <ColorPicker
+                color={COLORS[textColorIndex]}
+                title="Text Color"
+                testID="change-text-color"
+                onPress={() => setTextColorIndex(i => (i + 1) % COLORS.length)}
+              />
+            </View>
+            <View style={styles.col}>
+              <ColorPicker
+                color={COLORS[linkColorIndex]}
+                title="Link Color"
+                testID="change-text-color"
+                onPress={() => setLinkColorIndex(i => (i + 1) % COLORS.length)}
+              />
+            </View>
+          </View>
+          <View style={styles.row}>
+            <View style={styles.col}>
+              <FontPicker
+                title="Text Font Size"
+                fontSize={FONT_SIZES[textFontSizeIndex]}
+                onPress={() =>
+                  setTextFontSizeIndex(i => (i + 1) % FONT_SIZES.length)
+                }
+              />
+            </View>
+            <View style={styles.col}>
+              <FontPicker
+                title="Emoji Font Size"
+                fontSize={FONT_SIZES[emojiFontSizeIndex]}
+                onPress={() =>
+                  setEmojiFontSizeIndex(i => (i + 1) % FONT_SIZES.length)
+                }
+              />
+            </View>
+          </View>
+          <View style={styles.row}>
+            <View style={styles.col}>
+              <Btn
+                testID="focus"
+                title="Focus"
+                onPress={() => {
+                  if (!ref.current) {
+                    return;
+                  }
+                  ref.current.focus();
+                }}
+              />
+            </View>
+            <View style={styles.col}>
+              <Btn
+                testID="blur"
+                title="Blur"
+                onPress={() => {
+                  if (!ref.current) {
+                    return;
+                  }
+                  ref.current.blur();
+                }}
+              />
+            </View>
+          </View>
+          <View style={styles.row}>
+            <View style={styles.col}>
+              <Btn
+                testID="reset"
+                title="Reset"
+                onPress={() => {
+                  setValue(TEST_CONST.EXAMPLE_CONTENT);
+                  setTextColorIndex(0);
+                  setLinkColorIndex(0);
+                  setTextFontSizeIndex(0);
+                  setEmojiFontSizeIndex(0);
+                  setSelection({start: 0, end: 0});
+                }}
+              />
+            </View>
+            <View style={styles.col}>
+              <Btn
+                testID="clear"
+                title="Clear"
+                onPress={() => {
+                  setValue('');
+                }}
+              />
+            </View>
+          </View>
+          <View style={styles.row}>
+            <View style={styles.col}>
+              <Btn
+                title="Change selection"
+                onPress={() => {
+                  if (!ref.current) {
+                    return;
+                  }
+                  ref.current.focus();
+                  setSelection({start: 0, end: 20});
+                }}
+              />
+            </View>
+            <View style={styles.col}></View>
+          </View>
+        </View>
       </View>
     </ScrollView>
   );
 }
 
-function LabelWrapper({
+function FontPicker({
   title,
-  children,
+  testID,
+  onPress,
+  fontSize,
 }: {
-  children: React.ReactNode;
-  title: string;
+  title?: string;
+  testID?: string;
+  fontSize?: number;
+  onPress: () => void;
 }) {
   return (
-    <View style={wrapperStyles.container}>
-      {children}
-      <Text style={wrapperStyles.title}>{title}</Text>
+    <View style={pickerStyles.container}>
+      <Btn testID={testID} onPress={onPress}>
+        <Text style={pickerStyles.title}>{fontSize}</Text>
+      </Btn>
+      <Text style={pickerStyles.title}>{title}</Text>
     </View>
   );
 }
 
-const wrapperStyles = StyleSheet.create({
+function ColorPicker({
+  title,
+  testID,
+  onPress,
+  color,
+}: {
+  title?: string;
+  testID?: string;
+  color?: string;
+  onPress: () => void;
+}) {
+  const boxStyle = React.useMemo(
+    () => [pickerStyles.box, {backgroundColor: color}],
+    [color],
+  );
+  return (
+    <View style={pickerStyles.container}>
+      <Btn testID={testID} onPress={onPress}>
+        <View style={boxStyle} />
+      </Btn>
+      <Text style={pickerStyles.title}>{title}</Text>
+    </View>
+  );
+}
+
+function Btn({
+  title,
+  testID,
+  onPress,
+  children,
+}: {
+  title?: string;
+  testID?: string;
+  children?: React.ReactNode;
+  onPress: () => void;
+}) {
+  return (
+    <TouchableOpacity
+      testID={testID}
+      style={btnStyles.button}
+      onPress={onPress}>
+      {title && <Text style={btnStyles.text}>{title}</Text>}
+      {children && <>{children}</>}
+    </TouchableOpacity>
+  );
+}
+const btnStyles = StyleSheet.create({
+  button: {
+    backgroundColor: 'white',
+    borderWidth: 2,
+    padding: 8,
+    minHeight: 50,
+    minWidth: 50,
+    borderColor: 'black',
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  text: {
+    fontWeight: 800,
+  },
+});
+
+const pickerStyles = StyleSheet.create({
   container: {
     flexGrow: 1,
     flexDirection: 'row',
     gap: 8,
     alignItems: 'center',
+  },
+  box: {
+    width: 30,
+    height: 30,
+    borderRadius: 8,
   },
   title: {
     fontWeight: 800,
@@ -165,8 +272,21 @@ const wrapperStyles = StyleSheet.create({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 30,
+  },
+  controlsGrid: {
+    flex: 2,
+    paddingTop: 8,
     gap: 8,
+  },
+  row: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  col: {
+    flex: 1,
   },
   input: {
     fontSize: 20,
