@@ -11,12 +11,12 @@ import {TextInput} from 'react-native';
 import * as TEST_CONST from '../testConstants';
 
 const FONT_SIZES = [24, 32, 8, 12, 16];
-const COLORS = ['black', 'red', 'cyan', 'magenta', 'orange'];
+const COLORS = ['black', 'blue', 'red', 'cyan', 'magenta', 'orange'];
 
 export function PlaygroundExample() {
   const [value, setValue] = React.useState(TEST_CONST.EXAMPLE_CONTENT);
   const [textColorIndex, setTextColorIndex] = React.useState(0);
-  const [linkColorIndex, setLinkColorIndex] = React.useState(0);
+  const [linkColorIndex, setLinkColorIndex] = React.useState(1);
   const [textFontSizeIndex, setTextFontSizeIndex] = React.useState(0);
   const [emojiFontSizeIndex, setEmojiFontSizeIndex] = React.useState(0);
   const [selection, setSelection] = React.useState({start: 0, end: 0});
@@ -130,7 +130,7 @@ export function PlaygroundExample() {
                 onPress={() => {
                   setValue(TEST_CONST.EXAMPLE_CONTENT);
                   setTextColorIndex(0);
-                  setLinkColorIndex(0);
+                  setLinkColorIndex(1);
                   setTextFontSizeIndex(0);
                   setEmojiFontSizeIndex(0);
                   setSelection({start: 0, end: 0});
