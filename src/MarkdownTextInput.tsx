@@ -6,12 +6,13 @@ import type {MarkdownStyle} from './MarkdownTextInputDecoratorViewNativeComponen
 import NativeLiveMarkdownModule from './NativeLiveMarkdownModule';
 import {mergeMarkdownStyleWithDefault} from './styleUtils';
 import type {PartialMarkdownStyle} from './styleUtils';
+import type {InlineImagesInputProps} from './commonTypes';
 
 if (NativeLiveMarkdownModule) {
   NativeLiveMarkdownModule.install();
 }
 
-interface MarkdownTextInputProps extends TextInputProps {
+interface MarkdownTextInputProps extends TextInputProps, InlineImagesInputProps {
   markdownStyle?: PartialMarkdownStyle;
 }
 

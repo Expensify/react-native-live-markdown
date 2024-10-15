@@ -35,6 +35,7 @@ public class CustomFabricUIManager {
     }
   }
 
+  @SuppressWarnings("unchecked")
   private static <T> T readPrivateField(Object obj, String name) throws NoSuchFieldException, IllegalAccessException {
     Class<?> clazz = obj.getClass();
 

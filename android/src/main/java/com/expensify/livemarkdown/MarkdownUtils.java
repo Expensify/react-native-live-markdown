@@ -6,6 +6,7 @@ import android.text.Spanned;
 
 import androidx.annotation.NonNull;
 
+import com.expensify.livemarkdown.spans.*;
 import com.facebook.react.views.text.internal.span.CustomLineHeightSpan;
 import com.facebook.soloader.SoLoader;
 
