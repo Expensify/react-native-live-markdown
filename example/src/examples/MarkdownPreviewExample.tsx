@@ -52,10 +52,6 @@ const MARKDOWN_EXAMPLES: MarkdownExample[] = [
     title: 'Image',
     content: '![demo image](https://picsum.photos/id/1067/200/300)',
   },
-  {
-    title: 'Autocorrect',
-    content: 'trailing space ',
-  },
 ];
 
 export function MarkdownPreviewExample() {

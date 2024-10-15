@@ -58,26 +58,26 @@ export function PlaygroundExample() {
           id={TEST_CONST.INPUT_ID}
         />
         <View style={styles.controlsGrid}>
-          <View style={styles.row}>
-            <View style={styles.col}>
+          <Row>
+            <Col>
               <ColorPicker
                 color={COLORS[textColorIndex]}
                 title="Text Color"
                 testID="change-text-color"
                 onPress={() => setTextColorIndex(i => (i + 1) % COLORS.length)}
               />
-            </View>
-            <View style={styles.col}>
+            </Col>
+            <Col>
               <ColorPicker
                 color={COLORS[linkColorIndex]}
                 title="Link Color"
                 testID="change-text-color"
                 onPress={() => setLinkColorIndex(i => (i + 1) % COLORS.length)}
               />
-            </View>
-          </View>
-          <View style={styles.row}>
-            <View style={styles.col}>
+            </Col>
+          </Row>
+          <Row>
+            <Col>
               <FontPicker
                 title="Text Font Size"
                 fontSize={FONT_SIZES[textFontSizeIndex]}
@@ -85,8 +85,8 @@ export function PlaygroundExample() {
                   setTextFontSizeIndex(i => (i + 1) % FONT_SIZES.length)
                 }
               />
-            </View>
-            <View style={styles.col}>
+            </Col>
+            <Col>
               <FontPicker
                 title="Emoji Font Size"
                 fontSize={FONT_SIZES[emojiFontSizeIndex]}
@@ -94,10 +94,10 @@ export function PlaygroundExample() {
                   setEmojiFontSizeIndex(i => (i + 1) % FONT_SIZES.length)
                 }
               />
-            </View>
-          </View>
-          <View style={styles.row}>
-            <View style={styles.col}>
+            </Col>
+          </Row>
+          <Row>
+            <Col>
               <Btn
                 testID="focus"
                 title="Focus"
@@ -108,8 +108,8 @@ export function PlaygroundExample() {
                   ref.current.focus();
                 }}
               />
-            </View>
-            <View style={styles.col}>
+            </Col>
+            <Col>
               <Btn
                 testID="blur"
                 title="Blur"
@@ -120,10 +120,10 @@ export function PlaygroundExample() {
                   ref.current.blur();
                 }}
               />
-            </View>
-          </View>
-          <View style={styles.row}>
-            <View style={styles.col}>
+            </Col>
+          </Row>
+          <Row>
+            <Col>
               <Btn
                 testID="reset"
                 title="Reset"
@@ -136,8 +136,8 @@ export function PlaygroundExample() {
                   setSelection({start: 0, end: 0});
                 }}
               />
-            </View>
-            <View style={styles.col}>
+            </Col>
+            <Col>
               <Btn
                 testID="clear"
                 title="Clear"
@@ -145,10 +145,10 @@ export function PlaygroundExample() {
                   setValue('');
                 }}
               />
-            </View>
-          </View>
-          <View style={styles.row}>
-            <View style={styles.col}>
+            </Col>
+          </Row>
+          <Row>
+            <Col>
               <Btn
                 title="Change selection"
                 onPress={() => {
@@ -159,8 +159,8 @@ export function PlaygroundExample() {
                   setSelection({start: 0, end: 20});
                 }}
               />
-            </View>
-          </View>
+            </Col>
+          </Row>
         </View>
       </View>
     </ScrollView>
@@ -250,6 +250,13 @@ const btnStyles = StyleSheet.create({
     fontWeight: 800,
   },
 });
+
+function Row({children}: {children: React.ReactNode}) {
+  return <View style={styles.row}>{children}</View>;
+}
+function Col({children}: {children: React.ReactNode}) {
+  return <View style={styles.col}>{children}</View>;
+}
 
 const pickerStyles = StyleSheet.create({
   container: {
