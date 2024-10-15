@@ -160,7 +160,6 @@ export function PlaygroundExample() {
                 }}
               />
             </View>
-            <View style={styles.col}></View>
           </View>
         </View>
       </View>
