@@ -38,14 +38,12 @@ public class CustomMountingManager extends MountingManager {
       @NonNull ViewManagerRegistry viewManagerRegistry,
       @NonNull MountItemExecutor mountItemExecutor,
       @NonNull Context context,
-      @NonNull ReadableMap decoratorProps) {
+      @NonNull ReadableMap decoratorProps,
+      int parserId) {
     super(viewManagerRegistry, mountItemExecutor);
-
-    AssetManager assetManager = context.getAssets();
-    MarkdownUtils.maybeInitializeRuntime(assetManager);
-
-    this.markdownUtils = new MarkdownUtils(assetManager);
+    this.markdownUtils = new MarkdownUtils((ReactContext) context);
     this.markdownUtils.setMarkdownStyle(new MarkdownStyle(decoratorProps, context));
+    this.markdownUtils.setParserId(parserId);
   }
 
   @Override

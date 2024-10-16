@@ -151,6 +151,9 @@ android {
       "**/libfbjni.so",
       "**/libjsi.so",
       "**/libreactnativejni.so",
+      "**/libreact_nativemodule_core.so",
+      "**/libruntimeexecutor.so",
+      "**/libworklets.so",
     ]
   }
 
@@ -173,6 +176,7 @@ repositories {
 dependencies {
   implementation "com.facebook.react:react-android" // version substituted by RNGP
   implementation "com.facebook.react:hermes-android" // version substituted by RNGP
+  implementation project(":react-native-reanimated")
 }
 
 if (isNewArchitectureEnabled()) {
@@ -181,15 +185,6 @@ if (isNewArchitectureEnabled()) {
     libraryName = "LiveMarkdown"
     codegenJavaPackageName = "com.expensify.livemarkdown"
   }
-}
-
-task copyJS(type: Copy) {
-  from '../parser/react-native-live-markdown-parser.js'
-  into 'src/main/assets'
-}
-
-tasks.preBuild {
-  dependsOn copyJS
 }
 
 tasks.withType(JavaCompile).configureEach {

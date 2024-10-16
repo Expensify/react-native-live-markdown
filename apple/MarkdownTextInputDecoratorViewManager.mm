@@ -20,4 +20,13 @@ RCT_CUSTOM_VIEW_PROPERTY(markdownStyle, NSDictionary, MarkdownTextInputDecorator
 #endif /* RCT_NEW_ARCH_ENABLED */
 }
 
+RCT_CUSTOM_VIEW_PROPERTY(parserId, NSNumber, MarkdownTextInputDecoratorView)
+{
+#ifdef RCT_NEW_ARCH_ENABLED
+  // implemented in MarkdownTextInputDecoratorView updateProps:
+#else
+  [view setParserId:json];
+#endif /* RCT_NEW_ARCH_ENABLED */
+}
+
 @end
