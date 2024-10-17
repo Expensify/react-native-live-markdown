@@ -6,7 +6,9 @@ import * as TEST_CONST from './testConstants';
 import {PlatformInfo} from './PlatformInfo';
 
 export default function App() {
-  const [value, setValue] = React.useState(TEST_CONST.EXAMPLE_CONTENT);
+  const [value, setValue] = React.useState(
+    'Hello *world*!\n> Lorem ipsum\nexample.com\n# Hello world\n# Hello world\n# Hello world',
+  );
   const [textColorState, setTextColorState] = React.useState(false);
   const [linkColorState, setLinkColorState] = React.useState(false);
   const [textFontSizeState, setTextFontSizeState] = React.useState(false);

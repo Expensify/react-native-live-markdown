@@ -8,25 +8,10 @@
 
 using namespace facebook;
 
-@implementation RCTMarkdownUtils {
-  NSString *_prevInputString;
-  NSAttributedString *_prevAttributedString;
-  NSDictionary<NSAttributedStringKey, id> *_prevTextAttributes;
-  __weak RCTMarkdownStyle *_prevMarkdownStyle;
-}
+@implementation RCTMarkdownUtils
 
-- (NSAttributedString *)parseMarkdown:(nullable NSAttributedString *)input withAttributes:(nullable NSDictionary<NSAttributedStringKey,id> *)attributes
+- (void)applyFormatting:(nonnull NSMutableAttributedString *)attributedString withDefaultTextAttributes:(nonnull NSDictionary<NSAttributedStringKey,id> *)defaultTextAttributes
 {
-    @synchronized (self) {
-        if (input == nil) {
-            return nil;
-        }
-
-        NSString *inputString = [input string];
-        if ([inputString isEqualToString:_prevInputString] && [attributes isEqualToDictionary:_prevTextAttributes] && [_markdownStyle isEqual:_prevMarkdownStyle]) {
-            return _prevAttributedString;
-        }
-
         static std::shared_ptr<jsi::Runtime> runtime;
         static std::mutex runtimeMutex;
         auto lock = std::lock_guard<std::mutex>(runtimeMutex);
@@ -42,24 +27,27 @@ using namespace facebook;
         }
 
         jsi::Runtime &rt = *runtime;
-        auto text = jsi::String::createFromUtf8(rt, [inputString UTF8String]);
+        auto text = jsi::String::createFromUtf8(rt, [attributedString.string UTF8String]);
 
         auto func = rt.global().getPropertyAsFunction(rt, "parseExpensiMarkToRanges");
         auto output = func.call(rt, text);
-        if (output.isUndefined()) {
-          return input;
-        }
+        // TODO: memoize parser output
         const auto &ranges = output.asObject(rt).asArray(rt);
 
-        NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:inputString attributes:attributes];
+        NSRange fullRange = NSMakeRange(0, attributedString.length);
+
         [attributedString beginEditing];
+
+        [attributedString addAttributes:defaultTextAttributes range:fullRange];
 
         // If the attributed string ends with underlined text, blurring the single-line input imprints the underline style across the whole string.
         // It looks like a bug in iOS, as there is no underline style to be found in the attributed string, especially after formatting.
         // This is a workaround that applies the NSUnderlineStyleNone to the string before iterating over ranges which resolves this problem.
-        [attributedString addAttribute:NSUnderlineStyleAttributeName value:[NSNumber numberWithInteger:NSUnderlineStyleNone] range:NSMakeRange(0, attributedString.length)];
+        [attributedString addAttribute:NSUnderlineStyleAttributeName value:[NSNumber numberWithInteger:NSUnderlineStyleNone] range:fullRange];
+        // TODO: confirm if this workaround is still necessary
 
         _blockquoteRangesAndLevels = [NSMutableArray new];
+        // TODO: use custom attribute to mark blockquotes
 
         for (size_t i = 0, n = ranges.size(rt); i < n; ++i) {
             const auto &item = ranges.getValueAtIndex(rt, i).asObject(rt);
@@ -74,14 +62,6 @@ using namespace facebook;
         RCTApplyBaselineOffset(attributedString);
 
         [attributedString endEditing];
-
-        _prevInputString = inputString;
-        _prevAttributedString = attributedString;
-        _prevTextAttributes = attributes;
-        _prevMarkdownStyle = _markdownStyle;
-
-        return attributedString;
-    }
 }
 
 - (void)applyRangeToAttributedString:(NSMutableAttributedString *)attributedString type:(const std::string)type start:(const int)start length:(const int)length depth:(const int)depth {

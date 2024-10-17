@@ -8,7 +8,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) RCTMarkdownStyle *markdownStyle;
 @property (nonatomic) NSMutableArray<NSDictionary *> *blockquoteRangesAndLevels;
 
-- (NSAttributedString *)parseMarkdown:(nullable NSAttributedString *)input withAttributes:(nullable NSDictionary<NSAttributedStringKey, id>*)attributes;
+- (void)applyFormatting:(nonnull NSMutableAttributedString *)attributedString withDefaultTextAttributes:(nonnull NSDictionary<NSAttributedStringKey,id> *)defaultTextAttributes;
 
 @end
 
