@@ -92,9 +92,9 @@ function addStylesheetRules(rules: Rule[], styleSheet: CSSStyleSheet) {
     const {selector, properties} = rule;
     let propertiesStr = '';
 
-    Object.keys(properties).forEach((property) => {
-      const value = properties[property];
-      propertiesStr += `${property}: ${value};\n`;
+    Object.keys(properties).forEach((prop) => {
+      const value = properties[prop];
+      propertiesStr += `${prop}: ${value};\n`;
     });
 
     styleSheet.insertRule(`${selector}{${propertiesStr}}`, styleSheet.cssRules.length);
@@ -124,7 +124,7 @@ function generateCodeBlocksRules(target: MarkdownTextInputElement, styleTag: HTM
     {
       selector: `.${target.uniqueId} *[data-type='pre']::before`,
       properties: {
-        top: `${Math.floor(lineHeight)}px`,
+        top: `${Math.floor(lineHeight) - 1}px`,
         padding: `${verticalPadding.toString()}px ${horizontalPadding.toString()}px`,
         'background-color': `${(preStyles?.backgroundColor as string) ?? 'lightgray'}`,
         'border-radius': `${preStyles?.borderRadius?.toString() ?? '4'}px`,

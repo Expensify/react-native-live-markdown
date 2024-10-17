@@ -18,10 +18,6 @@ function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownSty
       Object.assign(node.style, {
         margin: '0',
         padding: '0',
-        position: 'relative',
-        width: 'fit-content',
-        maxWidth: '100%',
-        boxSizing: 'border-box',
       });
       break;
     case 'syntax':
@@ -65,6 +61,10 @@ function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownSty
       });
       Object.assign((node.parentNode as HTMLElement).style, {
         padding: `${preVerticalPadding}px ${preHorizontalPadding}px`,
+        position: 'relative',
+        width: 'fit-content',
+        maxWidth: '100%',
+        boxSizing: 'border-box',
       });
       break;
 

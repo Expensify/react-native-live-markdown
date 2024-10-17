@@ -170,7 +170,7 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, MarkdownRange[]] {
       } else if (node.tag === '<br />') {
         text += '\n';
       } else if (node.tag.startsWith('<pre')) {
-        appendSyntax('```');
+        appendSyntax(`\`\`\`${unescapeText(node.tag.match(/new-line-char="([^"]*)"/)![1]!)}`);
         const content = node.children.join('').replaceAll('&#32;', ' ');
         addChildrenWithStyle(content, 'pre');
         appendSyntax('```');
