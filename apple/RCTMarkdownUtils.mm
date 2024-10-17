@@ -40,12 +40,6 @@ using namespace facebook;
 
         [attributedString addAttributes:defaultTextAttributes range:fullRange];
 
-        // If the attributed string ends with underlined text, blurring the single-line input imprints the underline style across the whole string.
-        // It looks like a bug in iOS, as there is no underline style to be found in the attributed string, especially after formatting.
-        // This is a workaround that applies the NSUnderlineStyleNone to the string before iterating over ranges which resolves this problem.
-        [attributedString addAttribute:NSUnderlineStyleAttributeName value:[NSNumber numberWithInteger:NSUnderlineStyleNone] range:fullRange];
-        // TODO: confirm if this workaround is still necessary
-
         _blockquoteRangesAndLevels = [NSMutableArray new];
         // TODO: use custom attribute to mark blockquotes
 
