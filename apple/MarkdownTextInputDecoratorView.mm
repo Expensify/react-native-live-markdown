@@ -22,7 +22,7 @@
 #else
   __weak RCTBaseTextInputView *_textInput;
 #endif /* RCT_NEW_ARCH_ENABLED */
-  __weak UIView<RCTBackedTextInputViewProtocol> *_backedTextInputView;
+  __weak RCTUIView<RCTBackedTextInputViewProtocol> *_backedTextInputView;
   __weak RCTBackedTextFieldDelegateAdapter *_adapter;
   __weak RCTUITextView *_textView;
 }
@@ -47,7 +47,7 @@
 #endif /* RCT_NEW_ARCH_ENABLED */
 
   react_native_assert(currentIndex != 0 && currentIndex != NSNotFound && "Error while finding current component.");
-  UIView *view = [viewsArray objectAtIndex:currentIndex - 1];
+  RCTUIView *view = [viewsArray objectAtIndex:currentIndex - 1];
 
 #ifdef RCT_NEW_ARCH_ENABLED
   react_native_assert([view isKindOfClass:[RCTTextInputComponentView class]] && "Previous sibling component is not an instance of RCTTextInputComponentView.");
@@ -78,17 +78,17 @@
     CGSize contentSize = _textView.contentSize;
     CGRect textBounds = [layoutManager usedRectForTextContainer:_textView.textContainer];
     contentSize.height = textBounds.size.height + _textView.textContainerInset.top + _textView.textContainerInset.bottom;
-    [_textView setContentSize:contentSize];
+    // [_textView setContentSize:contentSize]; // TODO
 
     layoutManager.allowsNonContiguousLayout = NO; // workaround for onScroll issue
     object_setClass(layoutManager, [MarkdownLayoutManager class]);
-    [layoutManager setValue:_markdownUtils forKey:@"markdownUtils"];
+    objc_setAssociatedObject(layoutManager, @selector(markdownUtils), _markdownUtils, OBJC_ASSOCIATION_RETAIN);
   } else {
     react_native_assert(false && "Cannot enable Markdown for this type of TextInput.");
   }
 }
 
-- (void)willMoveToWindow:(UIWindow *)newWindow
+- (void)willMoveToWindow:(RCTUIWindow *)newWindow
 {
   if (_textInput != nil) {
     [_textInput setMarkdownUtils:nil];
@@ -98,9 +98,10 @@
   }
   if (_textView != nil) {
     [_textView setMarkdownUtils:nil];
-    if (_textView.layoutManager != nil && [object_getClass(_textView.layoutManager) isEqual:[MarkdownLayoutManager class]]) {
-      [_textView.layoutManager setValue:nil forKey:@"markdownUtils"];
-      object_setClass(_textView.layoutManager, [NSLayoutManager class]);
+    NSLayoutManager *layoutManager = _textView.layoutManager;
+    if (layoutManager != nil && [object_getClass(layoutManager) isEqual:[MarkdownLayoutManager class]]) {
+      objc_setAssociatedObject(layoutManager, @selector(markdownUtils), nil, OBJC_ASSOCIATION_RETAIN);
+      object_setClass(layoutManager, [NSLayoutManager class]);
     }
   }
 }
