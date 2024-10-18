@@ -22,7 +22,7 @@
 }
 
 - (void)drawAtPoint:(CGPoint)point inContext:(CGContextRef)ctx {
-  [[UIColor blueColor] setFill];
+  [_markdownUtils.markdownStyle.blockquoteBorderColor setFill];
   UIRectFill(self.ribbonRect);
   [super drawAtPoint:point inContext:ctx];
 }
