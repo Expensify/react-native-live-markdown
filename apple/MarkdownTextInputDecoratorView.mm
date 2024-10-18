@@ -1,7 +1,7 @@
 #import <React/RCTUITextField.h>
 #import "react_native_assert.h"
 
-#import <RNLiveMarkdown/MarkdownLayoutManager.h>
+#import <RNLiveMarkdown/MarkdownTextLayoutManagerDelegate.h>
 #import <RNLiveMarkdown/MarkdownTextInputDecoratorView.h>
 #import <RNLiveMarkdown/RCTBackedTextFieldDelegateAdapter+Markdown.h>
 #import <RNLiveMarkdown/RCTUITextView+Markdown.h>
@@ -17,6 +17,7 @@
 @implementation MarkdownTextInputDecoratorView {
   RCTMarkdownUtils *_markdownUtils;
   RCTMarkdownStyle *_markdownStyle;
+  MarkdownTextLayoutManagerDelegate *_markdownTextLayoutManagerDelegate;
 #ifdef RCT_NEW_ARCH_ENABLED
   __weak RCTTextInputComponentView *_textInput;
 #else
@@ -71,18 +72,15 @@
   } else if ([_backedTextInputView isKindOfClass:[RCTUITextView class]]) {
     _textView = (RCTUITextView *)_backedTextInputView;
     [_textView setMarkdownUtils:_markdownUtils];
-    NSLayoutManager *layoutManager = _textView.layoutManager; // switching to TextKit 1 compatibility mode
-
-    // Correct content height in TextKit 1 compatibility mode. (See https://github.com/Expensify/App/issues/41567)
-    // Consider removing this fix if it is no longer needed after migrating to TextKit 2.
-    CGSize contentSize = _textView.contentSize;
-    CGRect textBounds = [layoutManager usedRectForTextContainer:_textView.textContainer];
-    contentSize.height = textBounds.size.height + _textView.textContainerInset.top + _textView.textContainerInset.bottom;
-    [_textView setContentSize:contentSize];
-
-    layoutManager.allowsNonContiguousLayout = NO; // workaround for onScroll issue
-    object_setClass(layoutManager, [MarkdownLayoutManager class]);
-    [layoutManager setValue:_markdownUtils forKey:@"markdownUtils"];
+    
+    if (@available(iOS 16.0, *)) {
+      _markdownTextLayoutManagerDelegate = [[MarkdownTextLayoutManagerDelegate alloc] init];
+      _markdownTextLayoutManagerDelegate.textStorage = _textView.textStorage;
+      _markdownTextLayoutManagerDelegate.markdownUtils = _markdownUtils;
+      _textView.textLayoutManager.delegate = _markdownTextLayoutManagerDelegate;
+    } else {
+      // Do nothing on earlier versions
+    }
   } else {
     react_native_assert(false && "Cannot enable Markdown for this type of TextInput.");
   }
@@ -98,9 +96,11 @@
   }
   if (_textView != nil) {
     [_textView setMarkdownUtils:nil];
-    if (_textView.layoutManager != nil && [object_getClass(_textView.layoutManager) isEqual:[MarkdownLayoutManager class]]) {
-      [_textView.layoutManager setValue:nil forKey:@"markdownUtils"];
-      object_setClass(_textView.layoutManager, [NSLayoutManager class]);
+
+    if (@available(iOS 16.0, *)) {
+      _textView.textLayoutManager.delegate = nil;
+    } else {
+      // Fallback on earlier versions
     }
   }
 }
