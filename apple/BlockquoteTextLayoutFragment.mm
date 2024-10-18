@@ -15,7 +15,7 @@
       fragmentTextBounds = CGRectUnion(fragmentTextBounds, lineFragmentBounds);
     }
   }
-  fragmentTextBounds.origin.x -= _markdownUtils.markdownStyle.blockquoteMarginLeft + _markdownUtils.markdownStyle.blockquoteBorderWidth + _markdownUtils.markdownStyle.blockquotePaddingLeft;
+  fragmentTextBounds.origin.x -= _markdownUtils.markdownStyle.blockquoteBorderWidth + _markdownUtils.markdownStyle.blockquotePaddingLeft;
   fragmentTextBounds.size.width = _markdownUtils.markdownStyle.blockquoteBorderWidth;
   // TODO: draw multiple ribbons for nested blockquotes
   return fragmentTextBounds;
