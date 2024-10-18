@@ -6,6 +6,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface RCTUITextView (Private)
 - (void)textDidChange;
+- (void)setSelectedTextRange:(UITextRange *)selectedTextRange notifyDelegate:(BOOL)notifyDelegate;
 @end
 
 @interface RCTUITextView (Markdown)
