@@ -59,8 +59,6 @@ using namespace facebook;
         // This is a workaround that applies the NSUnderlineStyleNone to the string before iterating over ranges which resolves this problem.
         [attributedString addAttribute:NSUnderlineStyleAttributeName value:[NSNumber numberWithInteger:NSUnderlineStyleNone] range:NSMakeRange(0, attributedString.length)];
 
-        _blockquoteRangesAndLevels = [NSMutableArray new];
-
         for (size_t i = 0, n = ranges.size(rt); i < n; ++i) {
             const auto &item = ranges.getValueAtIndex(rt, i).asObject(rt);
             const auto &type = item.getProperty(rt, "type").asString(rt).utf8(rt);
@@ -155,10 +153,7 @@ using namespace facebook;
         paragraphStyle.firstLineHeadIndent = indent;
         paragraphStyle.headIndent = indent;
         [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:range];
-        [_blockquoteRangesAndLevels addObject:@{
-            @"range": [NSValue valueWithRange:range],
-            @"depth": @(depth)
-        }];
+        [attributedString addAttribute:RCTLiveMarkdownBlockquoteAttributeName value:@(true) range:range];
     } else if (type == "pre") {
         [attributedString addAttribute:NSForegroundColorAttributeName value:_markdownStyle.preColor range:range];
         NSRange rangeForBackground = [[attributedString string] characterAtIndex:range.location] == '\n' ? NSMakeRange(range.location + 1, range.length - 1) : range;
