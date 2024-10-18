@@ -1,0 +1,15 @@
+#import <RNLiveMarkdown/MarkdownTextStorageDelegate.h>
+
+@implementation MarkdownTextStorageDelegate
+
+- (void)textStorage:(NSTextStorage *)textStorage didProcessEditing:(NSTextStorageEditActions)editedMask range:(NSRange)editedRange changeInLength:(NSInteger)delta {
+  react_native_assert(_markdownUtils != nil);
+  react_native_assert(_textView != nil);
+  react_native_assert(_textView.defaultTextAttributes != nil);
+
+  [_markdownUtils applyFormatting:textStorage withDefaultTextAttributes:_textView.defaultTextAttributes];
+
+  // TODO: fix cursor position when adding newline after a blockquote (probably not here though)
+}
+
+@end
