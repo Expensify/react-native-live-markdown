@@ -1,4 +1,4 @@
-const LOCAL_URL = 'http://localhost:19006/';
+const LOCAL_URL = 'http://localhost:19006/PlaygroundExample';
 
 const EXAMPLE_CONTENT = [
   'Hello, *world*!',
