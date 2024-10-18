@@ -1,7 +1,6 @@
 import * as React from 'react';
 import {Button, StyleSheet, Text, View} from 'react-native';
 import {MarkdownTextInput} from '@expensify/react-native-live-markdown';
-import type {TextInput} from 'react-native';
 import * as TEST_CONST from './testConstants';
 import {PlatformInfo} from './PlatformInfo';
 
@@ -31,8 +30,7 @@ export default function App() {
     };
   }, [emojiFontSizeState, linkColorState]);
 
-  // TODO: use MarkdownTextInput ref instead of TextInput ref
-  const ref = React.useRef<TextInput>(null);
+  const ref = React.useRef<MarkdownTextInput>(null);
 
   return (
     <View style={styles.container}>
