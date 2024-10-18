@@ -16,7 +16,6 @@ function getPlatform() {
   // @ts-ignore it works
   return Platform.constants.systemName || Platform.constants.Brand;
 }
-
 function getPlatformVersion() {
   return Platform.Version;
 }
@@ -49,7 +48,7 @@ function getReactNativeVersion() {
   return `${major}.${minor}.${patch}`;
 }
 
-export function PlatformInfo() {
+export function AboutExample() {
   return (
     <View style={styles.platform}>
       <Text>
@@ -71,6 +70,6 @@ export function PlatformInfo() {
 const styles = StyleSheet.create({
   platform: {
     alignItems: 'center',
-    marginBottom: 20,
+    marginTop: 20,
   },
 });
