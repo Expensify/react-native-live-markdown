@@ -1,5 +1,5 @@
 import type {CSSProperties} from 'react';
-import type {MarkdownTextInputElement} from '../../MarkdownTextInput.web';
+import type {HTMLMarkdownElement, MarkdownTextInputElement} from '../../MarkdownTextInput.web';
 
 const ZERO_WIDTH_SPACE = '\u200B';
 
@@ -37,7 +37,7 @@ function normalizeValue(value: string) {
 }
 
 // Parses the HTML structure of a MarkdownTextInputElement to a plain text string. Used for getting the correct value of the input element.
-function parseInnerHTMLToText(target: MarkdownTextInputElement, inputType: string, cursorPosition: number): string {
+function parseInnerHTMLToText(target: MarkdownTextInputElement | HTMLMarkdownElement, inputType: string, cursorPosition: number): string {
   // Returns the parent of a given node that is higher in the hierarchy and is of a different type than 'text', 'br' or 'line'
   function getTopParentNode(node: ChildNode) {
     let currentParentNode = node.parentNode;
