@@ -7,10 +7,11 @@
 API_AVAILABLE(ios(15.0)){
     NSInteger index = [textLayoutManager offsetFromLocation:textLayoutManager.documentRange.location toLocation:location];
     if (index < self.textStorage.length) {
-        NSNumber *isBlockquote = [self.textStorage attribute:RCTLiveMarkdownBlockquoteAttributeName atIndex:index effectiveRange:nil];
-        if ([isBlockquote boolValue]) {
+        NSNumber *depth = [self.textStorage attribute:RCTLiveMarkdownBlockquoteAttributeName atIndex:index effectiveRange:nil];
+        if (depth != nil) {
             BlockquoteTextLayoutFragment *textLayoutFragment = [[BlockquoteTextLayoutFragment alloc] initWithTextElement:textElement range:textElement.elementRange];
             textLayoutFragment.markdownUtils = _markdownUtils;
+            textLayoutFragment.depth = [depth unsignedIntValue];
             return textLayoutFragment;
         }
     }

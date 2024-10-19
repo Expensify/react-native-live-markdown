@@ -153,7 +153,7 @@ using namespace facebook;
         paragraphStyle.firstLineHeadIndent = indent;
         paragraphStyle.headIndent = indent;
         [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:range];
-        [attributedString addAttribute:RCTLiveMarkdownBlockquoteAttributeName value:@(true) range:range];
+        [attributedString addAttribute:RCTLiveMarkdownBlockquoteAttributeName value:@(depth) range:range];
     } else if (type == "pre") {
         [attributedString addAttribute:NSForegroundColorAttributeName value:_markdownStyle.preColor range:range];
         NSRange rangeForBackground = [[attributedString string] characterAtIndex:range.location] == '\n' ? NSMakeRange(range.location + 1, range.length - 1) : range;

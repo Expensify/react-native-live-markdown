@@ -8,6 +8,8 @@ API_AVAILABLE(ios(15.0))
 
 @property (nonnull, atomic) RCTMarkdownUtils *markdownUtils;
 
+@property NSUInteger depth;
+
 @end
 
 NS_ASSUME_NONNULL_END
