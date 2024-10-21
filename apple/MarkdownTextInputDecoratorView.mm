@@ -1,6 +1,7 @@
 #import <React/RCTUITextField.h>
 #import <React/RCTUITextView.h>
 #import <React/RCTTextInputComponentView.h>
+#import <React/RCTBaseTextInputView.h>
 #import "react_native_assert.h"
 
 #import <RNLiveMarkdown/MarkdownLayoutManager.h>
@@ -46,8 +47,9 @@
   RCTTextInputComponentView *textInputComponentView = (RCTTextInputComponentView *)view;
   UIView<RCTBackedTextInputViewProtocol> *backedTextInputView = [textInputComponentView valueForKey:@"_backedTextInputView"];
 #else
-  // TODO: implement on Paper
-  react_native_assert(false && "Not implemented on Paper yet");
+  react_native_assert([view isKindOfClass:[RCTBaseTextInputView class]] && "Previous sibling component is not an instance of RCTBaseTextInputView.");
+  RCTBaseTextInputView *baseTextInputView = (RCTBaseTextInputView *)view;
+  UIView<RCTBackedTextInputViewProtocol> *backedTextInputView = baseTextInputView.backedTextInputView;
 #endif /* RCT_NEW_ARCH_ENABLED */
 
   _markdownUtils = [[RCTMarkdownUtils alloc] init];
@@ -84,8 +86,12 @@
     // register delegate for future edits
     _textView.textStorage.delegate = _markdownTextStorageDelegate;
 
+#ifdef RCT_NEW_ARCH_ENABLED
     // format initial value
     [_textView.textStorage setAttributedString:_textView.attributedText];
+#else
+    // `_textView.defaultTextAttributes` is nil here, initial value will be passed to `setAttributedText:` that will be called later
+#endif
 
     NSLayoutManager *layoutManager = _textView.layoutManager; // switching to TextKit 1 compatibility mode
 
