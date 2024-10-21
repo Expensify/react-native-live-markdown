@@ -1,4 +1,5 @@
 #import <RNLiveMarkdown/MarkdownTextFieldObserver.h>
+#import "react_native_assert.h"
 
 @implementation MarkdownTextFieldObserver
 

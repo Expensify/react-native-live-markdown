@@ -1,4 +1,5 @@
 #import <RNLiveMarkdown/MarkdownTextStorageDelegate.h>
+#import "react_native_assert.h"
 
 @implementation MarkdownTextStorageDelegate
 
