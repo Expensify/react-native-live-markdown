@@ -107,12 +107,13 @@
 - (void)willMoveToWindow:(UIWindow *)newWindow
 {
   if (_textView != nil) {
-    _textView.textStorage.delegate = nil;
-
     if (_textView.layoutManager != nil && [object_getClass(_textView.layoutManager) isEqual:[MarkdownLayoutManager class]]) {
       [_textView.layoutManager setValue:nil forKey:@"markdownUtils"];
       object_setClass(_textView.layoutManager, [NSLayoutManager class]);
     }
+    _markdownTextStorageDelegate = nil;
+    _textView.textStorage.delegate = nil;
+    _textView = nil;
   }
   
   if (_textField != nil) {
