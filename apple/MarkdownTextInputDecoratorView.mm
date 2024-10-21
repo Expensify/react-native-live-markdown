@@ -1,8 +1,12 @@
 #import <React/RCTUITextField.h>
 #import <React/RCTUITextView.h>
-#import <React/RCTTextInputComponentView.h>
-#import <React/RCTBaseTextInputView.h>
 #import "react_native_assert.h"
+
+#ifdef RCT_NEW_ARCH_ENABLED
+#import <React/RCTTextInputComponentView.h>
+#else
+#import <React/RCTBaseTextInputView.h>
+#endif
 
 #import <RNLiveMarkdown/MarkdownLayoutManager.h>
 #import <RNLiveMarkdown/MarkdownTextInputDecoratorView.h>
