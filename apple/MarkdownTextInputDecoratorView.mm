@@ -6,6 +6,7 @@
 #import <RNLiveMarkdown/MarkdownLayoutManager.h>
 #import <RNLiveMarkdown/MarkdownTextInputDecoratorView.h>
 #import <RNLiveMarkdown/MarkdownTextStorageDelegate.h>
+#import <RNLiveMarkdown/MarkdownTextFieldObserver.h>
 
 #import <objc/runtime.h>
 
@@ -13,7 +14,9 @@
   RCTMarkdownUtils *_markdownUtils;
   RCTMarkdownStyle *_markdownStyle;
   MarkdownTextStorageDelegate *_markdownTextStorageDelegate;
+  MarkdownTextFieldObserver *_markdownTextFieldObserver;
   __weak RCTUITextView *_textView;
+  __weak RCTUITextField *_textField;
 }
 
 - (void)didMoveToWindow {
@@ -52,8 +55,25 @@
   [_markdownUtils setMarkdownStyle:_markdownStyle];
 
   if ([backedTextInputView isKindOfClass:[RCTUITextField class]]) {
-    // TODO: implement for singleline input
-    react_native_assert(false && "Not implemented for singleline input yet");
+    _textField = (RCTUITextField *)backedTextInputView;
+    
+    // make sure `adjustsFontSizeToFitWidth` is disabled, otherwise formatting will be overwritten
+    react_native_assert(_textField.adjustsFontSizeToFitWidth == NO);
+    
+    _markdownTextFieldObserver = [[MarkdownTextFieldObserver alloc] init];
+    _markdownTextFieldObserver.markdownUtils = _markdownUtils;
+    _markdownTextFieldObserver.textField = _textField;
+    _markdownTextFieldObserver.active = YES;
+    
+    // register observers for future edits
+    [_textField addTarget:_markdownTextFieldObserver action:@selector(textFieldDidChange:) forControlEvents:UIControlEventEditingChanged];
+    [_textField addObserver:_markdownTextFieldObserver forKeyPath:@"text" options:NSKeyValueObservingOptionNew context:NULL];
+    [_textField addObserver:_markdownTextFieldObserver forKeyPath:@"attributedText" options:NSKeyValueObservingOptionNew context:NULL];
+    
+    // format initial value
+    [_markdownTextFieldObserver textFieldDidChange:_textField];
+    
+    // TODO: register blockquotes layout manager
   } else if ([backedTextInputView isKindOfClass:[RCTUITextView class]]) {
     _textView = (RCTUITextView *)backedTextInputView;
 
@@ -93,6 +113,14 @@
       [_textView.layoutManager setValue:nil forKey:@"markdownUtils"];
       object_setClass(_textView.layoutManager, [NSLayoutManager class]);
     }
+  }
+  
+  if (_textField != nil) {
+    [_textField removeTarget:_markdownTextFieldObserver action:@selector(textFieldDidChange:) forControlEvents:UIControlEventEditingChanged];
+    [_textField removeObserver:_markdownTextFieldObserver forKeyPath:@"text" context:NULL];
+    [_textField removeObserver:_markdownTextFieldObserver forKeyPath:@"attributedText" context:NULL];
+    _markdownTextFieldObserver = nil;
+    _textField = nil;
   }
 }
 
