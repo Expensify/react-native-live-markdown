@@ -27,7 +27,7 @@ using namespace facebook;
         }
 
         jsi::Runtime &rt = *runtime;
-        auto text = jsi::String::createFromUtf8(rt, [attributedString.string UTF8String]);
+        auto text = jsi::String::createFromUtf8(rt, attributedString.string.UTF8String);
 
         auto func = rt.global().getPropertyAsFunction(rt, "parseExpensiMarkToRanges");
         auto output = func.call(rt, text);
