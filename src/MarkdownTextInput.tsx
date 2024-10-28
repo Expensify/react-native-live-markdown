@@ -56,6 +56,8 @@ interface MarkdownTextInputProps extends TextInputProps, InlineImagesInputProps 
   parser: (value: string) => MarkdownRange[];
 }
 
+type MarkdownTextInput = TextInput & React.Component<MarkdownTextInputProps>;
+
 function processColorsInMarkdownStyle(input: MarkdownStyle): MarkdownStyle {
   const output = JSON.parse(JSON.stringify(input));
 
@@ -77,7 +79,7 @@ function processMarkdownStyle(input: PartialMarkdownStyle | undefined): Markdown
   return processColorsInMarkdownStyle(mergeMarkdownStyleWithDefault(input));
 }
 
-const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>((props, ref) => {
+const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputProps>((props, ref) => {
   const IS_FABRIC = 'nativeFabricUIManager' in global;
 
   const markdownStyle = React.useMemo(() => processMarkdownStyle(props.markdownStyle), [props.markdownStyle]);

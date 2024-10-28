@@ -39,6 +39,8 @@ interface MarkdownNativeEvent extends Event {
   inputType: string;
 }
 
+type MarkdownTextInput = TextInput & React.Component<MarkdownTextInputProps>;
+
 type Selection = {
   start: number;
   end: number;
@@ -60,13 +62,14 @@ type MarkdownTextInputElement = HTMLDivElement &
   HTMLInputElement & {
     tree: TreeNode;
     selection: Selection;
+    imageElements: HTMLImageElement[];
   };
 
 type HTMLMarkdownElement = HTMLElement & {
   value: string;
 };
 
-const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
+const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputProps>(
   (
     {
       accessibilityLabel,
