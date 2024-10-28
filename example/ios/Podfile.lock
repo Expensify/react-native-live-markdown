@@ -1497,7 +1497,7 @@ PODS:
     - React-logger (= 0.75.3)
     - React-perflogger (= 0.75.3)
     - React-utils (= 0.75.3)
-  - RNLiveMarkdown (0.1.170):
+  - RNLiveMarkdown (0.1.177):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1517,10 +1517,10 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNLiveMarkdown/newarch (= 0.1.170)
+    - RNLiveMarkdown/newarch (= 0.1.177)
     - RNReanimated/worklets
     - Yoga
-  - RNLiveMarkdown/newarch (0.1.170):
+  - RNLiveMarkdown/newarch (0.1.177):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1542,7 +1542,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - RNReanimated/worklets
     - Yoga
-  - RNReanimated (3.16.0-nightly-20241003-18a6355cb):
+  - RNReanimated (3.16.1):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1562,10 +1562,10 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNReanimated/reanimated (= 3.16.0-nightly-20241003-18a6355cb)
-    - RNReanimated/worklets (= 3.16.0-nightly-20241003-18a6355cb)
+    - RNReanimated/reanimated (= 3.16.1)
+    - RNReanimated/worklets (= 3.16.1)
     - Yoga
-  - RNReanimated/reanimated (3.16.0-nightly-20241003-18a6355cb):
+  - RNReanimated/reanimated (3.16.1):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1585,9 +1585,9 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNReanimated/reanimated/apple (= 3.16.0-nightly-20241003-18a6355cb)
+    - RNReanimated/reanimated/apple (= 3.16.1)
     - Yoga
-  - RNReanimated/reanimated/apple (3.16.0-nightly-20241003-18a6355cb):
+  - RNReanimated/reanimated/apple (3.16.1):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1608,7 +1608,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNReanimated/worklets (3.16.0-nightly-20241003-18a6355cb):
+  - RNReanimated/worklets (3.16.1):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1897,8 +1897,8 @@ SPEC CHECKSUMS:
   React-utils: f2afa6acd905ca2ce7bb8ffb4a22f7f8a12534e8
   ReactCodegen: ff95a93d5ab5d9b2551571886271478eaa168565
   ReactCommon: 289214026502e6a93484f4a46bcc0efa4f3f2864
-  RNLiveMarkdown: bbd74ac9bd8c6e064d38052647f86f6a9f5c2461
-  RNReanimated: fe05b2cab00f0e01a5eb7df3383296974faa83fa
+  RNLiveMarkdown: e6ad8effb9d19537bd412bcabfb3cd8e880de9e3
+  RNReanimated: 2d728bad3a69119be89c3431ee0ccda026ecffdc
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
   Yoga: 1354c027ab07c7736f99a3bef16172d6f1b12b47
 
