@@ -1,12 +1,12 @@
 import {defineConfig, devices} from '@playwright/test';
-import * as TEST_CONST from '../example/src/testConstants';
+import * as TEST_CONST from '@expensify/react-native-live-markdown-example/src/testConstants';
 
 export default defineConfig({
   testDir: './__tests__',
   preserveOutput: 'never',
   outputDir: undefined,
   webServer: {
-    command: 'yarn web',
+    command: 'npm run web',
     url: TEST_CONST.LOCAL_URL,
     reuseExistingServer: !process.env.CI,
     stdout: 'pipe',

@@ -6,18 +6,16 @@ We want this community to be friendly and respectful to each other. Please follo
 
 ## Development workflow
 
-This project is a monorepo managed using [Yarn workspaces](https://yarnpkg.com/features/workspaces). It contains the following packages:
+This project is a monorepo managed using [NPM workspaces](https://docs.npmjs.com/cli/v10/using-npm/workspaces). It contains the following packages:
 
 - The library package in the root directory.
 - An example app in the `example/` directory.
 
-To get started with the project, run `yarn` in the root directory to install the required dependencies for each package:
+To get started with the project, run `npm install` in the root directory to install the required dependencies for each package:
 
 ```sh
-yarn
+npm install
 ```
-
-> Since the project relies on Yarn workspaces, you cannot use [`npm`](https://github.com/npm/cli) for development.
 
 The [example app](/example/) demonstrates usage of the library. You need to run it to test any changes you make.
 
@@ -32,19 +30,19 @@ You can use various commands from the root directory to work with the project.
 To start the packager:
 
 ```sh
-yarn example start
+npm run example start
 ```
 
 To run the example app on Android:
 
 ```sh
-yarn example android
+npm run example android
 ```
 
 To run the example app on iOS:
 
 ```sh
-yarn example ios
+npm run example ios
 ```
 
 By default, the example is configured to build with the old architecture. To run the example with the new architecture, you can do the following:
@@ -52,20 +50,20 @@ By default, the example is configured to build with the old architecture. To run
 1. For Android, run:
 
    ```sh
-   ORG_GRADLE_PROJECT_newArchEnabled=true yarn example android
+   ORG_GRADLE_PROJECT_newArchEnabled=true npm run example android
    ```
 
 2. For iOS, run:
 
    ```sh
    cd example/ios && bundler install && RCT_NEW_ARCH_ENABLED=1 bundler exec pod install
-   yarn example ios
+   npm run example ios
    ```
 
 If you are building for a different architecture than your previous build, make sure to remove the build folders first. You can run the following command to cleanup all build folders:
 
 ```sh
-yarn clean
+npm run clean
 ```
 
 To confirm that the app is running with the new architecture, you can check the Metro logs for a message like this:
@@ -79,20 +77,20 @@ Note the `"fabric":true` and `"concurrentRoot":true` properties.
 Make sure your code passes TypeScript and ESLint. Run the following to verify:
 
 ```sh
-yarn typecheck
-yarn lint
+npm run typecheck
+npm run lint
 ```
 
 To fix formatting errors, run the following:
 
 ```sh
-yarn lint --fix
+npm run lint --fix
 ```
 
 Remember to add tests for your change if possible. Run the unit tests by:
 
 ```sh
-yarn test
+npm run test
 ```
 
 ### Commit message convention
@@ -123,20 +121,20 @@ We use [release-it](https://github.com/release-it/release-it) to make it easier 
 To publish new versions, run the following:
 
 ```sh
-yarn release
+npm run release
 ```
 
 ### Scripts
 
 The `package.json` file contains various scripts for common tasks:
 
-- `yarn`: setup project by installing dependencies and pods - run with `POD_INSTALL=0` to skip installing pods.
-- `yarn typecheck`: type-check files with TypeScript.
-- `yarn lint`: lint files with ESLint.
-- `yarn test`: run unit tests with Jest.
-- `yarn example start`: start the Metro server for the example app.
-- `yarn example android`: run the example app on Android.
-- `yarn example ios`: run the example app on iOS.
+- `npm install`: setup project by installing dependencies and pods - run with `POD_INSTALL=0` to skip installing pods.
+- `npm run typecheck`: type-check files with TypeScript.
+- `npm run lint`: lint files with ESLint.
+- `npm run test`: run unit tests with Jest.
+- `npm run example start`: start the Metro server for the example app.
+- `npm run example android`: run the example app on Android.
+- `npm run example ios`: run the example app on iOS.
 
 ### Sending a pull request
 
@@ -151,11 +149,12 @@ When you're sending a pull request:
 - For pull requests that change the API or implementation, discuss with maintainers first by opening an issue.
 
 ### Testing with Expensify/App (or other projects)
+
 It's possible to locally develop this repo such with live-reload in another React Native project. These instructions are for Expensify/App, but they can be adapted to other repos as well.
 
 1. Clone this repo
-2. Run `yarn install`
-3. Run `yarn build:watch`
+2. Run `npm install`
+3. Run `npm run build:watch`
 4. In Expensify/App, run `npm install`.
    - _Note:_ There is a patch for the `link` dev dependency in this repo. If you want these steps to work reliably, you'll likely need to copy that patch over.
 5. In Expensify/App, run `npx link publish --watch ~/react-native-live-markdown --litmus .build_complete`
