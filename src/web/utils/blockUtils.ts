@@ -128,4 +128,12 @@ function extendBlockStructure(
   return targetNode;
 }
 
-export {addStyleToBlock, extendBlockStructure, isBlockMarkdownType, getFirstBlockMarkdownRange};
+function getTopParentTreeNode(node: TreeNode) {
+  let currentParentNode = node.parentNode;
+  while (currentParentNode && ['text', 'br', 'line', 'syntax'].includes(currentParentNode.parentNode?.type || '')) {
+    currentParentNode = currentParentNode?.parentNode || null;
+  }
+  return currentParentNode;
+}
+
+export {addStyleToBlock, extendBlockStructure, isBlockMarkdownType, getFirstBlockMarkdownRange, getTopParentTreeNode};
