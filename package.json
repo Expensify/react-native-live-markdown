@@ -28,7 +28,7 @@
     "!**/.*"
   ],
   "scripts": {
-    "example": "yarn workspace @expensify/react-native-live-markdown-example",
+    "example": "npm run --workspace=@expensify/react-native-live-markdown-example",
     "test": "jest",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --ext .js,.ts,.tsx",
@@ -67,9 +67,8 @@
     "@lwc/eslint-plugin-lwc": "^1.7.2",
     "@react-native/eslint-config": "0.75.2",
     "@release-it/conventional-changelog": "^5.0.0",
-    "@types/jest": "^28.1.2",
-    "@types/react": "~17.0.21",
-    "@types/react-native": "0.70.0",
+    "@types/jest": "^29.5.14",
+    "@types/react": "~18.2.6",
     "@typescript-eslint/eslint-plugin": "^6.15.0",
     "@typescript-eslint/parser": "^6.15.0",
     "del-cli": "^5.0.0",
@@ -92,15 +91,11 @@
     "prettier": "2.8.8",
     "react": "18.3.1",
     "react-native": "0.75.2",
-    "react-native-builder-bob": "^0.20.0",
+    "react-native-builder-bob": "^0.30.2",
     "react-native-web": "^0.19.10",
     "release-it": "^15.0.0",
     "turbo": "^1.10.7",
     "typescript": "^5.3.3"
-  },
-  "resolutions": {
-    "@types/react": "17.0.21",
-    "link@^2.1.1": "patch:link@npm%3A2.1.1#./.yarn/patches/link-npm-2.1.1-1c9fea076e.patch"
   },
   "peerDependencies": {
     "react": "*",
@@ -111,9 +106,9 @@
     "example",
     "WebExample"
   ],
-  "packageManager": "yarn@3.6.4",
   "engines": {
-    "node": ">= 18.0.0"
+    "node": "20.18.0",
+    "npm": "10.8.2"
   },
   "jest": {
     "preset": "react-native",
