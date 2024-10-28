@@ -25,32 +25,32 @@ jobs:
           node-version: 18
 
       - name: Install node_modules
-        run: yarn install --immutable
+        run: npm ci
 
       - name: Verify there's no parser diff
         working-directory: parser
         run: |
-          yarn build
+          npm run build
           if ! git diff --name-only --exit-code; then
             # shellcheck disable=SC2016
-            echo 'Error: Parser diff detected! Please run `cd parser && yarn build` and commit the changes.'
+            echo 'Error: Parser diff detected! Please run `cd parser && npm run build` and commit the changes.'
             exit 1
           fi
 
       - name: Typecheck library
-        run: yarn tsc --project tsconfig.json --noEmit
+        run: npm run tsc --project tsconfig.json --noEmit
 
       - name: Typecheck parser
-        run: yarn tsc --project parser/tsconfig.json --noEmit
+        run: npm run tsc --project parser/tsconfig.json --noEmit
 
       - name: Typecheck example app
-        run: yarn tsc --project example/tsconfig.json --noEmit
+        run: npm run tsc --project example/tsconfig.json --noEmit
 
       - name: Typecheck WebExample app
-        run: yarn tsc --project WebExample/tsconfig.json --noEmit
+        run: npm run tsc --project WebExample/tsconfig.json --noEmit
 
       - name: Lint
-        run: yarn lint
+        run: npm run lint
 
       - name: Test
-        run: yarn test
+        run: npm run test

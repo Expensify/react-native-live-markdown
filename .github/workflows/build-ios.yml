@@ -43,11 +43,11 @@ jobs:
           path: |
             node_modules
             example/node_modules
-          key: build-ios-node-modules-${{ matrix.react-native-architecture }}-${{ hashFiles('yarn.lock') }}
+          key: build-ios-node-modules-${{ matrix.react-native-architecture }}-${{ hashFiles('package-lock.json') }}
           restore-keys: build-ios-node-modules-${{ matrix.react-native-architecture }}-
 
       - name: Install node_modules
-        run: yarn install --immutable
+        run: npm ci
 
       - name: Restore Pods from cache
         uses: actions/cache@v4

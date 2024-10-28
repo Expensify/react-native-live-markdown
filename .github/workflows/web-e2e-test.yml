@@ -37,7 +37,7 @@ jobs:
           node-version: 18
 
       - name: Install node_modules
-        run: yarn install --immutable
+        run: npm ci
 
       - name: Install browsers
         run: npx playwright install --with-deps
@@ -46,4 +46,4 @@ jobs:
         run: npx playwright install-deps
 
       - name: Run Playwright tests
-        run: yarn test
+        run: npm run test

@@ -38,7 +38,7 @@
     "lint:WebExample": "eslint WebExample --ext .js,.ts,.tsx",
     "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
     "prepare": "bob build && mkdir -p lib/parser && cp parser/react-native-live-markdown-parser.js lib/parser/react-native-live-markdown-parser.js",
-    "build:watch": "nodemon --watch src --ext .ts,.tsx,.css --exec \"rm -f .build_complete && yarn prepare && yarn pack && touch .build_complete\"",
+    "build:watch": "nodemon --watch src --ext .ts,.tsx,.css --exec \"rm -f .build_complete && npm run prepare && npm pack && touch .build_complete\"",
     "release": "release-it"
   },
   "keywords": [
