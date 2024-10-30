@@ -77,11 +77,9 @@ function configureCustomWebStylesheet() {
 
 function handleCustomStyles(target: MarkdownTextInputElement, markdownStyle: PartialMarkdownStyle) {
   const styleTag = document.getElementById(CUSTOM_WEB_STYLES_ID) as HTMLStyleElement;
-  const cssRules = Object.values(styleTag?.sheet?.cssRules ?? {});
-  if (!styleTag || cssRules.some((rule) => (rule as any).selectorText === `.${target.uniqueId} [data-type="pre"]::before`)) {
+  if (!styleTag) {
     return;
   }
-
   generateCodeBlocksRules(target, styleTag, markdownStyle);
 }
 
@@ -129,8 +127,6 @@ function generateCodeBlocksRules(target: MarkdownTextInputElement, styleTag: HTM
         'background-color': `${(preStyles?.backgroundColor as string) ?? 'lightgray'}`,
         'border-radius': `${preStyles?.borderRadius?.toString() ?? '4'}px`,
         'border-color': `${preStyles?.borderColor ?? 'grey'}`,
-        'min-width': `min(calc(100% + 2.5px), ${contentWidth}px)`,
-        'max-width': `${contentWidth}px`,
       },
     },
     {
@@ -159,6 +155,20 @@ function generateCodeBlocksRules(target: MarkdownTextInputElement, styleTag: HTM
       },
     },
   ];
+
+  const preBlocks = [...document.querySelectorAll('*[data-type="pre"]')];
+  for (let i = 0; i < preBlocks.length; i++) {
+    const preBlock = preBlocks[i] as HTMLElement;
+    const preBlockWidth = preBlock.getBoundingClientRect().width;
+
+    rules.push({
+      selector: `.${target.uniqueId} *:nth-child(${i + 1} of [data-type='line']:has(> *[data-type='pre'])) > *[data-type='pre']::before`,
+      properties: {
+        'min-width': `min(calc(100% + 1.5px), ${preBlockWidth + horizontalPadding * 2 + 2}px)`,
+        'max-width': `min(${preBlockWidth + horizontalPadding * 2 + 2}px, ${contentWidth}px)`,
+      },
+    });
+  }
 
   if (styleTag.sheet) {
     addStylesheetRules(rules, styleTag.sheet);
