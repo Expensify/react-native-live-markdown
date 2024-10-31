@@ -23,7 +23,6 @@ using namespace expensify::livemarkdown;
 // actually register the hook
 
 @implementation LiveMarkdownModule {
-  BOOL installed_;
 #ifdef RCT_NEW_ARCH_ENABLED
   std::shared_ptr<MarkdownCommitHook> commitHook_;
   __weak RCTSurfacePresenter *surfacePresenter_;
@@ -41,7 +40,6 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install)
 #ifdef RCT_NEW_ARCH_ENABLED
   RCTScheduler *scheduler = [surfacePresenter_ scheduler];
   commitHook_ = std::make_shared<MarkdownCommitHook>(scheduler.uiManager);
-  installed_ = YES;
 #endif // RCT_NEW_ARCH_ENABLED
 
   return @(1);
