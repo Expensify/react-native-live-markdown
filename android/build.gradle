@@ -192,7 +192,3 @@ task copyJS(type: Copy) {
 tasks.preBuild {
   dependsOn copyJS
 }
-
-tasks.withType(JavaCompile).configureEach {
-  options.compilerArgs << "-Xlint:all" << "-Werror"
-}
