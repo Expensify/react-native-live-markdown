@@ -55,6 +55,8 @@ using namespace facebook;
 
         RCTApplyBaselineOffset(attributedString);
 
+        [attributedString fixAttributesInRange:fullRange];
+
         [attributedString endEditing];
 }
 
