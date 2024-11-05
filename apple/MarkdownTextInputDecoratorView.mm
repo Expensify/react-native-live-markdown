@@ -143,7 +143,12 @@
   [_markdownUtils setMarkdownStyle:markdownStyle];
 
   // trigger reformatting
-  [_textView.textStorage setAttributedString:_textView.attributedText];
+  if (_textView != nil) {
+    [_textView.textStorage setAttributedString:_textView.attributedText];
+  }
+  if (_textField != nil) {
+    [_markdownTextFieldObserver textFieldDidChange:_textField];
+  }
 }
 
 @end
