@@ -148,10 +148,10 @@ public class MarkdownUtils {
         break;
       case "h1":
         setSpan(ssb, new MarkdownBoldSpan(), start, end);
-        CustomLineHeightSpan[] spans = ssb.getSpans(0, ssb.length(), CustomLineHeightSpan.class);
-        if (spans.length >= 1) {
-          int lineHeight = spans[0].getLineHeight();
-          setSpan(ssb, new MarkdownLineHeightSpan(lineHeight * 1.5f), start, end);
+        float lineHeight = mMarkdownStyle.getH1LineHeight();
+        if (lineHeight != -1) {
+          // NOTE: actually, we should also include "# " but it also works this way
+          setSpan(ssb, new MarkdownLineHeightSpan(lineHeight), start, end);
         }
         // NOTE: size span must be set after line height span to avoid height jumps
         setSpan(ssb, new MarkdownFontSizeSpan(mMarkdownStyle.getH1FontSize()), start, end);

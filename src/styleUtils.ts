@@ -20,6 +20,7 @@ function makeDefaultMarkdownStyle(): MarkdownStyle {
     },
     h1: {
       fontSize: 25,
+      lineHeight: -1,
     },
     emoji: {
       fontSize: 20,
