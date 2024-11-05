@@ -1,10 +1,10 @@
 import type {HTMLMarkdownElement, MarkdownTextInputElement} from '../../MarkdownTextInput.web';
-import {addNodeToTree, updateTreeElementRefs} from './treeUtils';
+import {addNodeToTree, createRootTreeNode, updateTreeElementRefs} from './treeUtils';
 import type {NodeType, TreeNode} from './treeUtils';
 import type {PartialMarkdownStyle} from '../../styleUtils';
 import {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition} from './cursorUtils';
 import {addStyleToBlock, extendBlockStructure, getFirstBlockMarkdownRange, isBlockMarkdownType} from './blockUtils';
-import type {MarkdownRange} from '../../commonTypes';
+import type {InlineImagesInputProps, MarkdownRange} from '../../commonTypes';
 import {getAnimationCurrentTimes, updateAnimationsTime} from './animationUtils';
 
 type Paragraph = {
@@ -151,19 +151,12 @@ function parseRangesToHTMLNodes(
   markdownStyle: PartialMarkdownStyle = {},
   disableInlineStyles = false,
   currentInput: MarkdownTextInputElement | null = null,
+  inlineImagesProps: InlineImagesInputProps = {},
 ) {
   const rootElement: HTMLMarkdownElement = document.createElement('span') as HTMLMarkdownElement;
   const textLength = text.length;
-  const rootNode: TreeNode = {
-    element: rootElement,
-    start: 0,
-    length: textLength,
-    parentNode: null,
-    childNodes: [],
-    type: 'root',
-    orderIndex: '',
-    isGeneratingNewline: false,
-  };
+  const rootNode: TreeNode = createRootTreeNode(rootElement, textLength);
+
   let currentParentNode: TreeNode = rootNode;
   let lines = splitTextIntoLines(text);
 
@@ -232,7 +225,7 @@ function parseRangesToHTMLNodes(
       const spanNode = appendNode(span, currentParentNode, range.type, range.length);
 
       if (isMultiline && !disableInlineStyles && currentInput) {
-        currentParentNode = extendBlockStructure(currentInput, currentParentNode, range, lineMarkdownRanges, text, markdownStyle);
+        currentParentNode = extendBlockStructure(currentInput, currentParentNode, range, lineMarkdownRanges, text, markdownStyle, inlineImagesProps);
       }
 
       if (lineMarkdownRanges.length > 0 && nextRangeStartIndex < endOfCurrentRange && range.type !== 'syntax') {
@@ -266,7 +259,7 @@ function parseRangesToHTMLNodes(
   return {dom: rootElement, tree: rootNode};
 }
 
-function moveCursor(isFocused: boolean, alwaysMoveCursorToTheEnd: boolean, cursorPosition: number | null, target: MarkdownTextInputElement) {
+function moveCursor(isFocused: boolean, alwaysMoveCursorToTheEnd: boolean, cursorPosition: number | null, target: MarkdownTextInputElement, shouldScrollIntoView = false) {
   if (!isFocused) {
     return;
   }
@@ -274,7 +267,7 @@ function moveCursor(isFocused: boolean, alwaysMoveCursorToTheEnd: boolean, curso
   if (alwaysMoveCursorToTheEnd || cursorPosition === null) {
     moveCursorToEnd(target);
   } else if (cursorPosition !== null) {
-    setCursorPosition(target, cursorPosition);
+    setCursorPosition(target, cursorPosition, null, shouldScrollIntoView);
   }
 }
 
@@ -286,6 +279,8 @@ function updateInputStructure(
   markdownStyle: PartialMarkdownStyle = {},
   alwaysMoveCursorToTheEnd = false,
   shouldForceDOMUpdate = false,
+  shouldScrollIntoView = false,
+  inlineImagesProps: InlineImagesInputProps = {},
 ) {
   const targetElement = target;
 
@@ -304,7 +299,7 @@ function updateInputStructure(
 
   // We don't want to parse text with single '\n', because contentEditable represents it as invisible <br />
   if (text) {
-    const {dom, tree} = parseRangesToHTMLNodes(text, markdownRanges, isMultiline, markdownStyle, false, targetElement);
+    const {dom, tree} = parseRangesToHTMLNodes(text, markdownRanges, isMultiline, markdownStyle, false, targetElement, inlineImagesProps);
 
     if (shouldForceDOMUpdate || targetElement.innerHTML !== dom.innerHTML) {
       const animationTimes = getAnimationCurrentTimes(targetElement);
@@ -317,7 +312,9 @@ function updateInputStructure(
     updateTreeElementRefs(tree, targetElement);
     targetElement.tree = tree;
 
-    moveCursor(isFocused, alwaysMoveCursorToTheEnd, cursorPosition, targetElement);
+    moveCursor(isFocused, alwaysMoveCursorToTheEnd, cursorPosition, targetElement, shouldScrollIntoView);
+  } else {
+    targetElement.tree = createRootTreeNode(targetElement);
   }
 
   return {text, cursorPosition: cursorPosition || 0};

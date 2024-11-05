@@ -155,6 +155,7 @@ android {
       "**/libfbjni.so",
       "**/libjsi.so",
       "**/libreactnativejni.so",
+      "**/libreactnative.so",
       "**/libreact_render*.so",
       "**/librrc_root.so",
     ]

@@ -1,4 +1,4 @@
-package com.expensify.livemarkdown;
+package com.expensify.livemarkdown.spans;
 
 import android.graphics.Typeface;
 import android.text.style.StyleSpan;

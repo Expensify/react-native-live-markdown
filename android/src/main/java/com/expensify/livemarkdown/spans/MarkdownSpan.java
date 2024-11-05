@@ -1,4 +1,4 @@
-package com.expensify.livemarkdown;
+package com.expensify.livemarkdown.spans;
 
 /*
  * Enables us to distinguish between spans that were added by Live Markdown and spans that were

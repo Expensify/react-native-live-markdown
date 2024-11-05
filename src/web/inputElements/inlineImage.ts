@@ -1,5 +1,5 @@
 import type {HTMLMarkdownElement, MarkdownTextInputElement} from '../../MarkdownTextInput.web';
-import type {MarkdownRange} from '../../commonTypes';
+import type {InlineImagesInputProps, MarkdownRange} from '../../commonTypes';
 import {parseStringWithUnitToNumber} from '../../styleUtils';
 import type {PartialMarkdownStyle} from '../../styleUtils';
 import type {TreeNode} from '../utils/treeUtils';
@@ -75,10 +75,16 @@ function handleOnLoad(
       justifyContent: 'center',
     }),
   });
-
   Object.assign(img.style, !err && imgStyle);
 
   targetElement.appendChild(imageContainer);
+
+  const currentInputElement = currentInput;
+  if (currentInput.imageElements) {
+    currentInputElement.imageElements.push(img);
+  } else {
+    currentInputElement.imageElements = [img];
+  }
 
   const imageClientHeight = Math.max(img.clientHeight, imageContainer.clientHeight);
   Object.assign(imageContainer.style, {
@@ -95,7 +101,7 @@ function createImageElement(currentInput: MarkdownTextInputElement, targetNode: 
   if (timeoutMap.has(targetNode.orderIndex)) {
     const mapItem = timeoutMap.get(targetNode.orderIndex);
     // Check if the image URL has been changed, if not, early return so the image can be loaded asynchronously
-    const currentElement = document.querySelector(`[data-type="block"][data-id="${targetNode.orderIndex}"]`) as HTMLMarkdownElement;
+    const currentElement = currentInput.querySelector(`[data-type="block"][data-id="${targetNode.orderIndex}"]`) as HTMLMarkdownElement;
     if (mapItem?.url === url && currentElement && getImagePreviewElement(currentElement)) {
       return;
     }
@@ -141,11 +147,22 @@ function updateImageTreeNode(targetNode: TreeNode, newElement: HTMLMarkdownEleme
 }
 
 /** The main function that adds inline image preview to the node */
-function addInlineImagePreview(currentInput: MarkdownTextInputElement, targetNode: TreeNode, text: string, ranges: MarkdownRange[], markdownStyle: PartialMarkdownStyle) {
+function addInlineImagePreview(
+  currentInput: MarkdownTextInputElement,
+  targetNode: TreeNode,
+  text: string,
+  ranges: MarkdownRange[],
+  markdownStyle: PartialMarkdownStyle,
+  inlineImagesProps: InlineImagesInputProps,
+) {
+  const {addAuthTokenToImageURLCallback, imagePreviewAuthRequiredURLs} = inlineImagesProps;
   const linkRange = ranges.find((r) => r.type === 'link');
   let imageHref = '';
   if (linkRange) {
     imageHref = text.substring(linkRange.start, linkRange.start + linkRange.length);
+    if (addAuthTokenToImageURLCallback && imagePreviewAuthRequiredURLs && imagePreviewAuthRequiredURLs.find((url) => imageHref.startsWith(url))) {
+      imageHref = addAuthTokenToImageURLCallback(imageHref);
+    }
   }
 
   const imageMarginTop = parseStringWithUnitToNumber(`${markdownStyle.inlineImage?.marginTop}`);
@@ -153,7 +170,7 @@ function addInlineImagePreview(currentInput: MarkdownTextInputElement, targetNod
 
   // If the inline image markdown with the same href exists in the current input, use it instead of creating new one.
   // Prevents from image flickering and layout jumps
-  const alreadyLoadedPreview = currentInput.querySelector(`img[src="${imageHref}"]`);
+  const alreadyLoadedPreview = currentInput.imageElements?.find((el) => el?.src === imageHref);
   const loadedImageContainer = alreadyLoadedPreview?.parentElement;
 
   if (loadedImageContainer && loadedImageContainer.getAttribute('data-type') === 'inline-container') {

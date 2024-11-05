@@ -6,14 +6,17 @@ import type {MarkdownStyle} from './MarkdownTextInputDecoratorViewNativeComponen
 import NativeLiveMarkdownModule from './NativeLiveMarkdownModule';
 import {mergeMarkdownStyleWithDefault} from './styleUtils';
 import type {PartialMarkdownStyle} from './styleUtils';
+import type {InlineImagesInputProps} from './commonTypes';
 
 if (NativeLiveMarkdownModule) {
   NativeLiveMarkdownModule.install();
 }
 
-interface MarkdownTextInputProps extends TextInputProps {
+interface MarkdownTextInputProps extends TextInputProps, InlineImagesInputProps {
   markdownStyle?: PartialMarkdownStyle;
 }
+
+type MarkdownTextInput = TextInput & React.Component<MarkdownTextInputProps>;
 
 function processColorsInMarkdownStyle(input: MarkdownStyle): MarkdownStyle {
   const output = JSON.parse(JSON.stringify(input));
@@ -36,7 +39,7 @@ function processMarkdownStyle(input: PartialMarkdownStyle | undefined): Markdown
   return processColorsInMarkdownStyle(mergeMarkdownStyleWithDefault(input));
 }
 
-const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>((props, ref) => {
+const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputProps>((props, ref) => {
   const IS_FABRIC = 'nativeFabricUIManager' in global;
 
   const markdownStyle = React.useMemo(() => processMarkdownStyle(props.markdownStyle), [props.markdownStyle]);

@@ -2,7 +2,7 @@ import type {MarkdownTextInputElement} from '../../MarkdownTextInput.web';
 import {findHTMLElementInTree, getTreeNodeByIndex} from './treeUtils';
 import type {TreeNode} from './treeUtils';
 
-function setCursorPosition(target: MarkdownTextInputElement, startIndex: number, endIndex: number | null = null) {
+function setCursorPosition(target: MarkdownTextInputElement, startIndex: number, endIndex: number | null = null, shouldScrollIntoView = false) {
   // We don't want to move the cursor if the target is not focused
   if (!target.tree || target !== document.activeElement) {
     return;
@@ -27,13 +27,15 @@ function setCursorPosition(target: MarkdownTextInputElement, startIndex: number,
   if (startTreeNode.type === 'br') {
     range.setStartBefore(startTreeNode.element);
   } else {
-    range.setStart(startTreeNode.element.childNodes[0] as ChildNode, start - startTreeNode.start);
+    const startElement = startTreeNode.element;
+    range.setStart((startElement.childNodes[0] || startElement) as ChildNode, start - startTreeNode.start);
   }
 
   if (endTreeNode.type === 'br') {
     range.setEndBefore(endTreeNode.element);
   } else {
-    range.setEnd(endTreeNode.element.childNodes[0] as ChildNode, (end || start) - endTreeNode.start);
+    const endElement = endTreeNode.element;
+    range.setEnd((endElement.childNodes[0] || endElement) as ChildNode, (end || start) - endTreeNode.start);
   }
 
   if (!end) {
@@ -45,20 +47,28 @@ function setCursorPosition(target: MarkdownTextInputElement, startIndex: number,
     selection.setBaseAndExtent(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
   }
 
-  scrollIntoView(startTreeNode);
+  if (shouldScrollIntoView) {
+    scrollIntoView(target, endTreeNode);
+  }
 }
 
-function scrollIntoView(node: TreeNode) {
-  if (node.type === 'br' && node.parentNode?.parentNode?.type === 'line') {
-    // If the node is a line break, scroll to the parent paragraph, because Safari doesn't support scrollIntoView on br elements
-    node.parentNode.parentNode.element.scrollIntoView({
-      block: 'nearest',
-    });
-  } else {
-    node.element.scrollIntoView({
-      block: 'nearest',
-    });
+function scrollIntoView(target: MarkdownTextInputElement, node: TreeNode) {
+  const targetElement = target;
+  const orderIndex = Number(node.orderIndex.split(',')[0]);
+  const currentLine = target.tree.childNodes[orderIndex]?.element;
+  const scrollTargetElement = currentLine || node.element;
+
+  const caretRect = scrollTargetElement.getBoundingClientRect();
+  const targetRect = target.getBoundingClientRect();
+  // In case the caret is below the visible input area, scroll to the end of the node
+  if (caretRect.top + caretRect.height > targetRect.top + targetRect.height) {
+    targetElement.scrollTop = caretRect.top - targetRect.top + target.scrollTop - targetRect.height + caretRect.height + 4;
+    return;
   }
+
+  scrollTargetElement.scrollIntoView({
+    block: 'nearest',
+  });
 }
 
 function moveCursorToEnd(target: HTMLElement) {
