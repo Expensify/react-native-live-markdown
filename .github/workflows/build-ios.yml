@@ -80,4 +80,4 @@ jobs:
 
       - name: Build app
         working-directory: example
-        run: npx react-native@latest run-ios --no-packager
+        run: npx react-native run-ios --no-packager
