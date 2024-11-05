@@ -80,6 +80,7 @@
     [_markdownTextFieldObserver textFieldDidChange:_textField];
     
     // TODO: register blockquotes layout manager
+    // https://github.com/Expensify/react-native-live-markdown/issues/87
   } else if ([backedTextInputView isKindOfClass:[RCTUITextView class]]) {
     _textView = (RCTUITextView *)backedTextInputView;
 
