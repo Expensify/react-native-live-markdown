@@ -93,10 +93,39 @@ public class MarkdownUtils {
         if (length == 0 || end > input.length()) {
           continue;
         }
+
         applyRange(ssb, type, start, end, depth);
       }
     } catch (JSONException e) {
       // Do nothing
+    }
+  }
+
+  private void clearTextFormattingAt(SpannableStringBuilder ssb, int start, int end) {
+    MarkdownSpan[] spans = ssb.getSpans(start, end, MarkdownItalicSpan.class);
+
+    for (MarkdownSpan span : spans) {
+      int startSpan = ssb.getSpanStart(span);
+      int endSpan = ssb.getSpanEnd(span);
+      boolean isChanged = false;
+
+      try {
+        if (start - startSpan >= 0) {
+            setSpan(ssb, span.getClass().newInstance(), startSpan, start);
+            isChanged = true;
+        }
+
+        if (endSpan - end >= 0) {
+            setSpan(ssb, span.getClass().newInstance(), end, endSpan);
+            isChanged = true;
+        }
+
+        if (isChanged) {
+          ssb.removeSpan(span);
+        }
+      } catch (IllegalAccessException | InstantiationException e) {
+        // Do nothing
+      }
     }
   }
 
@@ -112,6 +141,7 @@ public class MarkdownUtils {
         setSpan(ssb, new MarkdownStrikethroughSpan(), start, end);
         break;
       case "emoji":
+        clearTextFormattingAt(ssb, start, end);
         setSpan(ssb, new MarkdownEmojiSpan(mMarkdownStyle.getEmojiFontSize()), start, end);
         break;
       case "mention-here":
