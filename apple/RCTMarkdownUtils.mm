@@ -55,8 +55,22 @@ using namespace facebook;
 
         RCTApplyBaselineOffset(attributedString);
 
+        /*
+        Calling `[attributedString addAttributes:defaultTextAttributes range:fullRange]` breaks the font for emojis.
+        Before, NSFont attribute is ".SFUI-Regular" and NSOriginalFont attribute is ".AppleColorEmoji".
+        After the call, both are set to ".SFUI-Regular" which makes emoji invisible and zero-width.
+        Calling `fixAttributesInRange:` fixes this problem.
+        */
         [attributedString fixAttributesInRange:fullRange];
 
+        /*
+        When updating MarkdownTextInput's `style` property without changing `markdownStyle`,
+        React Native calls `[RCTTextInputComponentView _setAttributedString:]` which skips update if strings are equal.
+        See https://github.com/facebook/react-native/blob/287e20033207df5e59d199a347b7ae2b4cd7a59e/packages/react-native/React/Fabric/Mounting/ComponentViews/TextInput/RCTTextInputComponentView.mm#L680-L684
+        The attributed strings are compared using `[RCTTextInputComponentView _textOf:equals:]` which compares only raw strings
+        if NSOriginalFont attribute is present. So we purposefully remove this attribute to force update.
+        See https://github.com/facebook/react-native/blob/287e20033207df5e59d199a347b7ae2b4cd7a59e/packages/react-native/React/Fabric/Mounting/ComponentViews/TextInput/RCTTextInputComponentView.mm#L751-L784
+        */
         [attributedString removeAttribute:@"NSOriginalFont" range:fullRange];
 
         [attributedString endEditing];
