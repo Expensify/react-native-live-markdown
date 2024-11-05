@@ -37,7 +37,7 @@ interface MarkdownTextInputProps extends TextInputProps, InlineImagesInputProps 
 }
 
 interface MarkdownNativeEvent extends Event {
-  inputType: string;
+  inputType?: string;
 }
 
 type MarkdownTextInput = TextInput & React.Component<MarkdownTextInputProps>;
@@ -316,7 +316,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
         updateTextColor(divRef.current, e.target.textContent ?? '');
         const previousText = divRef.current.value;
         let parsedText = normalizeValue(
-          inputType === 'pasteText' ? pasteContent.current || '' : parseInnerHTMLToText(e.target as MarkdownTextInputElement, inputType, contentSelection.current.start),
+          inputType === 'pasteText' ? pasteContent.current || '' : parseInnerHTMLToText(e.target as MarkdownTextInputElement, contentSelection.current.start, inputType),
         );
 
         if (pasteContent.current) {

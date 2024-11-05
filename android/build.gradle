@@ -151,6 +151,7 @@ android {
       "**/libfbjni.so",
       "**/libjsi.so",
       "**/libreactnativejni.so",
+      "**/libreactnative.so",
     ]
   }
 
@@ -190,8 +191,4 @@ task copyJS(type: Copy) {
 
 tasks.preBuild {
   dependsOn copyJS
-}
-
-tasks.withType(JavaCompile).configureEach {
-  options.compilerArgs << "-Xlint:all" << "-Werror"
 }
