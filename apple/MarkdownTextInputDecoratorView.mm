@@ -88,6 +88,7 @@
     _markdownTextStorageDelegate.textView = _textView;
 
     // register delegate for future edits
+    react_native_assert(_textView.textStorage.delegate == nil);
     _textView.textStorage.delegate = _markdownTextStorageDelegate;
 
 #ifdef RCT_NEW_ARCH_ENABLED
