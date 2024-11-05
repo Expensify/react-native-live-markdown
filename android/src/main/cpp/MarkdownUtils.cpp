@@ -11,6 +11,7 @@ namespace livemarkdown {
       jni::alias_ref<jhybridobject> jThis,
       jni::alias_ref<jni::JString> input,
       int parserId) {
+    // This method is synchronized (see MarkdownUtils.java) so we don't need a mutex here.
     const auto markdownRuntime = expensify::livemarkdown::getMarkdownRuntime();
     jsi::Runtime &rt = markdownRuntime->getJSIRuntime();
 
