@@ -16,6 +16,9 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 public class MarkdownUtils {
@@ -102,7 +105,9 @@ public class MarkdownUtils {
   }
 
   private void clearTextFormattingAt(SpannableStringBuilder ssb, int start, int end) {
-    MarkdownSpan[] spans = ssb.getSpans(start, end, MarkdownItalicSpan.class);
+    List<MarkdownSpan> spans = new ArrayList<>();
+    spans.addAll(Arrays.asList(ssb.getSpans(start, end, MarkdownItalicSpan.class)));
+    spans.addAll(Arrays.asList(ssb.getSpans(start, end, MarkdownStrikethroughSpan.class)));
 
     for (MarkdownSpan span : spans) {
       int startSpan = ssb.getSpanStart(span);
