@@ -27,7 +27,7 @@ test.describe('markdown content styling', () => {
   });
 
   test('h1', async ({page}) => {
-    await testMarkdownContentStyle({testContent: 'header1', style: 'font-size: 25px; font-weight: bold;', page});
+    await testMarkdownContentStyle({testContent: 'header1', style: 'font-size: 25px; line-height: 50px; font-weight: bold;', page});
   });
 
   test('inline code', async ({page}) => {
