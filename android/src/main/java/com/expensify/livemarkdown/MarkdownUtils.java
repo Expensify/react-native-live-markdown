@@ -16,6 +16,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class MarkdownUtils {
@@ -61,6 +62,8 @@ public class MarkdownUtils {
   private String mPrevOutput;
 
   private MarkdownStyle mMarkdownStyle;
+
+  private final ArrayList<MarkdownSpan> mMarkdownSpans = new ArrayList<>();
 
   public void setMarkdownStyle(@NonNull MarkdownStyle markdownStyle) {
     mMarkdownStyle = markdownStyle;
@@ -170,13 +173,14 @@ public class MarkdownUtils {
 
   private void setSpan(SpannableStringBuilder ssb, MarkdownSpan span, int start, int end) {
     ssb.setSpan(span, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+    mMarkdownSpans.add(span);
   }
 
   private void removeSpans(SpannableStringBuilder ssb) {
-    // We shouldn't use `removeSpans()` because it also removes SpellcheckSpan, SuggestionSpan etc.
-    MarkdownSpan[] spans = ssb.getSpans(0, ssb.length(), MarkdownSpan.class);
-    for (MarkdownSpan span : spans) {
+    // We shouldn't use `ssb.removeSpans()` because it also removes SpellcheckSpan, SuggestionSpan etc.
+    for (MarkdownSpan span : mMarkdownSpans) {
       ssb.removeSpan(span);
     }
+    mMarkdownSpans.clear();
   }
 }
