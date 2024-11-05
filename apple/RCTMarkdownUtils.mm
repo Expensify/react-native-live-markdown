@@ -57,6 +57,8 @@ using namespace facebook;
 
         [attributedString fixAttributesInRange:fullRange];
 
+        [attributedString removeAttribute:@"NSOriginalFont" range:fullRange];
+
         [attributedString endEditing];
 }
 
