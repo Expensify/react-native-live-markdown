@@ -6,9 +6,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MarkdownTextStorageDelegate : NSObject <NSTextStorageDelegate>
 
-@property(nonatomic, nullable) RCTMarkdownUtils *markdownUtils;
-
-@property(nonatomic, nullable, strong) RCTUITextView *textView;
+- (instancetype)initWithTextView:(nonnull RCTUITextView *)textView markdownUtils:(nonnull RCTMarkdownUtils *)markdownUtils;
 
 @end
 

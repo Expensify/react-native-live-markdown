@@ -6,11 +6,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MarkdownTextFieldObserver : NSObject
 
-@property (nonatomic, nullable, strong) RCTMarkdownUtils *markdownUtils;
-
-@property (nonatomic, nullable, strong) RCTUITextField *textField;
-
-@property (nonatomic) BOOL active;
+- (instancetype)initWithTextField:(nonnull RCTUITextField *)textField markdownUtils:(nonnull RCTMarkdownUtils *)markdownUtils;
 
 - (void)textFieldDidChange:(UITextField *)textField;
 

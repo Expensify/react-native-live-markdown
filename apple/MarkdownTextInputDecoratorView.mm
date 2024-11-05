@@ -66,10 +66,7 @@
     // make sure `adjustsFontSizeToFitWidth` is disabled, otherwise formatting will be overwritten
     react_native_assert(_textField.adjustsFontSizeToFitWidth == NO);
     
-    _markdownTextFieldObserver = [[MarkdownTextFieldObserver alloc] init];
-    _markdownTextFieldObserver.markdownUtils = _markdownUtils;
-    _markdownTextFieldObserver.textField = _textField;
-    _markdownTextFieldObserver.active = YES;
+    _markdownTextFieldObserver = [[MarkdownTextFieldObserver alloc] initWithTextField:_textField markdownUtils:_markdownUtils];
     
     // register observers for future edits
     [_textField addTarget:_markdownTextFieldObserver action:@selector(textFieldDidChange:) forControlEvents:UIControlEventEditingChanged];
@@ -84,12 +81,9 @@
   } else if ([backedTextInputView isKindOfClass:[RCTUITextView class]]) {
     _textView = (RCTUITextView *)backedTextInputView;
 
-    _markdownTextStorageDelegate = [[MarkdownTextStorageDelegate alloc] init];
-    _markdownTextStorageDelegate.markdownUtils = _markdownUtils;
-    _markdownTextStorageDelegate.textView = _textView;
-
     // register delegate for future edits
     react_native_assert(_textView.textStorage.delegate == nil);
+    _markdownTextStorageDelegate = [[MarkdownTextStorageDelegate alloc] initWithTextView:_textView markdownUtils:_markdownUtils];
     _textView.textStorage.delegate = _markdownTextStorageDelegate;
 
 #ifdef RCT_NEW_ARCH_ENABLED

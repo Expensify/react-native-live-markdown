@@ -1,20 +1,33 @@
 #import <RNLiveMarkdown/MarkdownTextFieldObserver.h>
 #import "react_native_assert.h"
 
-@implementation MarkdownTextFieldObserver
+@implementation MarkdownTextFieldObserver {
+  RCTUITextField *_textField;
+  RCTMarkdownUtils *_markdownUtils;
+  BOOL _active;
+}
+
+- (instancetype)initWithTextField:(nonnull RCTUITextField *)textField markdownUtils:(nonnull RCTMarkdownUtils *)markdownUtils
+{
+  if ((self = [super init])) {
+    react_native_assert(textField != nil);
+    react_native_assert(markdownUtils != nil);
+
+    _textField = textField;
+    _markdownUtils = markdownUtils;
+    _active = YES;
+  }
+  return self;
+}
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context
 {
-  react_native_assert(_textField != nil);
-
   if (_active && ([keyPath isEqualToString:@"text"] || [keyPath isEqualToString:@"attributedText"])) {
     [self textFieldDidChange:_textField];
   }
 }
 
 - (void)textFieldDidChange:(__unused UITextField *)textField {
-  react_native_assert(_markdownUtils != nil);
-  react_native_assert(_textField != nil);
   react_native_assert(_textField.defaultTextAttributes != nil);
 
   if (_textField.markedTextRange != nil) {
