@@ -38,16 +38,16 @@ jobs:
           fi
 
       - name: Typecheck library
-        run: npm run tsc --project tsconfig.json --noEmit
+        run: npm run typecheck -- --project tsconfig.json
 
       - name: Typecheck parser
-        run: npm run tsc --project parser/tsconfig.json --noEmit
+        run: npm run typecheck -- --project parser/tsconfig.json
 
       - name: Typecheck example app
-        run: npm run tsc --project example/tsconfig.json --noEmit
+        run: npm run typecheck -- --project example/tsconfig.json
 
       - name: Typecheck WebExample app
-        run: npm run tsc --project WebExample/tsconfig.json --noEmit
+        run: npm run typecheck -- --project WebExample/tsconfig.json
 
       - name: Lint
         run: npm run lint
