@@ -1,5 +1,5 @@
 import {test, expect} from '@playwright/test';
-import * as TEST_CONST from '../../example/src/testConstants';
+import * as TEST_CONST from '@expensify/react-native-live-markdown-example/src/testConstants';
 import {getCursorPosition, getElementValue, setupInput} from './utils';
 
 test.beforeEach(async ({page}) => {

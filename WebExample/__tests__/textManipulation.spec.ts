@@ -1,6 +1,6 @@
 import {test, expect} from '@playwright/test';
 import type {Locator, Page} from '@playwright/test';
-import * as TEST_CONST from '../../example/src/testConstants';
+import * as TEST_CONST from '@expensify/react-native-live-markdown-example/src/testConstants';
 import {getCursorPosition, setupInput, getElementStyle, pressCmd, getElementValue} from './utils';
 
 const pasteContent = async ({text, page, inputLocator}: {text: string; page: Page; inputLocator: Locator}) => {
