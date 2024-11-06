@@ -102,9 +102,9 @@
     "react-native": "*"
   },
   "workspaces": [
-    "parser",
-    "example",
-    "WebExample"
+    "./parser",
+    "./example",
+    "./WebExample"
   ],
   "engines": {
     "node": "20.18.0",

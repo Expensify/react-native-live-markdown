@@ -1,3 +1,4 @@
-import App from '../example/src/App';
+import App from '@expensify/react-native-live-markdown-example/src/App';
+import {registerRootComponent} from 'expo';
 
-export default App;
+registerRootComponent(App);
