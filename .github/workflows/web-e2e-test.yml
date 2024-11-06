@@ -20,9 +20,6 @@ jobs:
   test:
     if: github.repository == 'Expensify/react-native-live-markdown'
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./WebExample
 
     concurrency:
       group: web-e2e-test-${{ github.ref }}
@@ -38,7 +35,6 @@ jobs:
 
       - name: Install node_modules
         run: npm ci --ignore-scripts
-        working-directory: ..
 
       - name: Install browsers
         run: npx playwright install --with-deps
@@ -48,3 +44,4 @@ jobs:
 
       - name: Run Playwright tests
         run: npm run test
+        working-directory: WebExample
