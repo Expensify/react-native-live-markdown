@@ -1,6 +1,7 @@
 import {test, expect} from '@playwright/test';
 import type {Page} from '@playwright/test';
-import * as TEST_CONST from '@expensify/react-native-live-markdown-example/src/testConstants';
+// eslint-disable-next-line import/no-relative-packages
+import * as TEST_CONST from '../../example/src/testConstants';
 import {setupInput, getElementStyle} from './utils';
 
 const testMarkdownContentStyle = async ({testContent, style, page}: {testContent: string; style: string; page: Page}) => {

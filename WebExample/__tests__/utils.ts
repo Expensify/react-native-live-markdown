@@ -1,5 +1,6 @@
 import type {Locator, Page} from '@playwright/test';
-import * as TEST_CONST from '@expensify/react-native-live-markdown-example/src/testConstants';
+// eslint-disable-next-line import/no-relative-packages
+import * as TEST_CONST from '../../example/src/testConstants';
 
 const setupInput = async (page: Page, action?: 'clear' | 'reset') => {
   const inputLocator = await page.locator(`div#${TEST_CONST.INPUT_ID}`);
