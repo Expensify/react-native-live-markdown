@@ -38,6 +38,7 @@ jobs:
 
       - name: Install node_modules
         run: npm ci --ignore-scripts
+        working-directory: ..
 
       - name: Install browsers
         run: npx playwright install --with-deps

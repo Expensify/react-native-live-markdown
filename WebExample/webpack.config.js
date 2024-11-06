@@ -11,6 +11,6 @@ module.exports = async function (env, argv) {
     },
     argv,
   );
-  config.resolve.fallback = {'@react-native-community': path.join(env.projectRoot, '..', 'node_modules', '@react-native-community'), crypto: false};
+  config.resolve.fallback = {crypto: false};
   return config;
 };
