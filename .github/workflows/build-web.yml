@@ -28,7 +28,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install node_modules
-        run: npm ci
+        run: npm ci --ignore-scripts
 
       - name: Build app
         working-directory: WebExample
