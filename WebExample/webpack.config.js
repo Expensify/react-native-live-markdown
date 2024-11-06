@@ -1,3 +1,4 @@
+const path = require('path');
 const createExpoWebpackConfigAsync = require('@expo/webpack-config');
 
 module.exports = async function (env, argv) {
@@ -10,6 +11,6 @@ module.exports = async function (env, argv) {
     },
     argv,
   );
-  config.resolve.fallback = {crypto: false};
+  config.resolve.fallback = {'@react-native-community': path.join(env.projectRoot, '..', 'node_modules', '@react-native-community'), crypto: false};
   return config;
 };
