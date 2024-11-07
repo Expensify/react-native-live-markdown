@@ -17,7 +17,6 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -69,6 +68,62 @@ public class MarkdownUtils {
     mMarkdownStyle = markdownStyle;
   }
 
+  private List<MarkdownRange> splitRangesOnEmojis(List<MarkdownRange> markdownRanges) {
+    List<MarkdownRange> emojiRanges = new ArrayList<>();
+    for (MarkdownRange range : markdownRanges) {
+      if (range.type.equals("emoji")) {
+        emojiRanges.add(range);
+      }
+    }
+
+    for (int i = 0; i < markdownRanges.size(); i++) {
+      MarkdownRange range = markdownRanges.get(i);
+      if (!range.type.equals("italic") && !range.type.equals("strikethrough")) {
+        continue;
+      }
+
+      for (int j = 0; j <  emojiRanges.size(); j++) {
+        MarkdownRange emojiRange = emojiRanges.get(j);
+        if (emojiRange.start >= range.start && emojiRange.end <= range.end) {
+          // Split range
+          MarkdownRange startRange = new MarkdownRange(range.type, range.start, emojiRange.start, range.depth);
+          MarkdownRange endRange =  new MarkdownRange(range.type, emojiRange.end, range.end, range.depth);
+          markdownRanges.add(i + 1, endRange);
+          markdownRanges.add(i + 1, startRange);
+          markdownRanges.remove(i);
+          i += 1;
+          range = endRange;
+        } else {
+          break;
+        }
+      }
+    }
+    return markdownRanges;
+  }
+
+
+  private MarkdownRange[] parseRanges(String rangesJSON) {
+    try {
+      List<MarkdownRange> markdownRanges = new ArrayList<>();
+      JSONArray ranges = new JSONArray(rangesJSON);
+      for (int i = 0; i < ranges.length(); i++) {
+        JSONObject range = ranges.getJSONObject(i);
+        String type = range.getString("type");
+        int start = range.getInt("start");
+        int length = range.getInt("length");
+        int depth = range.optInt("depth", 1);
+        int end = start + length;
+        markdownRanges.add(new MarkdownRange(type, start, end, depth));
+      }
+      List<MarkdownRange> splittedRanges = splitRangesOnEmojis(markdownRanges);
+      return splittedRanges.toArray(new MarkdownRange[0]);
+    } catch (JSONException e) {
+      return new MarkdownRange[0];
+    }
+  }
+
+
+
   public void applyMarkdownFormatting(SpannableStringBuilder ssb) {
     Objects.requireNonNull(mMarkdownStyle, "mMarkdownStyle is null");
 
@@ -84,53 +139,12 @@ public class MarkdownUtils {
       mPrevOutput = output;
     }
 
-    try {
-      JSONArray ranges = new JSONArray(output);
-      for (int i = 0; i < ranges.length(); i++) {
-        JSONObject range = ranges.getJSONObject(i);
-        String type = range.getString("type");
-        int start = range.getInt("start");
-        int length = range.getInt("length");
-        int depth = range.optInt("depth", 1);
-        int end = start + length;
-        if (length == 0 || end > input.length()) {
-          continue;
-        }
-
-        applyRange(ssb, type, start, end, depth);
+    MarkdownRange[] ranges = parseRanges(output);
+    for (MarkdownRange range: ranges) {
+      if (range.length == 0 || range.end > input.length()) {
+        continue;
       }
-    } catch (JSONException e) {
-      // Do nothing
-    }
-  }
-
-  private void clearTextFormattingAt(SpannableStringBuilder ssb, int start, int end) {
-    List<MarkdownSpan> spans = new ArrayList<>();
-    spans.addAll(Arrays.asList(ssb.getSpans(start, end, MarkdownItalicSpan.class)));
-    spans.addAll(Arrays.asList(ssb.getSpans(start, end, MarkdownStrikethroughSpan.class)));
-
-    for (MarkdownSpan span : spans) {
-      int startSpan = ssb.getSpanStart(span);
-      int endSpan = ssb.getSpanEnd(span);
-      boolean isChanged = false;
-
-      try {
-        if (start - startSpan >= 0) {
-            setSpan(ssb, span.getClass().newInstance(), startSpan, start);
-            isChanged = true;
-        }
-
-        if (endSpan - end >= 0) {
-            setSpan(ssb, span.getClass().newInstance(), end, endSpan);
-            isChanged = true;
-        }
-
-        if (isChanged) {
-          ssb.removeSpan(span);
-        }
-      } catch (IllegalAccessException | InstantiationException e) {
-        // Do nothing
-      }
+      applyRange(ssb, range.type, range.start, range.end, range.depth);
     }
   }
 
@@ -146,7 +160,6 @@ public class MarkdownUtils {
         setSpan(ssb, new MarkdownStrikethroughSpan(), start, end);
         break;
       case "emoji":
-        clearTextFormattingAt(ssb, start, end);
         setSpan(ssb, new MarkdownEmojiSpan(mMarkdownStyle.getEmojiFontSize()), start, end);
         break;
       case "mention-here":
