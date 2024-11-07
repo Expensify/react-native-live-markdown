@@ -84,7 +84,7 @@ npm run lint
 To fix formatting errors, run the following:
 
 ```sh
-npm run lint --fix
+npm run lint -- --fix
 ```
 
 Remember to add tests for your change if possible. Run the unit tests by:

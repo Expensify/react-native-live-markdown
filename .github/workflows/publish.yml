@@ -63,7 +63,7 @@ jobs:
         run: git push --set-upstream origin main && git push --tags
 
       - name: Build package
-        run: npm run pack
+        run: npm pack
 
       - name: Publish to npm
         run: npm publish --access public
