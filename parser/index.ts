@@ -2,6 +2,8 @@
 import ExpensiMark from 'expensify-common/dist/ExpensiMark';
 import {unescapeText} from './utils';
 
+const MAX_PARSABLE_LENGTH = 4000;
+
 type MarkdownType =
   | 'bold'
   | 'italic'
@@ -273,6 +275,9 @@ function groupRanges(ranges: MarkdownRange[]) {
 
 function parseExpensiMarkToRanges(markdown: string): MarkdownRange[] {
   try {
+    if (markdown.length > MAX_PARSABLE_LENGTH) {
+      return [];
+    }
     const html = parseMarkdownToHTML(markdown);
     const tokens = parseHTMLToTokens(html);
     const tree = parseTokensToTree(tokens);
