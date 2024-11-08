@@ -72,7 +72,7 @@ public class MarkdownUtils {
     List<MarkdownRange> emojiRanges = new ArrayList<>();
     List<MarkdownRange> styleRanges = new ArrayList<>();
     int index = 0;
-    for (MarkdownRange range : markdownRanges) {
+    for (MarkdownRange range: markdownRanges) {
       if (range.type.equals("emoji")) {
         emojiRanges.add(range);
       } else if (range.type.equals(type)) {
@@ -94,8 +94,8 @@ public class MarkdownUtils {
         continue;
       } else if (emojiRange.start >= styleRange.start && emojiRange.end <= styleRange.end) {
         // Split range
-        MarkdownRange startRange = new MarkdownRange(styleRange.type, styleRange.start, emojiRange.start, styleRange.depth, styleRange.index);
-        MarkdownRange endRange =  new MarkdownRange(styleRange.type, emojiRange.end, styleRange.end, styleRange.depth, styleRange.index);
+        MarkdownRange startRange = new MarkdownRange(styleRange.type, styleRange.start, emojiRange.start - styleRange.start, styleRange.depth, styleRange.index);
+        MarkdownRange endRange = new MarkdownRange(styleRange.type, emojiRange.end, styleRange.end - emojiRange.end, styleRange.depth, styleRange.index);
         styleRanges.add(j + 1, endRange);
         styleRanges.add(j + 1, startRange);
         styleRanges.remove(j);
@@ -108,7 +108,7 @@ public class MarkdownUtils {
     // Replace style ranges with splitted ones
     index = -1;
     int addedElements = 0;
-    for (MarkdownRange range : styleRanges) {
+    for (MarkdownRange range: styleRanges) {
       if (index != range.index) {
         markdownRanges.remove(range.index + addedElements);
         index = range.index;
@@ -120,25 +120,20 @@ public class MarkdownUtils {
   }
 
 
-  private MarkdownRange[] parseRanges(String rangesJSON) {
+  private List<MarkdownRange> parseRanges(String rangesJSON) {
+    List<MarkdownRange> markdownRanges = new ArrayList<>();
     try {
-      List<MarkdownRange> markdownRanges = new ArrayList<>();
       JSONArray ranges = new JSONArray(rangesJSON);
       for (int i = 0; i < ranges.length(); i++) {
         JSONObject range = ranges.getJSONObject(i);
-        String type = range.getString("type");
-        int start = range.getInt("start");
-        int length = range.getInt("length");
-        int depth = range.optInt("depth", 1);
-        int end = start + length;
-        markdownRanges.add(new MarkdownRange(type, start, end, depth, i));
+        markdownRanges.add(new MarkdownRange(range, i));
       }
-      splitRangesOnEmojis(markdownRanges, "italic");
-      splitRangesOnEmojis(markdownRanges, "strikethrough");
-      return markdownRanges.toArray(new MarkdownRange[0]);
     } catch (JSONException e) {
-      return new MarkdownRange[0];
+      return new ArrayList<>();
     }
+    splitRangesOnEmojis(markdownRanges, "italic");
+    splitRangesOnEmojis(markdownRanges, "strikethrough");
+    return markdownRanges;
   }
 
 
@@ -158,7 +153,7 @@ public class MarkdownUtils {
       mPrevOutput = output;
     }
 
-    MarkdownRange[] ranges = parseRanges(output);
+    List<MarkdownRange> ranges = parseRanges(output);
     for (MarkdownRange range: ranges) {
       if (range.length == 0 || range.end > input.length()) {
         continue;

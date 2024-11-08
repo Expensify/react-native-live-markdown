@@ -1,20 +1,38 @@
 package com.expensify.livemarkdown;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class MarkdownRange {
-  public String type;
-  public int start;
-  public int end;
-  public int length;
-  public int depth;
+  public final String type;
+  public final int start;
+  public final int end;
+  public final int length;
+  public final int depth;
   public int index;
 
-  public MarkdownRange(String type, int start, int end, int depth, int index) {
+  public MarkdownRange(String type, int start, int length, int depth, int index) {
     this.type = type;
     this.start = start;
-    this.end = end;
-    this.length = end - start + 1;
+    this.length = length;
+    this.end = start + length;
     this.depth = depth;
     this.index = index;
+  }
+
+  public MarkdownRange(JSONObject range, int index) {
+    try {
+      this.type = range.getString("type");
+      this.start = range.getInt("start");
+      this.length = range.getInt("length");
+      this.end = start + length;
+      this.depth = range.optInt("depth", 1);
+      this.index = index;
+
+    } catch (JSONException e) {
+      throw new RuntimeException(e);
+
+    }
   }
 }
 
