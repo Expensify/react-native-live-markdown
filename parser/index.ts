@@ -274,10 +274,10 @@ function groupRanges(ranges: MarkdownRange[]) {
 }
 
 function parseExpensiMarkToRanges(markdown: string): MarkdownRange[] {
+  if (markdown.length > MAX_PARSABLE_LENGTH) {
+    return [];
+  }
   try {
-    if (markdown.length > MAX_PARSABLE_LENGTH) {
-      return [];
-    }
     const html = parseMarkdownToHTML(markdown);
     const tokens = parseHTMLToTokens(html);
     const tree = parseTokensToTree(tokens);
