@@ -72,7 +72,7 @@ public class MarkdownUtils {
     List<MarkdownRange> emojiRanges = new ArrayList<>();
     List<MarkdownRange> styleRanges = new ArrayList<>();
     int index = 0;
-    for (MarkdownRange range: markdownRanges) {
+    for (MarkdownRange range : markdownRanges) {
       if (range.type.equals("emoji")) {
         emojiRanges.add(range);
       } else if (range.type.equals(type)) {
@@ -108,7 +108,7 @@ public class MarkdownUtils {
     // Replace style ranges with splitted ones
     index = -1;
     int addedElements = 0;
-    for (MarkdownRange range: styleRanges) {
+    for (MarkdownRange range : styleRanges) {
       if (index != range.index) {
         markdownRanges.remove(range.index + addedElements);
         index = range.index;
@@ -154,7 +154,7 @@ public class MarkdownUtils {
     }
 
     List<MarkdownRange> ranges = parseRanges(output);
-    for (MarkdownRange range: ranges) {
+    for (MarkdownRange range : ranges) {
       if (range.length == 0 || range.end > input.length()) {
         continue;
       }
