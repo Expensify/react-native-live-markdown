@@ -112,21 +112,28 @@ public class MarkdownUtils {
       if (index != range.index) {
         markdownRanges.remove(range.index + addedElements);
         index = range.index;
-      } else {
-        addedElements += 1;
+        addedElements -= 1;
       }
-      markdownRanges.add(index + addedElements, range);
+
+      if (range.length > 0) {
+        addedElements += 1;
+        markdownRanges.add(index + addedElements, range);
+      }
     }
   }
 
 
-  private List<MarkdownRange> parseRanges(String rangesJSON) {
+  private List<MarkdownRange> parseRanges(String rangesJSON, String innerText) {
     List<MarkdownRange> markdownRanges = new ArrayList<>();
     try {
       JSONArray ranges = new JSONArray(rangesJSON);
       for (int i = 0; i < ranges.length(); i++) {
         JSONObject range = ranges.getJSONObject(i);
-        markdownRanges.add(new MarkdownRange(range, i));
+        MarkdownRange markdownRange = new MarkdownRange(range, i);
+        if (markdownRange.length == 0 || markdownRange.end > innerText.length()) {
+          continue;
+        }
+        markdownRanges.add(markdownRange);
       }
     } catch (JSONException e) {
       return new ArrayList<>();
@@ -153,11 +160,8 @@ public class MarkdownUtils {
       mPrevOutput = output;
     }
 
-    List<MarkdownRange> ranges = parseRanges(output);
+    List<MarkdownRange> ranges = parseRanges(output, input);
     for (MarkdownRange range : ranges) {
-      if (range.length == 0 || range.end > input.length()) {
-        continue;
-      }
       applyRange(ssb, range.type, range.start, range.end, range.depth);
     }
   }
