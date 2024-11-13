@@ -107,7 +107,12 @@ public class MarkdownUtils {
       JSONArray ranges = new JSONArray(rangesJSON);
       for (int i = 0; i < ranges.length(); i++) {
         JSONObject range = ranges.getJSONObject(i);
-        MarkdownRange markdownRange = new MarkdownRange(range);
+        String type = range.getString("type");
+        int start = range.getInt("start");
+        int length = range.getInt("length");
+        int depth = range.optInt("depth", 1);
+
+        MarkdownRange markdownRange = new MarkdownRange(type, start, length, depth);
         if (markdownRange.length == 0 || markdownRange.end > innerText.length()) {
           continue;
         }

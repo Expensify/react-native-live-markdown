@@ -17,25 +17,5 @@ public class MarkdownRange {
     this.end = start + length;
     this.depth = depth;
   }
-
-  public MarkdownRange(JSONObject range) {
-    try {
-      this.type = range.getString("type");
-      this.start = range.getInt("start");
-      this.length = range.getInt("length");
-      this.end = start + length;
-      this.depth = range.optInt("depth", 1);
-    } catch (JSONException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null || getClass() != obj.getClass()) return false;
-    MarkdownRange range = (MarkdownRange) obj;
-    return range.type.equals(this.type) && range.start == this.start && range.end == this.end && range.length == this.length && range.depth == this.depth;
-  }
 }
 
