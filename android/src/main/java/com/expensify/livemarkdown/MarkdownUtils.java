@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.TreeMap;
 
 public class MarkdownUtils {
   static {
@@ -70,55 +71,32 @@ public class MarkdownUtils {
 
   private void splitRangesOnEmojis(List<MarkdownRange> markdownRanges, String type) {
     List<MarkdownRange> emojiRanges = new ArrayList<>();
-    List<MarkdownRange> styleRanges = new ArrayList<>();
-    int index = 0;
     for (MarkdownRange range : markdownRanges) {
       if (range.type.equals("emoji")) {
         emojiRanges.add(range);
-      } else if (range.type.equals(type)) {
-        styleRanges.add(range);
       }
-      range.index = index;
-      index += 1;
     }
 
     int i = 0;
     int j = 0;
-    while (i < emojiRanges.size() && j < styleRanges.size()) {
-      MarkdownRange emojiRange = emojiRanges.get(i);
-      MarkdownRange styleRange = styleRanges.get(j);
+    while (i < markdownRanges.size() && j < emojiRanges.size()) {
+      MarkdownRange currentRange = markdownRanges.get(i);
+      MarkdownRange emojiRange = emojiRanges.get(j);
 
-      if (styleRange.end < emojiRange.start) {
-        // Next style range
-        j += 1;
-        continue;
-      } else if (emojiRange.start >= styleRange.start && emojiRange.end <= styleRange.end) {
+      if (!currentRange.type.equals(type) || currentRange.end < emojiRange.start) {
+          i += 1;
+          continue;
+      } else if (emojiRange.start >= currentRange.start && emojiRange.end <= currentRange.end) {
         // Split range
-        MarkdownRange startRange = new MarkdownRange(styleRange.type, styleRange.start, emojiRange.start - styleRange.start, styleRange.depth, styleRange.index);
-        MarkdownRange endRange = new MarkdownRange(styleRange.type, emojiRange.end, styleRange.end - emojiRange.end, styleRange.depth, styleRange.index);
-        styleRanges.add(j + 1, endRange);
-        styleRanges.add(j + 1, startRange);
-        styleRanges.remove(j);
-        j += 1;
-      }
-      i += 1;
-    }
+        MarkdownRange startRange = new MarkdownRange(currentRange.type, currentRange.start, emojiRange.start - currentRange.start, currentRange.depth);
+        MarkdownRange endRange = new MarkdownRange(currentRange.type, emojiRange.end, currentRange.end - emojiRange.end, currentRange.depth);
 
-
-    // Replace style ranges with splitted ones
-    index = -1;
-    int addedElements = 0;
-    for (MarkdownRange range : styleRanges) {
-      if (index != range.index) {
-        markdownRanges.remove(range.index + addedElements);
-        index = range.index;
-        addedElements -= 1;
+        markdownRanges.add(i + 1, startRange);
+        markdownRanges.add(i + 2, endRange);
+        markdownRanges.remove(i);
+        i = i + 1;
       }
-
-      if (range.length > 0) {
-        addedElements += 1;
-        markdownRanges.add(index + addedElements, range);
-      }
+      j += 1;
     }
   }
 
@@ -129,7 +107,7 @@ public class MarkdownUtils {
       JSONArray ranges = new JSONArray(rangesJSON);
       for (int i = 0; i < ranges.length(); i++) {
         JSONObject range = ranges.getJSONObject(i);
-        MarkdownRange markdownRange = new MarkdownRange(range, i);
+        MarkdownRange markdownRange = new MarkdownRange(range);
         if (markdownRange.length == 0 || markdownRange.end > innerText.length()) {
           continue;
         }
