@@ -89,10 +89,43 @@ function mergeMarkdownStyleWithDefault(input: PartialMarkdownStyle | undefined):
   return output;
 }
 
+function deepEqualMarkdownStyles(markdownStyle1: MarkdownStyle, markdownStyle2: PartialMarkdownStyle) {
+  const keys1 = Object.keys(markdownStyle1) as Array<keyof MarkdownStyle>;
+  const keys2 = Object.keys(markdownStyle2) as Array<keyof MarkdownStyle>;
+
+  if (keys1.length !== keys2.length) {
+    return false;
+  }
+
+  let areStylesEqual = true;
+  keys1.forEach((key) => {
+    // Because each of the markdown objects types are not overlapping, we have to case to Record<string, string | number>
+    const singleStyle1 = markdownStyle1[key] as Record<string, string | number>;
+    const singleStyle2 = markdownStyle2[key] as Record<string, string | number>;
+    const singleStyleKeys1 = Object.keys(singleStyle1);
+    const singleStyleKeys2 = Object.keys(singleStyle2);
+    if (singleStyleKeys1.length !== singleStyleKeys2.length) {
+      areStylesEqual = false;
+      return;
+    }
+    singleStyleKeys1.forEach((styleKey) => {
+      if (!(styleKey in singleStyle1) || !(styleKey in singleStyle2)) {
+        areStylesEqual = false;
+        return;
+      }
+      if (singleStyle1[styleKey] !== singleStyle2[styleKey]) {
+        areStylesEqual = false;
+      }
+    });
+  });
+
+  return areStylesEqual;
+}
+
 function parseStringWithUnitToNumber(value: string | null): number {
   return value ? parseInt(value.replace('px', ''), 10) : 0;
 }
 
 export type {PartialMarkdownStyle};
 
-export {mergeMarkdownStyleWithDefault, parseStringWithUnitToNumber};
+export {mergeMarkdownStyleWithDefault, parseStringWithUnitToNumber, deepEqualMarkdownStyles as deepCompareMarkdownStyles};
