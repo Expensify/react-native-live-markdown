@@ -19,16 +19,14 @@ export default function App() {
     };
   }, [textColorState, textFontSizeState]);
 
-  const markdownStyle = React.useMemo(() => {
-    return {
-      emoji: {
-        fontSize: emojiFontSizeState ? 15 : 20,
-      },
-      link: {
-        color: linkColorState ? 'red' : 'blue',
-      },
-    };
-  }, [emojiFontSizeState, linkColorState]);
+  const markdownStyle = {
+    emoji: {
+      fontSize: emojiFontSizeState ? 15 : 20,
+    },
+    link: {
+      color: linkColorState ? 'red' : 'blue',
+    },
+  };
 
   const ref = React.useRef<MarkdownTextInput>(null);
 
