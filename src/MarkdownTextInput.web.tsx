@@ -127,16 +127,17 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
     }
 
     const flattenedStyle = useMemo(() => StyleSheet.flatten(style), [style]);
-    const prevMarkdownStyle = useRef<MarkdownStyle | undefined>(undefined);
+    const prevMarkdownStyle = useRef<MarkdownStyle>();
     const memoizedMarkdownStyle = useMemo(() => {
-      if (prevMarkdownStyle.current && deepCompareMarkdownStyles(prevMarkdownStyle.current ?? {}, markdownStyle ?? {})) {
+      if (prevMarkdownStyle.current && deepCompareMarkdownStyles(prevMarkdownStyle.current, markdownStyle ?? {})) {
         return prevMarkdownStyle.current;
       }
       return markdownStyle;
     }, [markdownStyle]);
+
     useEffect(() => {
       prevMarkdownStyle.current = memoizedMarkdownStyle;
-    }, [memoizedMarkdownStyle]); // Runs after state is updated
+    }, [memoizedMarkdownStyle]);
 
     // Empty placeholder would collapse the div, so we need to use zero-width space to prevent it
     const heightSafePlaceholder = useMemo(() => getPlaceholderValue(placeholder), [placeholder]);
