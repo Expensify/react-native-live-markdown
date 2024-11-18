@@ -165,6 +165,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
         shouldAddToHistory = true,
         shouldForceDOMUpdate = false,
         shouldScrollIntoView = false,
+        shouldPreserveSelection = false,
       ): ParseTextResult => {
         if (!divRef.current) {
           return {text: text || '', cursorPosition: null};
@@ -173,10 +174,21 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
         if (text === null) {
           return {text: divRef.current.value, cursorPosition: null};
         }
-        const parsedText = updateInputStructure(target, text, cursorPosition, multiline, customMarkdownStyles, false, shouldForceDOMUpdate, shouldScrollIntoView, {
-          addAuthTokenToImageURLCallback,
-          imagePreviewAuthRequiredURLs,
-        });
+        const parsedText = updateInputStructure(
+          target,
+          text,
+          cursorPosition,
+          multiline,
+          customMarkdownStyles,
+          false,
+          shouldForceDOMUpdate,
+          shouldScrollIntoView,
+          {
+            addAuthTokenToImageURLCallback,
+            imagePreviewAuthRequiredURLs,
+          },
+          shouldPreserveSelection,
+        );
         divRef.current.value = parsedText.text;
 
         if (history.current && shouldAddToHistory) {
@@ -191,7 +203,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
     const processedMarkdownStyle = useMemo(() => {
       const newMarkdownStyle = processMarkdownStyle(memoizedMarkdownStyle);
       if (divRef.current) {
-        parseText(divRef.current, divRef.current.value, newMarkdownStyle, null, false, false);
+        parseText(divRef.current, divRef.current.value, newMarkdownStyle, null, false, false, false, true);
       }
       return newMarkdownStyle;
     }, [memoizedMarkdownStyle, parseText]);

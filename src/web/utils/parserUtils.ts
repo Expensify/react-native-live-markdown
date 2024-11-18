@@ -259,7 +259,14 @@ function parseRangesToHTMLNodes(
   return {dom: rootElement, tree: rootNode};
 }
 
-function moveCursor(isFocused: boolean, alwaysMoveCursorToTheEnd: boolean, cursorPosition: number | null, target: MarkdownTextInputElement, shouldScrollIntoView = false) {
+function moveCursor(
+  isFocused: boolean,
+  alwaysMoveCursorToTheEnd: boolean,
+  cursorPosition: number | null,
+  target: MarkdownTextInputElement,
+  selectionEnd: number | null = null,
+  shouldScrollIntoView = false,
+) {
   if (!isFocused) {
     return;
   }
@@ -267,7 +274,7 @@ function moveCursor(isFocused: boolean, alwaysMoveCursorToTheEnd: boolean, curso
   if (alwaysMoveCursorToTheEnd || cursorPosition === null) {
     moveCursorToEnd(target);
   } else if (cursorPosition !== null) {
-    setCursorPosition(target, cursorPosition, null, shouldScrollIntoView);
+    setCursorPosition(target, cursorPosition, selectionEnd, shouldScrollIntoView);
   }
 }
 
@@ -281,15 +288,19 @@ function updateInputStructure(
   shouldForceDOMUpdate = false,
   shouldScrollIntoView = false,
   inlineImagesProps: InlineImagesInputProps = {},
+  shouldPreserveSelection = false,
 ) {
   const targetElement = target;
 
   // in case the cursorPositionIndex is larger than text length, cursorPosition will be null, i.e: move the caret to the end
   let cursorPosition: number | null = cursorPositionIndex !== null && cursorPositionIndex <= text.length ? cursorPositionIndex : null;
+  let selectionEndPosition: number | null = null;
   const isFocused = document.activeElement === target;
   if (isFocused && cursorPositionIndex === null) {
     const selection = getCurrentCursorPosition(target);
     cursorPosition = selection ? selection.start : null;
+    // in some cases like rerendering because style was changed we want to preserve selection
+    selectionEndPosition = shouldPreserveSelection && selection ? selection.end : null;
   }
   const markdownRanges = global.parseExpensiMarkToRanges(text);
   if (!text || targetElement.innerHTML === '<br>' || (targetElement && targetElement.innerHTML === '\n')) {
@@ -312,7 +323,7 @@ function updateInputStructure(
     updateTreeElementRefs(tree, targetElement);
     targetElement.tree = tree;
 
-    moveCursor(isFocused, alwaysMoveCursorToTheEnd, cursorPosition, targetElement, shouldScrollIntoView);
+    moveCursor(isFocused, alwaysMoveCursorToTheEnd, cursorPosition, targetElement, selectionEndPosition, shouldScrollIntoView);
   } else {
     targetElement.tree = createRootTreeNode(targetElement);
   }
