@@ -128,4 +128,4 @@ function parseStringWithUnitToNumber(value: string | null): number {
 
 export type {PartialMarkdownStyle};
 
-export {mergeMarkdownStyleWithDefault, parseStringWithUnitToNumber, deepEqualMarkdownStyles as deepCompareMarkdownStyles};
+export {mergeMarkdownStyleWithDefault, parseStringWithUnitToNumber, deepEqualMarkdownStyles};

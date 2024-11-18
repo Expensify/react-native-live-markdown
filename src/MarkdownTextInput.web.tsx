@@ -24,7 +24,7 @@ import {getElementHeight, getPlaceholderValue, isEventComposing, normalizeValue,
 import {parseToReactDOMStyle, processMarkdownStyle} from './web/utils/webStyleUtils';
 import {forceRefreshAllImages} from './web/inputElements/inlineImage';
 import type {InlineImagesInputProps} from './commonTypes';
-import {deepCompareMarkdownStyles} from './styleUtils';
+import {deepEqualMarkdownStyles} from './styleUtils';
 
 require('../parser/react-native-live-markdown-parser.js');
 
@@ -129,7 +129,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
     const flattenedStyle = useMemo(() => StyleSheet.flatten(style), [style]);
     const prevMarkdownStyle = useRef<MarkdownStyle>();
     const memoizedMarkdownStyle = useMemo(() => {
-      if (prevMarkdownStyle.current && deepCompareMarkdownStyles(prevMarkdownStyle.current, markdownStyle ?? {})) {
+      if (prevMarkdownStyle.current && deepEqualMarkdownStyles(prevMarkdownStyle.current, markdownStyle ?? {})) {
         return prevMarkdownStyle.current;
       }
       return markdownStyle;
