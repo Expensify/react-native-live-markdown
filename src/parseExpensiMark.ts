@@ -4,6 +4,8 @@ import {ExpensiMark} from 'expensify-common';
 import {unescapeText} from 'expensify-common/dist/utils';
 import type {MarkdownType, MarkdownRange} from './commonTypes';
 
+const MAX_PARSABLE_LENGTH = 4000;
+
 type Token = ['TEXT' | 'HTML', string];
 type StackItem = {tag: string; children: Array<StackItem | string>};
 
@@ -253,6 +255,9 @@ function groupRanges(ranges: MarkdownRange[]) {
 }
 
 function parseExpensiMark(markdown: string): MarkdownRange[] {
+  if (markdown.length > MAX_PARSABLE_LENGTH) {
+    return [];
+  }
   try {
     const html = parseMarkdownToHTML(markdown);
     const tokens = parseHTMLToTokens(html);
