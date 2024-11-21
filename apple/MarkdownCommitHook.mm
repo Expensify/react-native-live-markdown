@@ -275,17 +275,17 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
       // if usedUtils is defferent from the one kept in the decorator state, it
       // needs to be updated to ensure memoization works correctly
       if (usedUtils != MarkdownCommitHook::getMarkdownUtils(*decoratorNode)) {
-        const auto olddecoratorState = *std::static_pointer_cast<
+        const auto oldDecoratorState = *std::static_pointer_cast<
             const ConcreteState<MarkdownTextInputDecoratorState>>(
             decoratorNode->getState());
         const auto newDecoratorState =
             std::make_shared<const MarkdownTextInputDecoratorState>(
-                olddecoratorState.getData().decoratorFamily,
+                oldDecoratorState.getData().decoratorFamily,
                 wrapManagedObject(usedUtils));
         const auto newDecoratorNode = decoratorNode->clone(
             {.state = std::make_shared<
                  const ConcreteState<MarkdownTextInputDecoratorState>>(
-                 newDecoratorState, olddecoratorState)});
+                 newDecoratorState, oldDecoratorState)});
 
         // since we did clone the path to the text input, parent node is mutable
         // at this point - no need to clone the entire path
