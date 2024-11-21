@@ -3,11 +3,11 @@
 #include <React/RCTUtils.h>
 #include <react/renderer/core/ComponentDescriptor.h>
 #include <react/renderer/textlayoutmanager/RCTAttributedTextUtils.h>
+#include <react/utils/ManagedObjectWrapper.h>
 
 #include "MarkdownCommitHook.h"
 #include "MarkdownShadowFamilyRegistry.h"
 #include "RCTMarkdownStyle.h"
-#include "RCTMarkdownUtils.h"
 
 using namespace facebook::react;
 
@@ -22,6 +22,27 @@ MarkdownCommitHook::MarkdownCommitHook(
 
 MarkdownCommitHook::~MarkdownCommitHook() noexcept {
   uiManager_->unregisterCommitHook(*this);
+}
+
+RCTMarkdownUtils *MarkdownCommitHook::getMarkdownUtils(
+    const MarkdownTextInputDecoratorShadowNode &decorator) {
+  const auto decoratorState = std::static_pointer_cast<
+      const ConcreteState<MarkdownTextInputDecoratorState>>(
+      decorator.getState());
+  const auto memoizedUtils = (RCTMarkdownUtils *)unwrapManagedObject(
+      decoratorState->getData().markdownUtils);
+  return memoizedUtils;
+}
+
+RCTMarkdownUtils *MarkdownCommitHook::getOrCreateMarkdownUtils(
+    const MarkdownTextInputDecoratorShadowNode &decorator) {
+  const auto memoizedUtils = MarkdownCommitHook::getMarkdownUtils(decorator);
+
+  if (memoizedUtils != nullptr) {
+    return memoizedUtils;
+  } else {
+    return [[RCTMarkdownUtils alloc] init];
+  }
 }
 
 RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
@@ -94,6 +115,8 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
     const auto fontSizeMultiplier =
         newRootShadowNode->getConcreteProps().layoutContext.fontSizeMultiplier;
 
+    RCTMarkdownUtils *usedUtils = nil;
+
     // We only want to update the shadow node when the attributed string is
     // stored by value If it's stored by pointer, the markdown formatting should
     // already by applied to it, since the only source of that pointer (besides
@@ -115,7 +138,7 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
             nodes.textInput->getTag())) {
       rootNode = rootNode->cloneTree(
           nodes.textInput->getFamily(),
-          [&nodes, &textInputState, &stateData,
+          [&nodes, &textInputState, &stateData, &usedUtils,
            fontSizeMultiplier](const ShadowNode &node) {
             const auto &markdownProps = *std::static_pointer_cast<
                 MarkdownTextInputDecoratorViewProps const>(
@@ -132,9 +155,10 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
             // this can possibly be optimized
             RCTMarkdownStyle *markdownStyle = [[RCTMarkdownStyle alloc]
                 initWithStruct:markdownProps.markdownStyle];
-            RCTMarkdownUtils *utils = [[RCTMarkdownUtils alloc] init];
-            [utils setMarkdownStyle:markdownStyle];
-            [utils setParserId:@(markdownProps.parserId)];
+            usedUtils =
+                MarkdownCommitHook::getOrCreateMarkdownUtils(*nodes.decorator);
+            [usedUtils setMarkdownStyle:markdownStyle];
+            [usedUtils setParserId:@(markdownProps.parserId)];
 
             // convert the attibuted string stored in state to
             // NSAttributedString
@@ -143,14 +167,15 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
                     stateData.attributedStringBox);
 
             // Handles the first render, where the text stored in props is
-            // different than the one stored in state. The one in state is empty,
-            // while the one in props is passed from JS. If we don't update the
-            // state here, we'll end up with a one-default-line-sized text input
+            // different than the one stored in state. The one in state is
+            // empty, while the one in props is passed from JS. If we don't
+            // update the state here, we'll end up with a one-default-line-sized
+            // text input
             if (textInputState.getRevision() == State::initialRevisionValue) {
-                auto plainStringFromState =
-                    std::string([[nsAttributedString string] UTF8String]);
+              auto plainStringFromState =
+                  std::string([[nsAttributedString string] UTF8String]);
 
-                if (plainStringFromState != textInputProps.text) {
+              if (plainStringFromState != textInputProps.text) {
                 // creates new AttributedString from props, adapted from
                 // TextInputShadowNode (ios one, text inputs are
                 // platform-specific)
@@ -165,14 +190,15 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
 
                 // convert the newly created attributed string to
                 // NSAttributedString
-                nsAttributedString = RCTNSAttributedStringFromAttributedStringBox(
-                    AttributedStringBox{attributedString});
-                }
+                nsAttributedString =
+                    RCTNSAttributedStringFromAttributedStringBox(
+                        AttributedStringBox{attributedString});
+              }
             }
 
             // apply markdown
-            auto newString = [utils parseMarkdown:nsAttributedString
-                                   withAttributes:defaultNSTextAttributes];
+            auto newString = [usedUtils parseMarkdown:nsAttributedString
+                                       withAttributes:defaultNSTextAttributes];
 
             // create a clone of the old TextInputState and update the
             // attributed string box to point to the string with markdown
@@ -188,10 +214,10 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
             });
           });
     } else if (stateData.attributedStringBox.getMode() ==
-            AttributedStringBox::Mode::OpaquePointer) {
+               AttributedStringBox::Mode::OpaquePointer) {
       rootNode = rootNode->cloneTree(
           nodes.textInput->getFamily(),
-          [&nodes, &textInputState, &stateData,
+          [&nodes, &textInputState, &stateData, &usedUtils,
            fontSizeMultiplier](const ShadowNode &node) {
             const auto &markdownProps = *std::static_pointer_cast<
                 MarkdownTextInputDecoratorViewProps const>(
@@ -208,9 +234,10 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
             // this can possibly be optimized
             RCTMarkdownStyle *markdownStyle = [[RCTMarkdownStyle alloc]
                 initWithStruct:markdownProps.markdownStyle];
-            RCTMarkdownUtils *utils = [[RCTMarkdownUtils alloc] init];
-            [utils setMarkdownStyle:markdownStyle];
-            [utils setParserId:@(markdownProps.parserId)];
+            usedUtils =
+                MarkdownCommitHook::getOrCreateMarkdownUtils(*nodes.decorator);
+            [usedUtils setMarkdownStyle:markdownStyle];
+            [usedUtils setParserId:@(markdownProps.parserId)];
 
             // convert the attibuted string stored in state to
             // NSAttributedString
@@ -219,8 +246,8 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
                     stateData.attributedStringBox);
 
             // apply markdown
-            auto newString = [utils parseMarkdown:nsAttributedString
-                                   withAttributes:defaultNSTextAttributes];
+            auto newString = [usedUtils parseMarkdown:nsAttributedString
+                                       withAttributes:defaultNSTextAttributes];
 
             // create a clone of the old TextInputState and update the
             // attributed string box to point to the string with markdown
@@ -235,6 +262,39 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
                     newStateData, textInputState),
             });
           });
+    }
+
+    // if usedUtils is not nil, then we did some work on the TextInput
+    // ShadowNode, we may need to update the decorator as well
+    if (usedUtils != nil) {
+      const auto ancestors =
+          nodes.decorator->getFamily().getAncestors(*rootNode);
+      const auto parentInfo = ancestors.back();
+      const auto decoratorNode =
+          std::static_pointer_cast<const MarkdownTextInputDecoratorShadowNode>(
+              parentInfo.first.get().getChildren().at(parentInfo.second));
+
+      // if usedUtils is defferent from the one kept in the decorator state, it
+      // needs to be updated to ensure memoization works correctly
+      if (usedUtils != MarkdownCommitHook::getMarkdownUtils(*decoratorNode)) {
+        const auto oldDecoratorState = *std::static_pointer_cast<
+            const ConcreteState<MarkdownTextInputDecoratorState>>(
+            decoratorNode->getState());
+        const auto newDecoratorState =
+            std::make_shared<const MarkdownTextInputDecoratorState>(
+                oldDecoratorState.getData().decoratorFamily,
+                wrapManagedObject(usedUtils));
+        const auto newDecoratorNode = decoratorNode->clone(
+            {.state = std::make_shared<
+                 const ConcreteState<MarkdownTextInputDecoratorState>>(
+                 newDecoratorState, oldDecoratorState)});
+
+        // since we did clone the path to the text input, parent node is mutable
+        // at this point - no need to clone the entire path
+        const auto mutableParent =
+            const_cast<ShadowNode *>(&parentInfo.first.get());
+        mutableParent->replaceChild(*decoratorNode, newDecoratorNode);
+      }
     }
   }
 
