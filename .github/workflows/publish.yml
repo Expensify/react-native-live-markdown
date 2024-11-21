@@ -2,70 +2,70 @@ name: Publish package to npmjs
 
 # This workflow runs when code is pushed to `main` (i.e: when a pull request is merged)
 on:
-   push:
-       branches: [main]
+  push:
+    branches: [main]
 
 # Ensure that only once instance of this workflow executes at a time.
 # If multiple PRs are merged in quick succession, there will only ever be one publish workflow running and one pending.
 concurrency: ${{ github.workflow }}
 
 jobs:
-   version:
-       runs-on: ubuntu-latest
+  version:
+    runs-on: ubuntu-latest
 
-       # OSBotify will update the version on `main`, so this check is important to prevent an infinite loop
-       if: ${{ github.actor != 'OSBotify' }}
+    # OSBotify will update the version on `main`, so this check is important to prevent an infinite loop
+    if: ${{ github.actor != 'OSBotify' }}
 
-       steps:
-           - uses: actions/checkout@v4
-             with:
-               ref: main
-               # The OS_BOTIFY_COMMIT_TOKEN is a personal access token tied to osbotify
-               # This is a workaround to allow pushes to a protected branch
-               token: ${{ secrets.OS_BOTIFY_COMMIT_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          # The OS_BOTIFY_COMMIT_TOKEN is a personal access token tied to osbotify
+          # This is a workaround to allow pushes to a protected branch
+          token: ${{ secrets.OS_BOTIFY_COMMIT_TOKEN }}
 
-           - name: Decrypt & Import OSBotify GPG key
-             run: |
-               cd .github
-               gpg --quiet --batch --yes --decrypt --passphrase="$LARGE_SECRET_PASSPHRASE" --output OSBotify-private-key.asc OSBotify-private-key.asc.gpg
-               gpg --import OSBotify-private-key.asc
-             env:
-               LARGE_SECRET_PASSPHRASE: ${{ secrets.LARGE_SECRET_PASSPHRASE }}
+      - name: Decrypt & Import OSBotify GPG key
+        run: |
+          cd .github
+          gpg --quiet --batch --yes --decrypt --passphrase="$LARGE_SECRET_PASSPHRASE" --output OSBotify-private-key.asc OSBotify-private-key.asc.gpg
+          gpg --import OSBotify-private-key.asc
+        env:
+          LARGE_SECRET_PASSPHRASE: ${{ secrets.LARGE_SECRET_PASSPHRASE }}
 
-           - name: Set up git for OSBotify
-             run: |
-               git config --global user.signingkey AEE1036472A782AB
-               git config --global commit.gpgsign true
-               git config --global user.name OSBotify
-               git config --global user.email infra+osbotify@expensify.com
+      - name: Set up git for OSBotify
+        run: |
+          git config --global user.signingkey AEE1036472A782AB
+          git config --global commit.gpgsign true
+          git config --global user.name OSBotify
+          git config --global user.email infra+osbotify@expensify.com
 
-           - uses: actions/setup-node@v4
-             with:
-               node-version-file: '.nvmrc'
-               registry-url: 'https://registry.npmjs.org'
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          registry-url: 'https://registry.npmjs.org'
 
-           - name: Install yarn packages
-             run: yarn install --immutable
+      - name: Install npm packages
+        run: npm ci
 
-           - name: Update npm version
-             run: yarn version patch
+      - name: Update npm version
+        run: npm version patch
 
-           - name: Set new version in GitHub ENV
-             run: echo "NEW_VERSION=$(jq '.version' package.json)" >> $GITHUB_ENV
+      - name: Set new version in GitHub ENV
+        run: echo "NEW_VERSION=$(jq '.version' package.json)" >> $GITHUB_ENV
 
-           - name: Commit version bump
-             run: git commit -am "Bump version to ${{ env.NEW_VERSION }}"
+      - name: Commit version bump
+        run: git commit -am "Bump version to ${{ env.NEW_VERSION }}"
 
-           - name: Tag version bump
-             run: git tag ${{ env.NEW_VERSION }}
+      - name: Tag version bump
+        run: git tag ${{ env.NEW_VERSION }}
 
-           - name: Push branch and publish tags
-             run: git push --set-upstream origin main && git push --tags
+      - name: Push branch and publish tags
+        run: git push --set-upstream origin main && git push --tags
 
-           - name: Build package
-             run: yarn pack
+      - name: Build package
+        run: npm pack
 
-           - name: Publish to npm
-             run: npm publish --access public
-             env:
-               NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Publish to npm
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -20,9 +20,6 @@ jobs:
   test:
     if: github.repository == 'Expensify/react-native-live-markdown'
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./WebExample
 
     concurrency:
       group: web-e2e-test-${{ github.ref }}
@@ -37,7 +34,7 @@ jobs:
           node-version: 18
 
       - name: Install node_modules
-        run: yarn install --immutable
+        run: npm ci
 
       - name: Install browsers
         run: npx playwright install --with-deps
@@ -46,4 +43,5 @@ jobs:
         run: npx playwright install-deps
 
       - name: Run Playwright tests
-        run: yarn test
+        run: npm run test
+        working-directory: WebExample
