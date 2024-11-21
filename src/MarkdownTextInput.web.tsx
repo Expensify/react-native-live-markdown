@@ -275,7 +275,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
     );
 
     const handleOnSelect = useCallback(
-      (e: React.SyntheticEvent<HTMLDivElement>) => {
+      (e) => {
         updateSelection(e);
 
         // If the input has just been focused, we need to scroll the cursor into view
@@ -576,7 +576,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
     }, []);
 
     const handleCut = useCallback(
-      (e: React.ClipboardEvent<HTMLDivElement>) => {
+      (e) => {
         if (!divRef.current || !contentSelection.current) {
           return;
         }
@@ -589,7 +589,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
     );
 
     const handlePaste = useCallback(
-      (e: React.ClipboardEvent<HTMLDivElement>) => {
+      (e) => {
         if (e.isDefaultPrevented() || !divRef.current || !contentSelection.current) {
           return;
         }
@@ -606,7 +606,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
     }, []);
 
     const endComposition = useCallback(
-      (e: React.CompositionEvent<HTMLDivElement>) => {
+      (e) => {
         compositionRef.current = false;
         handleOnChangeText(e);
       },
@@ -741,7 +741,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
         onCopy={handleCopy}
         onCut={handleCut}
         onPaste={handlePaste}
-        // @ts-expect-error: we use placeholder attr to style it in css even though its not handled internally
+        // we use placeholder prop to style it in CSS even though its not handled internally
         placeholder={heightSafePlaceholder}
         spellCheck={spellCheck}
         dir={dir}

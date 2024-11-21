@@ -6,7 +6,7 @@ We want this community to be friendly and respectful to each other. Please follo
 
 ## Development workflow
 
-This project is a monorepo managed using [NPM workspaces](https://docs.npmjs.com/cli/v10/using-npm/workspaces). It contains the following packages:
+This project is a monorepo managed using [npm workspaces](https://docs.npmjs.com/cli/v10/using-npm/workspaces). It contains the following packages:
 
 - The library package in the root directory.
 - An example app in the `example/` directory.
