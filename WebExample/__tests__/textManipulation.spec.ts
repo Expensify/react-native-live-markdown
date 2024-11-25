@@ -2,7 +2,7 @@ import {test, expect} from '@playwright/test';
 import type {Locator, Page} from '@playwright/test';
 // eslint-disable-next-line import/no-relative-packages
 import * as TEST_CONST from '../../example/src/testConstants';
-import {getCursorPosition, setupInput, getElementStyle, pressCmd, getElementValue} from './utils';
+import {getCursorPosition, setupInput, getElementStyle, pressCmd, getElementValue, setSelection, changeMarkdownStyle} from './utils';
 
 const pasteContent = async ({text, page, inputLocator}: {text: string; page: Page; inputLocator: Locator}) => {
   await page.evaluate(async (pasteText) => navigator.clipboard.writeText(pasteText), text);
@@ -96,6 +96,18 @@ test('select all', async ({page}) => {
   const cursorPosition = await getCursorPosition(inputLocator);
 
   expect(cursorPosition.end).toBe(TEST_CONST.EXAMPLE_CONTENT.length);
+});
+
+test("don't remove selection when changing markdown style", async ({page}) => {
+  const inputLocator = await setupInput(page, 'reset');
+
+  setSelection(page);
+  changeMarkdownStyle(page);
+  inputLocator.focus();
+
+  const cursorPosition = await getCursorPosition(inputLocator);
+
+  expect(cursorPosition.end).toBe(TEST_CONST.SELECTION_END);
 });
 
 test('cut content changes', async ({page, browserName}) => {

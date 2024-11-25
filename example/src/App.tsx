@@ -92,6 +92,7 @@ export default function App() {
         onPress={() => setTextColorState(prev => !prev)}
       />
       <Button
+        testID="toggle-link-color"
         title="Toggle link color"
         onPress={() => setLinkColorState(prev => !prev)}
       />
@@ -113,6 +114,7 @@ export default function App() {
         }}
       />
       <Button
+        testID="change-selection"
         title="Change selection"
         onPress={() => {
           if (!ref.current) {
