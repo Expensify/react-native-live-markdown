@@ -44,7 +44,7 @@ jobs:
           java-version: 17
 
       - name: Install node_modules
-        run: yarn install --immutable
+        run: npm ci
 
       - name: Build app
         working-directory: example/android

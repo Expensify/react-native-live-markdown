@@ -117,7 +117,7 @@ function addTextToElement(node: TreeNode, text: string) {
   });
 }
 
-function addParagraph(node: TreeNode, text: string | null = null, length: number, disableInlineStyles = false) {
+function addParagraph(node: TreeNode, text: string | null, length: number, disableInlineStyles = false) {
   const p = document.createElement('p');
   p.setAttribute('data-type', 'line');
   if (!disableInlineStyles) {
