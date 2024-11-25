@@ -10,5 +10,6 @@ module.exports = async function (env, argv) {
     },
     argv,
   );
+  config.resolve.fallback = {crypto: false};
   return config;
 };

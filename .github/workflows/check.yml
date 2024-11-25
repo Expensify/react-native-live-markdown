@@ -25,19 +25,19 @@ jobs:
           node-version: 18
 
       - name: Install node_modules
-        run: yarn install --immutable
+        run: npm ci
 
       - name: Typecheck library
-        run: yarn tsc --project tsconfig.json --noEmit
+        run: npm run typecheck -- --project tsconfig.json
 
       - name: Typecheck example app
-        run: yarn tsc --project example/tsconfig.json --noEmit
+        run: npm run typecheck -- --project example/tsconfig.json
 
       - name: Typecheck WebExample app
-        run: yarn tsc --project WebExample/tsconfig.json --noEmit
+        run: npm run typecheck -- --project WebExample/tsconfig.json
 
       - name: Lint
-        run: yarn lint
+        run: npm run lint
 
       - name: Test
-        run: yarn test
+        run: npm run test
