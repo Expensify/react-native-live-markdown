@@ -101,9 +101,9 @@ test('select all', async ({page}) => {
 test("don't remove selection when changing markdown style", async ({page}) => {
   const inputLocator = await setupInput(page, 'reset');
 
-  setSelection(page);
-  changeMarkdownStyle(page);
-  inputLocator.focus();
+  await setSelection(page);
+  await changeMarkdownStyle(page);
+  await inputLocator.focus();
 
   const cursorPosition = await getCursorPosition(inputLocator);
 
