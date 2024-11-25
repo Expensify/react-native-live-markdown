@@ -71,7 +71,9 @@ public class MarkdownUtils {
 
   private void splitRangesOnEmojis(List<MarkdownRange> markdownRanges, String type) {
     List<MarkdownRange> emojiRanges = new ArrayList<>();
-    for (MarkdownRange range : markdownRanges) {
+    List<MarkdownRange> oldRanges = new ArrayList<>(markdownRanges);
+    markdownRanges.clear();
+    for (MarkdownRange range : oldRanges) {
       if (range.type.equals("emoji")) {
         emojiRanges.add(range);
       }
@@ -79,24 +81,29 @@ public class MarkdownUtils {
 
     int i = 0;
     int j = 0;
-    while (i < markdownRanges.size() && j < emojiRanges.size()) {
-      MarkdownRange currentRange = markdownRanges.get(i);
-      MarkdownRange emojiRange = emojiRanges.get(j);
-
-      if (!currentRange.type.equals(type) || currentRange.end < emojiRange.start) {
+    while (i < oldRanges.size()) {
+      MarkdownRange currentRange = oldRanges.get(i);
+      if (!currentRange.type.equals(type)) {
+          markdownRanges.add(currentRange);
           i += 1;
           continue;
-      } else if (emojiRange.start >= currentRange.start && emojiRange.end <= currentRange.end) {
-        // Split range
-        MarkdownRange startRange = new MarkdownRange(currentRange.type, currentRange.start, emojiRange.start - currentRange.start, currentRange.depth);
-        MarkdownRange endRange = new MarkdownRange(currentRange.type, emojiRange.end, currentRange.end - emojiRange.end, currentRange.depth);
-
-        markdownRanges.add(i + 1, startRange);
-        markdownRanges.add(i + 2, endRange);
-        markdownRanges.remove(i);
-        i = i + 1;
       }
-      j += 1;
+
+      // Split range
+      while(j < emojiRanges.size()){
+        MarkdownRange emojiRange = emojiRanges.get(j);
+        if(emojiRange.start > currentRange.end) break;
+
+        if (emojiRange.start >= currentRange.start && emojiRange.end <= currentRange.end) {
+          MarkdownRange newRange = new MarkdownRange(currentRange.type, currentRange.start, emojiRange.start - currentRange.start, currentRange.depth);
+          currentRange = new MarkdownRange(currentRange.type, emojiRange.end, currentRange.end - emojiRange.end, currentRange.depth);
+
+          markdownRanges.add(newRange);
+        }
+        j += 1;
+      }
+      markdownRanges.add(currentRange);
+      i += 1;
     }
   }
 
