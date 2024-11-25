@@ -24,6 +24,7 @@ import {getElementHeight, getPlaceholderValue, isEventComposing, normalizeValue,
 import {parseToReactDOMStyle, processMarkdownStyle} from './web/utils/webStyleUtils';
 import {forceRefreshAllImages} from './web/inputElements/inlineImage';
 import type {InlineImagesInputProps} from './commonTypes';
+import {deepEqualMarkdownStyles} from './styleUtils';
 
 require('../parser/react-native-live-markdown-parser.js');
 
@@ -126,6 +127,17 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
     }
 
     const flattenedStyle = useMemo(() => StyleSheet.flatten(style), [style]);
+    const prevMarkdownStyle = useRef<MarkdownStyle>();
+    const memoizedMarkdownStyle = useMemo(() => {
+      if (prevMarkdownStyle.current && deepEqualMarkdownStyles(prevMarkdownStyle.current, markdownStyle ?? {})) {
+        return prevMarkdownStyle.current;
+      }
+      return markdownStyle;
+    }, [markdownStyle]);
+
+    useEffect(() => {
+      prevMarkdownStyle.current = memoizedMarkdownStyle;
+    }, [memoizedMarkdownStyle]);
 
     // Empty placeholder would collapse the div, so we need to use zero-width space to prevent it
     const heightSafePlaceholder = useMemo(() => getPlaceholderValue(placeholder), [placeholder]);
@@ -153,6 +165,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
         shouldAddToHistory = true,
         shouldForceDOMUpdate = false,
         shouldScrollIntoView = false,
+        shouldPreserveSelection = false,
       ): ParseTextResult => {
         if (!divRef.current) {
           return {text: text || '', cursorPosition: null};
@@ -161,10 +174,21 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
         if (text === null) {
           return {text: divRef.current.value, cursorPosition: null};
         }
-        const parsedText = updateInputStructure(target, text, cursorPosition, multiline, customMarkdownStyles, false, shouldForceDOMUpdate, shouldScrollIntoView, {
-          addAuthTokenToImageURLCallback,
-          imagePreviewAuthRequiredURLs,
-        });
+        const parsedText = updateInputStructure(
+          target,
+          text,
+          cursorPosition,
+          multiline,
+          customMarkdownStyles,
+          false,
+          shouldForceDOMUpdate,
+          shouldScrollIntoView,
+          {
+            addAuthTokenToImageURLCallback,
+            imagePreviewAuthRequiredURLs,
+          },
+          shouldPreserveSelection,
+        );
         divRef.current.value = parsedText.text;
 
         if (history.current && shouldAddToHistory) {
@@ -177,12 +201,12 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
     );
 
     const processedMarkdownStyle = useMemo(() => {
-      const newMarkdownStyle = processMarkdownStyle(markdownStyle);
+      const newMarkdownStyle = processMarkdownStyle(memoizedMarkdownStyle);
       if (divRef.current) {
-        parseText(divRef.current, divRef.current.value, newMarkdownStyle, null, false, false);
+        parseText(divRef.current, divRef.current.value, newMarkdownStyle, null, false, false, false, true);
       }
       return newMarkdownStyle;
-    }, [markdownStyle, parseText]);
+    }, [memoizedMarkdownStyle, parseText]);
 
     const inputStyles = useMemo(
       () =>

@@ -19,16 +19,14 @@ export default function App() {
     };
   }, [textColorState, textFontSizeState]);
 
-  const markdownStyle = React.useMemo(() => {
-    return {
-      emoji: {
-        fontSize: emojiFontSizeState ? 15 : 20,
-      },
-      link: {
-        color: linkColorState ? 'red' : 'blue',
-      },
-    };
-  }, [emojiFontSizeState, linkColorState]);
+  const markdownStyle = {
+    emoji: {
+      fontSize: emojiFontSizeState ? 15 : 20,
+    },
+    link: {
+      color: linkColorState ? 'red' : 'blue',
+    },
+  };
 
   const ref = React.useRef<MarkdownTextInput>(null);
 
@@ -94,6 +92,7 @@ export default function App() {
         onPress={() => setTextColorState(prev => !prev)}
       />
       <Button
+        testID="toggle-link-color"
         title="Toggle link color"
         onPress={() => setLinkColorState(prev => !prev)}
       />
@@ -115,6 +114,7 @@ export default function App() {
         }}
       />
       <Button
+        testID="change-selection"
         title="Change selection"
         onPress={() => {
           if (!ref.current) {
