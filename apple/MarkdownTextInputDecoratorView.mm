@@ -8,6 +8,7 @@
 #import <React/RCTBaseTextInputView.h>
 #endif
 
+#import <RNLiveMarkdown/MarkdownBackedTextInputDelegate.h>
 #import <RNLiveMarkdown/MarkdownLayoutManager.h>
 #import <RNLiveMarkdown/MarkdownTextInputDecoratorView.h>
 #import <RNLiveMarkdown/MarkdownTextStorageDelegate.h>
@@ -18,6 +19,7 @@
 @implementation MarkdownTextInputDecoratorView {
   RCTMarkdownUtils *_markdownUtils;
   RCTMarkdownStyle *_markdownStyle;
+  MarkdownBackedTextInputDelegate *_markdownBackedTextInputDelegate;
   MarkdownTextStorageDelegate *_markdownTextStorageDelegate;
   MarkdownTextFieldObserver *_markdownTextFieldObserver;
   __weak RCTUITextView *_textView;
@@ -86,6 +88,9 @@
     _markdownTextStorageDelegate = [[MarkdownTextStorageDelegate alloc] initWithTextView:_textView markdownUtils:_markdownUtils];
     _textView.textStorage.delegate = _markdownTextStorageDelegate;
 
+    // register delegate for fixing cursor position
+    _markdownBackedTextInputDelegate = [[MarkdownBackedTextInputDelegate alloc] initWithTextView:_textView];
+
 #ifdef RCT_NEW_ARCH_ENABLED
     // format initial value
     [_textView.textStorage setAttributedString:_textView.attributedText];
@@ -117,6 +122,7 @@
       [_textView.layoutManager setValue:nil forKey:@"markdownUtils"];
       object_setClass(_textView.layoutManager, [NSLayoutManager class]);
     }
+    _markdownBackedTextInputDelegate = nil;
     _markdownTextStorageDelegate = nil;
     _textView.textStorage.delegate = nil;
     _textView = nil;
