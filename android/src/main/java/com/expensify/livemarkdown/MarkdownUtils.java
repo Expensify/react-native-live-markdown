@@ -1,5 +1,7 @@
 package com.expensify.livemarkdown;
 
+import static com.expensify.livemarkdown.RangeSplitter.splitRangesOnEmojis;
+
 import android.content.res.AssetManager;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -68,38 +70,6 @@ public class MarkdownUtils {
   public void setMarkdownStyle(@NonNull MarkdownStyle markdownStyle) {
     mMarkdownStyle = markdownStyle;
   }
-
-  private void splitRangesOnEmojis(List<MarkdownRange> markdownRanges, String type) {
-    List<MarkdownRange> emojiRanges = new ArrayList<>();
-    for (MarkdownRange range : markdownRanges) {
-      if (range.type.equals("emoji")) {
-        emojiRanges.add(range);
-      }
-    }
-
-    int i = 0;
-    int j = 0;
-    while (i < markdownRanges.size() && j < emojiRanges.size()) {
-      MarkdownRange currentRange = markdownRanges.get(i);
-      MarkdownRange emojiRange = emojiRanges.get(j);
-
-      if (!currentRange.type.equals(type) || currentRange.end < emojiRange.start) {
-          i += 1;
-          continue;
-      } else if (emojiRange.start >= currentRange.start && emojiRange.end <= currentRange.end) {
-        // Split range
-        MarkdownRange startRange = new MarkdownRange(currentRange.type, currentRange.start, emojiRange.start - currentRange.start, currentRange.depth);
-        MarkdownRange endRange = new MarkdownRange(currentRange.type, emojiRange.end, currentRange.end - emojiRange.end, currentRange.depth);
-
-        markdownRanges.add(i + 1, startRange);
-        markdownRanges.add(i + 2, endRange);
-        markdownRanges.remove(i);
-        i = i + 1;
-      }
-      j += 1;
-    }
-  }
-
 
   private List<MarkdownRange> parseRanges(String rangesJSON, String innerText) {
     List<MarkdownRange> markdownRanges = new ArrayList<>();
