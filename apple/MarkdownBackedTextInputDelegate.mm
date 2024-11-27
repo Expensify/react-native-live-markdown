@@ -27,9 +27,15 @@
   // still contain NSParagraphStyle with non-zero firstLineHeadIndent and headIntent.
   // This causes the cursor to be shifted to the right instead of being located at the beginning of the line.
   // The following code removes NSParagraphStyle from typing attributes to fix the position of the cursor.
-  NSMutableDictionary *typingAttributes = [_textView.typingAttributes mutableCopy];
-  [typingAttributes removeObjectForKey:NSParagraphStyleAttributeName];
-  _textView.typingAttributes = typingAttributes;
+  NSParagraphStyle *paragraphStyle = _textView.typingAttributes[NSParagraphStyleAttributeName];
+  if (paragraphStyle != nil && paragraphStyle.firstLineHeadIndent != 0) {
+    NSMutableDictionary *newTypingAttributes = [_textView.typingAttributes mutableCopy];
+    NSMutableParagraphStyle *newParagraphStyle = [paragraphStyle mutableCopy];
+    newParagraphStyle.firstLineHeadIndent = 0;
+    newParagraphStyle.headIndent = 0;
+    newTypingAttributes[NSParagraphStyleAttributeName] = newParagraphStyle;
+    _textView.typingAttributes = newTypingAttributes;
+  }
 
   // Delegate the call to the original text input delegate
   [_originalTextInputDelegate textInputDidChange];
