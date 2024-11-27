@@ -41,23 +41,23 @@
   [_originalTextInputDelegate textInputDidBeginEditing];
 }
 
-- (void)textInputDidChangeSelection { 
+- (void)textInputDidChangeSelection {
   [_originalTextInputDelegate textInputDidChangeSelection];
 }
 
-- (void)textInputDidEndEditing { 
+- (void)textInputDidEndEditing {
   [_originalTextInputDelegate textInputDidEndEditing];
 }
 
-- (void)textInputDidReturn { 
+- (void)textInputDidReturn {
   [_originalTextInputDelegate textInputDidReturn];
 }
 
-- (BOOL)textInputShouldBeginEditing { 
+- (BOOL)textInputShouldBeginEditing {
   return [_originalTextInputDelegate textInputShouldBeginEditing];
 }
 
-- (nonnull NSString *)textInputShouldChangeText:(nonnull NSString *)text inRange:(NSRange)range { 
+- (nonnull NSString *)textInputShouldChangeText:(nonnull NSString *)text inRange:(NSRange)range {
   return [_originalTextInputDelegate textInputShouldChangeText:text inRange:range];
 }
 
