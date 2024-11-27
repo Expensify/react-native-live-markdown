@@ -6,6 +6,7 @@ import {PlatformInfo} from './PlatformInfo';
 
 export default function App() {
   const [value, setValue] = React.useState(TEST_CONST.EXAMPLE_CONTENT);
+  const [multiline, setMultiline] = React.useState(true);
   const [textColorState, setTextColorState] = React.useState(false);
   const [linkColorState, setLinkColorState] = React.useState(false);
   const [textFontSizeState, setTextFontSizeState] = React.useState(false);
@@ -36,7 +37,7 @@ export default function App() {
     <View style={styles.container}>
       <PlatformInfo />
       <MarkdownTextInput
-        multiline
+        multiline={multiline}
         autoCapitalize="none"
         value={value}
         onChangeText={setValue}
@@ -88,6 +89,10 @@ export default function App() {
         onPress={() => {
           setValue('');
         }}
+      />
+      <Button
+        title="Toggle multiline"
+        onPress={() => setMultiline(prev => !prev)}
       />
       <Button
         title="Toggle text color"

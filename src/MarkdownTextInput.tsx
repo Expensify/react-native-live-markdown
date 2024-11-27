@@ -53,6 +53,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
       <MarkdownTextInputDecoratorViewNativeComponent
         style={IS_FABRIC ? styles.farAway : styles.displayNone}
         markdownStyle={markdownStyle}
+        key={String(props.multiline)} // force remount on multiline change
       />
     </>
   );
