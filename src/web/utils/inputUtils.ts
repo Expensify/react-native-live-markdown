@@ -1,5 +1,5 @@
-import type {CSSProperties} from 'react';
-import type {MarkdownTextInputElement} from '../../MarkdownTextInput.web';
+import type { CSSProperties } from 'react';
+import type { HTMLMarkdownElement, MarkdownTextInputElement } from '../../MarkdownTextInput.web';
 
 const ZERO_WIDTH_SPACE = '\u200B';
 
@@ -110,4 +110,4 @@ function parseInnerHTMLToText(target: MarkdownTextInputElement, cursorPosition: 
   return text;
 }
 
-export {isEventComposing, getPlaceholderValue, getElementHeight, parseInnerHTMLToText, normalizeValue};
+export { isEventComposing, getPlaceholderValue, getElementHeight, parseInnerHTMLToText, normalizeValue };
