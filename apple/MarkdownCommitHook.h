@@ -8,6 +8,7 @@
 #include <memory>
 
 #include "MarkdownTextInputDecoratorShadowNode.h"
+#include "RCTMarkdownUtils.h"
 
 using namespace facebook::react;
 
@@ -35,6 +36,10 @@ public:
       RootShadowNode::Unshared const &newRootShadowNode) noexcept override;
 
 private:
+  static RCTMarkdownUtils *
+  getMarkdownUtils(const MarkdownTextInputDecoratorShadowNode &decorator);
+  static RCTMarkdownUtils *getOrCreateMarkdownUtils(
+      const MarkdownTextInputDecoratorShadowNode &decorator);
   const std::shared_ptr<UIManager> uiManager_;
 };
 

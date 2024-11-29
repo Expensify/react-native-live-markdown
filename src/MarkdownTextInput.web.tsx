@@ -38,8 +38,10 @@ interface MarkdownTextInputProps extends TextInputProps, InlineImagesInputProps 
 }
 
 interface MarkdownNativeEvent extends Event {
-  inputType: string;
+  inputType?: string;
 }
+
+type MarkdownTextInput = TextInput & React.Component<MarkdownTextInputProps>;
 
 type Selection = {
   start: number;
@@ -63,13 +65,14 @@ type MarkdownTextInputElement = HTMLDivElement &
     tree: TreeNode;
     uniqueId: string;
     selection: Selection;
+    imageElements: HTMLImageElement[];
   };
 
 type HTMLMarkdownElement = HTMLElement & {
   value: string;
 };
 
-const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
+const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputProps>(
   (
     {
       accessibilityLabel,
@@ -274,7 +277,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     );
 
     const handleOnSelect = useCallback(
-      (e) => {
+      (e: React.SyntheticEvent<HTMLDivElement>) => {
         updateSelection(e);
 
         // If the input has just been focused, we need to scroll the cursor into view
@@ -315,7 +318,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         updateTextColor(divRef.current, e.target.textContent ?? '');
         const previousText = divRef.current.value;
         let parsedText = normalizeValue(
-          inputType === 'pasteText' ? pasteContent.current || '' : parseInnerHTMLToText(e.target as MarkdownTextInputElement, inputType, contentSelection.current.start),
+          inputType === 'pasteText' ? pasteContent.current || '' : parseInnerHTMLToText(e.target as MarkdownTextInputElement, contentSelection.current.start, inputType),
         );
 
         if (pasteContent.current) {
@@ -575,7 +578,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     }, []);
 
     const handleCut = useCallback(
-      (e) => {
+      (e: React.ClipboardEvent<HTMLDivElement>) => {
         if (!divRef.current || !contentSelection.current) {
           return;
         }
@@ -588,7 +591,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     );
 
     const handlePaste = useCallback(
-      (e) => {
+      (e: React.ClipboardEvent<HTMLDivElement>) => {
         if (e.isDefaultPrevented() || !divRef.current || !contentSelection.current) {
           return;
         }
@@ -605,7 +608,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
     }, []);
 
     const endComposition = useCallback(
-      (e) => {
+      (e: React.CompositionEvent<HTMLDivElement>) => {
         compositionRef.current = false;
         handleOnChangeText(e);
       },
@@ -745,6 +748,7 @@ const MarkdownTextInput = React.forwardRef<TextInput, MarkdownTextInputProps>(
         onCopy={handleCopy}
         onCut={handleCut}
         onPaste={handlePaste}
+        // @ts-expect-error: we use placeholder prop to style it in CSS even though its not handled internally
         placeholder={heightSafePlaceholder}
         spellCheck={spellCheck}
         dir={dir}

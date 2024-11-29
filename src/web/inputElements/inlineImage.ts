@@ -75,10 +75,16 @@ function handleOnLoad(
       justifyContent: 'center',
     }),
   });
-
   Object.assign(img.style, !err && imgStyle);
 
   targetElement.appendChild(imageContainer);
+
+  const currentInputElement = currentInput;
+  if (currentInput.imageElements) {
+    currentInputElement.imageElements.push(img);
+  } else {
+    currentInputElement.imageElements = [img];
+  }
 
   const imageClientHeight = Math.max(img.clientHeight, imageContainer.clientHeight);
   Object.assign(imageContainer.style, {
@@ -164,7 +170,7 @@ function addInlineImagePreview(
 
   // If the inline image markdown with the same href exists in the current input, use it instead of creating new one.
   // Prevents from image flickering and layout jumps
-  const alreadyLoadedPreview = currentInput.querySelector(`img[src="${imageHref}"]`);
+  const alreadyLoadedPreview = currentInput.imageElements?.find((el) => el?.src === imageHref);
   const loadedImageContainer = alreadyLoadedPreview?.parentElement;
 
   if (loadedImageContainer && loadedImageContainer.getAttribute('data-type') === 'inline-container') {

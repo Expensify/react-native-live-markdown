@@ -43,11 +43,11 @@ jobs:
           path: |
             node_modules
             example/node_modules
-          key: build-ios-node-modules-${{ matrix.react-native-architecture }}-${{ hashFiles('yarn.lock') }}
+          key: build-ios-node-modules-${{ matrix.react-native-architecture }}-${{ hashFiles('package-lock.json') }}
           restore-keys: build-ios-node-modules-${{ matrix.react-native-architecture }}-
 
       - name: Install node_modules
-        run: yarn install --immutable
+        run: npm ci
 
       - name: Restore Pods from cache
         uses: actions/cache@v4
@@ -56,7 +56,7 @@ jobs:
             example/ios/Pods
             ~/Library/Caches/CocoaPods
             ~/.cocoapods
-          key: build-ios-pods-${{ matrix.react-native-architecture }}-${{ hashFiles('example/node_modules/react-native/package.json') }}
+          key: build-ios-pods-${{ matrix.react-native-architecture }}-${{ hashFiles('node_modules/react-native/package.json') }}
           restore-keys: build-ios-pods-${{ matrix.react-native-architecture }}-
 
       - name: Install Pods
@@ -75,9 +75,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/Library/Developer/Xcode/DerivedData
-          key: build-ios-derived-data-${{ matrix.react-native-architecture }}-${{ hashFiles('example/node_modules/react-native/package.json') }}
+          key: build-ios-derived-data-${{ matrix.react-native-architecture }}-${{ hashFiles('node_modules/react-native/package.json') }}
           restore-keys: build-ios-derived-data-${{ matrix.react-native-architecture }}-
 
       - name: Build app
         working-directory: example
-        run: npx react-native@latest run-ios --no-packager
+        run: npx react-native run-ios --no-packager
