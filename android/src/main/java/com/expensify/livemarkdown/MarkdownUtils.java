@@ -58,7 +58,11 @@ public class MarkdownUtils {
     if (input.equals(mPrevInput) && mParserId == mPrevParserId) {
       output = mPrevOutput;
     } else {
-      output = nativeParseMarkdown(input, mParserId);
+      try {
+        output = nativeParseMarkdown(input, mParserId);
+      } catch (Exception e) {
+        output = "[]";
+      }
       mPrevInput = input;
       mPrevOutput = output;
       mPrevParserId = mParserId;

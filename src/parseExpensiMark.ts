@@ -258,25 +258,20 @@ function parseExpensiMark(markdown: string): MarkdownRange[] {
   if (markdown.length > MAX_PARSABLE_LENGTH) {
     return [];
   }
-  try {
-    const html = parseMarkdownToHTML(markdown);
-    const tokens = parseHTMLToTokens(html);
-    const tree = parseTokensToTree(tokens);
-    const [text, ranges] = parseTreeToTextAndRanges(tree);
-    if (text !== markdown) {
-      throw new Error(
-        `[react-native-live-markdown] Parsing error: the processed text does not match the original Markdown input. This may be caused by incorrect parsing functions or invalid input Markdown.\nProcessed input: '${JSON.stringify(
-          text,
-        )}'\nOriginal input: '${JSON.stringify(markdown)}'`,
-      );
-    }
-    const sortedRanges = sortRanges(ranges);
-    const groupedRanges = groupRanges(sortedRanges);
-    return groupedRanges;
-  } catch (error) {
-    // returning an empty array in case of error
-    return [];
+  const html = parseMarkdownToHTML(markdown);
+  const tokens = parseHTMLToTokens(html);
+  const tree = parseTokensToTree(tokens);
+  const [text, ranges] = parseTreeToTextAndRanges(tree);
+  if (text !== markdown) {
+    throw new Error(
+      `[react-native-live-markdown] Parsing error: the processed text does not match the original Markdown input. This may be caused by incorrect parsing functions or invalid input Markdown.\nProcessed input: '${JSON.stringify(
+        text,
+      )}'\nOriginal input: '${JSON.stringify(markdown)}'`,
+    );
   }
+  const sortedRanges = sortRanges(ranges);
+  const groupedRanges = groupRanges(sortedRanges);
+  return groupedRanges;
 }
 
 export default parseExpensiMark;
