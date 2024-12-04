@@ -47,7 +47,7 @@
     id<RCTBackedTextInputViewProtocol> backedTextInputView = self.backedTextInputView;
     NSAttributedString *oldAttributedText = backedTextInputView.attributedText;
     NSAttributedString *newAttributedText = [markdownUtils parseMarkdown:oldAttributedText withAttributes:backedTextInputView.defaultTextAttributes];
-    UITextRange *range = backedTextInputView.selectedTextRange;
+    NSRange range = backedTextInputView.selectedTextRange;
 
     // update attributed text without emitting onSelectionChange event
     id<RCTBackedTextInputDelegate> delegate = backedTextInputView.textInputDelegate;
@@ -84,7 +84,7 @@
       SEL swizzledSelector = @selector(markdown_updateLocalData);
       Method originalMethod = class_getInstanceMethod(cls, originalSelector);
       Method swizzledMethod = class_getInstanceMethod(cls, swizzledSelector);
-      method_exchangeImplementations(originalMethod, swizzledMethod);
+      // method_exchangeImplementations(originalMethod, swizzledMethod);
     }
 
     {

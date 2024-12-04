@@ -1,4 +1,3 @@
-#import <UIKit/UIKit.h>
 #import <React/RCTUITextView.h>
 #import <RNLiveMarkdown/RCTMarkdownUtils.h>
 
