@@ -158,6 +158,7 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
             usedUtils =
                 MarkdownCommitHook::getOrCreateMarkdownUtils(*nodes.decorator);
             [usedUtils setMarkdownStyle:markdownStyle];
+            [usedUtils setParserId:@(markdownProps.parserId)];
 
             // convert the attibuted string stored in state to
             // NSAttributedString
@@ -236,6 +237,7 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
             usedUtils =
                 MarkdownCommitHook::getOrCreateMarkdownUtils(*nodes.decorator);
             [usedUtils setMarkdownStyle:markdownStyle];
+            [usedUtils setParserId:@(markdownProps.parserId)];
 
             // convert the attibuted string stored in state to
             // NSAttributedString

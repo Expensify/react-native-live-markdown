@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 
+import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.views.textinput.ReactEditText;
 
 public class MarkdownTextInputDecoratorView extends View {
@@ -28,6 +29,8 @@ public class MarkdownTextInputDecoratorView extends View {
   }
 
   private MarkdownStyle mMarkdownStyle;
+
+  private int mParserId;
 
   private MarkdownUtils mMarkdownUtils;
 
@@ -52,10 +55,9 @@ public class MarkdownTextInputDecoratorView extends View {
     }
 
     if (previousSibling instanceof ReactEditText) {
-      AssetManager assetManager = getContext().getAssets();
-      MarkdownUtils.maybeInitializeRuntime(assetManager);
-      mMarkdownUtils = new MarkdownUtils(assetManager);
+      mMarkdownUtils = new MarkdownUtils((ReactContext) getContext());
       mMarkdownUtils.setMarkdownStyle(mMarkdownStyle);
+      mMarkdownUtils.setParserId(mParserId);
       mReactEditText = (ReactEditText) previousSibling;
       mTextWatcher = new MarkdownTextWatcher(mMarkdownUtils);
       mReactEditText.addTextChangedListener(mTextWatcher);
@@ -78,6 +80,18 @@ public class MarkdownTextInputDecoratorView extends View {
     if (mMarkdownUtils != null) {
       mMarkdownUtils.setMarkdownStyle(mMarkdownStyle);
     }
+    applyNewStyles();
+  }
+
+  protected void setParserId(int parserId) {
+    mParserId = parserId;
+    if (mMarkdownUtils != null) {
+      mMarkdownUtils.setParserId(mParserId);
+    }
+    applyNewStyles();
+  }
+
+  protected void applyNewStyles() {
     if (mReactEditText != null) {
       int selectionStart = mReactEditText.getSelectionStart();
       int selectionEnd = mReactEditText.getSelectionEnd();
