@@ -16,9 +16,7 @@ import {PlatformInfo} from './PlatformInfo';
 console.log(Animated);
 
 export default function App() {
-  const [value, setValue] = React.useState(
-    ['# Hello world', '# Hello world', '# Hello world'].join('\n'),
-  );
+  const [value, setValue] = React.useState(TEST_CONST.EXAMPLE_CONTENT);
   const [textColorState, setTextColorState] = React.useState(false);
   const [linkColorState, setLinkColorState] = React.useState(false);
   const [textFontSizeState, setTextFontSizeState] = React.useState(false);
