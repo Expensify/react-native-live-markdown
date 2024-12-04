@@ -16,6 +16,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 
 public class MarkdownUtils {
@@ -68,6 +70,7 @@ public class MarkdownUtils {
       mPrevParserId = mParserId;
     }
 
+    List<MarkdownRange> markdownRanges = new LinkedList<>();
     try {
       JSONArray ranges = new JSONArray(output);
       for (int i = 0; i < ranges.length(); i++) {
@@ -80,14 +83,21 @@ public class MarkdownUtils {
         if (length == 0 || end > input.length()) {
           continue;
         }
-        applyRange(ssb, type, start, end, depth);
+        markdownRanges.add(new MarkdownRange(type, start, length, depth));
       }
     } catch (JSONException e) {
       RNLog.w(mReactContext, "[react-native-live-markdown] Incorrect schema of worklet parser output: " + e.getMessage());
     }
+
+    for (MarkdownRange markdownRange : markdownRanges) {
+      applyRange(ssb, markdownRange);
+    }
   }
 
-  private void applyRange(SpannableStringBuilder ssb, String type, int start, int end, int depth) {
+  private void applyRange(SpannableStringBuilder ssb, MarkdownRange markdownRange) {
+    String type = markdownRange.getType();
+    int start = markdownRange.getStart();
+    int end = start + markdownRange.getLength();
     switch (type) {
       case "bold":
         setSpan(ssb, new MarkdownBoldSpan(), start, end);
@@ -149,7 +159,7 @@ public class MarkdownUtils {
           mMarkdownStyle.getBlockquoteBorderWidth(),
           mMarkdownStyle.getBlockquoteMarginLeft(),
           mMarkdownStyle.getBlockquotePaddingLeft(),
-          depth);
+          markdownRange.getDepth());
         setSpan(ssb, span, start, end);
         break;
     }
