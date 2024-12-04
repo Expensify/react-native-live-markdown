@@ -16,7 +16,6 @@ import type {CSSProperties, MutableRefObject, ReactEventHandler, FocusEventHandl
 import {StyleSheet} from 'react-native';
 import {updateInputStructure} from './web/utils/parserUtils';
 import InputHistory from './web/InputHistory';
-import type {MarkdownRange, InlineImagesInputProps} from './commonTypes';
 import type {TreeNode} from './web/utils/treeUtils';
 import {getCurrentCursorPosition, removeSelection, setCursorPosition} from './web/utils/cursorUtils';
 import './web/MarkdownTextInput.css';
@@ -24,6 +23,7 @@ import type {MarkdownStyle} from './MarkdownTextInputDecoratorViewNativeComponen
 import {getElementHeight, getPlaceholderValue, isEventComposing, normalizeValue, parseInnerHTMLToText} from './web/utils/inputUtils';
 import {parseToReactDOMStyle, processMarkdownStyle} from './web/utils/webStyleUtils';
 import {forceRefreshAllImages} from './web/inputElements/inlineImage';
+import type {MarkdownRange, InlineImagesInputProps} from './commonTypes';
 
 const useClientEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
 
