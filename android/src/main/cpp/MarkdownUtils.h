@@ -21,19 +21,14 @@ namespace livemarkdown {
     static constexpr auto kJavaDescriptor =
         "Lcom/expensify/livemarkdown/MarkdownUtils;";
 
-    static void nativeInitializeRuntime(
-        jni::alias_ref<jhybridobject> jThis,
-        jni::alias_ref<jni::JString> code);
-
     static jni::local_ref<jni::JString> nativeParseMarkdown(
         jni::alias_ref<jhybridobject> jThis,
-        jni::alias_ref<jni::JString> input);
+        jni::alias_ref<jni::JString> input,
+        int parserId);
 
     static void registerNatives();
 
   private:
-    static std::shared_ptr<jsi::Runtime> runtime_;
-
     friend HybridBase;
   };
 

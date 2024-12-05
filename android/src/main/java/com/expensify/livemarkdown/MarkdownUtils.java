@@ -7,6 +7,8 @@ import android.text.Spanned;
 import androidx.annotation.NonNull;
 
 import com.expensify.livemarkdown.spans.*;
+import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.util.RNLog;
 import com.facebook.react.views.text.internal.span.CustomLineHeightSpan;
 import com.facebook.soloader.SoLoader;
 
@@ -14,8 +16,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 
 public class MarkdownUtils {
@@ -23,47 +25,29 @@ public class MarkdownUtils {
     SoLoader.loadLibrary("livemarkdown");
   }
 
-  private static boolean IS_RUNTIME_INITIALIZED = false;
+  private static synchronized native String nativeParseMarkdown(String input, int parserId);
 
-  public static synchronized void maybeInitializeRuntime(AssetManager assetManager) {
-    if (IS_RUNTIME_INITIALIZED) {
-      return;
-    }
-    try {
-      InputStream inputStream = assetManager.open("react-native-live-markdown-parser.js");
-      byte[] buffer = new byte[inputStream.available()];
-      inputStream.read(buffer);
-      inputStream.close();
-      String code = new String(buffer);
-      nativeInitializeRuntime(code);
-      IS_RUNTIME_INITIALIZED = true;
-    } catch (IOException e) {
-      throw new RuntimeException("Failed to initialize Markdown runtime");
-    }
+  public MarkdownUtils(@NonNull ReactContext reactContext) {
+    mReactContext = reactContext;
+    mAssetManager = reactContext.getAssets();
   }
 
-  private static native void nativeInitializeRuntime(String code);
-
-  private synchronized static String parseMarkdown(String input) {
-    return nativeParseMarkdown(input);
-  }
-
-  private static native String nativeParseMarkdown(String input);
-
-  public MarkdownUtils(@NonNull AssetManager assetManager) {
-    mAssetManager = assetManager;
-  }
-
+  private final @NonNull ReactContext mReactContext;
   private final @NonNull AssetManager mAssetManager;
 
   private String mPrevInput;
-
   private String mPrevOutput;
+  private int mPrevParserId;
 
   private MarkdownStyle mMarkdownStyle;
+  private int mParserId;
 
   public void setMarkdownStyle(@NonNull MarkdownStyle markdownStyle) {
     mMarkdownStyle = markdownStyle;
+  }
+
+  public void setParserId(int parserId) {
+    mParserId = parserId;
   }
 
   public void applyMarkdownFormatting(SpannableStringBuilder ssb) {
@@ -73,14 +57,20 @@ public class MarkdownUtils {
 
     String input = ssb.toString();
     String output;
-    if (input.equals(mPrevInput)) {
+    if (input.equals(mPrevInput) && mParserId == mPrevParserId) {
       output = mPrevOutput;
     } else {
-      output = parseMarkdown(input);
+      try {
+        output = nativeParseMarkdown(input, mParserId);
+      } catch (Exception e) {
+        output = "[]";
+      }
       mPrevInput = input;
       mPrevOutput = output;
+      mPrevParserId = mParserId;
     }
 
+    List<MarkdownRange> markdownRanges = new LinkedList<>();
     try {
       JSONArray ranges = new JSONArray(output);
       for (int i = 0; i < ranges.length(); i++) {
@@ -93,14 +83,21 @@ public class MarkdownUtils {
         if (length == 0 || end > input.length()) {
           continue;
         }
-        applyRange(ssb, type, start, end, depth);
+        markdownRanges.add(new MarkdownRange(type, start, length, depth));
       }
     } catch (JSONException e) {
-      // Do nothing
+      RNLog.w(mReactContext, "[react-native-live-markdown] Incorrect schema of worklet parser output: " + e.getMessage());
+    }
+
+    for (MarkdownRange markdownRange : markdownRanges) {
+      applyRange(ssb, markdownRange);
     }
   }
 
-  private void applyRange(SpannableStringBuilder ssb, String type, int start, int end, int depth) {
+  private void applyRange(SpannableStringBuilder ssb, MarkdownRange markdownRange) {
+    String type = markdownRange.getType();
+    int start = markdownRange.getStart();
+    int end = start + markdownRange.getLength();
     switch (type) {
       case "bold":
         setSpan(ssb, new MarkdownBoldSpan(), start, end);
@@ -162,7 +159,7 @@ public class MarkdownUtils {
           mMarkdownStyle.getBlockquoteBorderWidth(),
           mMarkdownStyle.getBlockquoteMarginLeft(),
           mMarkdownStyle.getBlockquotePaddingLeft(),
-          depth);
+          markdownRange.getDepth());
         setSpan(ssb, span, start, end);
         break;
     }
