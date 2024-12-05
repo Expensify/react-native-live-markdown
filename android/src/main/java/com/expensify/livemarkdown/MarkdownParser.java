@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.util.RNLog;
+import com.facebook.soloader.SoLoader;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -14,6 +15,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class MarkdownParser {
+  static {
+    SoLoader.loadLibrary("livemarkdown");
+  }
+
   private final @NonNull ReactContext mReactContext;
   private String mPrevText;
   private int mPrevParserId;
