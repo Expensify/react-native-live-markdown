@@ -9,16 +9,11 @@ import androidx.annotation.NonNull;
 import com.expensify.livemarkdown.spans.*;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.views.text.internal.span.CustomLineHeightSpan;
-import com.facebook.soloader.SoLoader;
 
 import java.util.List;
 import java.util.Objects;
 
 public class MarkdownUtils {
-  static {
-    SoLoader.loadLibrary("livemarkdown");
-  }
-
   public MarkdownUtils(@NonNull ReactContext reactContext) {
     mAssetManager = reactContext.getAssets();
     mMarkdownParser = new MarkdownParser(reactContext);
