@@ -1,4 +1,5 @@
 import type {Locator, Page} from '@playwright/test';
+// eslint-disable-next-line import/no-relative-packages
 import * as TEST_CONST from '../../example/src/testConstants';
 
 const setupInput = async (page: Page, action?: 'clear' | 'reset') => {

@@ -7,6 +7,8 @@ import android.text.Spanned;
 import androidx.annotation.NonNull;
 
 import com.expensify.livemarkdown.spans.*;
+import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.util.RNLog;
 import com.facebook.react.views.text.internal.span.CustomLineHeightSpan;
 import com.facebook.soloader.SoLoader;
 
@@ -17,53 +19,31 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-import java.util.TreeMap;
 
 public class MarkdownUtils {
   static {
     SoLoader.loadLibrary("livemarkdown");
   }
 
-  private static boolean IS_RUNTIME_INITIALIZED = false;
+  private static synchronized native String nativeParseMarkdown(String input, int parserId);
 
-  public static synchronized void maybeInitializeRuntime(AssetManager assetManager) {
-    if (IS_RUNTIME_INITIALIZED) {
-      return;
-    }
-    try {
-      InputStream inputStream = assetManager.open("react-native-live-markdown-parser.js");
-      byte[] buffer = new byte[inputStream.available()];
-      inputStream.read(buffer);
-      inputStream.close();
-      String code = new String(buffer);
-      nativeInitializeRuntime(code);
-      IS_RUNTIME_INITIALIZED = true;
-    } catch (IOException e) {
-      throw new RuntimeException("Failed to initialize Markdown runtime");
-    }
+  public MarkdownUtils(@NonNull ReactContext reactContext) {
+    mReactContext = reactContext;
+    mAssetManager = reactContext.getAssets();
   }
 
-  private static native void nativeInitializeRuntime(String code);
-
-  private synchronized static String parseMarkdown(String input) {
-    return nativeParseMarkdown(input);
-  }
-
-  private static native String nativeParseMarkdown(String input);
-
-  public MarkdownUtils(@NonNull AssetManager assetManager) {
-    mAssetManager = assetManager;
-  }
-
+  private final @NonNull ReactContext mReactContext;
   private final @NonNull AssetManager mAssetManager;
 
   private String mPrevInput;
-
   private String mPrevOutput;
+  private int mPrevParserId;
 
   private MarkdownStyle mMarkdownStyle;
+  private int mParserId;
 
   public void setMarkdownStyle(@NonNull MarkdownStyle markdownStyle) {
     mMarkdownStyle = markdownStyle;
@@ -72,7 +52,7 @@ public class MarkdownUtils {
   private void splitRangesOnEmojis(List<MarkdownRange> markdownRanges, String type) {
     List<MarkdownRange> emojiRanges = new ArrayList<>();
     for (MarkdownRange range : markdownRanges) {
-      if (range.type.equals("emoji")) {
+      if (range.getType().equals("emoji")) {
         emojiRanges.add(range);
       }
     }
@@ -83,13 +63,13 @@ public class MarkdownUtils {
       MarkdownRange currentRange = markdownRanges.get(i);
       MarkdownRange emojiRange = emojiRanges.get(j);
 
-      if (!currentRange.type.equals(type) || currentRange.end < emojiRange.start) {
+      if (!currentRange.getType().equals(type) || currentRange.getEnd() < emojiRange.getStart()) {
           i += 1;
           continue;
-      } else if (emojiRange.start >= currentRange.start && emojiRange.end <= currentRange.end) {
+      } else if (emojiRange.getStart() >= currentRange.getStart() && emojiRange.getEnd() <= currentRange.getEnd()) {
         // Split range
-        MarkdownRange startRange = new MarkdownRange(currentRange.type, currentRange.start, emojiRange.start - currentRange.start, currentRange.depth);
-        MarkdownRange endRange = new MarkdownRange(currentRange.type, emojiRange.end, currentRange.end - emojiRange.end, currentRange.depth);
+        MarkdownRange startRange = new MarkdownRange(currentRange.getType(), currentRange.getStart(), emojiRange.getStart() - currentRange.getStart(), currentRange.getDepth());
+        MarkdownRange endRange = new MarkdownRange(currentRange.getType(), emojiRange.getEnd(), currentRange.getEnd() - emojiRange.getEnd(), currentRange.getDepth());
 
         markdownRanges.add(i + 1, startRange);
         markdownRanges.add(i + 2, endRange);
@@ -113,7 +93,7 @@ public class MarkdownUtils {
         int depth = range.optInt("depth", 1);
 
         MarkdownRange markdownRange = new MarkdownRange(type, start, length, depth);
-        if (markdownRange.length == 0 || markdownRange.end > innerText.length()) {
+        if (markdownRange.getLength() == 0 || markdownRange.getEnd() > innerText.length()) {
           continue;
         }
         markdownRanges.add(markdownRange);
@@ -128,6 +108,10 @@ public class MarkdownUtils {
 
 
 
+  public void setParserId(int parserId) {
+    mParserId = parserId;
+  }
+
   public void applyMarkdownFormatting(SpannableStringBuilder ssb) {
     Objects.requireNonNull(mMarkdownStyle, "mMarkdownStyle is null");
 
@@ -135,21 +119,29 @@ public class MarkdownUtils {
 
     String input = ssb.toString();
     String output;
-    if (input.equals(mPrevInput)) {
+    if (input.equals(mPrevInput) && mParserId == mPrevParserId) {
       output = mPrevOutput;
     } else {
-      output = parseMarkdown(input);
+      try {
+        output = nativeParseMarkdown(input, mParserId);
+      } catch (Exception e) {
+        output = "[]";
+      }
       mPrevInput = input;
       mPrevOutput = output;
+      mPrevParserId = mParserId;
     }
 
-    List<MarkdownRange> ranges = parseRanges(output, input);
-    for (MarkdownRange range : ranges) {
-      applyRange(ssb, range.type, range.start, range.end, range.depth);
+    List<MarkdownRange> markdownRanges = parseRanges(output, input);
+    for (MarkdownRange markdownRange : markdownRanges) {
+      applyRange(ssb, markdownRange);
     }
   }
 
-  private void applyRange(SpannableStringBuilder ssb, String type, int start, int end, int depth) {
+  private void applyRange(SpannableStringBuilder ssb, MarkdownRange markdownRange) {
+    String type = markdownRange.getType();
+    int start = markdownRange.getStart();
+    int end = start + markdownRange.getLength();
     switch (type) {
       case "bold":
         setSpan(ssb, new MarkdownBoldSpan(), start, end);
@@ -211,7 +203,7 @@ public class MarkdownUtils {
           mMarkdownStyle.getBlockquoteBorderWidth(),
           mMarkdownStyle.getBlockquoteMarginLeft(),
           mMarkdownStyle.getBlockquotePaddingLeft(),
-          depth);
+          markdownRange.getDepth());
         setSpan(ssb, span, start, end);
         break;
     }

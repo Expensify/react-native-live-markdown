@@ -1,18 +1,17 @@
 #import <RNLiveMarkdown/RCTMarkdownUtils.h>
+#import <RNLiveMarkdown/MarkdownGlobal.h>
+#import <RNLiveMarkdown/MarkdownRange.h>
 #import "react_native_assert.h"
 #import <React/RCTAssert.h>
 #import <React/RCTFont.h>
-
 #include <jsi/jsi.h>
-#include <hermes/hermes.h>
-
-using namespace facebook;
 
 @implementation RCTMarkdownUtils {
   NSString *_prevInputString;
   NSAttributedString *_prevAttributedString;
   NSDictionary<NSAttributedStringKey, id> *_prevTextAttributes;
   __weak RCTMarkdownStyle *_prevMarkdownStyle;
+  __weak NSNumber *_prevParserId;
 }
 
 - (NSAttributedString *)parseMarkdown:(nullable NSAttributedString *)input withAttributes:(nullable NSDictionary<NSAttributedStringKey,id> *)attributes
@@ -23,34 +22,47 @@ using namespace facebook;
         }
 
         NSString *inputString = [input string];
-        if ([inputString isEqualToString:_prevInputString] && [attributes isEqualToDictionary:_prevTextAttributes] && [_markdownStyle isEqual:_prevMarkdownStyle]) {
+        if ([inputString isEqualToString:_prevInputString] && [attributes isEqualToDictionary:_prevTextAttributes] && [_markdownStyle isEqual:_prevMarkdownStyle] && [_parserId isEqualToNumber:_prevParserId]) {
             return _prevAttributedString;
         }
 
-        static std::shared_ptr<jsi::Runtime> runtime;
         static std::mutex runtimeMutex;
         auto lock = std::lock_guard<std::mutex>(runtimeMutex);
 
-        if (runtime == nullptr) {
-            NSString *path = [[NSBundle mainBundle] pathForResource:@"react-native-live-markdown-parser" ofType:@"js"];
-            assert(path != nil && "[react-native-live-markdown] Markdown parser bundle not found");
-            NSString *content = [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:NULL];
-            assert(content != nil && "[react-native-live-markdown] Markdown parser bundle is empty");
-            runtime = facebook::hermes::makeHermesRuntime();
-            auto codeBuffer = std::make_shared<const jsi::StringBuffer>([content UTF8String]);
-            runtime->evaluateJavaScript(codeBuffer, "evaluateJavaScript");
+        auto markdownRuntime = expensify::livemarkdown::getMarkdownRuntime();
+        jsi::Runtime &rt = markdownRuntime->getJSIRuntime();
+
+        auto markdownWorklet = expensify::livemarkdown::getMarkdownWorklet([_parserId intValue]);
+        
+        NSMutableArray *markdownRanges = [[NSMutableArray alloc] init];
+
+        try {
+            const auto &text = jsi::String::createFromUtf8(rt, [inputString UTF8String]);
+            const auto &output = markdownRuntime->runGuarded(markdownWorklet, text);
+            const auto &ranges = output.asObject(rt).asArray(rt);
+
+            for (size_t i = 0, n = ranges.size(rt); i < n; ++i) {
+                const auto &item = ranges.getValueAtIndex(rt, i).asObject(rt);
+                const auto &type = item.getProperty(rt, "type").asString(rt).utf8(rt);
+                const auto &start = static_cast<int>(item.getProperty(rt, "start").asNumber());
+                const auto &length = static_cast<int>(item.getProperty(rt, "length").asNumber());
+                const auto &depth = item.hasProperty(rt, "depth") ? static_cast<int>(item.getProperty(rt, "depth").asNumber()) : 1;
+
+                NSRange range = NSMakeRange(start, length);
+                MarkdownRange *markdownRange = [[MarkdownRange alloc] initWithType:@(type.c_str()) range:range depth:depth];
+                [markdownRanges addObject:markdownRange];
+            }
+        } catch (const jsi::JSError &error) {
+            RCTLogWarn(@"[react-native-live-markdown] Incorrect schema of worklet parser output: %s", error.getMessage().c_str());
+            NSAttributedString *attributedString = [[NSAttributedString alloc] initWithString:inputString attributes:attributes];
+            _prevInputString = inputString;
+            _prevAttributedString = attributedString;
+            _prevTextAttributes = attributes;
+            _prevMarkdownStyle = _markdownStyle;
+            _prevParserId = _parserId;
+            return attributedString;
         }
-
-        jsi::Runtime &rt = *runtime;
-        auto text = jsi::String::createFromUtf8(rt, [inputString UTF8String]);
-
-        auto func = rt.global().getPropertyAsFunction(rt, "parseExpensiMarkToRanges");
-        auto output = func.call(rt, text);
-        if (output.isUndefined()) {
-          return input;
-        }
-        const auto &ranges = output.asObject(rt).asArray(rt);
-
+    
         NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:inputString attributes:attributes];
         [attributedString beginEditing];
 
@@ -61,14 +73,11 @@ using namespace facebook;
 
         _blockquoteRangesAndLevels = [NSMutableArray new];
 
-        for (size_t i = 0, n = ranges.size(rt); i < n; ++i) {
-            const auto &item = ranges.getValueAtIndex(rt, i).asObject(rt);
-            const auto &type = item.getProperty(rt, "type").asString(rt).utf8(rt);
-            const auto &start = static_cast<int>(item.getProperty(rt, "start").asNumber());
-            const auto &length = static_cast<int>(item.getProperty(rt, "length").asNumber());
-            const auto &depth = item.hasProperty(rt, "depth") ? static_cast<int>(item.getProperty(rt, "depth").asNumber()) : 1;
-
-            [self applyRangeToAttributedString:attributedString type:type start:start length:length depth:depth];
+        for (MarkdownRange *markdownRange in markdownRanges) {
+            [self applyRangeToAttributedString:attributedString
+                                          type:std::string([markdownRange.type UTF8String])
+                                         range:markdownRange.range
+                                         depth:markdownRange.depth];
         }
 
         RCTApplyBaselineOffset(attributedString);
@@ -79,20 +88,19 @@ using namespace facebook;
         _prevAttributedString = attributedString;
         _prevTextAttributes = attributes;
         _prevMarkdownStyle = _markdownStyle;
+        _prevParserId = _parserId;
 
         return attributedString;
     }
 }
 
-- (void)applyRangeToAttributedString:(NSMutableAttributedString *)attributedString type:(const std::string)type start:(const int)start length:(const int)length depth:(const int)depth {
-    if (length == 0 || start + length > attributedString.length) {
+- (void)applyRangeToAttributedString:(NSMutableAttributedString *)attributedString type:(const std::string)type range:(NSRange)range depth:(const int)depth {
+    if (range.length == 0 || range.location + range.length > attributedString.length) {
         return;
     }
 
-    NSRange range = NSMakeRange(start, length);
-
     if (type == "bold" || type == "italic" || type == "code" || type == "pre" || type == "h1" || type == "emoji") {
-        UIFont *font = [attributedString attribute:NSFontAttributeName atIndex:start effectiveRange:NULL];
+        UIFont *font = [attributedString attribute:NSFontAttributeName atIndex:range.location effectiveRange:NULL];
         if (type == "bold") {
             font = [RCTFont updateFont:font withWeight:@"bold"];
         } else if (type == "italic") {

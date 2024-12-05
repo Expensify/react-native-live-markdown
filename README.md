@@ -5,6 +5,7 @@
 - ⚛️ Drop-in replacement for `<TextInput>` component
 - ⌨️ Live synchronous formatting on every keystroke
 - ⚡ Fully native experience (selection, spellcheck, autocomplete)
+- 🔧 Customizable logic
 - 🎨 Customizable styles
 - 🌐 Universal support (Android, iOS, web)
 - 🏗️ Supports New Architecture
@@ -14,15 +15,17 @@
 First, install the library from npm with the package manager of your choice:
 
 ```sh
-yarn add @expensify/react-native-live-markdown
-npm install @expensify/react-native-live-markdown --save
-npx expo install @expensify/react-native-live-markdown
+yarn add @expensify/react-native-live-markdown react-native-reanimated expensify-common
+npm install @expensify/react-native-live-markdown react-native-reanimated expensify-common --save
+npx expo install @expensify/react-native-live-markdown react-native-reanimated expensify-common
 ```
+
+React Native Live Markdown requires [react-native-reanimated](https://github.com/software-mansion/react-native-reanimated) 3.16.3 or newer and [expensify-common](https://github.com/Expensify/expensify-common) 2.0.108 or newer.
 
 Then, install the iOS dependencies with CocoaPods:
 
 ```sh
-cd ios && pod install
+cd ios && bundler install && bundler exec pod install
 ```
 
 The library includes native code so you will need to re-build the native app.
@@ -33,7 +36,7 @@ The library includes native code so you will need to re-build the native app.
 ## Usage
 
 ```tsx
-import {MarkdownTextInput} from '@expensify/react-native-live-markdown';
+import {MarkdownTextInput, parseExpensiMark} from '@expensify/react-native-live-markdown';
 import React from 'react';
 
 export default function App() {
@@ -43,6 +46,7 @@ export default function App() {
     <MarkdownTextInput
       value={text}
       onChangeText={setText}
+      parser={parseExpensiMark}
     />
   );
 }
@@ -118,6 +122,48 @@ The style object can be passed to multiple `MarkdownTextInput` components using 
 > [!TIP]
 > We recommend to store the style object outside of a component body or memoize the style object with `React.useMemo`.
 
+## Parsing logic
+
+`MarkdownTextInput` behavior can be customized via `parser` property. Parser is a function that accepts a plaintext string and returns an array of `MarkdownRange` objects:
+
+```ts
+interface MarkdownRange {
+  type: MarkdownType;
+  start: number;
+  length: number;
+  depth?: number;
+}
+```
+
+Currently, only the following types are supported:
+
+```ts
+type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'emoji' | 'mention-here' | 'mention-user' | 'mention-report' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax';
+```
+
+Parser needs to be marked as a [worklet](https://docs.swmansion.com/react-native-reanimated/docs/guides/worklets/) because it's executed on the UI thread as the user types.
+
+Here's a sample function that parses all substrings located between two asterisks as bold text:
+
+```ts
+function parser(input: string) {
+  'worklet';
+
+  const ranges = [];
+  const regexp = /\*(.*?)\*/g;
+  let match;
+  while ((match = regexp.exec(input)) !== null) {
+    ranges.push({start: match.index, length: 1, type: 'syntax'});
+    ranges.push({start: match.index + 1, length: match[1]!.length, type: 'bold'});
+    ranges.push({start: match.index + 1 + match[1]!.length, length: 1, type: 'syntax'});
+  }
+  return ranges;
+}
+```
+
+> [!TIP]
+> We recommend to store the parser function outside of a component body or memoize the parser function with `React.useMemo`.
+
 ## Markdown flavors support
 
 Currently, `react-native-live-markdown` supports only [ExpensiMark](https://github.com/Expensify/expensify-common/blob/main/lib/ExpensiMark.ts) flavor. We are working on CommonMark support as well as possibility to use other Markdown parsers.
@@ -126,9 +172,10 @@ Currently, `react-native-live-markdown` supports only [ExpensiMark](https://gith
 
 `MarkdownTextInput` inherits all props of React Native's `TextInput` component as well as introduces the following properties:
 
-| Prop            | Type            | Default     | Note                                                                                                                                                                                                                   |
-| --------------- | --------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `markdownStyle` | `MarkdownStyle` | `undefined` | Adds custom styling to Markdown text. The provided value is merged with default style object. See [Styling](https://github.com/expensify/react-native-live-markdown/blob/main/README.md#styling) for more information. |
+| Prop            | Type                                 | Default     | Note                                                                                                                                                                                                                   |
+| --------------- | ------------------------------------ | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `parser`        | `(value: string) => MarkdownRange[]` | `undefined` | A function that parses the current value and returns an array of ranges.                                                                                                                                               |
+| `markdownStyle` | `MarkdownStyle`                      | `undefined` | Adds custom styling to Markdown text. The provided value is merged with default style object. See [Styling](https://github.com/expensify/react-native-live-markdown/blob/main/README.md#styling) for more information. |
 
 ## Compatibility
 

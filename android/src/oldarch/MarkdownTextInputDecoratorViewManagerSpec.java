@@ -7,4 +7,5 @@ import com.facebook.react.uimanager.SimpleViewManager;
 
 public abstract class MarkdownTextInputDecoratorViewManagerSpec<T extends View> extends SimpleViewManager<T> {
   public abstract void setMarkdownStyle(T view, ReadableMap value);
+  public abstract void setParserId(T view, int value);
 }
