@@ -45,6 +45,7 @@
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				761780EC2CA45674006654EE /* AppDelegate.swift */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
+				3866AF7A2D01AFBB00AC0797 /* AppDelegate.swift */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */,
 			);
@@ -131,7 +132,7 @@
 				LastUpgradeCheck = 1210;
 				TargetAttributes = {
 					13B07F861A680F5B00A75B9A = {
-						LastSwiftMigration = 1120;
+						LastSwiftMigration = 1540;
 					};
 				};
 			};
@@ -275,6 +276,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.LiveMarkdownExample.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = LiveMarkdownExample;
+				SWIFT_OBJC_BRIDGING_HEADER = "LiveMarkdownExample-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -302,6 +304,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.LiveMarkdownExample.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = LiveMarkdownExample;
+				SWIFT_OBJC_BRIDGING_HEADER = "LiveMarkdownExample-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
