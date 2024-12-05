@@ -117,17 +117,16 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
   }, [parserId]);
 
   return (
-    <>
+    <MarkdownTextInputDecoratorViewNativeComponent
+      style={{display: 'contents'}}
+      markdownStyle={markdownStyle}
+      parserId={parserId}
+    >
       <TextInput
         {...props}
         ref={ref}
       />
-      <MarkdownTextInputDecoratorViewNativeComponent
-        style={IS_FABRIC ? styles.farAway : styles.displayNone}
-        markdownStyle={markdownStyle}
-        parserId={parserId}
-      />
-    </>
+    </MarkdownTextInputDecoratorViewNativeComponent>
   );
 });
 

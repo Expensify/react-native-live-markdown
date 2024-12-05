@@ -3,18 +3,36 @@
 #import <react/renderer/components/RNLiveMarkdownSpec/Props.h>
 
 #import <RNLiveMarkdown/MarkdownTextInputDecoratorComponentView.h>
-#import <RNLiveMarkdown/MarkdownTextInputDecoratorView.h>
 #import <RNLiveMarkdown/RCTMarkdownStyle.h>
 
 #import <RNLiveMarkdown/MarkdownTextInputDecoratorViewComponentDescriptor.h>
-#import "MarkdownShadowFamilyRegistry.h"
 #import "RCTFabricComponentsPlugins.h"
+
+#import <React/RCTUITextField.h>
+#import "react_native_assert.h"
+
+#import <RNLiveMarkdown/MarkdownLayoutManager.h>
+#import <RNLiveMarkdown/MarkdownTextInputDecoratorView.h>
+#import <RNLiveMarkdown/RCTBackedTextFieldDelegateAdapter+Markdown.h>
+#import <RNLiveMarkdown/RCTUITextView+Markdown.h>
+
+#import <RNLiveMarkdown/RCTTextInputComponentView+Markdown.h>
+
+#import <objc/runtime.h>
 
 using namespace facebook::react;
 
 @implementation MarkdownTextInputDecoratorComponentView {
-  MarkdownTextInputDecoratorView *_view;
-  ShadowNodeFamily::Shared _decoratorFamily;
+    RCTMarkdownUtils *_markdownUtils;
+    RCTMarkdownStyle *_markdownStyle;
+  #ifdef RCT_NEW_ARCH_ENABLED
+    __weak RCTTextInputComponentView *_textInput;
+  #else
+    __weak RCTBaseTextInputView *_textInput;
+  #endif /* RCT_NEW_ARCH_ENABLED */
+    __weak UIView<RCTBackedTextInputViewProtocol> *_backedTextInputView;
+    __weak RCTBackedTextFieldDelegateAdapter *_adapter;
+    __weak RCTUITextView *_textView;
 }
 
 + (ComponentDescriptorProvider)componentDescriptorProvider
@@ -33,34 +51,74 @@ using namespace facebook::react;
   if (self = [super initWithFrame:frame]) {
     static const auto defaultProps = std::make_shared<const MarkdownTextInputDecoratorViewProps>();
     _props = defaultProps;
-
-    _view = [[MarkdownTextInputDecoratorView alloc] init];
-
-    self.contentView = _view;
   }
 
   return self;
 }
 
-- (void)updateState:(const facebook::react::State::Shared &)state oldState:(const facebook::react::State::Shared &)oldState
+- (void)didAddSubview:(UIView *)subview
 {
-    auto data = std::static_pointer_cast<MarkdownTextInputDecoratorShadowNode::ConcreteState const>(state)->getData();
-    
-    if (_decoratorFamily != nullptr) {
-        MarkdownShadowFamilyRegistry::unregisterFamilyForUpdates(_decoratorFamily);
-    }
-    
-    _decoratorFamily = data.decoratorFamily;
-    MarkdownShadowFamilyRegistry::registerFamilyForUpdates(_decoratorFamily);
+  react_native_assert([subview isKindOfClass:[RCTTextInputComponentView class]] && "Previous sibling component is not an instance of RCTTextInputComponentView.");
+  _textInput = (RCTTextInputComponentView *)subview;
+  _backedTextInputView = [_textInput valueForKey:@"_backedTextInputView"];
+
+
+  _markdownUtils = [[RCTMarkdownUtils alloc] init];
+
+  [_textInput setMarkdownUtils:_markdownUtils];
+  if ([_backedTextInputView isKindOfClass:[RCTUITextField class]]) {
+    RCTUITextField *textField = (RCTUITextField *)_backedTextInputView;
+    _adapter = [textField valueForKey:@"textInputDelegateAdapter"];
+    [_adapter setMarkdownUtils:_markdownUtils];
+  } else if ([_backedTextInputView isKindOfClass:[RCTUITextView class]]) {
+    _textView = (RCTUITextView *)_backedTextInputView;
+    [_textView setMarkdownUtils:_markdownUtils];
+    NSLayoutManager *layoutManager = _textView.layoutManager; // switching to TextKit 1 compatibility mode
+
+    // Correct content height in TextKit 1 compatibility mode. (See https://github.com/Expensify/App/issues/41567)
+    // Consider removing this fix if it is no longer needed after migrating to TextKit 2.
+    CGSize contentSize = _textView.contentSize;
+    CGRect textBounds = [layoutManager usedRectForTextContainer:_textView.textContainer];
+    contentSize.height = textBounds.size.height + _textView.textContainerInset.top + _textView.textContainerInset.bottom;
+    [_textView setContentSize:contentSize];
+
+    layoutManager.allowsNonContiguousLayout = NO; // workaround for onScroll issue
+    object_setClass(layoutManager, [MarkdownLayoutManager class]);
+    [layoutManager setValue:_markdownUtils forKey:@"markdownUtils"];
+  } else {
+    react_native_assert(false && "Cannot enable Markdown for this type of TextInput.");
+  }
 }
 
-- (void)willMoveToSuperview:(UIView *)newSuperview {
-    if (newSuperview == nil) {
-        MarkdownShadowFamilyRegistry::unregisterFamilyForUpdates(_decoratorFamily);
-      _decoratorFamily = nullptr;
+//- (void)updateState:(const facebook::react::State::Shared &)state oldState:(const facebook::react::State::Shared &)oldState
+//{
+//    auto data = std::static_pointer_cast<MarkdownTextInputDecoratorShadowNode::ConcreteState const>(state)->getData();
+//    
+//    if (_decoratorFamily != nullptr) {
+//        MarkdownShadowFamilyRegistry::unregisterFamilyForUpdates(_decoratorFamily);
+//    }
+//    
+//    _decoratorFamily = data.decoratorFamily;
+//    MarkdownShadowFamilyRegistry::registerFamilyForUpdates(_decoratorFamily);
+//}
+
+- (void)willMoveToWindow:(UIWindow *)newWindow
+{
+    if (newWindow == nil) {
+        if (_textInput != nil) {
+            [_textInput setMarkdownUtils:nil];
+        }
+        if (_adapter != nil) {
+            [_adapter setMarkdownUtils:nil];
+        }
+        if (_textView != nil) {
+            [_textView setMarkdownUtils:nil];
+            if (_textView.layoutManager != nil && [object_getClass(_textView.layoutManager) isEqual:[MarkdownLayoutManager class]]) {
+                [_textView.layoutManager setValue:nil forKey:@"markdownUtils"];
+                object_setClass(_textView.layoutManager, [NSLayoutManager class]);
+            }
+        }
     }
-    
-    [super willMoveToSuperview:newSuperview];
 }
 
 - (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
@@ -74,7 +132,16 @@ using namespace facebook::react;
 
     // TODO: if (oldViewProps.markdownStyle != newViewProps.markdownStyle)
     RCTMarkdownStyle *markdownStyle = [[RCTMarkdownStyle alloc] initWithStruct:newViewProps.markdownStyle];
-    [_view setMarkdownStyle:markdownStyle];
+    _markdownStyle = markdownStyle;
+    [_markdownUtils setMarkdownStyle:markdownStyle];
+
+    if (_textView != nil) {
+      // We want to use `textStorage` for applying markdown when possible. Currently it's only available for UITextView
+      [_textView textDidChange];
+    } else {
+      // apply new styles
+      [_textInput _setAttributedString:_backedTextInputView.attributedText];
+    }
 
     [super updateProps:props oldProps:oldProps];
 }
