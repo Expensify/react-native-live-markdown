@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 
 import com.expensify.livemarkdown.spans.*;
 import com.facebook.react.views.text.internal.span.CustomLineHeightSpan;
+import com.facebook.systrace.Systrace;
 
 import java.util.List;
 import java.util.Objects;
@@ -20,22 +21,37 @@ public class MarkdownFormatter {
   }
 
   public void format(SpannableStringBuilder ssb, List<MarkdownRange> markdownRanges, @NonNull MarkdownStyle markdownStyle) {
-    Objects.requireNonNull(markdownStyle, "mMarkdownStyle is null");
-    removeSpans(ssb);
-    applyRanges(ssb, markdownRanges, markdownStyle);
+    try {
+      Systrace.beginSection(0, "format");
+      Objects.requireNonNull(markdownStyle, "mMarkdownStyle is null");
+      removeSpans(ssb);
+      applyRanges(ssb, markdownRanges, markdownStyle);
+    } finally {
+      Systrace.endSection(0);
+    }
   }
 
   private void removeSpans(SpannableStringBuilder ssb) {
-    // We shouldn't use `removeSpans()` because it also removes SpellcheckSpan, SuggestionSpan etc.
-    MarkdownSpan[] spans = ssb.getSpans(0, ssb.length(), MarkdownSpan.class);
-    for (MarkdownSpan span : spans) {
-      ssb.removeSpan(span);
+    try {
+      Systrace.beginSection(0, "removeSpans");
+      // We shouldn't use `removeSpans()` because it also removes SpellcheckSpan, SuggestionSpan etc.
+      MarkdownSpan[] spans = ssb.getSpans(0, ssb.length(), MarkdownSpan.class);
+      for (MarkdownSpan span : spans) {
+        ssb.removeSpan(span);
+      }
+    } finally {
+      Systrace.endSection(0);
     }
   }
 
   private void applyRanges(SpannableStringBuilder ssb, List<MarkdownRange> markdownRanges, @NonNull MarkdownStyle markdownStyle) {
-    for (MarkdownRange markdownRange : markdownRanges) {
-      applyRange(ssb, markdownRange, markdownStyle);
+    try {
+      Systrace.beginSection(0, "applyRanges");
+      for (MarkdownRange markdownRange : markdownRanges) {
+        applyRange(ssb, markdownRange, markdownStyle);
+      }
+    } finally {
+      Systrace.endSection(0);
     }
   }
 
