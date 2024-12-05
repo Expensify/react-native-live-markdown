@@ -45,16 +45,15 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
   const markdownStyle = React.useMemo(() => processMarkdownStyle(props.markdownStyle), [props.markdownStyle]);
 
   return (
-    <>
+    <MarkdownTextInputDecoratorViewNativeComponent
+      style={{display: 'contents'}}
+      markdownStyle={markdownStyle}
+    >
       <TextInput
         {...props}
         ref={ref}
       />
-      <MarkdownTextInputDecoratorViewNativeComponent
-        style={IS_FABRIC ? styles.farAway : styles.displayNone}
-        markdownStyle={markdownStyle}
-      />
-    </>
+    </MarkdownTextInputDecoratorViewNativeComponent>
   );
 });
 

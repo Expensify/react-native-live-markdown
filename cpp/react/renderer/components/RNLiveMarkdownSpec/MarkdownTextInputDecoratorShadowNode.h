@@ -1,6 +1,5 @@
 #pragma once
 
-#include "MarkdownShadowFamilyRegistry.h"
 #include "MarkdownTextInputDecoratorState.h"
 #include "OwningShadowNodeFragment.h"
 #include <react/renderer/components/RNLiveMarkdownSpec/EventEmitters.h>
@@ -24,7 +23,9 @@ public:
                                        ShadowNodeFamily::Shared const &family,
                                        ShadowNodeTraits traits)
       : ConcreteViewShadowNode(updateFragmentState(fragment, family),
-                               family, traits) {}
+                               family, traits) {
+          ShadowNode::traits_.unset(ShadowNodeTraits::ForceFlattenView);
+      }
 
   MarkdownTextInputDecoratorShadowNode(ShadowNode const &sourceShadowNode,
                                        ShadowNodeFragment const &fragment)
@@ -32,8 +33,9 @@ public:
     // if the props changed, we need to update the shadow node state to reflect
     // potential style changes
     if (fragment.props != ShadowNodeFragment::propsPlaceholder()) {
-      MarkdownShadowFamilyRegistry::forceNextStateUpdate(this->getTag());
     }
+
+          ShadowNode::traits_.unset(ShadowNodeTraits::ForceFlattenView);
   }
 
 private:

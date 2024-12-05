@@ -15,8 +15,6 @@ MarkdownTextInputDecoratorShadowNode::updateFragmentState(
   const auto newStateData =
       std::make_shared<MarkdownTextInputDecoratorState>(family);
 
-  MarkdownShadowFamilyRegistry::registerFamilyForUpdates(family);
-
   // we pass the pointer to the ShadowNodeFamily in the initial state, so it's
   // propagated on every clone we need it to clear the reference in the registry
   // when the view is removed from window it cannot be done in the destructor,

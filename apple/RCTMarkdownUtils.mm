@@ -21,6 +21,10 @@ using namespace facebook;
         if (input == nil) {
             return nil;
         }
+        
+        if (_markdownStyle == nil) {
+            return nil;
+        }
 
         NSString *inputString = [input string];
         if ([inputString isEqualToString:_prevInputString] && [attributes isEqualToDictionary:_prevTextAttributes] && [_markdownStyle isEqual:_prevMarkdownStyle]) {

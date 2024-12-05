@@ -4,10 +4,7 @@
 #import <React/RCTSurfacePresenter.h>
 
 #import "MarkdownCommitHook.h"
-#import "MarkdownShadowFamilyRegistry.h"
 #import "RCTLiveMarkdownModule.h"
-
-using namespace expensify::livemarkdown;
 
 // A turbomodule used to register the commit hook
 // I think this is the easiest way to access the UIManager, which we need to
@@ -15,26 +12,18 @@ using namespace expensify::livemarkdown;
 
 @implementation RCTLiveMarkdownModule {
   BOOL installed_;
-  std::shared_ptr<MarkdownCommitHook> commitHook_;
   __weak RCTSurfacePresenter *surfacePresenter_;
 }
 
 RCT_EXPORT_MODULE(@"LiveMarkdownModule")
 
 - (NSNumber *)install {
-  if (!installed_ && surfacePresenter_ != nil) {
-    RCTScheduler *scheduler = [surfacePresenter_ scheduler];
-
-    commitHook_ = std::make_shared<MarkdownCommitHook>(scheduler.uiManager);
-    installed_ = YES;
-  }
   return @1;
 }
 
 - (void)handleJavaScriptDidLoadNotification:(NSNotification *)notification
 {
   surfacePresenter_ = self.bridge.surfacePresenter;
-  [self install];
 }
 
 - (void)setBridge:(RCTBridge *)bridge
@@ -70,7 +59,6 @@ RCT_EXPORT_MODULE(@"LiveMarkdownModule")
 }
 
 - (void)invalidate {
-  MarkdownShadowFamilyRegistry::reset();
   [[NSNotificationCenter defaultCenter] removeObserver:self];
   [super invalidate];
 }
