@@ -46,6 +46,10 @@
         const auto &length = static_cast<int>(item.getProperty(rt, "length").asNumber());
         const auto &depth = item.hasProperty(rt, "depth") ? static_cast<int>(item.getProperty(rt, "depth").asNumber()) : 1;
 
+        if (length == 0 || start + length > text.length) {
+          continue;
+        }
+
         NSRange range = NSMakeRange(start, length);
         MarkdownRange *markdownRange = [[MarkdownRange alloc] initWithType:@(type.c_str()) range:range depth:depth];
         [markdownRanges addObject:markdownRange];

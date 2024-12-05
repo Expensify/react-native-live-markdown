@@ -70,10 +70,6 @@
 }
 
 - (void)applyRangeToAttributedString:(NSMutableAttributedString *)attributedString type:(const std::string)type range:(NSRange)range depth:(const int)depth {
-    if (range.length == 0 || range.location + range.length > attributedString.length) {
-        return;
-    }
-
     if (type == "bold" || type == "italic" || type == "code" || type == "pre" || type == "h1" || type == "emoji") {
         UIFont *font = [attributedString attribute:NSFontAttributeName atIndex:range.location effectiveRange:NULL];
         if (type == "bold") {
