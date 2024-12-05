@@ -38,17 +38,6 @@
 
         NSArray<MarkdownRange *> *markdownRanges = [_markdownParser parse:inputString withParserId:_parserId];
 
-        // TODO: use custom attribute to store blockquote depth instead
-        _blockquoteRangesAndLevels = [NSMutableArray new];
-        for (MarkdownRange *markdownRange in markdownRanges) {
-            if ([markdownRange.type isEqualToString:@"blockquote"]) {
-                [_blockquoteRangesAndLevels addObject:@{
-                    @"range": [NSValue valueWithRange:markdownRange.range],
-                    @"depth": @(markdownRange.depth)
-                }];
-            }
-        }
-
         NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:inputString attributes:attributes];
         [attributedString beginEditing];
 
@@ -143,6 +132,7 @@
         paragraphStyle.firstLineHeadIndent = indent;
         paragraphStyle.headIndent = indent;
         [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:range];
+        [attributedString addAttribute:RCTLiveMarkdownBlockquoteDepthAttributeName value:@(depth) range:range];
     } else if (type == "pre") {
         [attributedString addAttribute:NSForegroundColorAttributeName value:_markdownStyle.preColor range:range];
         NSRange rangeForBackground = [[attributedString string] characterAtIndex:range.location] == '\n' ? NSMakeRange(range.location + 1, range.length - 1) : range;
