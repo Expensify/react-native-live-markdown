@@ -38,6 +38,17 @@
 
         NSArray<MarkdownRange *> *markdownRanges = [_markdownParser parse:inputString withParserId:_parserId];
 
+        // TODO: use custom attribute to store blockquote depth instead
+        _blockquoteRangesAndLevels = [NSMutableArray new];
+        for (MarkdownRange *markdownRange in markdownRanges) {
+            if ([markdownRange.type isEqualToString:@"blockquote"]) {
+                [_blockquoteRangesAndLevels addObject:@{
+                    @"range": [NSValue valueWithRange:markdownRange.range],
+                    @"depth": @(markdownRange.depth)
+                }];
+            }
+        }
+
         NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:inputString attributes:attributes];
         [attributedString beginEditing];
 
@@ -45,8 +56,6 @@
         // It looks like a bug in iOS, as there is no underline style to be found in the attributed string, especially after formatting.
         // This is a workaround that applies the NSUnderlineStyleNone to the string before iterating over ranges which resolves this problem.
         [attributedString addAttribute:NSUnderlineStyleAttributeName value:[NSNumber numberWithInteger:NSUnderlineStyleNone] range:NSMakeRange(0, attributedString.length)];
-
-        _blockquoteRangesAndLevels = [NSMutableArray new];
 
         for (MarkdownRange *markdownRange in markdownRanges) {
             [self applyRangeToAttributedString:attributedString
@@ -134,10 +143,6 @@
         paragraphStyle.firstLineHeadIndent = indent;
         paragraphStyle.headIndent = indent;
         [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:range];
-        [_blockquoteRangesAndLevels addObject:@{
-            @"range": [NSValue valueWithRange:range],
-            @"depth": @(depth)
-        }];
     } else if (type == "pre") {
         [attributedString addAttribute:NSForegroundColorAttributeName value:_markdownStyle.preColor range:range];
         NSRange rangeForBackground = [[attributedString string] characterAtIndex:range.location] == '\n' ? NSMakeRange(range.location + 1, range.length - 1) : range;
