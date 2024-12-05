@@ -8,15 +8,9 @@ import androidx.annotation.NonNull;
 
 import com.expensify.livemarkdown.spans.*;
 import com.facebook.react.bridge.ReactContext;
-import com.facebook.react.util.RNLog;
 import com.facebook.react.views.text.internal.span.CustomLineHeightSpan;
 import com.facebook.soloader.SoLoader;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
@@ -25,19 +19,13 @@ public class MarkdownUtils {
     SoLoader.loadLibrary("livemarkdown");
   }
 
-  private static synchronized native String nativeParseMarkdown(String input, int parserId);
-
   public MarkdownUtils(@NonNull ReactContext reactContext) {
-    mReactContext = reactContext;
     mAssetManager = reactContext.getAssets();
+    mMarkdownParser = new MarkdownParser(reactContext);
   }
 
-  private final @NonNull ReactContext mReactContext;
   private final @NonNull AssetManager mAssetManager;
-
-  private String mPrevInput;
-  private String mPrevOutput;
-  private int mPrevParserId;
+  private final @NonNull MarkdownParser mMarkdownParser;
 
   private MarkdownStyle mMarkdownStyle;
   private int mParserId;
@@ -55,39 +43,8 @@ public class MarkdownUtils {
 
     removeSpans(ssb);
 
-    String input = ssb.toString();
-    String output;
-    if (input.equals(mPrevInput) && mParserId == mPrevParserId) {
-      output = mPrevOutput;
-    } else {
-      try {
-        output = nativeParseMarkdown(input, mParserId);
-      } catch (Exception e) {
-        output = "[]";
-      }
-      mPrevInput = input;
-      mPrevOutput = output;
-      mPrevParserId = mParserId;
-    }
-
-    List<MarkdownRange> markdownRanges = new LinkedList<>();
-    try {
-      JSONArray ranges = new JSONArray(output);
-      for (int i = 0; i < ranges.length(); i++) {
-        JSONObject range = ranges.getJSONObject(i);
-        String type = range.getString("type");
-        int start = range.getInt("start");
-        int length = range.getInt("length");
-        int depth = range.optInt("depth", 1);
-        int end = start + length;
-        if (length == 0 || end > input.length()) {
-          continue;
-        }
-        markdownRanges.add(new MarkdownRange(type, start, length, depth));
-      }
-    } catch (JSONException e) {
-      RNLog.w(mReactContext, "[react-native-live-markdown] Incorrect schema of worklet parser output: " + e.getMessage());
-    }
+    String text = ssb.toString();
+    List<MarkdownRange> markdownRanges = mMarkdownParser.parse(text, mParserId);
 
     for (MarkdownRange markdownRange : markdownRanges) {
       applyRange(ssb, markdownRange);
