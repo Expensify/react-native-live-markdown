@@ -3,6 +3,7 @@ package com.expensify.livemarkdown;
 public class MarkdownRange {
   private final String mType;
   private final int mStart;
+  private final int mEnd;
   private final int mLength;
   private final int mDepth;
 
@@ -10,6 +11,7 @@ public class MarkdownRange {
     mType = type;
     mStart = start;
     mLength = length;
+    mEnd = start + length;
     mDepth = depth;
   }
 
@@ -23,6 +25,10 @@ public class MarkdownRange {
 
   public int getLength() {
     return mLength;
+  }
+
+  public int getEnd() {
+    return mEnd;
   }
 
   public int getDepth() {
