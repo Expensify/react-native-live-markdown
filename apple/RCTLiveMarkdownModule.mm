@@ -3,7 +3,6 @@
 #import <React/RCTScheduler.h>
 #import <React/RCTSurfacePresenter.h>
 
-#import "MarkdownCommitHook.h"
 #import "RCTLiveMarkdownModule.h"
 
 // A turbomodule used to register the commit hook

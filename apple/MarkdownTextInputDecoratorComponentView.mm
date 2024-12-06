@@ -90,18 +90,6 @@ using namespace facebook::react;
   }
 }
 
-//- (void)updateState:(const facebook::react::State::Shared &)state oldState:(const facebook::react::State::Shared &)oldState
-//{
-//    auto data = std::static_pointer_cast<MarkdownTextInputDecoratorShadowNode::ConcreteState const>(state)->getData();
-//    
-//    if (_decoratorFamily != nullptr) {
-//        MarkdownShadowFamilyRegistry::unregisterFamilyForUpdates(_decoratorFamily);
-//    }
-//    
-//    _decoratorFamily = data.decoratorFamily;
-//    MarkdownShadowFamilyRegistry::registerFamilyForUpdates(_decoratorFamily);
-//}
-
 - (void)willMoveToWindow:(UIWindow *)newWindow
 {
     if (newWindow == nil) {

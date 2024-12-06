@@ -2,8 +2,7 @@
 
 #include <react/renderer/components/iostextinput/TextInputState.h>
 
-// #include <React/RCTUtils.h>
-#import <React/RCTUtils.h>
+#include <React/RCTUtils.h>
 #include <react/renderer/components/view/conversions.h>
 #include <react/renderer/core/ComponentDescriptor.h>
 #include <react/renderer/textlayoutmanager/RCTAttributedTextUtils.h>
@@ -22,7 +21,6 @@ extern const char MarkdownTextInputDecoratorViewComponentName[] =
 
 void MarkdownTextInputDecoratorShadowNode::initialize() {
   ShadowNode::traits_.unset(ShadowNodeTraits::ForceFlattenView);
-  setStateData(MarkdownTextInputDecoratorState(false));
 }
 
 void MarkdownTextInputDecoratorShadowNode::adoptChildren() {
@@ -38,10 +36,10 @@ void MarkdownTextInputDecoratorShadowNode::adoptChildren() {
   if (const auto child = std::dynamic_pointer_cast<const TextInputShadowNode>(
           children.at(0))) {
     // don't mind this :)
-    const auto &test =
+    const auto &nodeWithAccessibleYogaNode =
         reinterpret_cast<const MarkdownTextInputDecoratorShadowNode *>(&*child);
 
-    YGNodeSetMeasureFunc(&test->yogaNode_, yogaNodeMeasureCallbackConnector);
+    YGNodeSetMeasureFunc(&nodeWithAccessibleYogaNode->yogaNode_, yogaNodeMeasureCallbackConnector);
   }
 }
 
@@ -92,7 +90,7 @@ void MarkdownTextInputDecoratorShadowNode::layout(LayoutContext layoutContext) {
 
       YogaLayoutableShadowNode::layout(layoutContext);
 
-  if (!getStateData().appliedMarkdownFormatting && children.size() > 0) {
+  if (children.size() > 0) {
     if (const auto child = std::dynamic_pointer_cast<const TextInputShadowNode>(
             children.at(0))) {
       // TODO: assert
@@ -108,8 +106,6 @@ void MarkdownTextInputDecoratorShadowNode::layout(LayoutContext layoutContext) {
 
       applyMarkdown(mutableChild, layoutContext);
     }
-
-    setStateData(MarkdownTextInputDecoratorState(true));
   }
 }
 
