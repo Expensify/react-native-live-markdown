@@ -1,17 +1,27 @@
 #import <RNLiveMarkdown/RCTMarkdownUtils.h>
 #import <RNLiveMarkdown/MarkdownGlobal.h>
-#import <RNLiveMarkdown/MarkdownRange.h>
+#import <RNLiveMarkdown/MarkdownParser.h>
 #import "react_native_assert.h"
 #import <React/RCTAssert.h>
 #import <React/RCTFont.h>
 #include <jsi/jsi.h>
 
 @implementation RCTMarkdownUtils {
+  MarkdownParser *_markdownParser;
   NSString *_prevInputString;
   NSAttributedString *_prevAttributedString;
   NSDictionary<NSAttributedStringKey, id> *_prevTextAttributes;
   __weak RCTMarkdownStyle *_prevMarkdownStyle;
   __weak NSNumber *_prevParserId;
+}
+
+- (instancetype)init
+{
+  if (self = [super init]) {
+    _markdownParser = [MarkdownParser new];
+  }
+
+  return self;
 }
 
 - (NSAttributedString *)parseMarkdown:(nullable NSAttributedString *)input withAttributes:(nullable NSDictionary<NSAttributedStringKey,id> *)attributes
@@ -26,43 +36,8 @@
             return _prevAttributedString;
         }
 
-        static std::mutex runtimeMutex;
-        auto lock = std::lock_guard<std::mutex>(runtimeMutex);
+        NSArray<MarkdownRange *> *markdownRanges = [_markdownParser parse:inputString withParserId:_parserId];
 
-        auto markdownRuntime = expensify::livemarkdown::getMarkdownRuntime();
-        jsi::Runtime &rt = markdownRuntime->getJSIRuntime();
-
-        auto markdownWorklet = expensify::livemarkdown::getMarkdownWorklet([_parserId intValue]);
-        
-        NSMutableArray *markdownRanges = [[NSMutableArray alloc] init];
-
-        try {
-            const auto &text = jsi::String::createFromUtf8(rt, [inputString UTF8String]);
-            const auto &output = markdownRuntime->runGuarded(markdownWorklet, text);
-            const auto &ranges = output.asObject(rt).asArray(rt);
-
-            for (size_t i = 0, n = ranges.size(rt); i < n; ++i) {
-                const auto &item = ranges.getValueAtIndex(rt, i).asObject(rt);
-                const auto &type = item.getProperty(rt, "type").asString(rt).utf8(rt);
-                const auto &start = static_cast<int>(item.getProperty(rt, "start").asNumber());
-                const auto &length = static_cast<int>(item.getProperty(rt, "length").asNumber());
-                const auto &depth = item.hasProperty(rt, "depth") ? static_cast<int>(item.getProperty(rt, "depth").asNumber()) : 1;
-
-                NSRange range = NSMakeRange(start, length);
-                MarkdownRange *markdownRange = [[MarkdownRange alloc] initWithType:@(type.c_str()) range:range depth:depth];
-                [markdownRanges addObject:markdownRange];
-            }
-        } catch (const jsi::JSError &error) {
-            RCTLogWarn(@"[react-native-live-markdown] Incorrect schema of worklet parser output: %s", error.getMessage().c_str());
-            NSAttributedString *attributedString = [[NSAttributedString alloc] initWithString:inputString attributes:attributes];
-            _prevInputString = inputString;
-            _prevAttributedString = attributedString;
-            _prevTextAttributes = attributes;
-            _prevMarkdownStyle = _markdownStyle;
-            _prevParserId = _parserId;
-            return attributedString;
-        }
-    
         NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:inputString attributes:attributes];
         [attributedString beginEditing];
 
@@ -95,10 +70,6 @@
 }
 
 - (void)applyRangeToAttributedString:(NSMutableAttributedString *)attributedString type:(const std::string)type range:(NSRange)range depth:(const int)depth {
-    if (range.length == 0 || range.location + range.length > attributedString.length) {
-        return;
-    }
-
     if (type == "bold" || type == "italic" || type == "code" || type == "pre" || type == "h1" || type == "emoji") {
         UIFont *font = [attributedString attribute:NSFontAttributeName atIndex:range.location effectiveRange:NULL];
         if (type == "bold") {
