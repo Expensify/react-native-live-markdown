@@ -55,6 +55,7 @@ public class MarkdownParser {
 
       List<MarkdownRange> markdownRanges = new LinkedList<>();
       try {
+        Systrace.beginSection(0, "markdownRanges");
         JSONArray ranges = new JSONArray(json);
         for (int i = 0; i < ranges.length(); i++) {
           JSONObject range = ranges.getJSONObject(i);
@@ -73,6 +74,8 @@ public class MarkdownParser {
         mPrevParserId = parserId;
         mPrevMarkdownRanges = Collections.emptyList();
         return mPrevMarkdownRanges;
+      } finally {
+        Systrace.endSection(0);
       }
 
       mPrevText = text;
