@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.util.RNLog;
 import com.facebook.soloader.SoLoader;
+import com.facebook.systrace.Systrace;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,46 +32,58 @@ public class MarkdownParser {
   private native String nativeParse(String text, int parserId);
 
   public synchronized List<MarkdownRange> parse(String text, int parserId) {
-    if (text.equals(mPrevText) && parserId == mPrevParserId) {
-      return mPrevMarkdownRanges;
-    }
-
-    String json;
     try {
-      json = nativeParse(text, parserId);
-    } catch (Exception e) {
-      // Skip formatting, runGuarded will show the error in LogBox
-      mPrevText = text;
-      mPrevParserId = parserId;
-      mPrevMarkdownRanges = Collections.emptyList();
-      return mPrevMarkdownRanges;
-    }
+      Systrace.beginSection(0, "parse");
 
-    List<MarkdownRange> markdownRanges = new LinkedList<>();
-    try {
-      JSONArray ranges = new JSONArray(json);
-      for (int i = 0; i < ranges.length(); i++) {
-        JSONObject range = ranges.getJSONObject(i);
-        String type = range.getString("type");
-        int start = range.getInt("start");
-        int length = range.getInt("length");
-        int depth = range.optInt("depth", 1);
-        if (length == 0 || start + length > text.length()) {
-          continue;
-        }
-        markdownRanges.add(new MarkdownRange(type, start, length, depth));
+      if (text.equals(mPrevText) && parserId == mPrevParserId) {
+        return mPrevMarkdownRanges;
       }
-    } catch (JSONException e) {
-      RNLog.w(mReactContext, "[react-native-live-markdown] Incorrect schema of worklet parser output: " + e.getMessage());
+
+      String json;
+      try {
+        Systrace.beginSection(0, "nativeParse");
+        json = nativeParse(text, parserId);
+      } catch (Exception e) {
+        // Skip formatting, runGuarded will show the error in LogBox
+        mPrevText = text;
+        mPrevParserId = parserId;
+        mPrevMarkdownRanges = Collections.emptyList();
+        return mPrevMarkdownRanges;
+      } finally {
+        Systrace.endSection(0);
+      }
+
+      List<MarkdownRange> markdownRanges = new LinkedList<>();
+      try {
+        Systrace.beginSection(0, "markdownRanges");
+        JSONArray ranges = new JSONArray(json);
+        for (int i = 0; i < ranges.length(); i++) {
+          JSONObject range = ranges.getJSONObject(i);
+          String type = range.getString("type");
+          int start = range.getInt("start");
+          int length = range.getInt("length");
+          int depth = range.optInt("depth", 1);
+          if (length == 0 || start + length > text.length()) {
+            continue;
+          }
+          markdownRanges.add(new MarkdownRange(type, start, length, depth));
+        }
+      } catch (JSONException e) {
+        RNLog.w(mReactContext, "[react-native-live-markdown] Incorrect schema of worklet parser output: " + e.getMessage());
+        mPrevText = text;
+        mPrevParserId = parserId;
+        mPrevMarkdownRanges = Collections.emptyList();
+        return mPrevMarkdownRanges;
+      } finally {
+        Systrace.endSection(0);
+      }
+
       mPrevText = text;
       mPrevParserId = parserId;
-      mPrevMarkdownRanges = Collections.emptyList();
+      mPrevMarkdownRanges = markdownRanges;
       return mPrevMarkdownRanges;
+    } finally {
+      Systrace.endSection(0);
     }
-
-    mPrevText = text;
-    mPrevParserId = parserId;
-    mPrevMarkdownRanges = markdownRanges;
-    return mPrevMarkdownRanges;
   }
 }
