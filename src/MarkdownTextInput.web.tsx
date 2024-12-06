@@ -236,6 +236,35 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
       [parser, parseText, processedMarkdownStyle],
     );
 
+    const format = useCallback(
+      (target: MarkdownTextInputElement, parsedText: string, cursorPosition: number, formatType: string): ParseTextResult => {
+        if (!contentSelection.current) {
+          return {
+            text: '',
+            cursorPosition: 0,
+          };
+        }
+        let markdown;
+        switch (formatType) {
+          case 'formatBold':
+            markdown = '*';
+            break;
+          case 'formatItalic':
+            markdown = '_';
+            break;
+          default:
+            markdown = '';
+        }
+
+        const beforeSelectedText = parsedText.slice(0, contentSelection.current.start);
+        const selectedText = parsedText.slice(contentSelection.current.start, contentSelection.current.end);
+        const afterSelectedText = parsedText.slice(contentSelection.current.end);
+        const text = `${beforeSelectedText}${markdown}${selectedText}${markdown}${afterSelectedText}`;
+        return parseText(parser, target, text, processedMarkdownStyle, cursorPosition + 2, true);
+      },
+      [parser, parseText, processedMarkdownStyle],
+    );
+
     // Placeholder text color logic
     const updateTextColor = useCallback(
       (node: HTMLDivElement, text: string) => {
@@ -361,6 +390,10 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
           case 'historyRedo':
             newInputUpdate = redo(divRef.current);
             break;
+          case 'formatBold':
+          case 'formatItalic':
+            newInputUpdate = format(divRef.current, parsedText, newCursorPosition, inputType);
+            break;
           default:
             newInputUpdate = parseText(parser, divRef.current, parsedText, processedMarkdownStyle, newCursorPosition, true, !inputType, inputType === 'pasteText');
         }
@@ -414,7 +447,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
 
         handleContentSizeChange();
       },
-      [parser, updateTextColor, updateSelection, onChange, onChangeText, handleContentSizeChange, undo, redo, parseText, processedMarkdownStyle, setEventProps, maxLength],
+      [parser, updateTextColor, updateSelection, onChange, onChangeText, handleContentSizeChange, undo, redo, format, parseText, processedMarkdownStyle, setEventProps, maxLength],
     );
 
     const insertText = useCallback(
