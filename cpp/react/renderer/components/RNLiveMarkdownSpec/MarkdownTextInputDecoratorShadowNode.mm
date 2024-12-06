@@ -39,7 +39,8 @@ void MarkdownTextInputDecoratorShadowNode::adoptChildren() {
     const auto &nodeWithAccessibleYogaNode =
         reinterpret_cast<const MarkdownTextInputDecoratorShadowNode *>(&*child);
 
-    YGNodeSetMeasureFunc(&nodeWithAccessibleYogaNode->yogaNode_, yogaNodeMeasureCallbackConnector);
+    YGNodeSetMeasureFunc(&nodeWithAccessibleYogaNode->yogaNode_,
+                         yogaNodeMeasureCallbackConnector);
   }
 }
 
@@ -69,11 +70,7 @@ Size MarkdownTextInputDecoratorShadowNode::measureContent(
       const auto child =
           std::static_pointer_cast<const TextInputShadowNode>(children.at(0));
 
-  if (doesOwn(*child)) {
-    printf("good!\n");
-  } else {
-    printf("bad!\n");
-  }
+  child->ensureUnsealed();
 
   const auto &mutableChild =
       std::const_pointer_cast<TextInputShadowNode>(child);
@@ -91,21 +88,18 @@ void MarkdownTextInputDecoratorShadowNode::layout(LayoutContext layoutContext) {
       YogaLayoutableShadowNode::layout(layoutContext);
 
   if (children.size() > 0) {
-    if (const auto child = std::dynamic_pointer_cast<const TextInputShadowNode>(
-            children.at(0))) {
-      // TODO: assert
+    react_native_assert(
+        std::dynamic_pointer_cast<const TextInputShadowNode>(children.at(0)) &&
+        "MarkdownTextInputDecoratorView received a child that's not a "
+        "TextInput") const auto child =
+        std::static_pointer_cast<const TextInputShadowNode>(children.at(0));
 
-      if (doesOwn(*child)) {
-        printf("good!\n");
-      } else {
-        printf("bad!\n");
-      }
+    child->ensureUnsealed();
 
-      const auto &mutableChild =
-          std::const_pointer_cast<TextInputShadowNode>(child);
+    const auto &mutableChild =
+        std::const_pointer_cast<TextInputShadowNode>(child);
 
-      applyMarkdown(mutableChild, layoutContext);
-    }
+    applyMarkdown(mutableChild, layoutContext);
   }
 }
 
@@ -119,32 +113,32 @@ void MarkdownTextInputDecoratorShadowNode::applyMarkdown(
   const auto &stateData = textInputState.getData();
   const auto fontSizeMultiplier = layoutContext.fontSizeMultiplier;
 
+  const auto &markdownProps =
+      *std::static_pointer_cast<MarkdownTextInputDecoratorViewProps const>(
+          getProps());
+  const auto &textInputProps =
+      *std::static_pointer_cast<TextInputProps const>(textInput->getProps());
+
+  const auto defaultTextAttributes =
+      textInputProps.getEffectiveTextAttributes(fontSizeMultiplier);
+  const auto defaultNSTextAttributes =
+      RCTNSTextAttributesFromTextAttributes(defaultTextAttributes);
+
+  // this can possibly be optimized
+  RCTMarkdownStyle *markdownStyle =
+      [[RCTMarkdownStyle alloc] initWithStruct:markdownProps.markdownStyle];
+  RCTMarkdownUtils *utils = [[RCTMarkdownUtils alloc] init];
+  [utils setMarkdownStyle:markdownStyle];
+
+  // convert the attibuted string stored in state to
+  // NSAttributedString
+  auto nsAttributedString = RCTNSAttributedStringFromAttributedStringBox(
+      stateData.attributedStringBox);
+
   auto newStateData = TextInputState(stateData);
 
   if (stateData.attributedStringBox.getMode() ==
       AttributedStringBox::Mode::Value) {
-
-    const auto &markdownProps =
-        *std::static_pointer_cast<MarkdownTextInputDecoratorViewProps const>(
-            getProps());
-    const auto &textInputProps =
-        *std::static_pointer_cast<TextInputProps const>(textInput->getProps());
-
-    const auto defaultTextAttributes =
-        textInputProps.getEffectiveTextAttributes(fontSizeMultiplier);
-    const auto defaultNSTextAttributes =
-        RCTNSTextAttributesFromTextAttributes(defaultTextAttributes);
-
-    // this can possibly be optimized
-    RCTMarkdownStyle *markdownStyle =
-        [[RCTMarkdownStyle alloc] initWithStruct:markdownProps.markdownStyle];
-    RCTMarkdownUtils *utils = [[RCTMarkdownUtils alloc] init];
-    [utils setMarkdownStyle:markdownStyle];
-
-    // convert the attibuted string stored in state to
-    // NSAttributedString
-    auto nsAttributedString = RCTNSAttributedStringFromAttributedStringBox(
-        stateData.attributedStringBox);
 
     // Handles the first render, where the text stored in props is
     // different than the one stored in state. The one in state is empty,
@@ -184,28 +178,6 @@ void MarkdownTextInputDecoratorShadowNode::applyMarkdown(
         RCTAttributedStringBoxFromNSAttributedString(newString);
   } else if (stateData.attributedStringBox.getMode() ==
              AttributedStringBox::Mode::OpaquePointer) {
-
-    const auto &markdownProps =
-        *std::static_pointer_cast<MarkdownTextInputDecoratorViewProps const>(
-            getProps());
-    const auto &textInputProps =
-        *std::static_pointer_cast<TextInputProps const>(textInput->getProps());
-
-    const auto defaultTextAttributes =
-        textInputProps.getEffectiveTextAttributes(fontSizeMultiplier);
-    const auto defaultNSTextAttributes =
-        RCTNSTextAttributesFromTextAttributes(defaultTextAttributes);
-
-    // this can possibly be optimized
-    RCTMarkdownStyle *markdownStyle =
-        [[RCTMarkdownStyle alloc] initWithStruct:markdownProps.markdownStyle];
-    RCTMarkdownUtils *utils = [[RCTMarkdownUtils alloc] init];
-    [utils setMarkdownStyle:markdownStyle];
-
-    // convert the attibuted string stored in state to
-    // NSAttributedString
-    auto nsAttributedString = RCTNSAttributedStringFromAttributedStringBox(
-        stateData.attributedStringBox);
 
     // apply markdown
     auto newString = [utils parseMarkdown:nsAttributedString

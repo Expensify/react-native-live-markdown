@@ -35,11 +35,6 @@ public:
   MarkdownTextInputDecoratorShadowNode(ShadowNode const &sourceShadowNode,
                                        ShadowNodeFragment const &fragment)
       : ConcreteViewShadowNode(sourceShadowNode, fragment) {
-    // if the props changed, we need to update the shadow node state to reflect
-    // potential style changes
-    if (fragment.props != ShadowNodeFragment::propsPlaceholder()) {
-    }
-
     initialize();
 
     if (fragment.children) {
