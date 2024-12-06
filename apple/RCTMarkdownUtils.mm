@@ -46,8 +46,6 @@
         // This is a workaround that applies the NSUnderlineStyleNone to the string before iterating over ranges which resolves this problem.
         [attributedString addAttribute:NSUnderlineStyleAttributeName value:[NSNumber numberWithInteger:NSUnderlineStyleNone] range:NSMakeRange(0, attributedString.length)];
 
-        _blockquoteRangesAndLevels = [NSMutableArray new];
-
         for (MarkdownRange *markdownRange in markdownRanges) {
             [self applyRangeToAttributedString:attributedString
                                           type:std::string([markdownRange.type UTF8String])
@@ -134,10 +132,7 @@
         paragraphStyle.firstLineHeadIndent = indent;
         paragraphStyle.headIndent = indent;
         [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:range];
-        [_blockquoteRangesAndLevels addObject:@{
-            @"range": [NSValue valueWithRange:range],
-            @"depth": @(depth)
-        }];
+        [attributedString addAttribute:RCTLiveMarkdownBlockquoteDepthAttributeName value:@(depth) range:range];
     } else if (type == "pre") {
         [attributedString addAttribute:NSForegroundColorAttributeName value:_markdownStyle.preColor range:range];
         NSRange rangeForBackground = [[attributedString string] characterAtIndex:range.location] == '\n' ? NSMakeRange(range.location + 1, range.length - 1) : range;
