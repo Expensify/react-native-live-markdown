@@ -4,7 +4,9 @@
 #include "OwningShadowNodeFragment.h"
 #include <react/renderer/components/RNLiveMarkdownSpec/EventEmitters.h>
 #include <react/renderer/components/RNLiveMarkdownSpec/Props.h>
+#include <react/renderer/components/iostextinput/TextInputShadowNode.h>
 #include <react/renderer/components/view/ConcreteViewShadowNode.h>
+#include <react/renderer/core/LayoutContext.h>
 
 using namespace expensify::livemarkdown;
 
@@ -22,10 +24,13 @@ public:
   MarkdownTextInputDecoratorShadowNode(ShadowNodeFragment const &fragment,
                                        ShadowNodeFamily::Shared const &family,
                                        ShadowNodeTraits traits)
-      : ConcreteViewShadowNode(updateFragmentState(fragment, family),
-                               family, traits) {
-          ShadowNode::traits_.unset(ShadowNodeTraits::ForceFlattenView);
-      }
+      : ConcreteViewShadowNode(fragment, family, traits) {
+    initialize();
+
+    if (fragment.children) {
+      adoptChildren();
+    }
+  }
 
   MarkdownTextInputDecoratorShadowNode(ShadowNode const &sourceShadowNode,
                                        ShadowNodeFragment const &fragment)
@@ -35,13 +40,34 @@ public:
     if (fragment.props != ShadowNodeFragment::propsPlaceholder()) {
     }
 
-          ShadowNode::traits_.unset(ShadowNodeTraits::ForceFlattenView);
+    initialize();
+
+    if (fragment.children) {
+      adoptChildren();
+    }
   }
 
+  void appendChild(const ShadowNode::Shared &child) override;
+  void replaceChild(const ShadowNode &oldChild,
+                    const ShadowNode::Shared &newChild,
+                    size_t suggestedIndex = SIZE_MAX) override;
+  void layout(LayoutContext layoutContext) override;
+  Size
+  measureContent(const LayoutContext &layoutContext,
+                 const LayoutConstraints &layoutConstraints) const override;
+
 private:
-  static const OwningShadowNodeFragment
-  updateFragmentState(ShadowNodeFragment const &fragment,
-                      ShadowNodeFamily::Shared const &family);
+  void initialize();
+  void adoptChildren();
+  void applyMarkdown(std::shared_ptr<TextInputShadowNode> node,
+                     const LayoutContext &layoutContext) const;
+  static YGSize yogaNodeMeasureCallbackConnector(YGNodeConstRef yogaNode,
+                                                 float width,
+                                                 YGMeasureMode widthMode,
+                                                 float height,
+                                                 YGMeasureMode heightMode);
+  static YogaLayoutableShadowNode &
+  shadowNodeFromContext(YGNodeConstRef yogaNode);
 };
 
 } // namespace react

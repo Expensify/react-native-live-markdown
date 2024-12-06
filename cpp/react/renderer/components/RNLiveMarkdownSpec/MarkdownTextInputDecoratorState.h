@@ -10,25 +10,17 @@ class JSI_EXPORT MarkdownTextInputDecoratorState final {
 public:
   using Shared = std::shared_ptr<const MarkdownTextInputDecoratorState>;
 
-  MarkdownTextInputDecoratorState()
-      : decoratorFamily(nullptr), markdownUtils(nullptr){};
+  MarkdownTextInputDecoratorState(){};
   MarkdownTextInputDecoratorState(
-      const ShadowNodeFamily::Shared textInputFamily_)
-      : decoratorFamily(textInputFamily_), markdownUtils(nullptr){};
-  MarkdownTextInputDecoratorState(
-      const ShadowNodeFamily::Shared textInputFamily_,
-      const std::shared_ptr<void> markdownUtils_)
-      : decoratorFamily(textInputFamily_), markdownUtils(markdownUtils_){};
+      const bool appliedMarkdownFormatting_)
+      : appliedMarkdownFormatting(appliedMarkdownFormatting_){};
 
 #ifdef ANDROID
   MarkdownTextInputDecoratorState(
-      MarkdownTextInputDecoratorState const &previousState, folly::dynamic data)
-      : decoratorFamily(previousState.decoratorFamily),
-        markdownUtils(nullptr){};
+      MarkdownTextInputDecoratorState const &previousState, folly::dynamic data){};
 #endif
 
-  const ShadowNodeFamily::Shared decoratorFamily;
-  const std::shared_ptr<void> markdownUtils;
+    const bool appliedMarkdownFormatting{false};
 
 #ifdef ANDROID
   folly::dynamic getDynamic() const {
