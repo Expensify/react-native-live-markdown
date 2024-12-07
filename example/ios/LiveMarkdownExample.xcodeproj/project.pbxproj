@@ -42,7 +42,7 @@
 		B00BAAF5C014FE7B2882F3D2 /* Pods-LiveMarkdownExample-LiveMarkdownExampleTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LiveMarkdownExample-LiveMarkdownExampleTests.debug.xcconfig"; path = "Target Support Files/Pods-LiveMarkdownExample-LiveMarkdownExampleTests/Pods-LiveMarkdownExample-LiveMarkdownExampleTests.debug.xcconfig"; sourceTree = "<group>"; };
 		CAA9E8DF265937F29F5F14B9 /* Pods-LiveMarkdownExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LiveMarkdownExample.debug.xcconfig"; path = "Target Support Files/Pods-LiveMarkdownExample/Pods-LiveMarkdownExample.debug.xcconfig"; sourceTree = "<group>"; };
 		CC1D7F32CF951D3C7E3766C2 /* Pods-LiveMarkdownExample-LiveMarkdownExampleTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LiveMarkdownExample-LiveMarkdownExampleTests.release.xcconfig"; path = "Target Support Files/Pods-LiveMarkdownExample-LiveMarkdownExampleTests/Pods-LiveMarkdownExample-LiveMarkdownExampleTests.release.xcconfig"; sourceTree = "<group>"; };
-		D0B2A4DCBD4F586B48D724B1 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = LiveMarkdownExample/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		D0B2A4DCBD4F586B48D724B1 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = LiveMarkdownExample/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		D26F35BF6D6F4E3DBD015150 /* Pods-LiveMarkdownExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LiveMarkdownExample.release.xcconfig"; path = "Target Support Files/Pods-LiveMarkdownExample/Pods-LiveMarkdownExample.release.xcconfig"; sourceTree = "<group>"; };
 		D76D1B9DE3FB85C3FCBD5ECA /* libPods-LiveMarkdownExample.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-LiveMarkdownExample.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
@@ -267,7 +267,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -e\n\nWITH_ENVIRONMENT=\"../node_modules/react-native/scripts/xcode/with-environment.sh\"\nREACT_NATIVE_XCODE=\"../node_modules/react-native/scripts/react-native-xcode.sh\"\n\n/bin/sh -c \"$WITH_ENVIRONMENT $REACT_NATIVE_XCODE\"\n";
+			shellScript = "set -e\n\nWITH_ENVIRONMENT=\"../../node_modules/react-native/scripts/xcode/with-environment.sh\"\nREACT_NATIVE_XCODE=\"../../node_modules/react-native/scripts/react-native-xcode.sh\"\n\n/bin/sh -c \"$WITH_ENVIRONMENT $REACT_NATIVE_XCODE\"\n";
 		};
 		0F2B0B8E979111BFF61F15EA /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -590,13 +590,12 @@
 					"-DFOLLY_MOBILE=1",
 					"-DFOLLY_USE_LIBCPP=1",
 					"-DFOLLY_CFG_NO_COROUTINES=1",
-					" ",
 				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					" ",
 				);
-				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
+				REACT_NATIVE_PATH = "${PODS_ROOT}/../../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
 				USE_HERMES = true;
@@ -670,13 +669,12 @@
 					"-DFOLLY_MOBILE=1",
 					"-DFOLLY_USE_LIBCPP=1",
 					"-DFOLLY_CFG_NO_COROUTINES=1",
-					" ",
 				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					" ",
 				);
-				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
+				REACT_NATIVE_PATH = "${PODS_ROOT}/../../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;
 				VALIDATE_PRODUCT = YES;

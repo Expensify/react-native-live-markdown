@@ -1,5 +1,6 @@
 import {test, expect} from '@playwright/test';
 import type {Locator, Page} from '@playwright/test';
+// eslint-disable-next-line import/no-relative-packages
 import * as TEST_CONST from '../../example/src/testConstants';
 import {getCursorPosition, setupInput, getElementStyle, pressCmd, getElementValue} from './utils';
 

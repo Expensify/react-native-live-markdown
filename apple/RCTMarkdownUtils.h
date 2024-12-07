@@ -3,10 +3,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+const NSAttributedStringKey RCTLiveMarkdownBlockquoteDepthAttributeName = @"RCTLiveMarkdownBlockquoteDepth";
+
 @interface RCTMarkdownUtils : NSObject
 
 @property (nonatomic) RCTMarkdownStyle *markdownStyle;
-@property (nonatomic) NSMutableArray<NSDictionary *> *blockquoteRangesAndLevels;
+@property (nonatomic) NSNumber *parserId;
 
 - (NSAttributedString *)parseMarkdown:(nullable NSAttributedString *)input withAttributes:(nullable NSDictionary<NSAttributedStringKey, id>*)attributes;
 

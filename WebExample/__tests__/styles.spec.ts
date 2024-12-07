@@ -1,5 +1,6 @@
 import {test, expect} from '@playwright/test';
 import type {Page} from '@playwright/test';
+// eslint-disable-next-line import/no-relative-packages
 import * as TEST_CONST from '../../example/src/testConstants';
 import {setupInput, getElementStyle} from './utils';
 
