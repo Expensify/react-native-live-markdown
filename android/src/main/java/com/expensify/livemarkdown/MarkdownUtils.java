@@ -4,7 +4,6 @@ import android.text.SpannableStringBuilder;
 
 import androidx.annotation.NonNull;
 
-import com.expensify.livemarkdown.spans.MarkdownSpan;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.systrace.Systrace;
 
