@@ -1,4 +1,5 @@
 import {defineConfig, devices} from '@playwright/test';
+// eslint-disable-next-line import/no-relative-packages
 import * as TEST_CONST from '../example/src/testConstants';
 
 export default defineConfig({
@@ -6,7 +7,7 @@ export default defineConfig({
   preserveOutput: 'never',
   outputDir: undefined,
   webServer: {
-    command: 'yarn web',
+    command: 'npm run web',
     url: TEST_CONST.LOCAL_URL,
     reuseExistingServer: !process.env.CI,
     stdout: 'pipe',

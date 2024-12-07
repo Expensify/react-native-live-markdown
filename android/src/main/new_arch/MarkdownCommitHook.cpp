@@ -107,30 +107,36 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
     rootNode = rootNode->cloneTree(
         nodes.textInput->getFamily(),
         [this, &stateData, &textInputState, &nodes](ShadowNode const &node) {
-          auto newStateData =
-              std::make_shared<AndroidTextInputState>(stateData);
-          // force measurement of a map buffer
-          newStateData->cachedAttributedStringId = 0;
+          std::shared_ptr<ShadowNode> newNode = nullptr;
 
-          // setting -1 as the event counter makes sure that the update will be ignored by the java
-          // part of the code, which is what we want as we don't change the attributed string here
-          if (previousEventCount_.contains(nodes.textInput->getTag()) &&
+          if (stateData.cachedAttributedStringId != 0) {
+            auto newStateData =
+                std::make_shared<AndroidTextInputState>(stateData);
+
+            // force measurement of a map buffer
+            newStateData->cachedAttributedStringId = 0;
+
+            // setting -1 as the event counter makes sure that the update will be ignored by the java
+            // part of the code, which is what we want as we don't change the attributed string here
+            if (previousEventCount_.contains(nodes.textInput->getTag()) &&
               previousEventCount_[nodes.textInput->getTag()] == stateData.mostRecentEventCount) {
               newStateData->mostRecentEventCount = -1;
-          } else {
+            } else {
               previousEventCount_[nodes.textInput->getTag()] = stateData.mostRecentEventCount;
-          }
+            }
 
-          // clone the text input with the new state
-          auto newNode = node.clone({
-              .state =
-                  std::make_shared<const ConcreteState<AndroidTextInputState>>(
-                      newStateData, textInputState),
-          });
+            auto newState = std::make_shared<const ConcreteState<AndroidTextInputState>>(
+                newStateData, textInputState);
+
+            newNode = node.clone({ .state = newState });
+          } else {
+            newNode = node.clone({});
+          }
 
           const auto currentDecoratorProps =
               nodes.decorator->getProps()->rawProps["markdownStyle"];
-
+          const auto currentParserId =
+              nodes.decorator->getProps()->rawProps["parserId"].asInt();
           // if it's the first time we encounter this particular input or the
           // markdown styles have changed (in which case we need to reset the
           // cpp cache, to which we don't have a direct access), create a new
@@ -138,13 +144,14 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
           // for this particular input
           if (!textLayoutManagers_.contains(nodes.textInput->getTag()) ||
               previousDecoratorProps_[nodes.textInput->getTag()] !=
-                  currentDecoratorProps) {
+                  currentDecoratorProps ||
+              previousParserId_[nodes.textInput->getTag()] != currentParserId) {
             static auto customUIManagerClass = jni::findClassStatic(
                 "com/expensify/livemarkdown/CustomFabricUIManager");
             static auto createCustomUIManager =
                 customUIManagerClass
                     ->getStaticMethod<JFabricUIManager::javaobject(
-                        JFabricUIManager::javaobject, ReadableMap::javaobject)>(
+                        JFabricUIManager::javaobject, ReadableMap::javaobject, int)>(
                         "create");
 
             auto const decoratorPropsRNM =
@@ -155,7 +162,7 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
 
             const auto customUIManager = jni::make_global(createCustomUIManager(
                 customUIManagerClass, fabricUIManager_.get(),
-                decoratorPropsRM.get()));
+                decoratorPropsRM.get(), currentParserId));
             const ContextContainer::Shared contextContainer =
                 std::make_shared<ContextContainer const>();
             contextContainer->insert("FabricUIManager", customUIManager);
@@ -163,6 +170,7 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
                 std::make_shared<TextLayoutManager>(contextContainer);
             previousDecoratorProps_[nodes.textInput->getTag()] =
                 currentDecoratorProps;
+            previousParserId_[nodes.textInput->getTag()] = currentParserId;
           }
 
           // we need to replace the TextLayoutManager every time to make sure
