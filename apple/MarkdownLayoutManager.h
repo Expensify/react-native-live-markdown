@@ -1,5 +1,6 @@
 #import <UIKit/UIKit.h>
 #import <RNLiveMarkdown/RCTMarkdownUtils.h>
+#import <RNLiveMarkdown/MarkdownFormatter.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
