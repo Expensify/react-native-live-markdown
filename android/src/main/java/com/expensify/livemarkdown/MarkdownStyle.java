@@ -32,6 +32,7 @@ public class MarkdownStyle {
 
   private final float mBlockquotePaddingLeft;
 
+  @NonNull
   private final String mCodeFontFamily;
 
   private final float mCodeFontSize;
@@ -42,6 +43,7 @@ public class MarkdownStyle {
   @ColorInt
   private final int mCodeBackgroundColor;
 
+  @NonNull
   private final String mPreFontFamily;
 
   private final float mPreFontSize;
