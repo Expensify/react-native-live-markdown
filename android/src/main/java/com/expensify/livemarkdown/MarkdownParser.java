@@ -29,9 +29,9 @@ public class MarkdownParser {
     mReactContext = reactContext;
   }
 
-  private native String nativeParse(String text, int parserId);
+  private native String nativeParse(@NonNull String text, int parserId);
 
-  public synchronized List<MarkdownRange> parse(String text, int parserId) {
+  public synchronized List<MarkdownRange> parse(@NonNull String text, int parserId) {
     try {
       Systrace.beginSection(0, "parse");
 

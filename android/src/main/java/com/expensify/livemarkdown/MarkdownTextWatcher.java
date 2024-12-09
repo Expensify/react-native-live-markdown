@@ -7,7 +7,7 @@ import android.text.TextWatcher;
 import androidx.annotation.NonNull;
 
 public class MarkdownTextWatcher implements TextWatcher {
-  private final MarkdownUtils mMarkdownUtils;
+  private final @NonNull MarkdownUtils mMarkdownUtils;
 
   public MarkdownTextWatcher(@NonNull MarkdownUtils markdownUtils) {
     mMarkdownUtils = markdownUtils;
