@@ -22,7 +22,8 @@
   return self;
 }
 
-- (NSAttributedString *)parseMarkdown:(nullable NSAttributedString *)input withAttributes:(nullable NSDictionary<NSAttributedStringKey,id> *)attributes
+- (NSAttributedString *)parseMarkdown:(nullable NSAttributedString *)input
+            withDefaultTextAttributes:(nonnull NSDictionary<NSAttributedStringKey, id> *)defaultTextAttributes
 {
   @synchronized (self) {
     if (input == nil) {
