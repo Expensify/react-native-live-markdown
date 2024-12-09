@@ -77,7 +77,7 @@ function updateTreeElementRefs(treeRoot: TreeNode, element: HTMLMarkdownElement)
     }
 
     if (currentElement?.dataset.type === 'pre') {
-      currentElement.setAttribute('data-content', parseInnerHTMLToText(currentElement, '', 0));
+      currentElement.setAttribute('data-content', parseInnerHTMLToText(currentElement as HTMLElement, 0));
     }
   }
 

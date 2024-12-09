@@ -3,6 +3,7 @@ import type {MarkdownTextInputElement} from '../../MarkdownTextInput.web';
 import {parseStringWithUnitToNumber} from '../../styleUtils';
 import type {PartialMarkdownStyle} from '../../styleUtils';
 import {addInlineImagePreview} from '../inputElements/inlineImage';
+import BrowserUtils from './browserUtils';
 import type {MarkdownRange} from './parserUtils';
 import type {NodeType, TreeNode} from './treeUtils';
 
@@ -61,6 +62,7 @@ function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownSty
       });
       Object.assign((node.parentNode as HTMLElement).style, {
         padding: `${preVerticalPadding}px ${preHorizontalPadding}px`,
+        'line-height': BrowserUtils.isMobile ? 1.3 : 'inherit',
         position: 'relative',
         width: 'fit-content',
         maxWidth: '100%',

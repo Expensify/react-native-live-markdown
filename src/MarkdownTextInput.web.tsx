@@ -345,6 +345,14 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
           if (onChangeText) {
             onChangeText(parsedText);
           }
+          if (processedMarkdownStyle) {
+            const preBlocks = [...divRef.current.querySelectorAll('*[data-type="pre"]')];
+            while (preBlocks.length > 0) {
+              const preBlock = preBlocks.pop() as HTMLElement;
+              preBlock.setAttribute('data-content', parseInnerHTMLToText(preBlock, 0));
+            }
+            handleCustomStyles(divRef.current, processedMarkdownStyle);
+          }
           return;
         }
         let newInputUpdate: ParseTextResult;

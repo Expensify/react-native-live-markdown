@@ -164,7 +164,7 @@ function generateCodeBlocksRules(target: MarkdownTextInputElement, styleTag: HTM
     rules.push({
       selector: `.${target.uniqueId} *:nth-child(${i + 1} of [data-type='line']:has(> *[data-type='pre'])) > *[data-type='pre']::before`,
       properties: {
-        'min-width': `min(calc(100% + 1.5px), ${preBlockWidth + horizontalPadding * 2 + 2}px)`,
+        'min-width': `min(calc(100% + 2.5px), ${preBlockWidth + horizontalPadding * 2 + 2}px)`,
         'max-width': `min(${preBlockWidth + horizontalPadding * 2 + 2}px, ${contentWidth}px)`,
       },
     });
