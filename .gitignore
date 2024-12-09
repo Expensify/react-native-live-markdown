@@ -78,5 +78,4 @@ android/keystores/debug.keystore
 lib/
 
 # react-native-live-markdown
-android/src/main/assets/react-native-live-markdown-parser.js
 .build_complete

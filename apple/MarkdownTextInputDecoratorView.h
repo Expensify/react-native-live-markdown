@@ -7,6 +7,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)setMarkdownStyle:(RCTMarkdownStyle *)markdownStyle;
 
+- (void)setParserId:(NSNumber *)parserId;
+
 @end
 
 NS_ASSUME_NONNULL_END

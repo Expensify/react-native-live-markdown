@@ -19,6 +19,7 @@
 @implementation MarkdownTextInputDecoratorView {
   RCTMarkdownUtils *_markdownUtils;
   RCTMarkdownStyle *_markdownStyle;
+  NSNumber *_parserId;
   MarkdownBackedTextInputDelegate *_markdownBackedTextInputDelegate;
   MarkdownTextStorageDelegate *_markdownTextStorageDelegate;
   MarkdownTextFieldObserver *_markdownTextFieldObserver;
@@ -61,6 +62,7 @@
   _markdownUtils = [[RCTMarkdownUtils alloc] init];
   react_native_assert(_markdownStyle != nil);
   [_markdownUtils setMarkdownStyle:_markdownStyle];
+  [_markdownUtils setParserId:_parserId];
 
   if ([backedTextInputView isKindOfClass:[RCTUITextField class]]) {
     _textField = (RCTUITextField *)backedTextInputView;
@@ -141,8 +143,18 @@
 {
   _markdownStyle = markdownStyle;
   [_markdownUtils setMarkdownStyle:markdownStyle];
+  [self applyNewStyles];
+}
 
-  // trigger reformatting
+- (void)setParserId:(NSNumber *)parserId
+{
+  _parserId = parserId;
+  [_markdownUtils setParserId:parserId];
+  [self applyNewStyles];
+}
+
+- (void)applyNewStyles
+{
   if (_textView != nil) {
     [_textView.textStorage setAttributedString:_textView.attributedText];
   }

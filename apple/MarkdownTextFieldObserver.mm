@@ -35,7 +35,7 @@
   }
 
   NSMutableAttributedString *attributedText = [textField.attributedText mutableCopy];
-  [_markdownUtils applyFormatting:attributedText withDefaultTextAttributes:_textField.defaultTextAttributes];
+  [_markdownUtils applyMarkdownFormatting:attributedText withDefaultTextAttributes:_textField.defaultTextAttributes];
 
   UITextRange *textRange = _textField.selectedTextRange;
   _active = NO; // prevent recursion
