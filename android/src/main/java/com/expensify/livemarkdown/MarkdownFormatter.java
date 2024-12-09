@@ -22,7 +22,7 @@ public class MarkdownFormatter {
     mAssetManager = assetManager;
   }
 
-  public void format(SpannableStringBuilder ssb, List<MarkdownRange> markdownRanges, @NonNull MarkdownStyle markdownStyle) {
+  public void format(@NonNull SpannableStringBuilder ssb, @NonNull List<MarkdownRange> markdownRanges, @NonNull MarkdownStyle markdownStyle) {
     try {
       Systrace.beginSection(0, "format");
       Objects.requireNonNull(markdownStyle, "mMarkdownStyle is null");
@@ -33,7 +33,7 @@ public class MarkdownFormatter {
     }
   }
 
-  private void removeSpans(SpannableStringBuilder ssb) {
+  private void removeSpans(@NonNull SpannableStringBuilder ssb) {
     try {
       Systrace.beginSection(0, "removeSpans");
       // We shouldn't use `ssb.removeSpans()` because it also removes SpellcheckSpan, SuggestionSpan etc.
@@ -46,7 +46,7 @@ public class MarkdownFormatter {
     }
   }
 
-  private void applyRanges(SpannableStringBuilder ssb, List<MarkdownRange> markdownRanges, @NonNull MarkdownStyle markdownStyle) {
+  private void applyRanges(@NonNull SpannableStringBuilder ssb, @NonNull List<MarkdownRange> markdownRanges, @NonNull MarkdownStyle markdownStyle) {
     try {
       Systrace.beginSection(0, "applyRanges");
       for (MarkdownRange markdownRange : markdownRanges) {
@@ -57,10 +57,10 @@ public class MarkdownFormatter {
     }
   }
 
-  private void applyRange(SpannableStringBuilder ssb, MarkdownRange markdownRange, MarkdownStyle markdownStyle) {
+  private void applyRange(@NonNull SpannableStringBuilder ssb, @NonNull MarkdownRange markdownRange, @NonNull MarkdownStyle markdownStyle) {
     String type = markdownRange.getType();
     int start = markdownRange.getStart();
-    int end = start + markdownRange.getLength();
+    int end = markdownRange.getEnd();
     switch (type) {
       case "bold":
         setSpan(ssb, new MarkdownBoldSpan(), start, end);
@@ -128,7 +128,7 @@ public class MarkdownFormatter {
     }
   }
 
-  private void setSpan(SpannableStringBuilder ssb, MarkdownSpan span, int start, int end) {
+  private void setSpan(@NonNull SpannableStringBuilder ssb, @NonNull MarkdownSpan span, int start, int end) {
     ssb.setSpan(span, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
     mMarkdownSpans.add(span);
   }
