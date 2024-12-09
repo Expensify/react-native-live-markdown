@@ -25,8 +25,8 @@ public class MarkdownTextWatcher implements TextWatcher {
 
   @Override
   public void afterTextChanged(Editable editable) {
-    if (editable instanceof SpannableStringBuilder) {
-      mMarkdownUtils.applyMarkdownFormatting((SpannableStringBuilder) editable);
+    if (editable instanceof SpannableStringBuilder ssb) {
+      mMarkdownUtils.applyMarkdownFormatting(ssb);
     }
   }
 }
