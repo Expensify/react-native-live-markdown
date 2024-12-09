@@ -8,7 +8,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) RCTMarkdownStyle *markdownStyle;
 @property (nonatomic) NSNumber *parserId;
 
-- (NSAttributedString *)parseMarkdown:(nullable NSAttributedString *)input withAttributes:(nullable NSDictionary<NSAttributedStringKey, id>*)attributes;
+- (NSAttributedString *)parseMarkdown:(nullable NSAttributedString *)input
+            withDefaultTextAttributes:(nonnull NSDictionary<NSAttributedStringKey, id> *)defaultTextAttributes;
 
 @end
 

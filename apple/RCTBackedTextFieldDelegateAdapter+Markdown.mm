@@ -19,7 +19,7 @@
   if (markdownUtils != nil) {
     RCTUITextField *backedTextInputView = [self valueForKey:@"_backedTextInputView"];
     UITextRange *range = backedTextInputView.selectedTextRange;
-    backedTextInputView.attributedText = [markdownUtils parseMarkdown:backedTextInputView.attributedText withAttributes:backedTextInputView.defaultTextAttributes];
+    backedTextInputView.attributedText = [markdownUtils parseMarkdown:backedTextInputView.attributedText withDefaultTextAttributes:backedTextInputView.defaultTextAttributes];
     [backedTextInputView setSelectedTextRange:range notifyDelegate:YES];
   }
 
