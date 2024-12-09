@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.util.RNLog;
 import com.facebook.soloader.SoLoader;
+import com.facebook.systrace.Systrace;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -29,9 +30,9 @@ public class MarkdownParser {
     mReactContext = reactContext;
   }
 
-  private native String nativeParse(String text, int parserId);
+  private native String nativeParse(@NonNull String text, int parserId);
 
-  private void splitRangesOnEmojis(List<MarkdownRange> markdownRanges, String type) {
+    private void splitRangesOnEmojis(List<MarkdownRange> markdownRanges, String type) {
     List<MarkdownRange> emojiRanges = new ArrayList<>();
     for (MarkdownRange range : markdownRanges) {
       if (range.getType().equals("emoji")) {
@@ -87,28 +88,37 @@ public class MarkdownParser {
     splitRangesOnEmojis(markdownRanges, "strikethrough");
     return markdownRanges;
   }
-
-  public synchronized List<MarkdownRange> parse(String text, int parserId) {
-    if (text.equals(mPrevText) && parserId == mPrevParserId) {
-      return mPrevMarkdownRanges;
-    }
-
-    String json;
+  public synchronized List<MarkdownRange> parse(@NonNull String text, int parserId) {
     try {
-      json = nativeParse(text, parserId);
-    } catch (Exception e) {
-      // Skip formatting, runGuarded will show the error in LogBox
+      Systrace.beginSection(0, "parse");
+
+      if (text.equals(mPrevText) && parserId == mPrevParserId) {
+        return mPrevMarkdownRanges;
+      }
+
+      String json;
+      try {
+        Systrace.beginSection(0, "nativeParse");
+        json = nativeParse(text, parserId);
+      } catch (Exception e) {
+        // Skip formatting, runGuarded will show the error in LogBox
+        mPrevText = text;
+        mPrevParserId = parserId;
+        mPrevMarkdownRanges = Collections.emptyList();
+        return mPrevMarkdownRanges;
+      } finally {
+        Systrace.endSection(0);
+      }
+
+      List<MarkdownRange> markdownRanges = parseRanges(json, text);
+      Systrace.endSection(0);
+
       mPrevText = text;
       mPrevParserId = parserId;
-      mPrevMarkdownRanges = Collections.emptyList();
+      mPrevMarkdownRanges = markdownRanges;
       return mPrevMarkdownRanges;
+    } finally {
+      Systrace.endSection(0);
     }
-
-    List<MarkdownRange> markdownRanges = parseRanges(json, text);
-
-    mPrevText = text;
-    mPrevParserId = parserId;
-    mPrevMarkdownRanges = markdownRanges;
-    return mPrevMarkdownRanges;
   }
 }

@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 
 import com.expensify.livemarkdown.spans.*;
 import com.facebook.react.views.text.internal.span.CustomLineHeightSpan;
+import com.facebook.systrace.Systrace;
 
 import java.util.List;
 import java.util.Objects;
@@ -19,30 +20,45 @@ public class MarkdownFormatter {
     mAssetManager = assetManager;
   }
 
-  public void format(SpannableStringBuilder ssb, List<MarkdownRange> markdownRanges, @NonNull MarkdownStyle markdownStyle) {
-    Objects.requireNonNull(markdownStyle, "mMarkdownStyle is null");
-    removeSpans(ssb);
-    applyRanges(ssb, markdownRanges, markdownStyle);
-  }
-
-  private void removeSpans(SpannableStringBuilder ssb) {
-    // We shouldn't use `removeSpans()` because it also removes SpellcheckSpan, SuggestionSpan etc.
-    MarkdownSpan[] spans = ssb.getSpans(0, ssb.length(), MarkdownSpan.class);
-    for (MarkdownSpan span : spans) {
-      ssb.removeSpan(span);
+  public void format(@NonNull SpannableStringBuilder ssb, @NonNull List<MarkdownRange> markdownRanges, @NonNull MarkdownStyle markdownStyle) {
+    try {
+      Systrace.beginSection(0, "format");
+      Objects.requireNonNull(markdownStyle, "mMarkdownStyle is null");
+      removeSpans(ssb);
+      applyRanges(ssb, markdownRanges, markdownStyle);
+    } finally {
+      Systrace.endSection(0);
     }
   }
 
-  private void applyRanges(SpannableStringBuilder ssb, List<MarkdownRange> markdownRanges, @NonNull MarkdownStyle markdownStyle) {
-    for (MarkdownRange markdownRange : markdownRanges) {
-      applyRange(ssb, markdownRange, markdownStyle);
+  private void removeSpans(@NonNull SpannableStringBuilder ssb) {
+    try {
+      Systrace.beginSection(0, "removeSpans");
+      // We shouldn't use `removeSpans()` because it also removes SpellcheckSpan, SuggestionSpan etc.
+      MarkdownSpan[] spans = ssb.getSpans(0, ssb.length(), MarkdownSpan.class);
+      for (MarkdownSpan span : spans) {
+        ssb.removeSpan(span);
+      }
+    } finally {
+      Systrace.endSection(0);
     }
   }
 
-  private void applyRange(SpannableStringBuilder ssb, MarkdownRange markdownRange, MarkdownStyle markdownStyle) {
+  private void applyRanges(@NonNull SpannableStringBuilder ssb, @NonNull List<MarkdownRange> markdownRanges, @NonNull MarkdownStyle markdownStyle) {
+    try {
+      Systrace.beginSection(0, "applyRanges");
+      for (MarkdownRange markdownRange : markdownRanges) {
+        applyRange(ssb, markdownRange, markdownStyle);
+      }
+    } finally {
+      Systrace.endSection(0);
+    }
+  }
+
+  private void applyRange(@NonNull SpannableStringBuilder ssb, @NonNull MarkdownRange markdownRange, @NonNull MarkdownStyle markdownStyle) {
     String type = markdownRange.getType();
     int start = markdownRange.getStart();
-    int end = start + markdownRange.getLength();
+    int end = markdownRange.getEnd();
     switch (type) {
       case "bold":
         setSpan(ssb, new MarkdownBoldSpan(), start, end);
@@ -110,7 +126,7 @@ public class MarkdownFormatter {
     }
   }
 
-  private void setSpan(SpannableStringBuilder ssb, MarkdownSpan span, int start, int end) {
+  private void setSpan(@NonNull SpannableStringBuilder ssb, @NonNull MarkdownSpan span, int start, int end) {
     ssb.setSpan(span, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
   }
 }

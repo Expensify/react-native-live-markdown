@@ -5,6 +5,7 @@ import android.text.SpannableStringBuilder;
 import androidx.annotation.NonNull;
 
 import com.facebook.react.bridge.ReactContext;
+import com.facebook.systrace.Systrace;
 
 import java.util.List;
 
@@ -29,8 +30,13 @@ public class MarkdownUtils {
   }
 
   public void applyMarkdownFormatting(SpannableStringBuilder ssb) {
-    String text = ssb.toString();
-    List<MarkdownRange> markdownRanges = mMarkdownParser.parse(text, mParserId);
-    mMarkdownFormatter.format(ssb, markdownRanges, mMarkdownStyle);
+    try {
+      Systrace.beginSection(0, "applyMarkdownFormatting");
+      String text = ssb.toString();
+      List<MarkdownRange> markdownRanges = mMarkdownParser.parse(text, mParserId);
+      mMarkdownFormatter.format(ssb, markdownRanges, mMarkdownStyle);
+    } finally {
+      Systrace.endSection(0);
+    }
   }
 }

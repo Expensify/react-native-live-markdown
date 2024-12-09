@@ -1,17 +1,19 @@
 package com.expensify.livemarkdown;
 
+import androidx.annotation.NonNull;
+
 public class MarkdownRange {
-  private final String mType;
+  private final @NonNull String mType;
   private final int mStart;
   private final int mEnd;
   private final int mLength;
   private final int mDepth;
 
-  public MarkdownRange(String type, int start, int length, int depth) {
+  public MarkdownRange(@NonNull String type, int start, int length, int depth) {
     mType = type;
     mStart = start;
-    mLength = length;
     mEnd = start + length;
+    mLength = length;
     mDepth = depth;
   }
 
@@ -23,12 +25,12 @@ public class MarkdownRange {
     return mStart;
   }
 
-  public int getLength() {
-    return mLength;
-  }
-
   public int getEnd() {
     return mEnd;
+  }
+
+  public int getLength() {
+    return mLength;
   }
 
   public int getDepth() {
