@@ -8,7 +8,7 @@
                     withMarkdownRanges:(nonnull NSArray<MarkdownRange *> *)markdownRanges
                      withMarkdownStyle:(nonnull RCTMarkdownStyle *)markdownStyle
 {
-  NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:text attributes:attributes];
+  NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:text attributes:defaultTextAttributes];
 
   [attributedString beginEditing];
 

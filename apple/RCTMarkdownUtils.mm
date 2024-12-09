@@ -7,7 +7,7 @@
   MarkdownFormatter *_markdownFormatter;
   NSString *_prevInputString;
   NSAttributedString *_prevAttributedString;
-  NSDictionary<NSAttributedStringKey, id> *_prevTextAttributes;
+  NSDictionary<NSAttributedStringKey, id> *_prevDefaultTextAttributes;
   __weak RCTMarkdownStyle *_prevMarkdownStyle;
   __weak NSNumber *_prevParserId;
 }
@@ -31,19 +31,19 @@
     }
 
     NSString *inputString = [input string];
-    if ([inputString isEqualToString:_prevInputString] && [attributes isEqualToDictionary:_prevTextAttributes] && [_markdownStyle isEqual:_prevMarkdownStyle] && [_parserId isEqualToNumber:_prevParserId]) {
+    if ([inputString isEqualToString:_prevInputString] && [defaultTextAttributes isEqualToDictionary:_prevDefaultTextAttributes] && [_markdownStyle isEqual:_prevMarkdownStyle] && [_parserId isEqualToNumber:_prevParserId]) {
       return _prevAttributedString;
     }
 
     NSArray<MarkdownRange *> *markdownRanges = [_markdownParser parse:inputString withParserId:_parserId];
 
     NSAttributedString *attributedString = [_markdownFormatter format:inputString
-                                                       withAttributes:attributes
+                                            withDefaultTextAttributes:defaultTextAttributes
                                                    withMarkdownRanges:markdownRanges
                                                     withMarkdownStyle:_markdownStyle];
     _prevInputString = inputString;
     _prevAttributedString = attributedString;
-    _prevTextAttributes = attributes;
+    _prevDefaultTextAttributes = defaultTextAttributes;
     _prevMarkdownStyle = _markdownStyle;
     _prevParserId = _parserId;
 
