@@ -47,6 +47,8 @@ private:
       textLayoutManagers_;
   std::unordered_map<facebook::react::Tag, folly::dynamic>
       previousDecoratorProps_;
+  std::unordered_map<facebook::react::Tag, int>
+      previousParserId_;
   std::unordered_map<facebook::react::Tag, int64_t>
       previousEventCount_;
 };

@@ -17,6 +17,7 @@
 @implementation MarkdownTextInputDecoratorView {
   RCTMarkdownUtils *_markdownUtils;
   RCTMarkdownStyle *_markdownStyle;
+  NSNumber *_parserId;
   MarkdownTextLayoutManagerDelegate *_markdownTextLayoutManagerDelegate;
 #ifdef RCT_NEW_ARCH_ENABLED
   __weak RCTTextInputComponentView *_textInput;
@@ -63,6 +64,7 @@
   _markdownUtils = [[RCTMarkdownUtils alloc] init];
   react_native_assert(_markdownStyle != nil);
   [_markdownUtils setMarkdownStyle:_markdownStyle];
+  [_markdownUtils setParserId:_parserId];
 
   [_textInput setMarkdownUtils:_markdownUtils];
   if ([_backedTextInputView isKindOfClass:[RCTUITextField class]]) {
@@ -109,7 +111,18 @@
 {
   _markdownStyle = markdownStyle;
   [_markdownUtils setMarkdownStyle:markdownStyle];
+  [self applyNewStyles];
+}
 
+- (void)setParserId:(NSNumber *)parserId
+{
+  _parserId = parserId;
+  [_markdownUtils setParserId:parserId];
+  [self applyNewStyles];
+}
+
+- (void)applyNewStyles
+{
   if (_textView != nil) {
     // We want to use `textStorage` for applying markdown when possible. Currently it's only available for UITextView
     [_textView textDidChange];

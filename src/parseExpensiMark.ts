@@ -1,28 +1,11 @@
-// eslint-disable-next-line import/no-unresolved
-import ExpensiMark from 'expensify-common/dist/ExpensiMark';
-import {unescapeText} from './utils';
+'worklet';
 
-type MarkdownType =
-  | 'bold'
-  | 'italic'
-  | 'strikethrough'
-  | 'emoji'
-  | 'mention-here'
-  | 'mention-user'
-  | 'mention-report'
-  | 'link'
-  | 'code'
-  | 'pre'
-  | 'blockquote'
-  | 'h1'
-  | 'syntax'
-  | 'inline-image';
-type MarkdownRange = {
-  type: MarkdownType;
-  start: number;
-  length: number;
-  depth?: number;
-};
+import {ExpensiMark} from 'expensify-common';
+import {unescapeText} from 'expensify-common/dist/utils';
+import type {MarkdownType, MarkdownRange} from './commonTypes';
+
+const MAX_PARSABLE_LENGTH = 4000;
+
 type Token = ['TEXT' | 'HTML', string];
 type StackItem = {tag: string; children: Array<StackItem | string>};
 
@@ -271,27 +254,24 @@ function groupRanges(ranges: MarkdownRange[]) {
   }, [] as MarkdownRange[]);
 }
 
-function parseExpensiMarkToRanges(markdown: string): MarkdownRange[] {
-  try {
-    const html = parseMarkdownToHTML(markdown);
-    const tokens = parseHTMLToTokens(html);
-    const tree = parseTokensToTree(tokens);
-    const [text, ranges] = parseTreeToTextAndRanges(tree);
-    if (text !== markdown) {
-      throw new Error(
-        `[react-native-live-markdown] Parsing error: the processed text does not match the original Markdown input. This may be caused by incorrect parsing functions or invalid input Markdown.\nProcessed input: '${JSON.stringify(
-          text,
-        )}'\nOriginal input: '${JSON.stringify(markdown)}'`,
-      );
-    }
-    const sortedRanges = sortRanges(ranges);
-    const groupedRanges = groupRanges(sortedRanges);
-    return groupedRanges;
-  } catch (error) {
-    // returning an empty array in case of error
+function parseExpensiMark(markdown: string): MarkdownRange[] {
+  if (markdown.length > MAX_PARSABLE_LENGTH) {
     return [];
   }
+  const html = parseMarkdownToHTML(markdown);
+  const tokens = parseHTMLToTokens(html);
+  const tree = parseTokensToTree(tokens);
+  const [text, ranges] = parseTreeToTextAndRanges(tree);
+  if (text !== markdown) {
+    throw new Error(
+      `[react-native-live-markdown] Parsing error: the processed text does not match the original Markdown input. This may be caused by incorrect parsing functions or invalid input Markdown.\nProcessed input: '${JSON.stringify(
+        text,
+      )}'\nOriginal input: '${JSON.stringify(markdown)}'`,
+    );
+  }
+  const sortedRanges = sortRanges(ranges);
+  const groupedRanges = groupRanges(sortedRanges);
+  return groupedRanges;
 }
 
-globalThis.parseExpensiMarkToRanges = parseExpensiMarkToRanges;
-export type {MarkdownType, MarkdownRange};
+export default parseExpensiMark;
