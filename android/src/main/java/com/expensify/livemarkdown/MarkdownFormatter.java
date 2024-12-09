@@ -58,7 +58,7 @@ public class MarkdownFormatter {
   private void applyRange(@NonNull SpannableStringBuilder ssb, @NonNull MarkdownRange markdownRange, @NonNull MarkdownStyle markdownStyle) {
     String type = markdownRange.getType();
     int start = markdownRange.getStart();
-    int end = start + markdownRange.getLength();
+    int end = markdownRange.getEnd();
     switch (type) {
       case "bold":
         setSpan(ssb, new MarkdownBoldSpan(), start, end);
