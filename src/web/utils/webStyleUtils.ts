@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type {TextStyle} from 'react-native';
 import type {MarkdownStyle} from '../../MarkdownTextInputDecoratorViewNativeComponent';
-import {mergeMarkdownStyleWithDefault} from '../../styleUtils';
+import {mergeMarkdownStyleWithDefault, parseStringWithUnitToNumber} from '../../styleUtils';
+import type {PartialMarkdownStyle} from '../../styleUtils';
+import type {MarkdownTextInputElement} from '../../MarkdownTextInput.web';
 
 let createReactDOMStyle: (style: any) => any;
 try {
@@ -51,4 +53,126 @@ function parseToReactDOMStyle(style: TextStyle): any {
   return createReactDOMStyle(preprocessStyle(style));
 }
 
-export {parseToReactDOMStyle, processMarkdownStyle};
+const CUSTOM_WEB_STYLES_ID = 'LiveMarkdownCustomWebStyles';
+
+function* generateUniqueId() {
+  let idCounter = 0;
+  while (true) {
+    yield `live-markdown-input-${idCounter++}`;
+  }
+}
+
+const idGenerator = generateUniqueId();
+
+function configureCustomWebStylesheet() {
+  if (document.getElementById(CUSTOM_WEB_STYLES_ID) !== null) {
+    return;
+  }
+
+  const customStyleTag = document.createElement('style');
+  customStyleTag.id = CUSTOM_WEB_STYLES_ID;
+
+  document.head.appendChild(customStyleTag);
+}
+
+function handleCustomStyles(target: MarkdownTextInputElement, markdownStyle: PartialMarkdownStyle) {
+  const styleTag = document.getElementById(CUSTOM_WEB_STYLES_ID) as HTMLStyleElement;
+  if (!styleTag) {
+    return;
+  }
+  generateCodeBlocksRules(target, styleTag, markdownStyle);
+}
+
+type Rule = {selector: string; properties: Record<string, string>};
+
+function addStylesheetRules(rules: Rule[], styleSheet: CSSStyleSheet) {
+  rules.forEach((rule) => {
+    const {selector, properties} = rule;
+    let propertiesStr = '';
+
+    Object.keys(properties).forEach((prop) => {
+      const value = properties[prop];
+      propertiesStr += `${prop}: ${value};\n`;
+    });
+
+    styleSheet.insertRule(`${selector}{${propertiesStr}}`, styleSheet.cssRules.length);
+  });
+}
+
+function property(e: HTMLElement, p: string) {
+  return parseFloat(window.getComputedStyle(e).getPropertyValue(p).replace('px', ''));
+}
+
+function generateCodeBlocksRules(target: MarkdownTextInputElement, styleTag: HTMLStyleElement, markdownStyle: PartialMarkdownStyle) {
+  const line = target.querySelector('*[data-type="line"]:has(> *[data-type="pre"]) > span:first-child');
+  if (!line) {
+    return;
+  }
+
+  const lineHeight = line.getBoundingClientRect()?.height;
+  const preStyles = markdownStyle.pre;
+  const padding = preStyles?.padding ?? 2;
+  const horizontalPadding = parseStringWithUnitToNumber(preStyles?.paddingHorizontal ?? padding);
+  const verticalPadding = parseStringWithUnitToNumber(preStyles?.paddingVertical ?? padding);
+
+  const contentWidth =
+    target.offsetWidth - property(target, 'border-left-width') - property(target, 'border-left-width') - property(target, 'padding-left') - property(target, 'padding-right');
+
+  const rules: Rule[] = [
+    {
+      selector: `.${target.uniqueId} *[data-type='pre']::before`,
+      properties: {
+        top: `${Math.floor(lineHeight) - 1}px`,
+        padding: `${verticalPadding.toString()}px ${horizontalPadding.toString()}px`,
+        'background-color': `${(preStyles?.backgroundColor as string) ?? 'lightgray'}`,
+        'border-radius': `${preStyles?.borderRadius?.toString() ?? '4'}px`,
+        'border-color': `${preStyles?.borderColor ?? 'grey'}`,
+      },
+    },
+    {
+      selector: `.${target.uniqueId} *[data-type='line'] *[data-type='syntax']:has(+ *[data-type='pre'])`,
+      properties: {
+        transform: `translate(-${horizontalPadding}px, -${verticalPadding}px)`,
+      },
+    },
+    {
+      selector: `.${target.uniqueId} *[data-type='line'] *[data-type='pre'] + *[data-type='syntax']`,
+      properties: {
+        transform: `translate(-${horizontalPadding}px, ${verticalPadding}px)`,
+      },
+    },
+    {
+      selector: `.${target.uniqueId} *[data-type='line'] *[data-type='pre'] + *[data-type='syntax'] + *[data-type='text']`,
+      properties: {
+        transform: `translate(-${horizontalPadding}px, ${verticalPadding}px)`,
+      },
+    },
+    {
+      selector: `.${target.uniqueId} *[data-type='line']:has(> *[data-type='pre']) > *:nth-child(n+4)`,
+      properties: {
+        display: 'inline-block',
+        transform: `translate(-${horizontalPadding}px, ${verticalPadding}px)`,
+      },
+    },
+  ];
+
+  const preBlocks = [...document.querySelectorAll('*[data-type="pre"]')];
+  for (let i = 0; i < preBlocks.length; i++) {
+    const preBlock = preBlocks[i] as HTMLElement;
+    const preBlockWidth = preBlock.getBoundingClientRect().width;
+
+    rules.push({
+      selector: `.${target.uniqueId} *:nth-child(${i + 1} of [data-type='line']:has(> *[data-type='pre'])) > *[data-type='pre']::before`,
+      properties: {
+        'min-width': `min(calc(100% + 2.5px), ${preBlockWidth + horizontalPadding * 2 + 2}px)`,
+        'max-width': `min(${preBlockWidth + horizontalPadding * 2 + 2}px, ${contentWidth}px)`,
+      },
+    });
+  }
+
+  if (styleTag.sheet) {
+    addStylesheetRules(rules, styleTag.sheet);
+  }
+}
+
+export {parseToReactDOMStyle, processMarkdownStyle, configureCustomWebStylesheet, idGenerator, handleCustomStyles};
