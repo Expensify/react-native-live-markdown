@@ -5,11 +5,6 @@
 @implementation RCTMarkdownUtils {
   MarkdownParser *_markdownParser;
   MarkdownFormatter *_markdownFormatter;
-  NSString *_prevInputString;
-  NSAttributedString *_prevAttributedString;
-  NSDictionary<NSAttributedStringKey, id> *_prevTextAttributes;
-  __weak RCTMarkdownStyle *_prevMarkdownStyle;
-  __weak NSNumber *_prevParserId;
 }
 
 - (instancetype)init
@@ -22,32 +17,15 @@
   return self;
 }
 
-- (NSAttributedString *)parseMarkdown:(nullable NSAttributedString *)input withAttributes:(nullable NSDictionary<NSAttributedStringKey,id> *)attributes
+- (void)applyMarkdownFormatting:(nonnull NSMutableAttributedString *)attributedString
+      withDefaultTextAttributes:(nonnull NSDictionary<NSAttributedStringKey, id> *)defaultTextAttributes
 {
-  @synchronized (self) {
-    if (input == nil) {
-      return nil;
-    }
+  NSArray<MarkdownRange *> *markdownRanges = [_markdownParser parse:attributedString.string withParserId:_parserId];
 
-    NSString *inputString = [input string];
-    if ([inputString isEqualToString:_prevInputString] && [attributes isEqualToDictionary:_prevTextAttributes] && [_markdownStyle isEqual:_prevMarkdownStyle] && [_parserId isEqualToNumber:_prevParserId]) {
-      return _prevAttributedString;
-    }
-
-    NSArray<MarkdownRange *> *markdownRanges = [_markdownParser parse:inputString withParserId:_parserId];
-
-    NSAttributedString *attributedString = [_markdownFormatter format:inputString
-                                                       withAttributes:attributes
-                                                   withMarkdownRanges:markdownRanges
-                                                    withMarkdownStyle:_markdownStyle];
-    _prevInputString = inputString;
-    _prevAttributedString = attributedString;
-    _prevTextAttributes = attributes;
-    _prevMarkdownStyle = _markdownStyle;
-    _prevParserId = _parserId;
-
-    return attributedString;
-  }
+  [_markdownFormatter formatAttributedString:attributedString
+                   withDefaultTextAttributes:defaultTextAttributes
+                          withMarkdownRanges:markdownRanges
+                           withMarkdownStyle:_markdownStyle];
 }
 
 @end

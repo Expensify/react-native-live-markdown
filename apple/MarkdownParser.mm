@@ -9,7 +9,7 @@
   NSArray<MarkdownRange *> *_prevMarkdownRanges;
 }
 
-- (NSArray<MarkdownRange *> *)parse:(NSString *)text withParserId:(nonnull NSNumber *)parserId {
+- (NSArray<MarkdownRange *> *)parse:(nonnull NSString *)text withParserId:(nonnull NSNumber *)parserId {
   @synchronized (self) {
     if ([text isEqualToString:_prevText] && [parserId isEqualToNumber:_prevParserId]) {
       return _prevMarkdownRanges;
@@ -30,7 +30,7 @@
       output = markdownRuntime->runGuarded(markdownWorklet, input);
     } catch (const jsi::JSError &error) {
       // Skip formatting, runGuarded will show the error in LogBox
-      _prevText = text;
+      _prevText = [NSString stringWithString:text];
       _prevParserId = parserId;
       _prevMarkdownRanges = @[];
       return _prevMarkdownRanges;
@@ -56,13 +56,13 @@
       }
     } catch (const jsi::JSError &error) {
       RCTLogWarn(@"[react-native-live-markdown] Incorrect schema of worklet parser output: %s", error.getMessage().c_str());
-      _prevText = text;
+      _prevText = [NSString stringWithString:text];
       _prevParserId = parserId;
       _prevMarkdownRanges = @[];
       return _prevMarkdownRanges;
     }
 
-    _prevText = text;
+    _prevText = [NSString stringWithString:text];
     _prevParserId = parserId;
     _prevMarkdownRanges = markdownRanges;
     return _prevMarkdownRanges;
