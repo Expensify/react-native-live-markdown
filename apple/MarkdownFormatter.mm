@@ -104,6 +104,11 @@
     paragraphStyle.headIndent = indent;
     [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:range];
     [attributedString addAttribute:RCTLiveMarkdownBlockquoteDepthAttributeName value:@(depth) range:range];
+  } else if (type == "h1" && markdownStyle.h1LineHeight != -1) {
+    NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
+    paragraphStyle.lineHeightMultiple = markdownStyle.h1LineHeight / markdownStyle.h1FontSize;
+    NSRange rangeWithHashAndSpace = NSMakeRange(range.location - 2, range.length + 2);
+    [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:rangeWithHashAndSpace];
   } else if (type == "pre") {
     [attributedString addAttribute:NSForegroundColorAttributeName value:markdownStyle.preColor range:range];
     NSRange rangeForBackground = [[attributedString string] characterAtIndex:range.location] == '\n' ? NSMakeRange(range.location + 1, range.length - 1) : range;
