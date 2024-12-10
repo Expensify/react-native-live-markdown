@@ -41,7 +41,12 @@
   _active = NO; // prevent recursion
   _textField.attributedText = attributedText;
   _active = YES;
+  
+  // Restore cursor position
   [_textField setSelectedTextRange:textRange notifyDelegate:NO];
+
+  // Eliminate underline blinks while typing if previous text ends with a link
+  _textField.typingAttributes = _textField.defaultTextAttributes;
 }
 
 - (void)textFieldDidEndEditing:(__unused UITextField *)textField
