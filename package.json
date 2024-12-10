@@ -10,6 +10,7 @@
   "files": [
     "src",
     "lib",
+    "mock",
     "android",
     "apple",
     "cpp",
