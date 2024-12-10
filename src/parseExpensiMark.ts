@@ -12,7 +12,7 @@ function isWeb() {
 }
 
 function isJest() {
-  return !!process.env.JEST_WORKER_ID;
+  return !!global.process.env.JEST_WORKER_ID;
 }
 
 // eslint-disable-next-line no-underscore-dangle
