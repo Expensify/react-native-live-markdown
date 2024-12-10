@@ -2,7 +2,16 @@
 
 import {ExpensiMark} from 'expensify-common';
 import {unescapeText} from 'expensify-common/dist/utils';
+import {decode} from 'html-entities';
+import type {WorkletFunction} from 'react-native-reanimated/lib/typescript/commonTypes';
 import type {MarkdownType, MarkdownRange} from './commonTypes';
+
+// eslint-disable-next-line no-underscore-dangle
+if (__DEV__ && (decode as WorkletFunction).__workletHash === undefined) {
+  throw new Error(
+    "[react-native-live-markdown] `parseExpensiMark` requires `html-entities` package to be workletized. Please add `'worklet';` directive at the top of `node_modules/html-entities/lib/index.js` using patch-package.",
+  );
+}
 
 const MAX_PARSABLE_LENGTH = 4000;
 
