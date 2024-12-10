@@ -23,30 +23,13 @@
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context
 {
   if (_active && ([keyPath isEqualToString:@"text"] || [keyPath isEqualToString:@"attributedText"])) {
-    [self textFieldDidChange:_textField];
+    [self applyMarkdownFormatting];
   }
 }
 
-- (void)textFieldDidChange:(__unused UITextField *)textField {
-  react_native_assert(_textField.defaultTextAttributes != nil);
-
-  if (_textField.markedTextRange != nil) {
-    return; // skip formatting during multi-stage input to avoid breaking internal state
-  }
-
-  NSMutableAttributedString *attributedText = [textField.attributedText mutableCopy];
-  [_markdownUtils applyMarkdownFormatting:attributedText withDefaultTextAttributes:_textField.defaultTextAttributes];
-
-  UITextRange *textRange = _textField.selectedTextRange;
-  _active = NO; // prevent recursion
-  _textField.attributedText = attributedText;
-  _active = YES;
-  
-  // Restore cursor position
-  [_textField setSelectedTextRange:textRange notifyDelegate:NO];
-
-  // Eliminate underline blinks while typing if previous text ends with a link
-  _textField.typingAttributes = _textField.defaultTextAttributes;
+- (void)textFieldDidChange:(__unused UITextField *)textField
+{
+  [self applyMarkdownFormatting];
 }
 
 - (void)textFieldDidEndEditing:(__unused UITextField *)textField
@@ -60,7 +43,31 @@
   NSMutableDictionary *defaultTextAttributes = [_textField.defaultTextAttributes mutableCopy];
   defaultTextAttributes[RCTLiveMarkdownForceUpdateAttributeName] = @(counter++);
   _textField.defaultTextAttributes = defaultTextAttributes;
-  [self textFieldDidChange:_textField];
+  [self applyMarkdownFormatting];
+}
+
+- (void)applyMarkdownFormatting
+{
+  react_native_assert(_textField.defaultTextAttributes != nil);
+
+  if (_textField.markedTextRange != nil) {
+    return; // skip formatting during multi-stage input to avoid breaking internal state
+  }
+
+  NSMutableAttributedString *attributedText = [_textField.attributedText mutableCopy];
+  [_markdownUtils applyMarkdownFormatting:attributedText withDefaultTextAttributes:_textField.defaultTextAttributes];
+
+  UITextRange *textRange = _textField.selectedTextRange;
+
+  _active = NO; // prevent recursion
+  _textField.attributedText = attributedText;
+  _active = YES;
+  
+  // Restore cursor position
+  [_textField setSelectedTextRange:textRange notifyDelegate:NO];
+
+  // Eliminate underline blinks while typing if previous text ends with a link
+  _textField.typingAttributes = _textField.defaultTextAttributes;
 }
 
 @end
