@@ -10,6 +10,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)textFieldDidChange:(UITextField *)textField;
 
+- (void)textFieldDidEndEditing:(UITextField *)textField;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -44,4 +44,18 @@
   [_textField setSelectedTextRange:textRange notifyDelegate:NO];
 }
 
+- (void)textFieldDidEndEditing:(__unused UITextField *)textField
+{
+  // In order to prevent iOS from applying underline to the whole text if text ends with a link on blur,
+  // we need to update `defaultTextAttributes` which at this point doesn't contain NSUnderline attribute yet.
+  // It seems like the setter performs deep comparision, so we differentiate the new value using a counter,
+  // otherwise this trick would work only once.
+  static NSAttributedStringKey RCTLiveMarkdownForceUpdateAttributeName = @"RCTLiveMarkdownForceUpdate";
+  static NSUInteger counter = 0;
+  NSMutableDictionary *defaultTextAttributes = [_textField.defaultTextAttributes mutableCopy];
+  defaultTextAttributes[RCTLiveMarkdownForceUpdateAttributeName] = @(counter++);
+  _textField.defaultTextAttributes = defaultTextAttributes;
+  [self textFieldDidChange:_textField];
+}
+
 @end

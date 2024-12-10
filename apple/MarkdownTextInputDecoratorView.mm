@@ -74,6 +74,7 @@
     
     // register observers for future edits
     [_textField addTarget:_markdownTextFieldObserver action:@selector(textFieldDidChange:) forControlEvents:UIControlEventEditingChanged];
+    [_textField addTarget:_markdownTextFieldObserver action:@selector(textFieldDidEndEditing:) forControlEvents:UIControlEventEditingDidEnd];
     [_textField addObserver:_markdownTextFieldObserver forKeyPath:@"text" options:NSKeyValueObservingOptionNew context:NULL];
     [_textField addObserver:_markdownTextFieldObserver forKeyPath:@"attributedText" options:NSKeyValueObservingOptionNew context:NULL];
     
@@ -132,6 +133,7 @@
   
   if (_textField != nil) {
     [_textField removeTarget:_markdownTextFieldObserver action:@selector(textFieldDidChange:) forControlEvents:UIControlEventEditingChanged];
+    [_textField removeTarget:_markdownTextFieldObserver action:@selector(textFieldDidEndEditing:) forControlEvents:UIControlEventEditingDidEnd];
     [_textField removeObserver:_markdownTextFieldObserver forKeyPath:@"text" context:NULL];
     [_textField removeObserver:_markdownTextFieldObserver forKeyPath:@"attributedText" context:NULL];
     _markdownTextFieldObserver = nil;
