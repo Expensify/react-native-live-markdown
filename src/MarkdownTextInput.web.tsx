@@ -23,13 +23,14 @@ import type {MarkdownStyle} from './MarkdownTextInputDecoratorViewNativeComponen
 import {getElementHeight, getPlaceholderValue, isEventComposing, normalizeValue, parseInnerHTMLToText} from './web/utils/inputUtils';
 import {parseToReactDOMStyle, processMarkdownStyle} from './web/utils/webStyleUtils';
 import {forceRefreshAllImages} from './web/inputElements/inlineImage';
-import type {MarkdownRange, InlineImagesInputProps} from './commonTypes';
+import type {MarkdownRange, InlineImagesInputProps, FormatType} from './commonTypes';
 
 const useClientEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
 
 interface MarkdownTextInputProps extends TextInputProps, InlineImagesInputProps {
   markdownStyle?: MarkdownStyle;
   parser: (text: string) => MarkdownRange[];
+  formatSelection?: (selectedText: string, formatType: FormatType) => string;
   onClick?: (e: MouseEvent<HTMLDivElement>) => void;
   dir?: string;
   disabled?: boolean;
@@ -85,6 +86,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
       multiline = false,
       markdownStyle,
       parser,
+      formatSelection,
       onBlur,
       onChange,
       onChangeText,
@@ -236,6 +238,40 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
       [parser, parseText, processedMarkdownStyle],
     );
 
+    const format = useCallback(
+      (target: MarkdownTextInputElement, parsedText: string, cursorPosition: number, formatCommand: string): ParseTextResult => {
+        if (!contentSelection.current) {
+          return {
+            text: '',
+            cursorPosition: 0,
+          };
+        }
+
+        let formatType: FormatType;
+        switch (formatCommand) {
+          case 'formatBold':
+            formatType = 'bold';
+            break;
+          case 'formatItalic':
+            formatType = 'italic';
+            break;
+          default:
+            formatType = 'underline';
+            break;
+        }
+
+        const beforeSelectedText = parsedText.slice(0, contentSelection.current.start);
+        const selectedText = parsedText.slice(contentSelection.current.start, contentSelection.current.end);
+        const formattedText = formatSelection?.(selectedText, formatType) ?? selectedText;
+        const formattedTextDiffLength = formattedText.length - selectedText.length;
+        const afterSelectedText = parsedText.slice(contentSelection.current.end);
+        const text = `${beforeSelectedText}${formattedText}${afterSelectedText}`;
+
+        return parseText(parser, target, text, processedMarkdownStyle, cursorPosition + formattedTextDiffLength, true);
+      },
+      [parser, parseText, formatSelection, processedMarkdownStyle],
+    );
+
     // Placeholder text color logic
     const updateTextColor = useCallback(
       (node: HTMLDivElement, text: string) => {
@@ -361,6 +397,11 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
           case 'historyRedo':
             newInputUpdate = redo(divRef.current);
             break;
+          case 'formatBold':
+          case 'formatItalic':
+          case 'formatUnderline':
+            newInputUpdate = format(divRef.current, parsedText, newCursorPosition, inputType);
+            break;
           default:
             newInputUpdate = parseText(parser, divRef.current, parsedText, processedMarkdownStyle, newCursorPosition, true, !inputType, inputType === 'pasteText');
         }
@@ -414,7 +455,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
 
         handleContentSizeChange();
       },
-      [parser, updateTextColor, updateSelection, onChange, onChangeText, handleContentSizeChange, undo, redo, parseText, processedMarkdownStyle, setEventProps, maxLength],
+      [parser, updateTextColor, updateSelection, onChange, onChangeText, handleContentSizeChange, undo, redo, format, parseText, processedMarkdownStyle, setEventProps, maxLength],
     );
 
     const insertText = useCallback(
