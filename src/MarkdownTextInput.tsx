@@ -2,7 +2,6 @@
 import type {
   TextInput,
   TextInputSubmitEditingEventData,
-  TextStyle,
   NativeSyntheticEvent,
   TextInputSelectionChangeEventData,
   TextInputProps,
@@ -13,7 +12,6 @@ import type {
 } from 'react-native';
 import React, {useEffect, useRef, useCallback, useMemo, useLayoutEffect} from 'react';
 import type {CSSProperties, MutableRefObject, ReactEventHandler, FocusEventHandler, MouseEvent, KeyboardEvent, SyntheticEvent, ClipboardEventHandler, TouchEvent} from 'react';
-import {StyleSheet} from 'react-native';
 import {updateInputStructure} from './web/utils/parserUtils';
 import InputHistory from './web/InputHistory';
 import type {TreeNode} from './web/utils/treeUtils';
@@ -69,6 +67,14 @@ type HTMLMarkdownElement = HTMLElement & {
   value: string;
 };
 
+function flattenStyle(style: React.CSSProperties | React.CSSProperties[] | undefined, finalStyle: CSSProperties = {}) {
+  if (Array.isArray(style)) {
+    style.forEach((s) => flattenStyle(s, finalStyle));
+    return finalStyle;
+  }
+  return Object.assign(finalStyle, style);
+}
+
 const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputProps>(
   (
     {
@@ -98,7 +104,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
       selectTextOnFocus,
       spellCheck,
       selection,
-      style = {},
+      style,
       value,
       autoFocus = false,
       onContentSizeChange,
@@ -132,7 +138,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
       history.current = new InputHistory(100, 150, value || '');
     }
 
-    const flattenedStyle = useMemo(() => StyleSheet.flatten(style), [style]);
+    const flattenedStyle = useMemo(() => flattenStyle(style as React.CSSProperties), [style]);
 
     // Empty placeholder would collapse the div, so we need to use zero-width space to prevent it
     const heightSafePlaceholder = useMemo(() => getPlaceholderValue(placeholder), [placeholder]);
@@ -193,16 +199,12 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
     }, [parser, markdownStyle, parseText]);
 
     const inputStyles = useMemo(
-      () =>
-        StyleSheet.flatten([
-          styles.defaultInputStyles,
-          flattenedStyle && {
-            caretColor: (flattenedStyle as TextStyle).color || 'black',
-          },
-          {whiteSpace: multiline ? 'pre-wrap' : 'nowrap'},
-          disabled && styles.disabledInputStyles,
-          parseToReactDOMStyle(flattenedStyle),
-        ]) as CSSProperties,
+      () => ({
+        ...styles.defaultInputStyles,
+        ...{whiteSpace: multiline ? 'pre-wrap' : 'nowrap'},
+        ...(disabled && styles.disabledInputStyles),
+        ...parseToReactDOMStyle(flattenedStyle),
+      }),
       [flattenedStyle, multiline, disabled],
     );
 
@@ -761,23 +763,23 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
   },
 );
 
-const styles = StyleSheet.create({
+const styles = {
   defaultInputStyles: {
     borderColor: 'black',
     borderWidth: 1,
     borderStyle: 'solid',
     fontFamily: 'sans-serif',
-    // @ts-expect-error it works on web
     boxSizing: 'border-box',
     overflowY: 'auto',
     overflowX: 'auto',
     overflowWrap: 'break-word',
+    caretColor: 'inherit',
   },
   disabledInputStyles: {
     opacity: 0.75,
     cursor: 'auto',
   },
-});
+} satisfies Record<string, CSSProperties>;
 
 export default MarkdownTextInput;
 

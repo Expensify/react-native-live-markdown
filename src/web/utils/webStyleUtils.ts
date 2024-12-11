@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type {TextStyle} from 'react-native';
 import type {MarkdownStyle} from '../../MarkdownTextInputDecoratorViewNativeComponent';
 import {mergeMarkdownStyleWithDefault} from '../../styleUtils';
 import type {PartialMarkdownStyle} from '../../styleUtils';
@@ -48,7 +47,10 @@ function processMarkdownStyle(input: PartialMarkdownStyle | undefined): Markdown
   return processUnitsInMarkdownStyle(mergeMarkdownStyleWithDefault(input));
 }
 
-function parseToReactDOMStyle(style: TextStyle): any {
+/**
+ * TODO nando DEPRECATE?
+ */
+function parseToReactDOMStyle(style: React.CSSProperties): any {
   return createReactDOMStyle(preprocessStyle(style));
 }
 
