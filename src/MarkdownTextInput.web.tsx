@@ -238,7 +238,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
       [parser, parseText, processedMarkdownStyle],
     );
 
-    const format = useCallback(
+    const handleFormatSelection = useCallback(
       (target: MarkdownTextInputElement, parsedText: string, cursorPosition: number, formatCommand: string): ParseTextResult => {
         if (!contentSelection.current) {
           return {
@@ -400,7 +400,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
           case 'formatBold':
           case 'formatItalic':
           case 'formatUnderline':
-            newInputUpdate = format(divRef.current, parsedText, newCursorPosition, inputType);
+            newInputUpdate = handleFormatSelection(divRef.current, parsedText, newCursorPosition, inputType);
             break;
           default:
             newInputUpdate = parseText(parser, divRef.current, parsedText, processedMarkdownStyle, newCursorPosition, true, !inputType, inputType === 'pasteText');
@@ -455,7 +455,21 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
 
         handleContentSizeChange();
       },
-      [parser, updateTextColor, updateSelection, onChange, onChangeText, handleContentSizeChange, undo, redo, format, parseText, processedMarkdownStyle, setEventProps, maxLength],
+      [
+        parser,
+        updateTextColor,
+        updateSelection,
+        onChange,
+        onChangeText,
+        handleContentSizeChange,
+        undo,
+        redo,
+        handleFormatSelection,
+        parseText,
+        processedMarkdownStyle,
+        setEventProps,
+        maxLength,
+      ],
     );
 
     const insertText = useCallback(
