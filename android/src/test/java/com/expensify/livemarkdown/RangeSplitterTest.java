@@ -14,9 +14,9 @@ import java.util.List;
 public class RangeSplitterTest {
 
   private void testRange(MarkdownRange range, int start, int end, String type){
-    assertEquals(start, range.start);
-    assertEquals(end, range.end);
-    assertEquals(type, range.type);
+    assertEquals(start, range.getStart());
+    assertEquals(end, range.getEnd());
+    assertEquals(type, range.getType());
   }
 
   @Test
@@ -55,7 +55,7 @@ public class RangeSplitterTest {
     splitRangesOnEmojis(markdownRanges, "strikethrough");
 
     // Sort is needed because ranges may get mixed while splitting
-    Collections.sort(markdownRanges, (r1, r2) -> Integer.compare(r1.start, r2.start));
+    Collections.sort(markdownRanges, (r1, r2) -> Integer.compare(r1.getStart(), r2.getStart()));
 
     assertEquals(3, markdownRanges.size());
     testRange(markdownRanges.get(0), 0 ,3, "strikethrough");
@@ -75,7 +75,7 @@ public class RangeSplitterTest {
     splitRangesOnEmojis(markdownRanges, "strikethrough");
 
     // Sort is needed because ranges may get mixed while splitting
-    Collections.sort(markdownRanges, (r1, r2) -> Integer.compare(r1.start, r2.start));
+    Collections.sort(markdownRanges, (r1, r2) -> Integer.compare(r1.getStart(), r2.getStart()));
 
     assertEquals(7, markdownRanges.size());
     testRange(markdownRanges.get(0), 0 ,20, "italic");
