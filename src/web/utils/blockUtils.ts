@@ -1,11 +1,19 @@
+import type {InlineImagesInputProps} from '../../commonTypes';
 import type {MarkdownTextInputElement} from '../../MarkdownTextInput.web';
-import type {InlineImagesInputProps, MarkdownRange} from '../../commonTypes';
+import {parseStringWithUnitToNumber} from '../../styleUtils';
 import type {PartialMarkdownStyle} from '../../styleUtils';
 import {addInlineImagePreview} from '../inputElements/inlineImage';
+import BrowserUtils from './browserUtils';
+import type {MarkdownRange} from './parserUtils';
 import type {NodeType, TreeNode} from './treeUtils';
 
 function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownStyle: PartialMarkdownStyle) {
   const node = targetElement;
+
+  const defaultPrePadding = markdownStyle.pre?.padding ?? 2;
+  const preHorizontalPadding = parseStringWithUnitToNumber(markdownStyle.pre?.paddingHorizontal ?? defaultPrePadding).toString();
+  const preVerticalPadding = parseStringWithUnitToNumber(markdownStyle.pre?.paddingVertical ?? defaultPrePadding).toString();
+
   switch (type) {
     case 'line':
       Object.assign(node.style, {
@@ -44,10 +52,22 @@ function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownSty
       });
       break;
     case 'code':
-      Object.assign(node.style, markdownStyle.code);
+      Object.assign(node.style, {...markdownStyle.code, lineHeight: 1.5});
       break;
     case 'pre':
-      Object.assign(node.style, markdownStyle.pre);
+      Object.assign(node.style, {
+        ...markdownStyle.pre,
+        backgroundColor: 'transparent',
+        padding: 0,
+      });
+      Object.assign((node.parentNode as HTMLElement).style, {
+        padding: `${preVerticalPadding}px ${preHorizontalPadding}px`,
+        'line-height': BrowserUtils.isMobile ? 1.3 : 'inherit',
+        position: 'relative',
+        width: 'fit-content',
+        maxWidth: '100%',
+        boxSizing: 'border-box',
+      });
       break;
 
     case 'blockquote':
@@ -110,4 +130,12 @@ function extendBlockStructure(
   return targetNode;
 }
 
-export {addStyleToBlock, extendBlockStructure, isBlockMarkdownType, getFirstBlockMarkdownRange};
+function getTopParentTreeNode(node: TreeNode) {
+  let currentParentNode = node.parentNode;
+  while (currentParentNode && ['text', 'br', 'line', 'syntax'].includes(currentParentNode.parentNode?.type || '')) {
+    currentParentNode = currentParentNode?.parentNode || null;
+  }
+  return currentParentNode;
+}
+
+export {addStyleToBlock, extendBlockStructure, isBlockMarkdownType, getFirstBlockMarkdownRange, getTopParentTreeNode};
