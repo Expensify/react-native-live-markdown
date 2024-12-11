@@ -25,9 +25,9 @@ public class RangeSplitter {
       }
 
       // Split range
-      while(j < emojiRanges.size()){
+      while (j < emojiRanges.size()) {
         MarkdownRange emojiRange = emojiRanges.get(j);
-        if(emojiRange.getStart() > currentRange.getEnd()) break;
+        if (emojiRange.getStart() > currentRange.getEnd()) break;
 
         if (emojiRange.getStart() >= currentRange.getStart() && emojiRange.getEnd() <= currentRange.getEnd()) {
           MarkdownRange newRange = new MarkdownRange(currentRange.getType(), currentRange.getStart(), emojiRange.getStart() - currentRange.getStart(), currentRange.getDepth());
