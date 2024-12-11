@@ -153,9 +153,10 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, MarkdownRange[]] {
       } else if (node.tag === '<br />') {
         text += '\n';
       } else if (node.tag.startsWith('<pre')) {
-        appendSyntax(`\`\`\`${unescapeText(node.tag.match(/new-line-char="([^"]*)"/)![1]!)}`);
-        const content = node.children.join('').replaceAll('&#32;', ' ');
-        addChildrenWithStyle(content, 'pre');
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const [_, lb, content] = node.children.join('').match(/^(\r?\n)([\s\S]*)$/) as RegExpMatchArray;
+        appendSyntax(`\`\`\`${lb}`);
+        addChildrenWithStyle(`${content}`, 'pre');
         appendSyntax('```');
       } else if (node.tag.startsWith('<a href="')) {
         const rawHref = node.tag.match(/href="([^"]*)"/)![1]!; // always present
