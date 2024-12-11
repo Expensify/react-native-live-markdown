@@ -3,21 +3,16 @@
 
 @implementation MarkdownFormatter
 
-- (nonnull NSAttributedString *)format:(nonnull NSString *)text
-             withDefaultTextAttributes:(nonnull NSDictionary<NSAttributedStringKey, id> *)defaultTextAttributes
-                    withMarkdownRanges:(nonnull NSArray<MarkdownRange *> *)markdownRanges
-                     withMarkdownStyle:(nonnull RCTMarkdownStyle *)markdownStyle
+- (void)formatAttributedString:(nonnull NSMutableAttributedString *)attributedString
+     withDefaultTextAttributes:(nonnull NSDictionary<NSAttributedStringKey, id> *)defaultTextAttributes
+            withMarkdownRanges:(nonnull NSArray<MarkdownRange *> *)markdownRanges
+             withMarkdownStyle:(nonnull RCTMarkdownStyle *)markdownStyle
 {
-  NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:text attributes:defaultTextAttributes];
+  NSRange fullRange = NSMakeRange(0, attributedString.length);
 
   [attributedString beginEditing];
 
-  // If the attributed string ends with underlined text, blurring the single-line input imprints the underline style across the whole string.
-  // It looks like a bug in iOS, as there is no underline style to be found in the attributed string, especially after formatting.
-  // This is a workaround that applies the NSUnderlineStyleNone to the string before iterating over ranges which resolves this problem.
-  [attributedString addAttribute:NSUnderlineStyleAttributeName
-                           value:[NSNumber numberWithInteger:NSUnderlineStyleNone]
-                           range:NSMakeRange(0, attributedString.length)];
+  [attributedString addAttributes:defaultTextAttributes range:fullRange];
 
   for (MarkdownRange *markdownRange in markdownRanges) {
     [self applyRangeToAttributedString:attributedString
@@ -29,9 +24,25 @@
 
   RCTApplyBaselineOffset(attributedString);
 
-  [attributedString endEditing];
+  /*
+  Calling `[attributedString addAttributes:defaultTextAttributes range:fullRange]` breaks the font for emojis.
+  Before, NSFont attribute is ".SFUI-Regular" and NSOriginalFont attribute is ".AppleColorEmoji".
+  After the call, both are set to ".SFUI-Regular" which makes emoji invisible and zero-width.
+  Calling `fixAttributesInRange:` fixes this problem.
+  */
+  [attributedString fixAttributesInRange:fullRange];
 
-  return attributedString;
+  /*
+  When updating MarkdownTextInput's `style` property without changing `markdownStyle`,
+  React Native calls `[RCTTextInputComponentView _setAttributedString:]` which skips update if strings are equal.
+  See https://github.com/facebook/react-native/blob/287e20033207df5e59d199a347b7ae2b4cd7a59e/packages/react-native/React/Fabric/Mounting/ComponentViews/TextInput/RCTTextInputComponentView.mm#L680-L684
+  The attributed strings are compared using `[RCTTextInputComponentView _textOf:equals:]` which compares only raw strings
+  if NSOriginalFont attribute is present. So we purposefully remove this attribute to force update.
+  See https://github.com/facebook/react-native/blob/287e20033207df5e59d199a347b7ae2b4cd7a59e/packages/react-native/React/Fabric/Mounting/ComponentViews/TextInput/RCTTextInputComponentView.mm#L751-L784
+  */
+  [attributedString removeAttribute:@"NSOriginalFont" range:fullRange];
+
+  [attributedString endEditing];
 }
 
 - (void)applyRangeToAttributedString:(NSMutableAttributedString *)attributedString
