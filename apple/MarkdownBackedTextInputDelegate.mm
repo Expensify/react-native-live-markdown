@@ -26,16 +26,15 @@
   // After adding a newline at the end of the blockquote, the typing attributes in the new line
   // still contain NSParagraphStyle with non-zero firstLineHeadIndent and headIntent.
   // This causes the cursor to be shifted to the right instead of being located at the beginning of the line.
-  // The following code removes NSParagraphStyle from typing attributes to fix the position of the cursor.
-  NSParagraphStyle *paragraphStyle = _textView.typingAttributes[NSParagraphStyleAttributeName];
-  if (paragraphStyle != nil && paragraphStyle.firstLineHeadIndent != 0) {
-    NSMutableDictionary *newTypingAttributes = [_textView.typingAttributes mutableCopy];
-    NSMutableParagraphStyle *newParagraphStyle = [paragraphStyle mutableCopy];
-    newParagraphStyle.firstLineHeadIndent = 0;
-    newParagraphStyle.headIndent = 0;
-    newTypingAttributes[NSParagraphStyleAttributeName] = newParagraphStyle;
-    _textView.typingAttributes = newTypingAttributes;
-  }
+  // Also, if the previous line of the text ends with a link, there will be underline blinks visible while typing.
+  // The following code resets default text attributes to fix both problems at once.
+  // It seems like the setter performs deep comparision, so we differentiate the new value using a counter,
+  // otherwise this trick would work only once.
+  static NSAttributedStringKey RCTLiveMarkdownForceUpdateAttributeName = @"RCTLiveMarkdownForceUpdate";
+  static NSUInteger counter = 0;
+  NSMutableDictionary *defaultTextAttributes = [_textView.defaultTextAttributes mutableCopy];
+  defaultTextAttributes[RCTLiveMarkdownForceUpdateAttributeName] = @(counter++);
+  _textView.defaultTextAttributes = defaultTextAttributes;
 
   // Delegate the call to the original text input delegate
   [_originalTextInputDelegate textInputDidChange];
