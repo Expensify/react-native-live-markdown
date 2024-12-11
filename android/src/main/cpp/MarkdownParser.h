@@ -15,25 +15,20 @@ using namespace facebook;
 namespace expensify {
 namespace livemarkdown {
 
-  class MarkdownUtils : public jni::HybridClass<MarkdownUtils>,
+  class MarkdownParser : public jni::HybridClass<MarkdownParser>,
                         public jsi::HostObject {
   public:
     static constexpr auto kJavaDescriptor =
-        "Lcom/expensify/livemarkdown/MarkdownUtils;";
+        "Lcom/expensify/livemarkdown/MarkdownParser;";
 
-    static void nativeInitializeRuntime(
+    static jni::local_ref<jni::JString> nativeParse(
         jni::alias_ref<jhybridobject> jThis,
-        jni::alias_ref<jni::JString> code);
-
-    static jni::local_ref<jni::JString> nativeParseMarkdown(
-        jni::alias_ref<jhybridobject> jThis,
-        jni::alias_ref<jni::JString> input);
+        jni::alias_ref<jni::JString> text,
+        const int parserId);
 
     static void registerNatives();
 
   private:
-    static std::shared_ptr<jsi::Runtime> runtime_;
-
     friend HybridBase;
   };
 

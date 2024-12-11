@@ -9,7 +9,7 @@ public class RangeSplitter {
     List<MarkdownRange> oldRanges = new ArrayList<>(markdownRanges);
     markdownRanges.clear();
     for (MarkdownRange range : oldRanges) {
-      if (range.type.equals("emoji")) {
+      if (range.getType().equals("emoji")) {
         emojiRanges.add(range);
       }
     }
@@ -18,7 +18,7 @@ public class RangeSplitter {
     int j = 0;
     while (i < oldRanges.size()) {
       MarkdownRange currentRange = oldRanges.get(i);
-      if (!currentRange.type.equals(type)) {
+      if (!currentRange.getType().equals(type)) {
         markdownRanges.add(currentRange);
         i += 1;
         continue;
@@ -27,11 +27,11 @@ public class RangeSplitter {
       // Split range
       while(j < emojiRanges.size()){
         MarkdownRange emojiRange = emojiRanges.get(j);
-        if(emojiRange.start > currentRange.end) break;
+        if(emojiRange.getStart() > currentRange.getEnd()) break;
 
-        if (emojiRange.start >= currentRange.start && emojiRange.end <= currentRange.end) {
-          MarkdownRange newRange = new MarkdownRange(currentRange.type, currentRange.start, emojiRange.start - currentRange.start, currentRange.depth);
-          currentRange = new MarkdownRange(currentRange.type, emojiRange.end, currentRange.end - emojiRange.end, currentRange.depth);
+        if (emojiRange.getStart() >= currentRange.getStart() && emojiRange.getEnd() <= currentRange.getEnd()) {
+          MarkdownRange newRange = new MarkdownRange(currentRange.getType(), currentRange.getStart(), emojiRange.getStart() - currentRange.getStart(), currentRange.getDepth());
+          currentRange = new MarkdownRange(currentRange.getType(), emojiRange.getEnd(), currentRange.getEnd() - emojiRange.getEnd(), currentRange.getDepth());
 
           markdownRanges.add(newRange);
         }
