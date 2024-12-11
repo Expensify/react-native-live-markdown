@@ -2,6 +2,7 @@
 import type {TextStyle} from 'react-native';
 import type {MarkdownStyle} from '../../MarkdownTextInputDecoratorViewNativeComponent';
 import {mergeMarkdownStyleWithDefault} from '../../styleUtils';
+import type {PartialMarkdownStyle} from '../../styleUtils';
 
 let createReactDOMStyle: (style: any) => any;
 try {
@@ -43,7 +44,7 @@ function processUnitsInMarkdownStyle(input: MarkdownStyle): MarkdownStyle {
   return output as MarkdownStyle;
 }
 
-function processMarkdownStyle(input: MarkdownStyle | undefined): MarkdownStyle {
+function processMarkdownStyle(input: PartialMarkdownStyle | undefined): MarkdownStyle {
   return processUnitsInMarkdownStyle(mergeMarkdownStyleWithDefault(input));
 }
 
