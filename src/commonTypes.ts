@@ -14,6 +14,8 @@ type MarkdownType =
   | 'syntax'
   | 'inline-image';
 
+type FormatType = 'bold' | 'italic' | 'underline';
+
 interface MarkdownRange {
   type: MarkdownType;
   start: number;
@@ -26,4 +28,4 @@ type InlineImagesInputProps = {
   imagePreviewAuthRequiredURLs?: string[];
 };
 
-export type {MarkdownType, MarkdownRange, InlineImagesInputProps};
+export type {MarkdownType, FormatType, MarkdownRange, InlineImagesInputProps};
