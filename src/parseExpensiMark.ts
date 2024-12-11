@@ -172,7 +172,7 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, MarkdownRange[]] {
         text += '\n';
       } else if (node.tag.startsWith('<pre')) {
         appendSyntax('```');
-        const content = node.children.join('').replaceAll('&#32;', ' ');
+        const content = node.children.join('');
         addChildrenWithStyle(content, 'pre');
         appendSyntax('```');
       } else if (node.tag.startsWith('<a href="')) {
