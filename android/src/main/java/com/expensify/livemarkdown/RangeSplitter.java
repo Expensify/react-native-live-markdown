@@ -1,13 +1,15 @@
 package com.expensify.livemarkdown;
 
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class RangeSplitter {
-  public static void splitRangesOnEmojis(List<MarkdownRange> markdownRanges, String type) {
-    List<MarkdownRange> emojiRanges = new ArrayList<>();
-    List<MarkdownRange> oldRanges = new ArrayList<>(markdownRanges);
-    markdownRanges.clear();
+  public static ArrayList<MarkdownRange> splitRangesOnEmojis(@NonNull List<MarkdownRange> markdownRanges, @NonNull String type) {
+    ArrayList<MarkdownRange> emojiRanges = new ArrayList<>();
+    ArrayList<MarkdownRange> oldRanges = new ArrayList<>(markdownRanges);
+    ArrayList<MarkdownRange> newRanges = new ArrayList<>();
     for (MarkdownRange range : oldRanges) {
       if (range.getType().equals("emoji")) {
         emojiRanges.add(range);
@@ -19,26 +21,33 @@ public class RangeSplitter {
     while (i < oldRanges.size()) {
       MarkdownRange currentRange = oldRanges.get(i);
       if (!currentRange.getType().equals(type)) {
-        markdownRanges.add(currentRange);
+        newRanges.add(currentRange);
         i += 1;
         continue;
       }
 
-      // Split range
+      // Iterate through all emoji ranges before the end of the current range, splitting the current range at each intersection.
       while (j < emojiRanges.size()) {
         MarkdownRange emojiRange = emojiRanges.get(j);
-        if (emojiRange.getStart() > currentRange.getEnd()) break;
+        if (emojiRange.getStart() > currentRange.getEnd()) {
+          break;
+        }
 
-        if (emojiRange.getStart() >= currentRange.getStart() && emojiRange.getEnd() <= currentRange.getEnd()) {
-          MarkdownRange newRange = new MarkdownRange(currentRange.getType(), currentRange.getStart(), emojiRange.getStart() - currentRange.getStart(), currentRange.getDepth());
-          currentRange = new MarkdownRange(currentRange.getType(), emojiRange.getEnd(), currentRange.getEnd() - emojiRange.getEnd(), currentRange.getDepth());
+        int currentStart = currentRange.getStart();
+        int currentEnd = currentRange.getEnd();
+        int emojiStart = emojiRange.getStart();
+        int emojiEnd = emojiRange.getEnd();
+        if (emojiStart >= currentStart && emojiEnd <= currentEnd) { // Intersection
+          MarkdownRange newRange = new MarkdownRange(currentRange.getType(), currentStart, emojiStart - currentStart, currentRange.getDepth());
+          currentRange = new MarkdownRange(currentRange.getType(), emojiEnd, currentEnd - emojiEnd, currentRange.getDepth());
 
-          markdownRanges.add(newRange);
+          newRanges.add(newRange);
         }
         j += 1;
       }
-      markdownRanges.add(currentRange);
+      newRanges.add(currentRange);
       i += 1;
     }
+    return newRanges;
   }
 }

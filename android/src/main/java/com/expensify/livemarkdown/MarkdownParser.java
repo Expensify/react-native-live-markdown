@@ -54,8 +54,8 @@ public class MarkdownParser {
     } catch (JSONException e) {
       return Collections.emptyList();
     }
-    splitRangesOnEmojis(markdownRanges, "italic");
-    splitRangesOnEmojis(markdownRanges, "strikethrough");
+    markdownRanges = splitRangesOnEmojis(markdownRanges, "italic");
+    markdownRanges = splitRangesOnEmojis(markdownRanges, "strikethrough");
     return markdownRanges;
   }
   public synchronized List<MarkdownRange> parse(@NonNull String text, int parserId) {
