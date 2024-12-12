@@ -1,6 +1,6 @@
 import {expect} from '@jest/globals';
 import type {MarkdownRange} from '../commonTypes';
-import parseExpensiMark from '../parseExpensiMark';
+import {parseExpensiMark} from '../parseExpensiMark';
 
 declare module 'expect' {
   interface Matchers<R> {

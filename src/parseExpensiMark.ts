@@ -292,4 +292,4 @@ function parseExpensiMark(markdown: string): MarkdownRange[] {
   return groupedRanges;
 }
 
-export default parseExpensiMark;
+export {parseExpensiMark, sortRanges};

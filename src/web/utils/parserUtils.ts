@@ -6,6 +6,7 @@ import {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition} from './cu
 import {addStyleToBlock, extendBlockStructure, getFirstBlockMarkdownRange, isBlockMarkdownType} from './blockUtils';
 import type {InlineImagesInputProps, MarkdownRange} from '../../commonTypes';
 import {getAnimationCurrentTimes, updateAnimationsTime} from './animationUtils';
+import {sortRanges} from '../../parseExpensiMark';
 
 type Paragraph = {
   text: string;
@@ -167,7 +168,8 @@ function parseRangesToHTMLNodes(
     return {dom: rootElement, tree: rootNode};
   }
 
-  const markdownRanges = ungroupRanges(ranges);
+  const sortedRanges = sortRanges(ranges);
+  const markdownRanges = ungroupRanges(sortedRanges);
   lines = mergeLinesWithMultilineTags(lines, markdownRanges);
 
   let lastRangeEndIndex = 0;
