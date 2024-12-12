@@ -28,10 +28,9 @@ function initializeLiveMarkdownIfNeeded() {
   if (initialized) {
     return;
   }
-  if (!NativeLiveMarkdownModule) {
-    throw new Error('[react-native-live-markdown] NativeLiveMarkdownModule is not available');
+  if (NativeLiveMarkdownModule) {
+    NativeLiveMarkdownModule.install();
   }
-  NativeLiveMarkdownModule.install();
   if (!global.jsi_setMarkdownRuntime) {
     throw new Error('[react-native-live-markdown] global.jsi_setMarkdownRuntime is not available');
   }
