@@ -12,6 +12,9 @@
 
   [attributedString beginEditing];
 
+  // We cannot simply call `[attributedString setAttributes:@{} range:fullRange];`
+  // because it makes spellcheck disappear immediately and also makes cursor lag behind while typing fast.
+
   [attributedString removeAttribute:NSParagraphStyleAttributeName range:fullRange];
   [attributedString removeAttribute:RCTLiveMarkdownBlockquoteDepthAttributeName range:fullRange];
 
