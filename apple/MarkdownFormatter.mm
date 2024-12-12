@@ -12,6 +12,9 @@
 
   [attributedString beginEditing];
 
+  [attributedString removeAttribute:NSParagraphStyleAttributeName range:fullRange];
+  [attributedString removeAttribute:RCTLiveMarkdownBlockquoteDepthAttributeName range:fullRange];
+
   [attributedString addAttributes:defaultTextAttributes range:fullRange];
 
   for (MarkdownRange *markdownRange in markdownRanges) {
