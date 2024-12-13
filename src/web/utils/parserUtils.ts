@@ -6,7 +6,7 @@ import {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition} from './cu
 import {addStyleToBlock, extendBlockStructure, getFirstBlockMarkdownRange, isBlockMarkdownType} from './blockUtils';
 import type {InlineImagesInputProps, MarkdownRange} from '../../commonTypes';
 import {getAnimationCurrentTimes, updateAnimationsTime} from './animationUtils';
-import {sortRanges} from '../../parseExpensiMark';
+import {sortRanges} from '../../rangeUtils';
 
 type Paragraph = {
   text: string;

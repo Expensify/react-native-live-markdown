@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {expect} from '@jest/globals';
 import {parseRangesToHTMLNodes} from '../web/utils/parserUtils';
-import {parseExpensiMark} from '../parseExpensiMark';
+import parseExpensiMark from '../parseExpensiMark';
 
 declare module 'expect' {
   interface Matchers<R> {

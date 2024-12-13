@@ -6,6 +6,7 @@ import {unescapeText} from 'expensify-common/dist/utils';
 import {decode} from 'html-entities';
 import type {WorkletFunction} from 'react-native-reanimated/lib/typescript/commonTypes';
 import type {MarkdownType, MarkdownRange} from './commonTypes';
+import {groupRanges, sortRanges} from './rangeUtils';
 
 function isWeb() {
   return Platform.OS === 'web';
@@ -233,45 +234,6 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, MarkdownRange[]] {
   return [text, ranges];
 }
 
-// getTagPriority returns a priority for a tag, higher priority means the tag should be processed first
-function getTagPriority(tag: string) {
-  switch (tag) {
-    case 'blockquote':
-      return 2;
-    case 'h1':
-      return 1;
-    default:
-      return 0;
-  }
-}
-
-function sortRanges(ranges: MarkdownRange[]) {
-  // sort ranges by start position, then by length, then by tag hierarchy
-  return ranges.sort((a, b) => a.start - b.start || b.length - a.length || getTagPriority(b.type) - getTagPriority(a.type) || 0);
-}
-
-function groupRanges(ranges: MarkdownRange[]) {
-  const lastVisibleRangeIndex: {[key in MarkdownType]?: number} = {};
-
-  return ranges.reduce((acc, range) => {
-    const start = range.start;
-    const end = range.start + range.length;
-
-    const rangeWithSameStyleIndex = lastVisibleRangeIndex[range.type];
-    const sameStyleRange = rangeWithSameStyleIndex !== undefined ? acc[rangeWithSameStyleIndex] : undefined;
-
-    if (sameStyleRange && sameStyleRange.start <= start && sameStyleRange.start + sameStyleRange.length >= end && range.length > 1) {
-      // increment depth of overlapping range
-      sameStyleRange.depth = (sameStyleRange.depth || 1) + 1;
-    } else {
-      lastVisibleRangeIndex[range.type] = acc.length;
-      acc.push(range);
-    }
-
-    return acc;
-  }, [] as MarkdownRange[]);
-}
-
 function parseExpensiMark(markdown: string): MarkdownRange[] {
   if (markdown.length > MAX_PARSABLE_LENGTH) {
     return [];
@@ -292,4 +254,4 @@ function parseExpensiMark(markdown: string): MarkdownRange[] {
   return groupedRanges;
 }
 
-export {parseExpensiMark, sortRanges};
+export default parseExpensiMark;
