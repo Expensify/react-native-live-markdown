@@ -25,7 +25,8 @@
                                   type:std::string([markdownRange.type UTF8String])
                                  range:markdownRange.range
                                  depth:markdownRange.depth
-                         markdownStyle:markdownStyle];
+                         markdownStyle:markdownStyle
+                 defaultTextAttributes:defaultTextAttributes];
   }
 
   RCTApplyBaselineOffset(attributedString);
@@ -55,7 +56,9 @@
                                 type:(const std::string)type
                                range:(const NSRange)range
                                depth:(const int)depth
-                       markdownStyle:(nonnull RCTMarkdownStyle *)markdownStyle {
+                       markdownStyle:(nonnull RCTMarkdownStyle *)markdownStyle
+               defaultTextAttributes:(nonnull NSDictionary<NSAttributedStringKey, id> *)defaultTextAttributes
+{
   if (type == "bold" || type == "italic" || type == "code" || type == "pre" || type == "h1" || type == "emoji") {
     UIFont *font = [attributedString attribute:NSFontAttributeName atIndex:range.location effectiveRange:NULL];
     if (type == "bold") {
@@ -116,7 +119,8 @@
     [attributedString addAttribute:NSForegroundColorAttributeName value:markdownStyle.linkColor range:range];
   } else if (type == "blockquote") {
     CGFloat indent = (markdownStyle.blockquoteMarginLeft + markdownStyle.blockquoteBorderWidth + markdownStyle.blockquotePaddingLeft) * depth;
-    NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
+    NSParagraphStyle *defaultParagraphStyle = defaultTextAttributes[NSParagraphStyleAttributeName];
+    NSMutableParagraphStyle *paragraphStyle = defaultParagraphStyle != nil ? [defaultParagraphStyle mutableCopy] : [NSMutableParagraphStyle new];
     paragraphStyle.firstLineHeadIndent = indent;
     paragraphStyle.headIndent = indent;
     [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:range];
