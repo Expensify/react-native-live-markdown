@@ -3,42 +3,62 @@
 
 @implementation MarkdownFormatter
 
-- (nonnull NSAttributedString *)format:(nonnull NSString *)text
-             withDefaultTextAttributes:(nonnull NSDictionary<NSAttributedStringKey, id> *)defaultTextAttributes
-                    withMarkdownRanges:(nonnull NSArray<MarkdownRange *> *)markdownRanges
-                     withMarkdownStyle:(nonnull RCTMarkdownStyle *)markdownStyle
+- (void)formatAttributedString:(nonnull NSMutableAttributedString *)attributedString
+     withDefaultTextAttributes:(nonnull NSDictionary<NSAttributedStringKey, id> *)defaultTextAttributes
+            withMarkdownRanges:(nonnull NSArray<MarkdownRange *> *)markdownRanges
+             withMarkdownStyle:(nonnull RCTMarkdownStyle *)markdownStyle
 {
-  NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:text attributes:defaultTextAttributes];
+  NSRange fullRange = NSMakeRange(0, attributedString.length);
 
   [attributedString beginEditing];
 
-  // If the attributed string ends with underlined text, blurring the single-line input imprints the underline style across the whole string.
-  // It looks like a bug in iOS, as there is no underline style to be found in the attributed string, especially after formatting.
-  // This is a workaround that applies the NSUnderlineStyleNone to the string before iterating over ranges which resolves this problem.
-  [attributedString addAttribute:NSUnderlineStyleAttributeName
-                           value:[NSNumber numberWithInteger:NSUnderlineStyleNone]
-                           range:NSMakeRange(0, attributedString.length)];
+  // We cannot simply call `[attributedString setAttributes:@{} range:fullRange];`
+  // because it makes spellcheck disappear immediately and also makes cursor lag behind while typing fast.
+
+  [attributedString removeAttribute:NSParagraphStyleAttributeName range:fullRange];
+  [attributedString removeAttribute:RCTLiveMarkdownBlockquoteDepthAttributeName range:fullRange];
+
+  [attributedString addAttributes:defaultTextAttributes range:fullRange];
 
   for (MarkdownRange *markdownRange in markdownRanges) {
     [self applyRangeToAttributedString:attributedString
                                   type:std::string([markdownRange.type UTF8String])
                                  range:markdownRange.range
                                  depth:markdownRange.depth
-                         markdownStyle:markdownStyle];
+                         markdownStyle:markdownStyle
+                 defaultTextAttributes:defaultTextAttributes];
   }
 
   RCTApplyBaselineOffset(attributedString);
 
-  [attributedString endEditing];
+  /*
+  Calling `[attributedString addAttributes:defaultTextAttributes range:fullRange]` breaks the font for emojis.
+  Before, NSFont attribute is ".SFUI-Regular" and NSOriginalFont attribute is ".AppleColorEmoji".
+  After the call, both are set to ".SFUI-Regular" which makes emoji invisible and zero-width.
+  Calling `fixAttributesInRange:` fixes this problem.
+  */
+  [attributedString fixAttributesInRange:fullRange];
 
-  return attributedString;
+  /*
+  When updating MarkdownTextInput's `style` property without changing `markdownStyle`,
+  React Native calls `[RCTTextInputComponentView _setAttributedString:]` which skips update if strings are equal.
+  See https://github.com/facebook/react-native/blob/287e20033207df5e59d199a347b7ae2b4cd7a59e/packages/react-native/React/Fabric/Mounting/ComponentViews/TextInput/RCTTextInputComponentView.mm#L680-L684
+  The attributed strings are compared using `[RCTTextInputComponentView _textOf:equals:]` which compares only raw strings
+  if NSOriginalFont attribute is present. So we purposefully remove this attribute to force update.
+  See https://github.com/facebook/react-native/blob/287e20033207df5e59d199a347b7ae2b4cd7a59e/packages/react-native/React/Fabric/Mounting/ComponentViews/TextInput/RCTTextInputComponentView.mm#L751-L784
+  */
+  [attributedString removeAttribute:@"NSOriginalFont" range:fullRange];
+
+  [attributedString endEditing];
 }
 
 - (void)applyRangeToAttributedString:(NSMutableAttributedString *)attributedString
                                 type:(const std::string)type
                                range:(const NSRange)range
                                depth:(const int)depth
-                       markdownStyle:(nonnull RCTMarkdownStyle *)markdownStyle {
+                       markdownStyle:(nonnull RCTMarkdownStyle *)markdownStyle
+               defaultTextAttributes:(nonnull NSDictionary<NSAttributedStringKey, id> *)defaultTextAttributes
+{
   if (type == "bold" || type == "italic" || type == "code" || type == "pre" || type == "h1" || type == "emoji") {
     UIFont *font = [attributedString attribute:NSFontAttributeName atIndex:range.location effectiveRange:NULL];
     if (type == "bold") {
@@ -99,7 +119,8 @@
     [attributedString addAttribute:NSForegroundColorAttributeName value:markdownStyle.linkColor range:range];
   } else if (type == "blockquote") {
     CGFloat indent = (markdownStyle.blockquoteMarginLeft + markdownStyle.blockquoteBorderWidth + markdownStyle.blockquotePaddingLeft) * depth;
-    NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
+    NSParagraphStyle *defaultParagraphStyle = defaultTextAttributes[NSParagraphStyleAttributeName];
+    NSMutableParagraphStyle *paragraphStyle = defaultParagraphStyle != nil ? [defaultParagraphStyle mutableCopy] : [NSMutableParagraphStyle new];
     paragraphStyle.firstLineHeadIndent = indent;
     paragraphStyle.headIndent = indent;
     [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:range];
