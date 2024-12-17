@@ -18,6 +18,7 @@ import {updateInputStructure} from './web/utils/parserUtils';
 import InputHistory from './web/InputHistory';
 import type {TreeNode} from './web/utils/treeUtils';
 import {getCurrentCursorPosition, removeSelection, setCursorPosition} from './web/utils/cursorUtils';
+import {getFormatType} from './web/utils/blockUtils';
 import './web/MarkdownTextInput.css';
 import type {MarkdownStyle} from './MarkdownTextInputDecoratorViewNativeComponent';
 import {getElementHeight, getPlaceholderValue, isEventComposing, normalizeValue, parseInnerHTMLToText} from './web/utils/inputUtils';
@@ -247,19 +248,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
           };
         }
 
-        let formatType: FormatType;
-        switch (formatCommand) {
-          case 'formatBold':
-            formatType = 'bold';
-            break;
-          case 'formatItalic':
-            formatType = 'italic';
-            break;
-          default:
-            formatType = 'underline';
-            break;
-        }
-
+        const formatType = getFormatType(formatCommand);
         const selectedText = parsedText.slice(contentSelection.current.start, contentSelection.current.end);
         const formattedText = formatSelection?.(selectedText, formatType) ?? selectedText;
 
