@@ -260,14 +260,19 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
             break;
         }
 
-        const beforeSelectedText = parsedText.slice(0, contentSelection.current.start);
         const selectedText = parsedText.slice(contentSelection.current.start, contentSelection.current.end);
         const formattedText = formatSelection?.(selectedText, formatType) ?? selectedText;
-        const formattedTextDiffLength = formattedText.length - selectedText.length;
-        const afterSelectedText = parsedText.slice(contentSelection.current.end);
-        const text = `${beforeSelectedText}${formattedText}${afterSelectedText}`;
 
-        return parseText(parser, target, text, processedMarkdownStyle, cursorPosition + formattedTextDiffLength, true);
+        if (selectedText === formattedText) {
+          return parseText(parser, target, parsedText, processedMarkdownStyle, cursorPosition);
+        }
+
+        const prefix = parsedText.slice(0, contentSelection.current.start);
+        const suffix = parsedText.slice(contentSelection.current.end);
+        const diffLength = formattedText.length - selectedText.length;
+        const text = `${prefix}${formattedText}${suffix}`;
+
+        return parseText(parser, target, text, processedMarkdownStyle, cursorPosition + diffLength, true);
       },
       [parser, parseText, formatSelection, processedMarkdownStyle],
     );
