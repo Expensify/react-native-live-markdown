@@ -1,5 +1,7 @@
 package com.expensify.livemarkdown;
 
+import static com.expensify.livemarkdown.RangeSplitter.splitRangesOnEmojis;
+
 import androidx.annotation.NonNull;
 
 import com.facebook.react.bridge.ReactContext;
@@ -32,38 +34,6 @@ public class MarkdownParser {
 
   private native String nativeParse(@NonNull String text, int parserId);
 
-    private void splitRangesOnEmojis(List<MarkdownRange> markdownRanges, String type) {
-    List<MarkdownRange> emojiRanges = new ArrayList<>();
-    for (MarkdownRange range : markdownRanges) {
-      if (range.getType().equals("emoji")) {
-        emojiRanges.add(range);
-      }
-    }
-
-    int i = 0;
-    int j = 0;
-    while (i < markdownRanges.size() && j < emojiRanges.size()) {
-      MarkdownRange currentRange = markdownRanges.get(i);
-      MarkdownRange emojiRange = emojiRanges.get(j);
-
-      if (!currentRange.getType().equals(type) || currentRange.getEnd() < emojiRange.getStart()) {
-        i += 1;
-        continue;
-      } else if (emojiRange.getStart() >= currentRange.getStart() && emojiRange.getEnd() <= currentRange.getEnd()) {
-        // Split range
-        MarkdownRange startRange = new MarkdownRange(currentRange.getType(), currentRange.getStart(), emojiRange.getStart() - currentRange.getStart(), currentRange.getDepth());
-        MarkdownRange endRange = new MarkdownRange(currentRange.getType(), emojiRange.getEnd(), currentRange.getEnd() - emojiRange.getEnd(), currentRange.getDepth());
-
-        markdownRanges.add(i + 1, startRange);
-        markdownRanges.add(i + 2, endRange);
-        markdownRanges.remove(i);
-        i = i + 1;
-      }
-      j += 1;
-    }
-  }
-
-
   private List<MarkdownRange> parseRanges(String rangesJSON, String innerText) {
     List<MarkdownRange> markdownRanges = new ArrayList<>();
     try {
@@ -84,8 +54,8 @@ public class MarkdownParser {
     } catch (JSONException e) {
       return Collections.emptyList();
     }
-    splitRangesOnEmojis(markdownRanges, "italic");
-    splitRangesOnEmojis(markdownRanges, "strikethrough");
+    markdownRanges = splitRangesOnEmojis(markdownRanges, "italic");
+    markdownRanges = splitRangesOnEmojis(markdownRanges, "strikethrough");
     return markdownRanges;
   }
   public synchronized List<MarkdownRange> parse(@NonNull String text, int parserId) {

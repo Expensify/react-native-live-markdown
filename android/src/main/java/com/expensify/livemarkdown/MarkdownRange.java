@@ -36,4 +36,32 @@ public class MarkdownRange {
   public int getDepth() {
     return mDepth;
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+
+    if (o instanceof MarkdownRange other) {
+      return this.mType.equals(other.mType)
+        && this.mStart == other.mStart
+        && this.mEnd == other.mEnd
+        && this.mLength == other.mLength
+        && this.mDepth == other.mDepth;
+    }
+    return false;
+  }
+
+  @NonNull
+  @Override
+  public String toString() {
+    return "MarkdownRange{" +
+      "type='" + mType + "'" +
+      ", start=" + mStart +
+      ", end=" + mEnd +
+      ", length=" + mLength +
+      ", depth=" + mDepth +
+      "}";
+  }
 }
