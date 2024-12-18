@@ -2,11 +2,14 @@ package com.expensify.livemarkdown;
 
 import androidx.annotation.NonNull;
 
+import com.facebook.systrace.Systrace;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class RangeSplitter {
   public static ArrayList<MarkdownRange> splitRangesOnEmojis(@NonNull List<MarkdownRange> markdownRanges, @NonNull String type) {
+    Systrace.beginSection(0, "splitRangesOnEmojis");
     ArrayList<MarkdownRange> emojiRanges = new ArrayList<>();
     ArrayList<MarkdownRange> oldRanges = new ArrayList<>(markdownRanges);
     ArrayList<MarkdownRange> newRanges = new ArrayList<>();
@@ -41,13 +44,16 @@ public class RangeSplitter {
           MarkdownRange newRange = new MarkdownRange(currentRange.getType(), currentStart, emojiStart - currentStart, currentRange.getDepth());
           currentRange = new MarkdownRange(currentRange.getType(), emojiEnd, currentEnd - emojiEnd, currentRange.getDepth());
 
-          newRanges.add(newRange);
+          if (newRange.getLength() > 0) {
+           newRanges.add(newRange);
+          }
         }
         j += 1;
       }
       newRanges.add(currentRange);
       i += 1;
     }
+    Systrace.endSection(0);
     return newRanges;
   }
 }
