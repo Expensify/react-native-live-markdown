@@ -175,6 +175,8 @@ dependencies {
   implementation "com.facebook.react:react-android" // version substituted by RNGP
   implementation "com.facebook.react:hermes-android" // version substituted by RNGP
   implementation project(":react-native-reanimated")
+
+  testImplementation "junit:junit:4.13.2"
 }
 
 if (isNewArchitectureEnabled()) {
