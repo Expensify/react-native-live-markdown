@@ -1,4 +1,4 @@
-import type {HTMLMarkdownElement, MarkdownTextInputElement} from '../../MarkdownTextInput.web';
+import type {HTMLMarkdownElement, MarkdownTextInputElement} from '../../MarkdownTextInput';
 import {addNodeToTree, createRootTreeNode, updateTreeElementRefs} from './treeUtils';
 import type {NodeType, TreeNode} from './treeUtils';
 import type {PartialMarkdownStyle} from '../../styleUtils';

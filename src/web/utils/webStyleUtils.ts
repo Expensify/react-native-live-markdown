@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type {TextStyle} from 'react-native';
 import type {MarkdownStyle} from '../../MarkdownTextInputDecoratorViewNativeComponent';
 import {mergeMarkdownStyleWithDefault} from '../../styleUtils';
+import type {PartialMarkdownStyle} from '../../styleUtils';
 
 let createReactDOMStyle: (style: any) => any;
 try {
@@ -43,11 +43,14 @@ function processUnitsInMarkdownStyle(input: MarkdownStyle): MarkdownStyle {
   return output as MarkdownStyle;
 }
 
-function processMarkdownStyle(input: MarkdownStyle | undefined): MarkdownStyle {
+function processMarkdownStyle(input: PartialMarkdownStyle | undefined): MarkdownStyle {
   return processUnitsInMarkdownStyle(mergeMarkdownStyleWithDefault(input));
 }
 
-function parseToReactDOMStyle(style: TextStyle): any {
+/**
+ * TODO nando DEPRECATE?
+ */
+function parseToReactDOMStyle(style: React.CSSProperties): any {
   return createReactDOMStyle(preprocessStyle(style));
 }
 
