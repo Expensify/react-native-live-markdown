@@ -52,7 +52,10 @@ public class RangeSplitter {
           }
           j += 1;
         }
-        newRanges.add(currentRange);
+
+        if (currentRange.getLength() > 0) {
+          newRanges.add(currentRange);
+        }
         i += 1;
       }
     } finally {
