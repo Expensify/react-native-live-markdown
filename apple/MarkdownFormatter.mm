@@ -29,7 +29,11 @@
                  defaultTextAttributes:defaultTextAttributes];
   }
 
-  RCTApplyBaselineOffset(attributedString);
+  [attributedString.string enumerateSubstringsInRange:NSMakeRange(0, attributedString.length)
+                                              options:NSStringEnumerationByLines | NSStringEnumerationSubstringNotRequired
+                                           usingBlock:^(NSString * _Nullable substring, NSRange substringRange, NSRange enclosingRange, BOOL * _Nonnull stop) {
+    RCTApplyBaselineOffset(attributedString, enclosingRange);
+  }];
 
   /*
   Calling `[attributedString addAttributes:defaultTextAttributes range:fullRange]` breaks the font for emojis.
@@ -133,12 +137,12 @@
   }
 }
 
-static void RCTApplyBaselineOffset(NSMutableAttributedString *attributedText)
+static void RCTApplyBaselineOffset(NSMutableAttributedString *attributedText, NSRange attributedTextRange)
 {
   __block CGFloat maximumLineHeight = 0;
 
   [attributedText enumerateAttribute:NSParagraphStyleAttributeName
-                             inRange:NSMakeRange(0, attributedText.length)
+                             inRange:attributedTextRange
                              options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired
                           usingBlock:^(NSParagraphStyle *paragraphStyle, __unused NSRange range, __unused BOOL *stop) {
     if (!paragraphStyle) {
@@ -156,7 +160,7 @@ static void RCTApplyBaselineOffset(NSMutableAttributedString *attributedText)
   __block CGFloat maximumFontLineHeight = 0;
 
   [attributedText enumerateAttribute:NSFontAttributeName
-                             inRange:NSMakeRange(0, attributedText.length)
+                             inRange:attributedTextRange
                              options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired
                           usingBlock:^(UIFont *font, NSRange range, __unused BOOL *stop) {
     if (!font) {
@@ -173,7 +177,7 @@ static void RCTApplyBaselineOffset(NSMutableAttributedString *attributedText)
   CGFloat baseLineOffset = (maximumLineHeight - maximumFontLineHeight) / 2.0;
   [attributedText addAttribute:NSBaselineOffsetAttributeName
                          value:@(baseLineOffset)
-                         range:NSMakeRange(0, attributedText.length)];
+                         range:attributedTextRange];
 }
 
 @end
