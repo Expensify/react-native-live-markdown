@@ -112,6 +112,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
         style={IS_FABRIC ? styles.farAway : styles.displayNone}
         markdownStyle={markdownStyle}
         parserId={parserId}
+        key={String(props.multiline)} // force remount on multiline change
       />
     </>
   );
