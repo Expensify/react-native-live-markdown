@@ -38,6 +38,9 @@ export default function App() {
       link: {
         color: linkColorState ? 'red' : 'blue',
       },
+      h1: {
+        lineHeight: 50,
+      },
     };
   }, [emojiFontSizeState, linkColorState]);
 
