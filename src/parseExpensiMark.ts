@@ -1,8 +1,26 @@
 'worklet';
 
+import {Platform} from 'react-native';
 import {ExpensiMark} from 'expensify-common';
 import {unescapeText} from 'expensify-common/dist/utils';
+import {decode} from 'html-entities';
+import type {WorkletFunction} from 'react-native-reanimated/lib/typescript/commonTypes';
 import type {MarkdownType, MarkdownRange} from './commonTypes';
+
+function isWeb() {
+  return Platform.OS === 'web';
+}
+
+function isJest() {
+  return !!global.process.env.JEST_WORKER_ID;
+}
+
+// eslint-disable-next-line no-underscore-dangle
+if (__DEV__ && !isWeb() && !isJest() && (decode as WorkletFunction).__workletHash === undefined) {
+  throw new Error(
+    "[react-native-live-markdown] `parseExpensiMark` requires `html-entities` package to be workletized. Please add `'worklet';` directive at the top of `node_modules/html-entities/lib/index.js` using patch-package.",
+  );
+}
 
 const MAX_PARSABLE_LENGTH = 4000;
 
@@ -154,7 +172,7 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, MarkdownRange[]] {
         text += '\n';
       } else if (node.tag.startsWith('<pre')) {
         appendSyntax('```');
-        const content = node.children.join('').replaceAll('&#32;', ' ');
+        const content = node.children.join('');
         addChildrenWithStyle(content, 'pre');
         appendSyntax('```');
       } else if (node.tag.startsWith('<a href="')) {

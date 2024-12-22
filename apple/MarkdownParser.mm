@@ -9,7 +9,9 @@
   NSArray<MarkdownRange *> *_prevMarkdownRanges;
 }
 
-- (NSArray<MarkdownRange *> *)parse:(NSString *)text withParserId:(nonnull NSNumber *)parserId {
+- (NSArray<MarkdownRange *> *)parse:(nonnull NSString *)text
+                       withParserId:(nonnull NSNumber *)parserId
+{
   @synchronized (self) {
     if ([text isEqualToString:_prevText] && [parserId isEqualToNumber:_prevParserId]) {
       return _prevMarkdownRanges;
