@@ -1,4 +1,4 @@
-import type {MarkdownTextInputElement} from '../../MarkdownTextInput.web';
+import type {MarkdownTextInputElement} from '../../MarkdownTextInput';
 import type {InlineImagesInputProps, MarkdownRange} from '../../commonTypes';
 import type {PartialMarkdownStyle} from '../../styleUtils';
 import {addInlineImagePreview} from '../inputElements/inlineImage';

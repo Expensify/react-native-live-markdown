@@ -1,5 +1,5 @@
 import type {CSSProperties} from 'react';
-import type {MarkdownTextInputElement} from '../../MarkdownTextInput.web';
+import type {MarkdownTextInputElement} from '../../MarkdownTextInput';
 
 const ZERO_WIDTH_SPACE = '\u200B';
 

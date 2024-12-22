@@ -1,4 +1,4 @@
-import type {HTMLMarkdownElement} from '../../MarkdownTextInput.web';
+import type {HTMLMarkdownElement} from '../../MarkdownTextInput';
 import type {MarkdownRange, MarkdownType} from '../../commonTypes';
 
 type NodeType = MarkdownType | 'line' | 'text' | 'br' | 'block' | 'root';

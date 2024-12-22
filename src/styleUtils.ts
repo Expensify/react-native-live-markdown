@@ -1,14 +1,9 @@
-import {Platform} from 'react-native';
 import type {MarkdownStyle} from './MarkdownTextInputDecoratorViewNativeComponent';
+import FONT_FAMILY_MONOSPACE from './font-family-monospace';
 
 type PartialMarkdownStyle = Partial<{
   [K in keyof MarkdownStyle]: Partial<MarkdownStyle[K]>;
 }>;
-
-const FONT_FAMILY_MONOSPACE = Platform.select({
-  ios: 'Courier',
-  default: 'monospace',
-});
 
 function makeDefaultMarkdownStyle(): MarkdownStyle {
   return {

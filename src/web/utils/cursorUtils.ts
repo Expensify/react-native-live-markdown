@@ -1,4 +1,4 @@
-import type {MarkdownTextInputElement} from '../../MarkdownTextInput.web';
+import type {MarkdownTextInputElement} from '../../MarkdownTextInput';
 import {findHTMLElementInTree, getTreeNodeByIndex} from './treeUtils';
 import type {TreeNode} from './treeUtils';
 

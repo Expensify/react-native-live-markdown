@@ -1,4 +1,4 @@
-import type {HTMLMarkdownElement, MarkdownTextInputElement} from '../../MarkdownTextInput.web';
+import type {HTMLMarkdownElement, MarkdownTextInputElement} from '../../MarkdownTextInput';
 
 const ANIMATED_ELEMENT_TYPES = ['spinner'] as const;
 
