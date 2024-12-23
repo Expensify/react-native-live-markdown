@@ -112,7 +112,7 @@ describe('single overlap', () => {
 });
 
 describe('multiple overlaps', () => {
-  test('multiple types splitting on one', () => {
+  test('splitting on one type', () => {
     let markdownRanges: MarkdownRange[] = [
       {type: 'italic', start: 0, length: 20},
       {type: 'strikethrough', start: 2, length: 12},
@@ -135,7 +135,7 @@ describe('multiple overlaps', () => {
     ]);
   });
 
-  test('multiple types splitting on all', () => {
+  test('splitting on two types', () => {
     let markdownRanges: MarkdownRange[] = [
       {type: 'italic', start: 0, length: 20},
       {type: 'strikethrough', start: 2, length: 12},
