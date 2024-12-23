@@ -6,6 +6,7 @@ import {unescapeText} from 'expensify-common/dist/utils';
 import {decode} from 'html-entities';
 import type {WorkletFunction} from 'react-native-reanimated/lib/typescript/commonTypes';
 import type {MarkdownType, MarkdownRange} from './commonTypes';
+import {splitRangesOnEmojis} from './rangeUtils';
 
 function isWeb() {
   return Platform.OS === 'web';
@@ -236,6 +237,8 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, MarkdownRange[]] {
 // getTagPriority returns a priority for a tag, higher priority means the tag should be processed first
 function getTagPriority(tag: string) {
   switch (tag) {
+    case 'syntax': // syntax has the lowest priority so other styles can be applied to it
+      return -1;
     case 'blockquote':
       return 2;
     case 'h1':
@@ -287,8 +290,13 @@ function parseExpensiMark(markdown: string): MarkdownRange[] {
       )}'\nOriginal input: '${JSON.stringify(markdown)}'`,
     );
   }
-  const sortedRanges = sortRanges(ranges);
+
+  let splittedRanges = splitRangesOnEmojis(ranges, 'italic');
+  splittedRanges = splitRangesOnEmojis(splittedRanges, 'strikethrough');
+
+  const sortedRanges = sortRanges(splittedRanges);
   const groupedRanges = groupRanges(sortedRanges);
+
   return groupedRanges;
 }
 
