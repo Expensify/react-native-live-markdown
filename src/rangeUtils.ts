@@ -1,3 +1,5 @@
+'worklet';
+
 import type {MarkdownRange, MarkdownType} from './commonTypes';
 
 function splitRangesOnEmojis(ranges: MarkdownRange[], type: MarkdownType): MarkdownRange[] {
