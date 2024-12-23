@@ -31,9 +31,9 @@ function splitRangesOnEmojis(ranges: MarkdownRange[], type: MarkdownType): Markd
         if (emojiStart >= currentStart && emojiEnd <= currentEnd) {
           // Intersection
           const newRange: MarkdownRange = {
+            type: currentRange.type,
             start: currentStart,
             length: emojiStart - currentStart,
-            type: currentRange.type,
             ...(currentRange?.depth && {depth: currentRange?.depth}),
           };
 
@@ -53,7 +53,6 @@ function splitRangesOnEmojis(ranges: MarkdownRange[], type: MarkdownType): Markd
       i++;
     }
   }
-
   return newRanges;
 }
 
