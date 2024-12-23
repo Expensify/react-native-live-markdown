@@ -39,4 +39,18 @@ function groupRanges(ranges: MarkdownRange[]) {
   }, [] as MarkdownRange[]);
 }
 
-export {sortRanges, groupRanges};
+function ungroupRanges(ranges: MarkdownRange[]): MarkdownRange[] {
+  const ungroupedRanges: MarkdownRange[] = [];
+  ranges.forEach((range) => {
+    if (!range.depth) {
+      ungroupedRanges.push(range);
+    }
+    const {depth, ...rangeWithoutDepth} = range;
+    Array.from({length: depth!}).forEach(() => {
+      ungroupedRanges.push(rangeWithoutDepth);
+    });
+  });
+  return ungroupedRanges;
+}
+
+export {sortRanges, groupRanges, ungroupRanges};
