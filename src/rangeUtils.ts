@@ -12,7 +12,7 @@ function splitRangesOnEmojis(ranges: MarkdownRange[], type: MarkdownType): Markd
       break;
     }
 
-    if (currentRange.type !== type || currentRange.type === 'emoji') {
+    if (currentRange.type !== type) {
       newRanges.push(currentRange);
       i++;
     } else {
@@ -34,7 +34,7 @@ function splitRangesOnEmojis(ranges: MarkdownRange[], type: MarkdownType): Markd
             start: currentStart,
             length: emojiStart - currentStart,
             type: currentRange.type,
-            depth: currentRange.depth,
+            ...(currentRange?.depth && {depth: currentRange?.depth}),
           };
 
           currentRange.start = emojiEnd;
@@ -53,6 +53,7 @@ function splitRangesOnEmojis(ranges: MarkdownRange[], type: MarkdownType): Markd
       i++;
     }
   }
+
   return newRanges;
 }
 
