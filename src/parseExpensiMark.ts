@@ -154,6 +154,8 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, MarkdownRange[]] {
         addChildrenWithStyle(node, 'mention-here');
       } else if (node.tag === '<mention-user>') {
         addChildrenWithStyle(node, 'mention-user');
+      } else if (node.tag === '<mention-short>') {
+        addChildrenWithStyle(node, 'mention-short');
       } else if (node.tag === '<mention-report>') {
         addChildrenWithStyle(node, 'mention-report');
       } else if (node.tag === '<blockquote>') {
