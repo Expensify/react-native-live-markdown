@@ -241,10 +241,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
     const handleFormatSelection = useCallback(
       (target: MarkdownTextInputElement, parsedText: string, cursorPosition: number, formatCommand: string): ParseTextResult => {
         if (!contentSelection.current || contentSelection.current.end - contentSelection.current.start < 1) {
-          return {
-            text: '',
-            cursorPosition: 0,
-          };
+          throw new Error('[react-native-live-markdown] invalid selection');
         }
 
         const selectedText = parsedText.slice(contentSelection.current.start, contentSelection.current.end);
