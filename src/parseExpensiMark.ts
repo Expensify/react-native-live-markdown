@@ -6,7 +6,7 @@ import {unescapeText} from 'expensify-common/dist/utils';
 import {decode} from 'html-entities';
 import type {WorkletFunction} from 'react-native-reanimated/lib/typescript/commonTypes';
 import type {MarkdownType, MarkdownRange} from './commonTypes';
-import {groupRanges, sortRanges} from './rangeUtils';
+import {groupRanges, sortRanges, splitRangesOnEmojis} from './rangeUtils';
 
 function isWeb() {
   return Platform.OS === 'web';
@@ -250,8 +250,13 @@ function parseExpensiMark(markdown: string): MarkdownRange[] {
     );
     return [];
   }
-  const sortedRanges = sortRanges(ranges);
+
+  let splittedRanges = splitRangesOnEmojis(ranges, 'italic');
+  splittedRanges = splitRangesOnEmojis(splittedRanges, 'strikethrough');
+
+  const sortedRanges = sortRanges(splittedRanges);
   const groupedRanges = groupRanges(sortedRanges);
+
   return groupedRanges;
 }
 
