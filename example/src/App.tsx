@@ -16,15 +16,14 @@ import {PlatformInfo} from './PlatformInfo';
 console.log(Animated);
 
 function handleFormatSelection(selectedText: string, formatCommand: string) {
-  if (formatCommand === 'formatBold') {
-    return `*${selectedText}*`;
+  switch (formatCommand) {
+    case 'formatBold':
+      return `*${selectedText}*`;
+    case 'formatItalic':
+      return `_${selectedText}_`;
+    default:
+      return selectedText;
   }
-
-  if (formatCommand === 'formatItalic') {
-    return `_${selectedText}_`;
-  }
-
-  return selectedText;
 }
 
 export default function App() {
