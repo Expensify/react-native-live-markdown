@@ -1,5 +1,5 @@
 import type {MarkdownTextInputElement} from '../../MarkdownTextInput.web';
-import type {FormatType, InlineImagesInputProps, MarkdownRange} from '../../commonTypes';
+import type {InlineImagesInputProps, MarkdownRange} from '../../commonTypes';
 import type {PartialMarkdownStyle} from '../../styleUtils';
 import {addInlineImagePreview} from '../inputElements/inlineImage';
 import type {NodeType, TreeNode} from './treeUtils';
@@ -110,15 +110,4 @@ function extendBlockStructure(
   return targetNode;
 }
 
-function getFormatType(formatCommand: string): FormatType {
-  switch (formatCommand) {
-    case 'formatBold':
-      return 'bold';
-    case 'formatItalic':
-      return 'italic';
-    default:
-      return 'underline';
-  }
-}
-
-export {addStyleToBlock, extendBlockStructure, isBlockMarkdownType, getFirstBlockMarkdownRange, getFormatType};
+export {addStyleToBlock, extendBlockStructure, isBlockMarkdownType, getFirstBlockMarkdownRange};

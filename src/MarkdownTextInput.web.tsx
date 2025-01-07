@@ -18,20 +18,19 @@ import {updateInputStructure} from './web/utils/parserUtils';
 import InputHistory from './web/InputHistory';
 import type {TreeNode} from './web/utils/treeUtils';
 import {getCurrentCursorPosition, removeSelection, setCursorPosition} from './web/utils/cursorUtils';
-import {getFormatType} from './web/utils/blockUtils';
 import './web/MarkdownTextInput.css';
 import type {MarkdownStyle} from './MarkdownTextInputDecoratorViewNativeComponent';
 import {getElementHeight, getPlaceholderValue, isEventComposing, normalizeValue, parseInnerHTMLToText} from './web/utils/inputUtils';
 import {parseToReactDOMStyle, processMarkdownStyle} from './web/utils/webStyleUtils';
 import {forceRefreshAllImages} from './web/inputElements/inlineImage';
-import type {MarkdownRange, InlineImagesInputProps, FormatType} from './commonTypes';
+import type {MarkdownRange, InlineImagesInputProps} from './commonTypes';
 
 const useClientEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
 
 interface MarkdownTextInputProps extends TextInputProps, InlineImagesInputProps {
   markdownStyle?: MarkdownStyle;
   parser: (text: string) => MarkdownRange[];
-  formatSelection?: (selectedText: string, formatType: FormatType) => string;
+  formatSelection?: (selectedText: string, formatCommand: string) => string;
   onClick?: (e: MouseEvent<HTMLDivElement>) => void;
   dir?: string;
   disabled?: boolean;
@@ -248,9 +247,8 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
           };
         }
 
-        const formatType = getFormatType(formatCommand);
         const selectedText = parsedText.slice(contentSelection.current.start, contentSelection.current.end);
-        const formattedText = formatSelection?.(selectedText, formatType) ?? selectedText;
+        const formattedText = formatSelection?.(selectedText, formatCommand) ?? selectedText;
 
         if (selectedText === formattedText) {
           return parseText(parser, target, parsedText, processedMarkdownStyle, cursorPosition);

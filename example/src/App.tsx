@@ -48,6 +48,7 @@ export default function App() {
       <PlatformInfo />
       <MarkdownTextInput
         multiline
+        formatSelection={(selectedText, formatCommand) => formatCommand === 'formatBold' ? `*${selectedText}*` : formatCommand === 'formatItalic' ? `_${selectedText}_` : selectedText}
         autoCapitalize="none"
         value={value}
         onChangeText={setValue}
