@@ -244,8 +244,12 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
           throw new Error('[react-native-live-markdown] Trying to apply format command on empty selection');
         }
 
+        if (!formatSelection) {
+          return parseText(parser, target, parsedText, processedMarkdownStyle, cursorPosition);
+        }
+
         const selectedText = parsedText.slice(contentSelection.current.start, contentSelection.current.end);
-        const formattedText = formatSelection?.(selectedText, formatCommand) ?? selectedText;
+        const formattedText = formatSelection(selectedText, formatCommand);
 
         if (selectedText === formattedText) {
           return parseText(parser, target, parsedText, processedMarkdownStyle, cursorPosition);
