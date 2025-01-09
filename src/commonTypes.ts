@@ -5,6 +5,7 @@ type MarkdownType =
   | 'emoji'
   | 'mention-here'
   | 'mention-user'
+  | 'mention-short'
   | 'mention-report'
   | 'link'
   | 'code'

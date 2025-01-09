@@ -17,7 +17,7 @@
   RCTMarkdownUtils *markdownUtils = [self getMarkdownUtils];
   if (markdownUtils != nil) {
     UITextRange *range = self.selectedTextRange;
-    super.attributedText = [markdownUtils parseMarkdown:self.attributedText withAttributes:self.defaultTextAttributes];
+    super.attributedText = [markdownUtils parseMarkdown:self.attributedText withDefaultTextAttributes:self.defaultTextAttributes];
     [super setSelectedTextRange:range]; // prevents cursor from jumping at the end when typing in the middle of the text
     self.typingAttributes = self.defaultTextAttributes; // removes indent in new line when typing after blockquote
   }

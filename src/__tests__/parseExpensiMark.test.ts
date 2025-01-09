@@ -31,6 +31,10 @@ test('no formatting', () => {
   expect('Hello, world!').toBeParsedAs([]);
 });
 
+describe('parsing error', () => {
+  expect(`> [exa\nmple.com](https://example.com)`).toBeParsedAs([]);
+});
+
 test('bold', () => {
   expect('Hello, *world*!').toBeParsedAs([
     {type: 'syntax', start: 7, length: 1},
