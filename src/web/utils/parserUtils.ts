@@ -6,6 +6,7 @@ import {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition} from './cu
 import {addStyleToBlock, extendBlockStructure, getFirstBlockMarkdownRange, isBlockMarkdownType} from './blockUtils';
 import type {InlineImagesInputProps, MarkdownRange} from '../../commonTypes';
 import {getAnimationCurrentTimes, updateAnimationsTime} from './animationUtils';
+import {sortRanges, ungroupRanges} from '../../rangeUtils';
 
 type Paragraph = {
   text: string;
@@ -13,20 +14,6 @@ type Paragraph = {
   length: number;
   markdownRanges: MarkdownRange[];
 };
-
-function ungroupRanges(ranges: MarkdownRange[]): MarkdownRange[] {
-  const ungroupedRanges: MarkdownRange[] = [];
-  ranges.forEach((range) => {
-    if (!range.depth) {
-      ungroupedRanges.push(range);
-    }
-    const {depth, ...rangeWithoutDepth} = range;
-    Array.from({length: depth!}).forEach(() => {
-      ungroupedRanges.push(rangeWithoutDepth);
-    });
-  });
-  return ungroupedRanges;
-}
 
 function splitTextIntoLines(text: string): Paragraph[] {
   let lineStartIndex = 0;
@@ -167,7 +154,9 @@ function parseRangesToHTMLNodes(
     return {dom: rootElement, tree: rootNode};
   }
 
-  const markdownRanges = ungroupRanges(ranges);
+  // Sort all ranges by start position, length, and by tag hierarchy so the styles and text are applied in correct order
+  const sortedRanges = sortRanges(ranges);
+  const markdownRanges = ungroupRanges(sortedRanges);
   lines = mergeLinesWithMultilineTags(lines, markdownRanges);
 
   let lastRangeEndIndex = 0;
