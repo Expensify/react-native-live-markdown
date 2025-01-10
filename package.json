@@ -1,6 +1,6 @@
 {
   "name": "@expensify/react-native-live-markdown",
-  "version": "0.1.203",
+  "version": "0.1.218",
   "description": "Drop-in replacement for React Native's TextInput component with Markdown formatting.",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -10,6 +10,7 @@
   "files": [
     "src",
     "lib",
+    "mock",
     "android",
     "apple",
     "cpp",
@@ -59,12 +60,15 @@
     "registry": "https://registry.npmjs.org/"
   },
   "devDependencies": {
-    "@babel/preset-env": "^7.20.2",
+    "@babel/preset-env": "^7.25.3",
     "@babel/preset-react": "^7.18.6",
     "@commitlint/config-conventional": "^17.0.2",
     "@evilmartians/lefthook": "^1.5.0",
     "@lwc/eslint-plugin-lwc": "^1.7.2",
-    "@react-native/eslint-config": "0.75.3",
+    "@react-native-community/cli": "15.0.1",
+    "@react-native-community/cli-platform-android": "15.0.1",
+    "@react-native-community/cli-platform-ios": "15.0.1",
+    "@react-native/eslint-config": "0.76.3",
     "@release-it/conventional-changelog": "^5.0.0",
     "@types/jest": "^29.5.14",
     "@types/react": "~18.2.6",
@@ -91,9 +95,9 @@
     "patch-package": "^8.0.0",
     "prettier": "2.8.8",
     "react": "18.3.1",
-    "react-native": "0.75.3",
+    "react-native": "0.76.3",
     "react-native-builder-bob": "^0.20.0",
-    "react-native-reanimated": "3.16.3",
+    "react-native-reanimated": "3.16.4",
     "react-native-web": "^0.19.10",
     "release-it": "^15.0.0",
     "turbo": "^1.10.7",
@@ -103,7 +107,7 @@
     "expensify-common": ">=2.0.108",
     "react": "*",
     "react-native": "*",
-    "react-native-reanimated": ">=3.16.3"
+    "react-native-reanimated": ">=3.16.4"
   },
   "workspaces": [
     "./example",

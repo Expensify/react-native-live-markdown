@@ -15,6 +15,17 @@ import {PlatformInfo} from './PlatformInfo';
 // We don't need this workaround in New Expensify App since Reanimated is imported before Live Markdown.
 console.log(Animated);
 
+function handleFormatSelection(selectedText: string, formatCommand: string) {
+  switch (formatCommand) {
+    case 'formatBold':
+      return `*${selectedText}*`;
+    case 'formatItalic':
+      return `_${selectedText}_`;
+    default:
+      return selectedText;
+  }
+}
+
 export default function App() {
   const [value, setValue] = React.useState(TEST_CONST.EXAMPLE_CONTENT);
   const [textColorState, setTextColorState] = React.useState(false);
@@ -48,6 +59,7 @@ export default function App() {
       <PlatformInfo />
       <MarkdownTextInput
         multiline
+        formatSelection={handleFormatSelection}
         autoCapitalize="none"
         value={value}
         onChangeText={setValue}

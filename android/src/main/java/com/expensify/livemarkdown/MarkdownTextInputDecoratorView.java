@@ -61,6 +61,7 @@ public class MarkdownTextInputDecoratorView extends View {
       mReactEditText = (ReactEditText) previousSibling;
       mTextWatcher = new MarkdownTextWatcher(mMarkdownUtils);
       mReactEditText.addTextChangedListener(mTextWatcher);
+      applyNewStyles();
     }
   }
 
