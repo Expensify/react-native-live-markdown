@@ -18,8 +18,14 @@
   display: none;
 }
 
-.react-native-live-markdown-input-singleline span[data-type="text"] {
+.react-native-live-markdown-input-singleline span[data-type='text'] {
   vertical-align: middle;
+}
+
+.react-native-live-markdown-input-singleline span[data-type='mention-user'] > span,
+.react-native-live-markdown-input-singleline span[data-type='mention-here'] > span,
+.react-native-live-markdown-input-singleline span[data-type='mention-report'] > span {
+  background: inherit;
 }
 
 .react-native-live-markdown-input-singleline:empty::before,
