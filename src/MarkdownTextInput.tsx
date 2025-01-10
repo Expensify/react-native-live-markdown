@@ -52,6 +52,7 @@ function unregisterParser(parserId: number) {
 
 interface MarkdownTextInputProps extends TextInputProps, InlineImagesInputProps {
   markdownStyle?: PartialMarkdownStyle;
+  formatSelection?: (selectedText: string, formatCommand: string) => string;
   parser: (value: string) => MarkdownRange[];
 }
 
