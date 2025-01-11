@@ -1,10 +1,6 @@
 import type {MarkdownRange} from '../commonTypes';
 import {splitRangesOnEmojis} from '../rangeUtils';
 
-const sortRanges = (ranges: MarkdownRange[]) => {
-  return ranges.sort((a, b) => a.start - b.start);
-};
-
 test('no overlap', () => {
   const markdownRanges: MarkdownRange[] = [
     {type: 'strikethrough', start: 0, length: 10},
@@ -28,6 +24,32 @@ test('overlap different type', () => {
   expect(splittedRanges).toEqual(markdownRanges);
 });
 
+test('overlap with bold and emoji type', () => {
+  const markdownRanges: MarkdownRange[] = [
+    {type: 'syntax', start: 0, length: 1},
+    {type: 'italic', start: 1, length: 4},
+    {type: 'syntax', start: 1, length: 1},
+    {type: 'bold', start: 2, length: 2},
+    {type: 'emoji', start: 2, length: 2},
+    {type: 'syntax', start: 4, length: 1},
+    {type: 'syntax', start: 5, length: 1},
+  ];
+
+  const expectedResult = [
+    {type: 'syntax', start: 0, length: 1},
+    {type: 'italic', start: 1, length: 1},
+    {type: 'syntax', start: 1, length: 1},
+    {type: 'bold', start: 2, length: 2},
+    {type: 'emoji', start: 2, length: 2},
+    {type: 'italic', start: 4, length: 1},
+    {type: 'syntax', start: 4, length: 1},
+    {type: 'syntax', start: 5, length: 1},
+  ];
+
+  const splittedRanges = splitRangesOnEmojis(markdownRanges, 'italic');
+  expect(splittedRanges).toEqual(expectedResult);
+});
+
 describe('single overlap', () => {
   test('emoji at the beginning', () => {
     let markdownRanges: MarkdownRange[] = [
@@ -36,7 +58,6 @@ describe('single overlap', () => {
     ];
 
     markdownRanges = splitRangesOnEmojis(markdownRanges, 'strikethrough');
-    sortRanges(markdownRanges);
 
     expect(markdownRanges).toEqual([
       {type: 'emoji', start: 0, length: 2},
@@ -51,7 +72,6 @@ describe('single overlap', () => {
     ];
 
     markdownRanges = splitRangesOnEmojis(markdownRanges, 'strikethrough');
-    sortRanges(markdownRanges);
 
     expect(markdownRanges).toEqual([
       {type: 'strikethrough', start: 0, length: 3},
@@ -67,7 +87,6 @@ describe('single overlap', () => {
     ];
 
     markdownRanges = splitRangesOnEmojis(markdownRanges, 'strikethrough');
-    sortRanges(markdownRanges);
 
     expect(markdownRanges).toEqual([
       {type: 'strikethrough', start: 0, length: 8},
@@ -83,7 +102,6 @@ describe('single overlap', () => {
     ];
 
     markdownRanges = splitRangesOnEmojis(markdownRanges, 'strikethrough');
-    sortRanges(markdownRanges);
 
     expect(markdownRanges).toEqual([
       {type: 'strikethrough', start: 0, length: 3},
@@ -122,7 +140,6 @@ describe('multiple overlaps', () => {
     ];
 
     markdownRanges = splitRangesOnEmojis(markdownRanges, 'strikethrough');
-    sortRanges(markdownRanges);
 
     expect(markdownRanges).toEqual([
       {type: 'italic', start: 0, length: 20},
@@ -146,7 +163,6 @@ describe('multiple overlaps', () => {
 
     markdownRanges = splitRangesOnEmojis(markdownRanges, 'strikethrough');
     markdownRanges = splitRangesOnEmojis(markdownRanges, 'italic');
-    sortRanges(markdownRanges);
 
     expect(markdownRanges).toEqual([
       {type: 'italic', start: 0, length: 3},
