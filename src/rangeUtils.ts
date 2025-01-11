@@ -154,6 +154,12 @@ function splitRangesOnEmojis(ranges: MarkdownRange[], type: MarkdownType): Markd
 
           if (newRange.length > 0) {
             if (firstTimeEntry) {
+              while (!queue.isEmpty() && compareRanges(newRange, queue.peek()) >= 0) {
+                const dequeuedRange = queue.dequeue();
+                if (dequeuedRange) {
+                  newRanges.push(dequeuedRange);
+                }
+              }
               newRanges.push(newRange);
             } else {
               queue.enqueue(newRange);

@@ -152,6 +152,36 @@ describe('multiple overlaps', () => {
     ]);
   });
 
+  test('splitting on one type back to back', () => {
+    let markdownRanges: MarkdownRange[] = [
+      {type: 'italic', start: 0, length: 20},
+      {type: 'strikethrough', start: 2, length: 12},
+      {type: 'emoji', start: 3, length: 1},
+      {type: 'emoji', start: 8, length: 2},
+      {type: 'strikethrough', start: 16, length: 5},
+      {type: 'emoji', start: 17, length: 1},
+      {type: 'emoji', start: 19, length: 1},
+      {type: 'strikethrough', start: 22, length: 5},
+    ];
+
+    markdownRanges = splitRangesOnEmojis(markdownRanges, 'strikethrough');
+
+    expect(markdownRanges).toEqual([
+      {type: 'italic', start: 0, length: 20},
+      {type: 'strikethrough', start: 2, length: 1},
+      {type: 'emoji', start: 3, length: 1},
+      {type: 'strikethrough', start: 4, length: 4},
+      {type: 'emoji', start: 8, length: 2},
+      {type: 'strikethrough', start: 10, length: 4},
+      {type: 'strikethrough', start: 16, length: 1},
+      {type: 'emoji', start: 17, length: 1},
+      {type: 'strikethrough', start: 18, length: 1},
+      {type: 'emoji', start: 19, length: 1},
+      {type: 'strikethrough', start: 20, length: 1},
+      {type: 'strikethrough', start: 22, length: 5},
+    ]);
+  });
+
   test('splitting on two types', () => {
     let markdownRanges: MarkdownRange[] = [
       {type: 'italic', start: 0, length: 20},
