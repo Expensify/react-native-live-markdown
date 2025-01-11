@@ -253,11 +253,11 @@ function parseExpensiMark(markdown: string): MarkdownRange[] {
     return [];
   }
 
-  let splittedRanges = splitRangesOnEmojis(ranges, 'italic');
+  let splittedRanges = sortRanges(ranges);
+  splittedRanges = splitRangesOnEmojis(ranges, 'italic');
   splittedRanges = splitRangesOnEmojis(splittedRanges, 'strikethrough');
 
-  const sortedRanges = sortRanges(splittedRanges);
-  const groupedRanges = groupRanges(sortedRanges);
+  const groupedRanges = groupRanges(splittedRanges);
 
   return groupedRanges;
 }
