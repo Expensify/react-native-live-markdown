@@ -26,7 +26,13 @@ function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownSty
       node.style.textDecoration = 'line-through';
       break;
     case 'emoji':
-      Object.assign(node.style, {...markdownStyle.emoji, verticalAlign: 'middle'});
+      Object.assign(node.style, {
+        ...markdownStyle.emoji,
+        verticalAlign: 'middle',
+        fontStyle: 'normal',
+        textDecoration: 'none',
+        display: 'inline-block',
+      });
       break;
     case 'mention-here':
       Object.assign(node.style, markdownStyle.mentionHere);
