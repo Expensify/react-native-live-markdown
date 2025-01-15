@@ -22,10 +22,8 @@
   vertical-align: middle;
 }
 
-.react-native-live-markdown-input-singleline span[data-type='mention-user'] > span,
-.react-native-live-markdown-input-singleline span[data-type='mention-here'] > span,
-.react-native-live-markdown-input-singleline span[data-type='mention-report'] > span {
-  background: inherit;
+.react-native-live-markdown-input-singleline > p:last-child span:last-child {
+  padding-right: 1px;
 }
 
 .react-native-live-markdown-input-singleline:empty::before,
