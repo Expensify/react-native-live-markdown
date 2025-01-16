@@ -18,7 +18,7 @@ using namespace expensify::livemarkdown;
   if (markdownUtils != nil) {
     // force Markdown formatting on first render because `_setAttributedText` is called before `setMarkdownUtils`
     RCTUITextField *backedTextInputView = [self getBackedTextInputView];
-    backedTextInputView.attributedText = [markdownUtils parseMarkdown:backedTextInputView.attributedText withAttributes:backedTextInputView.defaultTextAttributes];
+    backedTextInputView.attributedText = [markdownUtils parseMarkdown:backedTextInputView.attributedText withDefaultTextAttributes:backedTextInputView.defaultTextAttributes];
   }
 }
 
@@ -36,7 +36,7 @@ using namespace expensify::livemarkdown;
   RCTMarkdownUtils *markdownUtils = [self getMarkdownUtils];
   RCTUITextField *backedTextInputView = [self getBackedTextInputView];
   if (markdownUtils != nil && backedTextInputView != nil) {
-    attributedString = [markdownUtils parseMarkdown:attributedString withAttributes:backedTextInputView.defaultTextAttributes];
+    attributedString = [markdownUtils parseMarkdown:attributedString withDefaultTextAttributes:backedTextInputView.defaultTextAttributes];
   } else {
     // If markdownUtils is undefined, the text input hasn't been mounted yet. It will
     // update its state with the unformatted attributed string, we want to prevent displaying

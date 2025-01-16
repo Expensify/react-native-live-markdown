@@ -4,11 +4,11 @@
 @implementation MarkdownFormatter
 
 - (nonnull NSAttributedString *)format:(nonnull NSString *)text
-                        withAttributes:(nullable NSDictionary<NSAttributedStringKey, id> *)attributes
+             withDefaultTextAttributes:(nonnull NSDictionary<NSAttributedStringKey, id> *)defaultTextAttributes
                     withMarkdownRanges:(nonnull NSArray<MarkdownRange *> *)markdownRanges
                      withMarkdownStyle:(nonnull RCTMarkdownStyle *)markdownStyle
 {
-  NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:text attributes:attributes];
+  NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:text attributes:defaultTextAttributes];
 
   [attributedString beginEditing];
 
@@ -24,10 +24,15 @@
                                   type:std::string([markdownRange.type UTF8String])
                                  range:markdownRange.range
                                  depth:markdownRange.depth
-                         markdownStyle:markdownStyle];
+                         markdownStyle:markdownStyle
+                 defaultTextAttributes:defaultTextAttributes];
   }
 
-  RCTApplyBaselineOffset(attributedString);
+  [attributedString.string enumerateSubstringsInRange:NSMakeRange(0, attributedString.length)
+                                              options:NSStringEnumerationByLines | NSStringEnumerationSubstringNotRequired
+                                           usingBlock:^(NSString * _Nullable substring, NSRange substringRange, NSRange enclosingRange, BOOL * _Nonnull stop) {
+    RCTApplyBaselineOffset(attributedString, enclosingRange);
+  }];
 
   [attributedString endEditing];
 
@@ -38,7 +43,9 @@
                                 type:(const std::string)type
                                range:(const NSRange)range
                                depth:(const int)depth
-                       markdownStyle:(nonnull RCTMarkdownStyle *)markdownStyle {
+                       markdownStyle:(nonnull RCTMarkdownStyle *)markdownStyle
+               defaultTextAttributes:(nonnull NSDictionary<NSAttributedStringKey, id> *)defaultTextAttributes
+{
   if (type == "bold" || type == "italic" || type == "code" || type == "pre" || type == "h1" || type == "emoji") {
     UIFont *font = [attributedString attribute:NSFontAttributeName atIndex:range.location effectiveRange:NULL];
     if (type == "bold") {
@@ -99,7 +106,8 @@
     [attributedString addAttribute:NSForegroundColorAttributeName value:markdownStyle.linkColor range:range];
   } else if (type == "blockquote") {
     CGFloat indent = (markdownStyle.blockquoteMarginLeft + markdownStyle.blockquoteBorderWidth + markdownStyle.blockquotePaddingLeft) * depth;
-    NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
+    NSParagraphStyle *defaultParagraphStyle = defaultTextAttributes[NSParagraphStyleAttributeName];
+    NSMutableParagraphStyle *paragraphStyle = defaultParagraphStyle != nil ? [defaultParagraphStyle mutableCopy] : [NSMutableParagraphStyle new];
     paragraphStyle.firstLineHeadIndent = indent;
     paragraphStyle.headIndent = indent;
     [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:range];
@@ -112,12 +120,12 @@
   }
 }
 
-static void RCTApplyBaselineOffset(NSMutableAttributedString *attributedText)
+static void RCTApplyBaselineOffset(NSMutableAttributedString *attributedText, NSRange attributedTextRange)
 {
   __block CGFloat maximumLineHeight = 0;
 
   [attributedText enumerateAttribute:NSParagraphStyleAttributeName
-                             inRange:NSMakeRange(0, attributedText.length)
+                             inRange:attributedTextRange
                              options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired
                           usingBlock:^(NSParagraphStyle *paragraphStyle, __unused NSRange range, __unused BOOL *stop) {
     if (!paragraphStyle) {
@@ -135,7 +143,7 @@ static void RCTApplyBaselineOffset(NSMutableAttributedString *attributedText)
   __block CGFloat maximumFontLineHeight = 0;
 
   [attributedText enumerateAttribute:NSFontAttributeName
-                             inRange:NSMakeRange(0, attributedText.length)
+                             inRange:attributedTextRange
                              options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired
                           usingBlock:^(UIFont *font, NSRange range, __unused BOOL *stop) {
     if (!font) {
@@ -152,7 +160,7 @@ static void RCTApplyBaselineOffset(NSMutableAttributedString *attributedText)
   CGFloat baseLineOffset = (maximumLineHeight - maximumFontLineHeight) / 2.0;
   [attributedText addAttribute:NSBaselineOffsetAttributeName
                          value:@(baseLineOffset)
-                         range:NSMakeRange(0, attributedText.length)];
+                         range:attributedTextRange];
 }
 
 @end

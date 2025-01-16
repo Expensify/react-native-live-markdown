@@ -9,7 +9,7 @@ const NSAttributedStringKey RCTLiveMarkdownBlockquoteDepthAttributeName = @"RCTL
 @interface MarkdownFormatter : NSObject
 
 - (nonnull NSAttributedString *)format:(nonnull NSString *)text
-                        withAttributes:(nullable NSDictionary<NSAttributedStringKey, id>*)attributes
+             withDefaultTextAttributes:(nonnull NSDictionary<NSAttributedStringKey, id> *)defaultTextAttributes
                     withMarkdownRanges:(nonnull NSArray<MarkdownRange *> *)markdownRanges
                      withMarkdownStyle:(nonnull RCTMarkdownStyle *)markdownStyle;
 
