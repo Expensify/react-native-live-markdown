@@ -254,9 +254,9 @@ function parseExpensiMark(markdown: string): MarkdownRange[] {
   }
   const sortedRanges = sortRanges(ranges);
   let markdownRanges = sortedRanges;
-  // Blocks applying italic and strikethrough styles to emojis on Android
-  // TODO: Remove this condition when splitting emojis inside the inline code block will be fixed on the web
   if (Platform.OS === 'android') {
+    // Blocks applying italic and strikethrough styles to emojis on Android
+    // TODO: Remove this condition when splitting emojis inside the inline code block will be fixed on the web
     markdownRanges = splitRangesOnEmojis(markdownRanges, 'italic');
     markdownRanges = splitRangesOnEmojis(markdownRanges, 'strikethrough');
   }
