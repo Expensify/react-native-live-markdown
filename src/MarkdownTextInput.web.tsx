@@ -350,6 +350,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
         }
         const nativeEvent = e.nativeEvent as MarkdownNativeEvent;
         const inputType = nativeEvent.inputType;
+        const isComposing = isEventComposing(nativeEvent);
 
         updateTextColor(divRef.current, e.target.textContent ?? '');
         const previousText = divRef.current.value;
@@ -371,7 +372,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
             ? Math.max(contentSelection.current.start, 0) // Don't move the caret when deleting forward with no characters selected
             : Math.max(Math.max(contentSelection.current.end, 0) + (parsedText.length - previousText.length), 0);
 
-        if (isEventComposing(nativeEvent)) {
+        if (isComposing) {
           updateTextColor(divRef.current, parsedText);
           updateSelection(e, {
             start: newCursorPosition,
