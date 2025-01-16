@@ -38,6 +38,8 @@ interface MarkdownTextInputProps extends TextInputProps, InlineImagesInputProps 
 
 interface MarkdownNativeEvent extends Event {
   inputType?: string;
+  isComposing?: boolean;
+  keyCode?: number;
 }
 
 type MarkdownTextInput = TextInput & React.Component<MarkdownTextInputProps>;
@@ -120,7 +122,6 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
       throw new Error('[react-native-live-markdown] `parser` is not a function');
     }
 
-    const compositionRef = useRef<boolean>(false);
     const divRef = useRef<MarkdownTextInputElement | null>(null);
     const currentlyFocusedField = useRef<HTMLDivElement | null>(null);
     const contentSelection = useRef<Selection | null>(null);
@@ -370,7 +371,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
             ? Math.max(contentSelection.current.start, 0) // Don't move the caret when deleting forward with no characters selected
             : Math.max(Math.max(contentSelection.current.end, 0) + (parsedText.length - previousText.length), 0);
 
-        if (compositionRef.current) {
+        if (isEventComposing(nativeEvent)) {
           updateTextColor(divRef.current, parsedText);
           updateSelection(e, {
             start: newCursorPosition,
@@ -657,13 +658,8 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
       [insertText],
     );
 
-    const startComposition = useCallback(() => {
-      compositionRef.current = true;
-    }, []);
-
     const endComposition = useCallback(
       (e: React.CompositionEvent<HTMLDivElement>) => {
-        compositionRef.current = false;
         handleOnChangeText(e);
       },
       [handleOnChangeText],
@@ -788,7 +784,6 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
         autoCapitalize={autoCapitalize}
         className={className}
         onKeyDown={handleKeyPress}
-        onCompositionStart={startComposition}
         onCompositionEnd={endComposition}
         onInput={handleOnChangeText}
         onClick={handleClick}
@@ -829,4 +824,4 @@ const styles = StyleSheet.create({
 
 export default MarkdownTextInput;
 
-export type {MarkdownTextInputProps, MarkdownTextInputElement, HTMLMarkdownElement};
+export type {MarkdownNativeEvent, MarkdownTextInputProps, MarkdownTextInputElement, HTMLMarkdownElement};
