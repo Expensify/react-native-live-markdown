@@ -86,15 +86,25 @@ public class CustomMountingManager extends MountingManager {
       text = sb;
     }
 
-    Layout.Alignment alignment = TextLayoutManager.getTextAlignment(attributedString, text);
-
-    markdownUtils.applyMarkdownFormatting((SpannableStringBuilder)text);
-
-    BoringLayout.Metrics boring = BoringLayout.isBoring(text, sTextPaintInstance);
-
-    Class<TextLayoutManager> mapBufferClass = TextLayoutManager.class;
+    
     try {
-      Method createLayoutMethod = mapBufferClass.getDeclaredMethod("createLayout", Spannable.class, BoringLayout.Metrics.class, float.class, YogaMeasureMode.class, boolean.class, int.class, int.class, Layout.Alignment.class);
+      Class<TextLayoutManager> textLayoutManagerClass = TextLayoutManager.class;
+      Method getTextAlignmentMethod = textLayoutManagerClass.getDeclaredMethod("getTextAlignment", MapBuffer.class, Spannable.class, String.class);
+      getTextAlignmentMethod.setAccessible(true);
+
+      Layout.Alignment alignment = (Layout.Alignment)getTextAlignmentMethod.invoke(
+              null,
+              attributedString,
+              text,
+              null
+      );
+      
+
+      markdownUtils.applyMarkdownFormatting((SpannableStringBuilder)text);
+
+      BoringLayout.Metrics boring = BoringLayout.isBoring(text, sTextPaintInstance);
+      
+      Method createLayoutMethod = textLayoutManagerClass.getDeclaredMethod("createLayout", Spannable.class, BoringLayout.Metrics.class, float.class, YogaMeasureMode.class, boolean.class, int.class, int.class, Layout.Alignment.class);
       createLayoutMethod.setAccessible(true);
 
       Layout layout = (Layout)createLayoutMethod.invoke(
