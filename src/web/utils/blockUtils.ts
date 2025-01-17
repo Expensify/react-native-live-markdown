@@ -29,8 +29,8 @@ function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownSty
       Object.assign(node.style, {
         ...markdownStyle.emoji,
         verticalAlign: 'middle',
-        fontStyle: 'normal',
-        textDecoration: 'none',
+        fontStyle: 'normal', // remove italic
+        textDecoration: 'none', // remove strikethrough
         display: 'inline-block',
       });
       break;
