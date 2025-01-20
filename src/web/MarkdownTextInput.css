@@ -22,8 +22,8 @@
   vertical-align: middle;
 }
 
-.react-native-live-markdown-input-singleline > p:last-child span:last-child {
-  padding-right: 1px;
+.react-native-live-markdown-input-singleline > p:last-child {
+  padding-right: 1px !important;
 }
 
 .react-native-live-markdown-input-singleline:empty::before,
