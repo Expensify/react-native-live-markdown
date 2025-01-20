@@ -24,6 +24,15 @@ declare global {
 let initialized = false;
 let workletRuntime: WorkletRuntime | undefined;
 
+function getWorkletRuntime(): WorkletRuntime {
+  if (workletRuntime === undefined) {
+    throw new Error(
+      "[react-native-live-markdown] Worklet runtime hasn't been created yet. Please avoid calling `getWorkletRuntime()` in top-level scope. Instead, call `runOnRuntime()` directly in `runOnRuntime` arguments list.",
+    );
+  }
+  return workletRuntime;
+}
+
 function initializeLiveMarkdownIfNeeded() {
   if (initialized) {
     return;
@@ -132,3 +141,5 @@ const styles = StyleSheet.create({
 export type {PartialMarkdownStyle as MarkdownStyle, MarkdownTextInputProps};
 
 export default MarkdownTextInput;
+
+export {getWorkletRuntime};
