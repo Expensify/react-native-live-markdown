@@ -27,7 +27,7 @@ let workletRuntime: WorkletRuntime | undefined;
 function getWorkletRuntime(): WorkletRuntime {
   if (workletRuntime === undefined) {
     throw new Error(
-      "[react-native-live-markdown] Worklet runtime hasn't been created yet. Please avoid calling `getWorkletRuntime()` in top-level scope. Instead, call `runOnRuntime()` directly in `runOnRuntime` arguments list.",
+      "[react-native-live-markdown] Worklet runtime hasn't been created yet. Please avoid calling `getWorkletRuntime()` in top-level scope. Instead, call `getWorkletRuntime()` directly in `runOnRuntime` arguments list.",
     );
   }
   return workletRuntime;
