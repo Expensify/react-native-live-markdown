@@ -1,4 +1,5 @@
 import type {MarkdownTextInputElement} from '../../MarkdownTextInput.web';
+import {getTopParentTreeNode} from './blockUtils';
 import {findHTMLElementInTree, getTreeNodeByIndex} from './treeUtils';
 import type {TreeNode} from './treeUtils';
 
@@ -17,8 +18,15 @@ function setCursorPosition(target: MarkdownTextInputElement, startIndex: number,
   const range = document.createRange();
   range.selectNodeContents(target);
 
-  const startTreeNode = getTreeNodeByIndex(target.tree, start);
-  const endTreeNode = end && startTreeNode && (end < startTreeNode.start || end >= startTreeNode.start + startTreeNode.length) ? getTreeNodeByIndex(target.tree, end) : startTreeNode;
+  let startTreeNode = getTreeNodeByIndex(target.tree, start);
+  let endTreeNode = end && startTreeNode && (end < startTreeNode.start || end >= startTreeNode.start + startTreeNode.length) ? getTreeNodeByIndex(target.tree, end) : startTreeNode;
+
+  const parentLine = startTreeNode?.type === 'br' && getTopParentTreeNode(startTreeNode);
+  if (parentLine && parentLine?.childNodes?.some((e) => e.type === 'pre')) {
+    startTreeNode = getTreeNodeByIndex(target.tree, start - 1);
+    endTreeNode = startTreeNode;
+  }
+
   if (!startTreeNode || !endTreeNode) {
     console.error('Invalid start or end tree node');
     return;
