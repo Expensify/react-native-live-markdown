@@ -832,7 +832,7 @@ export default MarkdownTextInput;
 export type {MarkdownTextInputProps, MarkdownTextInputElement, HTMLMarkdownElement};
 
 function getWorkletRuntime() {
-  throw new Error('[react-native-live-markdown] getWorkletRuntime is not available on web. Please make sure to use it only on native Android and iOS.');
+  throw new Error('[react-native-live-markdown] `getWorkletRuntime` is not available on web. Please make sure to use it only on native Android or iOS.');
 }
 
 export {getWorkletRuntime};
