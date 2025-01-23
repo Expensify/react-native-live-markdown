@@ -137,9 +137,9 @@ android {
 
       // TextLayoutManager
       if (REACT_NATIVE_MINOR_VERSION <= 76 ) {
-          srcDirs += "src/reactNativeVersionPatch/CustomMountingManager/76"
+          java.srcDirs += "src/reactNativeVersionPatch/CustomMountingManager/76"
       } else {
-          srcDirs += "src/reactNativeVersionPatch/CustomMountingManager/latest"
+          java.srcDirs += "src/reactNativeVersionPatch/CustomMountingManager/latest"
       }
     }
   }
