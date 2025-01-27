@@ -85,16 +85,6 @@ public class CustomMountingManager extends MountingManager {
       TextAttributeProps.getHyphenationFrequency(
         paragraphAttributes.getString(TextLayoutManager.PA_KEY_HYPHENATION_FREQUENCY));
 
-    // StaticLayout returns wrong metrics for the last line if it's empty, add something to the
-    // last line so it's measured correctly
-    if (text.toString().endsWith("\n")) {
-      SpannableStringBuilder sb = new SpannableStringBuilder(text);
-      sb.append("I");
-
-      text = sb;
-    }
-
-
     try {
       Class<TextLayoutManager> textLayoutManagerClass = TextLayoutManager.class;
 
