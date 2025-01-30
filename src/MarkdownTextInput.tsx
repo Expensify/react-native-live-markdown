@@ -105,8 +105,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
 
   const parserId = React.useMemo(() => {
     return registerParser(props.parser);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [workletHash]);
+  }, [props.parser]);
 
   React.useEffect(() => {
     return () => unregisterParser(parserId);
