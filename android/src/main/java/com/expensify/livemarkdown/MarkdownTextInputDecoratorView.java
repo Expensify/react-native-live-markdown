@@ -3,7 +3,6 @@ package com.expensify.livemarkdown;
 import androidx.annotation.Nullable;
 
 import android.content.Context;
-import android.content.res.AssetManager;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 
