@@ -1,6 +1,6 @@
 {
   "name": "@expensify/react-native-live-markdown",
-  "version": "0.1.218",
+  "version": "0.1.228",
   "description": "Drop-in replacement for React Native's TextInput component with Markdown formatting.",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -36,10 +36,9 @@
     "lint:example": "eslint example --ext .js,.ts,.tsx",
     "lint:WebExample": "eslint WebExample --ext .js,.ts,.tsx",
     "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
-    "prepare": "bob build",
+    "prepare": "patch-package && bob build",
     "build:watch": "nodemon --watch src --ext .ts,.tsx,.css --exec \"rm -f .build_complete && npm run prepare && npm pack && touch .build_complete\"",
-    "release": "release-it",
-    "postinstall": "patch-package"
+    "release": "release-it"
   },
   "keywords": [
     "react-native",
