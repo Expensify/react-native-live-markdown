@@ -3,6 +3,8 @@ package com.expensify.livemarkdown;
 import androidx.annotation.Nullable;
 
 import android.content.Context;
+import android.text.Editable;
+import android.text.SpannableStringBuilder;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 
@@ -92,8 +94,11 @@ public class MarkdownTextInputDecoratorView extends View {
   }
 
   protected void applyNewStyles() {
-    if (mReactEditText != null) {
-      mReactEditText.setTextKeepState(mReactEditText.getText()); // trigger update
+    if (mReactEditText != null && mMarkdownUtils != null) {
+      Editable editable = mReactEditText.getText();
+      if (editable instanceof SpannableStringBuilder ssb) {
+        mMarkdownUtils.applyMarkdownFormatting(ssb);
+      }
     }
   }
 }
