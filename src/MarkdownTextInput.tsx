@@ -61,9 +61,14 @@ function unregisterParser(parserId: number) {
 
 interface MarkdownTextInputProps extends TextInputProps, InlineImagesInputProps {
   markdownStyle?: PartialMarkdownStyle;
-  formatSelection?: (selectedText: string, formatCommand: string) => string;
+  formatSelection?: (text: string, selectionStart: number, selectionEnd: number, formatCommand: string) => FormatSelectionResult;
   parser: (value: string) => MarkdownRange[];
 }
+
+type FormatSelectionResult = {
+  updatedText: string;
+  cursorOffset: number;
+};
 
 type MarkdownTextInput = TextInput & React.Component<MarkdownTextInputProps>;
 

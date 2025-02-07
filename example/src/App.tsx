@@ -15,15 +15,24 @@ import {PlatformInfo} from './PlatformInfo';
 // We don't need this workaround in New Expensify App since Reanimated is imported before Live Markdown.
 console.log(Animated);
 
-function handleFormatSelection(selectedText: string, formatCommand: string) {
-  switch (formatCommand) {
-    case 'formatBold':
-      return `*${selectedText}*`;
-    case 'formatItalic':
-      return `_${selectedText}_`;
-    default:
-      return selectedText;
-  }
+function handleFormatSelection(
+  text: string,
+  selectionStart: number,
+  selectionEnd: number,
+  formatCommand: string,
+) {
+  const prefix = text.slice(0, selectionStart);
+  const suffix = text.slice(selectionEnd);
+  const selectedText = text.slice(selectionStart, selectionEnd);
+  const formattedText =
+    formatCommand === 'formatBold'
+      ? `*${selectedText}*`
+      : formatCommand === 'formatItalic'
+      ? `_${selectedText}_`
+      : selectedText;
+  const updatedText = `${prefix}${formattedText}${suffix}`;
+  const cursorOffset = formattedText.length - selectedText.length;
+  return {updatedText, cursorOffset};
 }
 
 export default function App() {
