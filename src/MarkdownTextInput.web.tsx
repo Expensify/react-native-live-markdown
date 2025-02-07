@@ -24,6 +24,7 @@ import {getElementHeight, getPlaceholderValue, isEventComposing, normalizeValue,
 import {parseToReactDOMStyle, processMarkdownStyle} from './web/utils/webStyleUtils';
 import {forceRefreshAllImages} from './web/inputElements/inlineImage';
 import type {MarkdownRange, InlineImagesInputProps} from './commonTypes';
+import {removeFormat} from './web/utils/formatToggleUtils';
 
 const useClientEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
 
@@ -247,6 +248,12 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
 
         if (!formatSelection) {
           return parseText(parser, target, parsedText, processedMarkdownStyle, cursorPosition);
+        }
+
+        // Undo the formatting if the selection is already in the given format.
+        const formatRemovalResult = removeFormat(parsedText, contentSelection.current.start, contentSelection.current.end, formatCommand);
+        if (formatRemovalResult) {
+          return parseText(parser, target, formatRemovalResult.updatedText, processedMarkdownStyle, cursorPosition + formatRemovalResult.cursorOffset, true);
         }
 
         const selectedText = parsedText.slice(contentSelection.current.start, contentSelection.current.end);
