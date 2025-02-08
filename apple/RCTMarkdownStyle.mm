@@ -18,6 +18,7 @@
     _linkColor = RCTUIColorFromSharedColor(style.link.color);
 
     _h1FontSize = style.h1.fontSize;
+    _h1LineHeight = style.h1.lineHeight;
 
     _emojiFontSize = style.emoji.fontSize;
 
@@ -59,6 +60,7 @@
     _linkColor = [RCTConvert UIColor:json[@"link"][@"color"]];
 
     _h1FontSize = [RCTConvert CGFloat:json[@"h1"][@"fontSize"]];
+    _h1LineHeight = [RCTConvert CGFloat:json[@"h1"][@"lineHeight"]];
 
     _emojiFontSize = [RCTConvert CGFloat:json[@"emoji"][@"fontSize"]];
 
