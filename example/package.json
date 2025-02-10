@@ -9,7 +9,7 @@
     "start": "react-native start"
   },
   "dependencies": {
-    "expensify-common": "2.0.108",
+    "expensify-common": "2.0.115",
     "react": "18.3.1",
     "react-native": "0.76.3",
     "react-native-reanimated": "3.16.4"

@@ -87,7 +87,7 @@ function addBrElement(node: TreeNode) {
   return spanNode;
 }
 
-function addTextToElement(node: TreeNode, text: string) {
+function addTextToElement(node: TreeNode, text: string, isMultiline = true) {
   const lines = text.split('\n');
   lines.forEach((line, index) => {
     if (line !== '') {
@@ -96,6 +96,12 @@ function addTextToElement(node: TreeNode, text: string) {
       span.setAttribute('data-type', 'text');
       span.appendChild(document.createTextNode(line));
       appendNode(span, node, 'text', line.length);
+
+      const parentType = span.parentElement?.dataset.type;
+      if (!isMultiline && parentType && ['pre', 'code', 'mention-here', 'mention-user', 'mention-report'].includes(parentType)) {
+        // this is a fix to background colors being shifted downwards in a singleline input
+        addStyleToBlock(span, 'text', {}, false);
+      }
     }
 
     if (index < lines.length - 1 || (index === 0 && line === '')) {
@@ -208,7 +214,7 @@ function parseRangesToHTMLNodes(
       span.setAttribute('data-type', range.type);
 
       if (!disableInlineStyles) {
-        addStyleToBlock(span, range.type, markdownStyle);
+        addStyleToBlock(span, range.type, markdownStyle, isMultiline);
       }
 
       const spanNode = appendNode(span, currentParentNode, range.type, range.length);
@@ -223,7 +229,7 @@ function parseRangesToHTMLNodes(
         lastRangeEndIndex = range.start;
       } else {
         // adding markdown tag
-        addTextToElement(spanNode, text.substring(range.start, endOfCurrentRange));
+        addTextToElement(spanNode, text.substring(range.start, endOfCurrentRange), isMultiline);
         currentParentNode.element.value = (currentParentNode.element.value || '') + (spanNode.element.value || '');
         lastRangeEndIndex = endOfCurrentRange;
         // tag unnesting and adding text after the tag

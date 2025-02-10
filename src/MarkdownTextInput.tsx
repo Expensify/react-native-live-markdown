@@ -24,6 +24,15 @@ declare global {
 let initialized = false;
 let workletRuntime: WorkletRuntime | undefined;
 
+function getWorkletRuntime(): WorkletRuntime {
+  if (workletRuntime === undefined) {
+    throw new Error(
+      "[react-native-live-markdown] Worklet runtime hasn't been created yet. Please avoid calling `getWorkletRuntime()` in top-level scope. Instead, call `getWorkletRuntime()` directly in `runOnRuntime` arguments list.",
+    );
+  }
+  return workletRuntime;
+}
+
 function initializeLiveMarkdownIfNeeded() {
   if (initialized) {
     return;
@@ -96,8 +105,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
 
   const parserId = React.useMemo(() => {
     return registerParser(props.parser);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [workletHash]);
+  }, [props.parser]);
 
   React.useEffect(() => {
     return () => unregisterParser(parserId);
@@ -132,3 +140,5 @@ const styles = StyleSheet.create({
 export type {PartialMarkdownStyle as MarkdownStyle, MarkdownTextInputProps};
 
 export default MarkdownTextInput;
+
+export {getWorkletRuntime};
