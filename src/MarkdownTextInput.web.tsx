@@ -811,8 +811,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderStyle: 'solid',
     fontFamily: 'sans-serif',
-    // @ts-expect-error it works on web
     boxSizing: 'border-box',
+    // @ts-expect-error some type changes
     overflowY: 'auto',
     overflowX: 'auto',
     overflowWrap: 'break-word',
