@@ -17,10 +17,8 @@
       return _prevMarkdownRanges;
     }
 
-    static std::mutex workletRuntimeMutex; // this needs to be global since the worklet runtime is also global
-    const auto lock = std::lock_guard<std::mutex>(workletRuntimeMutex);
-
     const auto &markdownRuntime = expensify::livemarkdown::getMarkdownRuntime();
+    const auto lock = markdownRuntime->createLock();
     jsi::Runtime &rt = markdownRuntime->getJSIRuntime();
 
     std::shared_ptr<ShareableWorklet> markdownWorklet;
