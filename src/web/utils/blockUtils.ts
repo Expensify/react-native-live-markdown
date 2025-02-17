@@ -82,9 +82,11 @@ function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownSty
       });
       break;
     case 'text':
-      if (!isMultiline) {
-        Object.assign(node.style, {backgroundColor: targetElement.parentElement?.style.backgroundColor});
-        Object.assign(targetElement.parentElement?.style ?? {}, {backgroundColor: 'transparent'});
+      if (!isMultiline && targetElement.parentElement?.style) {
+        // Move text background styles from parent to the text node
+        const parentElement = targetElement.parentElement;
+        node.style.cssText = parentElement.style.cssText;
+        parentElement.style.cssText = '';
       }
       break;
     default:
