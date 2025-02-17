@@ -11,9 +11,6 @@ namespace livemarkdown {
       jni::alias_ref<jhybridobject> jThis,
       jni::alias_ref<jni::JString> text,
       const int parserId) {
-    static std::mutex workletRuntimeMutex; // this needs to be global since the worklet runtime is also global
-    const auto lock = std::lock_guard<std::mutex>(workletRuntimeMutex);
-
     const auto markdownRuntime = expensify::livemarkdown::getMarkdownRuntime();
     jsi::Runtime &rt = markdownRuntime->getJSIRuntime();
 
