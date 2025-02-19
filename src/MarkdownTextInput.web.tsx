@@ -81,6 +81,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
       autoCapitalize = 'sentences',
       autoCorrect = true,
       blurOnSubmit = false,
+      caretHidden,
       clearTextOnFocus,
       dir = 'auto',
       disabled = false,
@@ -205,8 +206,9 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
           {whiteSpace: multiline ? 'pre-wrap' : 'nowrap'},
           disabled && styles.disabledInputStyles,
           parseToReactDOMStyle(flattenedStyle),
+          caretHidden && styles.caretHidden,
         ]) as CSSProperties,
-      [flattenedStyle, multiline, disabled],
+      [flattenedStyle, multiline, disabled, caretHidden],
     );
 
     const undo = useCallback(
@@ -820,6 +822,10 @@ const styles = StyleSheet.create({
   disabledInputStyles: {
     opacity: 0.75,
     cursor: 'auto',
+  },
+  caretHidden: {
+    // @ts-expect-error it works on web
+    caretColor: 'transparent',
   },
 });
 

@@ -32,6 +32,7 @@ export default function App() {
   const [linkColorState, setLinkColorState] = React.useState(false);
   const [textFontSizeState, setTextFontSizeState] = React.useState(false);
   const [emojiFontSizeState, setEmojiFontSizeState] = React.useState(false);
+  const [caretHidden, setCaretHidden] = React.useState(false);
   const [selection, setSelection] = React.useState({start: 0, end: 0});
 
   const style = React.useMemo(() => {
@@ -61,6 +62,7 @@ export default function App() {
         multiline
         formatSelection={handleFormatSelection}
         autoCapitalize="none"
+        caretHidden={caretHidden}
         value={value}
         onChangeText={setValue}
         style={[styles.input, style]}
@@ -130,12 +132,17 @@ export default function App() {
         onPress={() => setEmojiFontSizeState(prev => !prev)}
       />
       <Button
+        title="Toggle caret hidden"
+        onPress={() => setCaretHidden(prev => !prev)}
+      />
+      <Button
         title="Toggle all"
         onPress={() => {
           setTextColorState(prev => !prev);
           setLinkColorState(prev => !prev);
           setTextFontSizeState(prev => !prev);
           setEmojiFontSizeState(prev => !prev);
+          setCaretHidden(prev => !prev);
         }}
       />
       <Button
