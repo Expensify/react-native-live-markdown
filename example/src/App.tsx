@@ -4,10 +4,10 @@ import Animated from 'react-native-reanimated';
 import {
   MarkdownTextInput,
   parseExpensiMark,
-  type MarkdownType,
 } from '@expensify/react-native-live-markdown';
 import * as TEST_CONST from './testConstants';
 import {PlatformInfo} from './PlatformInfo';
+import {handleFormatSelection} from './formatSelectionUtils';
 
 // This is a workaround that ensures that `ReanimatedCommitHook` is registered before `MarkdownCommitHook`.
 // Otherwise, `ReanimatedCommitHook` will cause `AndroidTextInputShadowNode` to be cloned
@@ -15,56 +15,6 @@ import {PlatformInfo} from './PlatformInfo';
 // leading to incorrect height of `MarkdownTextInput` component.
 // We don't need this workaround in New Expensify App since Reanimated is imported before Live Markdown.
 console.log(Animated);
-
-type FormatRule = {
-  markdownType: MarkdownType;
-  syntax: string;
-};
-
-function getFormatRule(formatCommand: string): FormatRule | null {
-  if (formatCommand === 'formatBold') {
-    return {markdownType: 'bold', syntax: '*'};
-  }
-  if (formatCommand === 'formatItalic') {
-    return {markdownType: 'italic', syntax: '_'};
-  }
-  return null;
-}
-
-function handleFormatSelection(text: string, selectionStart: number, selectionEnd: number, formatCommand: string) {
-  const formatRule = getFormatRule(formatCommand);
-  if (!text || selectionStart == null || selectionEnd == null || !formatRule) {
-    return {updatedText: text, cursorOffset: 0};
-  }
-
-  // Remove formatting if the selection is already formatted.
-  const markdownRanges = parseExpensiMark(text);
-  for (const range of markdownRanges) {
-    if (range && range.type === formatRule.markdownType && range.start != null && range.length != null) {
-      const rangeEnd = range.start + range.length;
-      const isExactMatch = range.start === selectionStart && rangeEnd === selectionEnd;
-      const isEnclosedMatch = range.start - 1 === selectionStart && rangeEnd + 1 === selectionEnd;
-      const isRangeBetweenSyntaxes = text[range.start - 1] === formatRule.syntax && text[rangeEnd] === formatRule.syntax;
-      if ((isExactMatch || isEnclosedMatch) && isRangeBetweenSyntaxes) {
-        const prefix = text.slice(0, range.start - 1);
-        const suffix = text.slice(rangeEnd + 1);
-        const unformattedText = text.slice(range.start, rangeEnd);
-        const updatedText = `${prefix}${unformattedText}${suffix}`;
-        const cursorOffset = selectionStart - range.start - 1;
-        return {updatedText, cursorOffset};
-      }
-    }
-  }
-
-  // Otherwise, add formatting.
-  const prefix = text.slice(0, selectionStart);
-  const suffix = text.slice(selectionEnd);
-  const selectedText = text.slice(selectionStart, selectionEnd);
-  const formattedText = `${formatRule.syntax}${selectedText}${formatRule.syntax}`;
-  const updatedText = `${prefix}${formattedText}${suffix}`;
-  const cursorOffset = formattedText.length - selectedText.length;
-  return {updatedText, cursorOffset};
-}
 
 export default function App() {
   const [value, setValue] = React.useState(TEST_CONST.EXAMPLE_CONTENT);
