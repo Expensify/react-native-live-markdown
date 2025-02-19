@@ -7,17 +7,7 @@ import {
 } from '@expensify/react-native-live-markdown';
 import * as TEST_CONST from './testConstants';
 import {PlatformInfo} from './PlatformInfo';
-
-function handleFormatSelection(selectedText: string, formatCommand: string) {
-  switch (formatCommand) {
-    case 'formatBold':
-      return `*${selectedText}*`;
-    case 'formatItalic':
-      return `_${selectedText}_`;
-    default:
-      return selectedText;
-  }
-}
+import {handleFormatSelection} from './formatSelectionUtils';
 
 export default function App() {
   const [value, setValue] = React.useState(TEST_CONST.EXAMPLE_CONTENT);
