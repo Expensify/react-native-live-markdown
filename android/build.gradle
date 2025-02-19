@@ -69,6 +69,8 @@ def getReactNativeMinorVersion() {
   return reactNativeVersion.split("\\.")[1].toInteger()
 }
 
+def REACT_NATIVE_MINOR_VERSION = getReactNativeMinorVersion()
+
 android {
   if (supportsNamespace()) {
     namespace "com.expensify.livemarkdown"
@@ -86,7 +88,7 @@ android {
     minSdkVersion getExtOrIntegerDefault("minSdkVersion")
     targetSdkVersion getExtOrIntegerDefault("targetSdkVersion")
 
-    buildConfigField "int", "REACT_NATIVE_MINOR_VERSION", getReactNativeMinorVersion().toString()
+    buildConfigField "int", "REACT_NATIVE_MINOR_VERSION", REACT_NATIVE_MINOR_VERSION.toString()
     buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
 
     consumerProguardFiles "proguard-rules.pro"
@@ -95,7 +97,7 @@ android {
       cmake {
         arguments "-DANDROID_STL=c++_shared",
           "-DANDROID_TOOLCHAIN=clang",
-          "-DREACT_NATIVE_MINOR_VERSION=${getReactNativeMinorVersion()}"
+          "-DREACT_NATIVE_MINOR_VERSION=${REACT_NATIVE_MINOR_VERSION}"
         abiFilters (*reactNativeArchitectures())
       }
     }
@@ -131,6 +133,13 @@ android {
         ]
       } else {
         java.srcDirs += ["src/oldarch"]
+      }
+
+      // TextLayoutManager
+      if (REACT_NATIVE_MINOR_VERSION <= 76 ) {
+          java.srcDirs += "src/reactNativeVersionPatch/CustomMountingManager/76"
+      } else {
+          java.srcDirs += "src/reactNativeVersionPatch/CustomMountingManager/latest"
       }
     }
   }
