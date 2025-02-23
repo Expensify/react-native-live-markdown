@@ -24,14 +24,22 @@ declare global {
 let initialized = false;
 let workletRuntime: WorkletRuntime | undefined;
 
+function getWorkletRuntime(): WorkletRuntime {
+  if (workletRuntime === undefined) {
+    throw new Error(
+      "[react-native-live-markdown] Worklet runtime hasn't been created yet. Please avoid calling `getWorkletRuntime()` in top-level scope. Instead, call `getWorkletRuntime()` directly in `runOnRuntime` arguments list.",
+    );
+  }
+  return workletRuntime;
+}
+
 function initializeLiveMarkdownIfNeeded() {
   if (initialized) {
     return;
   }
-  if (!NativeLiveMarkdownModule) {
-    throw new Error('[react-native-live-markdown] NativeLiveMarkdownModule is not available');
+  if (NativeLiveMarkdownModule) {
+    NativeLiveMarkdownModule.install();
   }
-  NativeLiveMarkdownModule.install();
   if (!global.jsi_setMarkdownRuntime) {
     throw new Error('[react-native-live-markdown] global.jsi_setMarkdownRuntime is not available');
   }
@@ -53,8 +61,14 @@ function unregisterParser(parserId: number) {
 
 interface MarkdownTextInputProps extends TextInputProps, InlineImagesInputProps {
   markdownStyle?: PartialMarkdownStyle;
+  formatSelection?: (text: string, selectionStart: number, selectionEnd: number, formatCommand: string) => FormatSelectionResult;
   parser: (value: string) => MarkdownRange[];
 }
+
+type FormatSelectionResult = {
+  updatedText: string;
+  cursorOffset: number;
+};
 
 type MarkdownTextInput = TextInput & React.Component<MarkdownTextInputProps>;
 
@@ -96,8 +110,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
 
   const parserId = React.useMemo(() => {
     return registerParser(props.parser);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [workletHash]);
+  }, [props.parser]);
 
   React.useEffect(() => {
     return () => unregisterParser(parserId);
@@ -132,3 +145,5 @@ const styles = StyleSheet.create({
 export type {PartialMarkdownStyle as MarkdownStyle, MarkdownTextInputProps};
 
 export default MarkdownTextInput;
+
+export {getWorkletRuntime};

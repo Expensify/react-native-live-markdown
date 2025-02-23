@@ -1,11 +1,11 @@
 import type {CSSProperties} from 'react';
-import type {MarkdownTextInputElement} from '../../MarkdownTextInput.web';
+import type {MarkdownNativeEvent, MarkdownTextInputElement} from '../../MarkdownTextInput.web';
 
 const ZERO_WIDTH_SPACE = '\u200B';
 
 // If an Input Method Editor is processing key input, the 'keyCode' is 229.
 // https://www.w3.org/TR/uievents/#determine-keydown-keyup-keyCode
-function isEventComposing(nativeEvent: globalThis.KeyboardEvent) {
+function isEventComposing(nativeEvent: globalThis.KeyboardEvent | MarkdownNativeEvent) {
   return nativeEvent.isComposing || nativeEvent.keyCode === 229;
 }
 

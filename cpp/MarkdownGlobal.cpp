@@ -36,9 +36,7 @@ void unregisterMarkdownWorklet(const int parserId) {
 
 std::shared_ptr<ShareableWorklet> getMarkdownWorklet(const int parserId) {
   std::unique_lock<std::mutex> lock(globalMarkdownShareableWorkletsMutex);
-  const auto &worklet = globalMarkdownShareableWorklets[parserId];
-  assert(worklet != nullptr);
-  return worklet;
+  return globalMarkdownShareableWorklets.at(parserId);
 }
 
 } // namespace livemarkdown

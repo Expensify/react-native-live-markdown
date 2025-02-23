@@ -1,8 +1,27 @@
 'worklet';
 
+import {Platform} from 'react-native';
 import {ExpensiMark} from 'expensify-common';
 import {unescapeText} from 'expensify-common/dist/utils';
+import {decode} from 'html-entities';
+import type {WorkletFunction} from 'react-native-reanimated/lib/typescript/commonTypes';
 import type {MarkdownType, MarkdownRange} from './commonTypes';
+import {groupRanges, sortRanges, splitRangesOnEmojis} from './rangeUtils';
+
+function isWeb() {
+  return Platform.OS === 'web';
+}
+
+function isJest() {
+  return !!global.process.env.JEST_WORKER_ID;
+}
+
+// eslint-disable-next-line no-underscore-dangle
+if (__DEV__ && !isWeb() && !isJest() && (decode as WorkletFunction).__workletHash === undefined) {
+  throw new Error(
+    "[react-native-live-markdown] `parseExpensiMark` requires `html-entities` package to be workletized. Please add `'worklet';` directive at the top of `node_modules/html-entities/lib/index.js` using patch-package.",
+  );
+}
 
 const MAX_PARSABLE_LENGTH = 4000;
 
@@ -136,6 +155,8 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, MarkdownRange[]] {
         addChildrenWithStyle(node, 'mention-here');
       } else if (node.tag === '<mention-user>') {
         addChildrenWithStyle(node, 'mention-user');
+      } else if (node.tag === '<mention-short>') {
+        addChildrenWithStyle(node, 'mention-short');
       } else if (node.tag === '<mention-report>') {
         addChildrenWithStyle(node, 'mention-report');
       } else if (node.tag === '<blockquote>') {
@@ -216,44 +237,7 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, MarkdownRange[]] {
   return [text, ranges];
 }
 
-// getTagPriority returns a priority for a tag, higher priority means the tag should be processed first
-function getTagPriority(tag: string) {
-  switch (tag) {
-    case 'blockquote':
-      return 2;
-    case 'h1':
-      return 1;
-    default:
-      return 0;
-  }
-}
-
-function sortRanges(ranges: MarkdownRange[]) {
-  // sort ranges by start position, then by length, then by tag hierarchy
-  return ranges.sort((a, b) => a.start - b.start || b.length - a.length || getTagPriority(b.type) - getTagPriority(a.type) || 0);
-}
-
-function groupRanges(ranges: MarkdownRange[]) {
-  const lastVisibleRangeIndex: {[key in MarkdownType]?: number} = {};
-
-  return ranges.reduce((acc, range) => {
-    const start = range.start;
-    const end = range.start + range.length;
-
-    const rangeWithSameStyleIndex = lastVisibleRangeIndex[range.type];
-    const sameStyleRange = rangeWithSameStyleIndex !== undefined ? acc[rangeWithSameStyleIndex] : undefined;
-
-    if (sameStyleRange && sameStyleRange.start <= start && sameStyleRange.start + sameStyleRange.length >= end && range.length > 1) {
-      // increment depth of overlapping range
-      sameStyleRange.depth = (sameStyleRange.depth || 1) + 1;
-    } else {
-      lastVisibleRangeIndex[range.type] = acc.length;
-      acc.push(range);
-    }
-
-    return acc;
-  }, [] as MarkdownRange[]);
-}
+const isAndroid = Platform.OS === 'android';
 
 function parseExpensiMark(markdown: string): MarkdownRange[] {
   if (markdown.length > MAX_PARSABLE_LENGTH) {
@@ -264,14 +248,22 @@ function parseExpensiMark(markdown: string): MarkdownRange[] {
   const tree = parseTokensToTree(tokens);
   const [text, ranges] = parseTreeToTextAndRanges(tree);
   if (text !== markdown) {
-    throw new Error(
+    console.error(
       `[react-native-live-markdown] Parsing error: the processed text does not match the original Markdown input. This may be caused by incorrect parsing functions or invalid input Markdown.\nProcessed input: '${JSON.stringify(
         text,
       )}'\nOriginal input: '${JSON.stringify(markdown)}'`,
     );
+    return [];
   }
-  const sortedRanges = sortRanges(ranges);
-  const groupedRanges = groupRanges(sortedRanges);
+  let markdownRanges = sortRanges(ranges);
+  if (isAndroid) {
+    // Blocks applying italic and strikethrough styles to emojis on Android
+    // TODO: Remove this condition when splitting emojis inside the inline code block will be fixed on the web
+    markdownRanges = splitRangesOnEmojis(markdownRanges, 'italic');
+    markdownRanges = splitRangesOnEmojis(markdownRanges, 'strikethrough');
+  }
+
+  const groupedRanges = groupRanges(markdownRanges);
   return groupedRanges;
 }
 

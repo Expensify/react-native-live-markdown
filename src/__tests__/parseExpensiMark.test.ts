@@ -31,6 +31,10 @@ test('no formatting', () => {
   expect('Hello, world!').toBeParsedAs([]);
 });
 
+describe('parsing error', () => {
+  expect(`> [exa\nmple.com](https://example.com)`).toBeParsedAs([]);
+});
+
 test('bold', () => {
   expect('Hello, *world*!').toBeParsedAs([
     {type: 'syntax', start: 7, length: 1},
@@ -367,10 +371,8 @@ describe('trailing whitespace', () => {
 
     test('with whitespace between syntax', () => {
       expect('> > > Hello world').toBeParsedAs([
-        {type: 'blockquote', start: 0, length: 17, depth: 3},
+        {type: 'blockquote', start: 0, length: 17},
         {type: 'syntax', start: 0, length: 1},
-        {type: 'syntax', start: 2, length: 1},
-        {type: 'syntax', start: 4, length: 1},
       ]);
     });
 
