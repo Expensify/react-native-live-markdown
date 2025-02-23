@@ -64,15 +64,18 @@ function* generateUniqueId() {
 
 const idGenerator = generateUniqueId();
 
-function configureCustomWebStylesheet() {
+function configureCustomWebStylesheet(): CSSStyleSheet | null {
   if (document.getElementById(CUSTOM_WEB_STYLES_ID) !== null) {
-    return;
+    return null;
   }
 
   const customStyleTag = document.createElement('style');
   customStyleTag.id = CUSTOM_WEB_STYLES_ID;
-
   document.head.appendChild(customStyleTag);
+
+  const sheet = new CSSStyleSheet();
+  document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet];
+  return sheet;
 }
 
 function handleCustomStyles(target: MarkdownTextInputElement, markdownStyle: PartialMarkdownStyle) {
@@ -80,12 +83,13 @@ function handleCustomStyles(target: MarkdownTextInputElement, markdownStyle: Par
   if (!styleTag) {
     return;
   }
-  generateCodeBlocksRules(target, styleTag, markdownStyle);
+  generateCodeBlocksRules(target, markdownStyle);
 }
 
 type Rule = {selector: string; properties: Record<string, string>};
 
-function addStylesheetRules(rules: Rule[], styleSheet: CSSStyleSheet) {
+function addStylesheetRules(rules: Rule[], sheet: CSSStyleSheet) {
+  let newSheet = '';
   rules.forEach((rule) => {
     const {selector, properties} = rule;
     let propertiesStr = '';
@@ -95,15 +99,16 @@ function addStylesheetRules(rules: Rule[], styleSheet: CSSStyleSheet) {
       propertiesStr += `${prop}: ${value};\n`;
     });
 
-    styleSheet.insertRule(`${selector}{${propertiesStr}}`, styleSheet.cssRules.length);
+    newSheet += `${selector}{${propertiesStr}} `;
   });
+  sheet.replaceSync(newSheet);
 }
 
 function property(e: HTMLElement, p: string) {
   return parseFloat(window.getComputedStyle(e).getPropertyValue(p).replace('px', ''));
 }
 
-function generateCodeBlocksRules(target: MarkdownTextInputElement, styleTag: HTMLStyleElement, markdownStyle: PartialMarkdownStyle) {
+function generateCodeBlocksRules(target: MarkdownTextInputElement, markdownStyle: PartialMarkdownStyle) {
   const line = target.querySelector('*[data-type="line"]:has(> *[data-type="pre"]) > span:first-child');
   if (!line) {
     return;
@@ -122,10 +127,10 @@ function generateCodeBlocksRules(target: MarkdownTextInputElement, styleTag: HTM
     {
       selector: `.${target.uniqueId} *[data-type='pre']::before`,
       properties: {
-        top: `${Math.floor(lineHeight) - 1}px`,
+        top: `${Math.floor(lineHeight)}px`,
         padding: `${verticalPadding.toString()}px ${horizontalPadding.toString()}px`,
         'background-color': `${(preStyles?.backgroundColor as string) ?? 'lightgray'}`,
-        'border-radius': `${preStyles?.borderRadius?.toString() ?? '4'}px`,
+        'border-radius': `${preStyles?.borderRadius?.toString() ?? '4px'}`,
         'border-color': `${preStyles?.borderColor ?? 'grey'}`,
       },
     },
@@ -160,18 +165,23 @@ function generateCodeBlocksRules(target: MarkdownTextInputElement, styleTag: HTM
   for (let i = 0; i < preBlocks.length; i++) {
     const preBlock = preBlocks[i] as HTMLElement;
     const preBlockWidth = preBlock.getBoundingClientRect().width;
+    const preLineHeight = preBlock.parentElement?.getBoundingClientRect().height ?? 0;
+
+    // Handle a case where something is written immediately after closing backticks without line-break
+    const textElementHeight = preBlock.nextElementSibling?.nextElementSibling?.getBoundingClientRect().height ?? 0;
 
     rules.push({
       selector: `.${target.uniqueId} *:nth-child(${i + 1} of [data-type='line']:has(> *[data-type='pre'])) > *[data-type='pre']::before`,
       properties: {
-        'min-width': `min(calc(100% + 2.5px), ${preBlockWidth + horizontalPadding * 2 + 2}px)`,
+        height: `${preLineHeight - 2 * lineHeight - textElementHeight}px`,
+        'min-width': `min(calc(100% + 2.5px), ${preBlockWidth + horizontalPadding * 2 + 1}px)`,
         'max-width': `min(${preBlockWidth + horizontalPadding * 2 + 2}px, ${contentWidth}px)`,
       },
     });
   }
 
-  if (styleTag.sheet) {
-    addStylesheetRules(rules, styleTag.sheet);
+  if (target.styleSheet) {
+    addStylesheetRules(rules, target.styleSheet);
   }
 }
 

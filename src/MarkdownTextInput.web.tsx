@@ -63,6 +63,7 @@ type MarkdownTextInputElement = HTMLDivElement &
   HTMLInputElement & {
     tree: TreeNode;
     uniqueId: string;
+    styleSheet: CSSStyleSheet;
     selection: Selection;
     imageElements: HTMLImageElement[];
   };
@@ -706,7 +707,10 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
         divRef.current.focus();
       }
 
-      configureCustomWebStylesheet();
+      const styleSheet = configureCustomWebStylesheet();
+      if (styleSheet) {
+        divRef.current.styleSheet = styleSheet;
+      }
       divRef.current.uniqueId = idGenerator.next().value as string;
       setClassName(`${className} ${divRef.current.uniqueId}`);
       handleCustomStyles(divRef.current, markdownStyle as PartialMarkdownStyle);
@@ -733,9 +737,18 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
         forceRefreshAllImages(divRef.current as MarkdownTextInputElement, processedMarkdownStyle);
       };
 
+      const handleStyles = () => {
+        if (!divRef.current) {
+          return;
+        }
+        handleCustomStyles(divRef.current, processedMarkdownStyle);
+      };
+
+      window.addEventListener('resize', handleStyles);
       window.addEventListener('online', handleReconnect);
       return () => {
         window.removeEventListener('online', handleReconnect);
+        window.removeEventListener('resize', handleStyles);
       };
     }, [processedMarkdownStyle]);
 

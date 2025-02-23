@@ -31,7 +31,9 @@ interface MarkdownStyle {
     borderWidth: Float;
     borderRadius: Float;
     borderStyle: string;
-    padding: Float;
+    padding?: Float;
+    paddingVertical?: Float;
+    paddingHorizontal?: Float;
   };
   pre: {
     fontFamily: string;

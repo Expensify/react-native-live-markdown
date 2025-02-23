@@ -45,6 +45,10 @@
   line-height: 1.3;
 }
 
+*[data-type='line'] *[data-type='pre'] + *[data-type='syntax'] + *[data-type='text'] {
+  max-width: 100%;
+}
+
 *[data-type='line'] *[data-type='syntax']:has(+ *[data-type='pre']) {
   display: grid;
   line-height: 1.3;

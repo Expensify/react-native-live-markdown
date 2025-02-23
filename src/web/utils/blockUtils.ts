@@ -14,6 +14,10 @@ function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownSty
   const preHorizontalPadding = parseStringWithUnitToNumber(markdownStyle.pre?.paddingHorizontal ?? defaultPrePadding).toString();
   const preVerticalPadding = parseStringWithUnitToNumber(markdownStyle.pre?.paddingVertical ?? defaultPrePadding).toString();
 
+  const defaultCodePadding = markdownStyle.code?.padding ?? 0;
+  const codeHorizontalPadding = parseStringWithUnitToNumber(markdownStyle.code?.paddingHorizontal ?? defaultCodePadding).toString();
+  const codeVerticalPadding = parseStringWithUnitToNumber(markdownStyle.code?.paddingVertical ?? defaultCodePadding).toString();
+
   switch (type) {
     case 'line':
       Object.assign(node.style, {
@@ -52,7 +56,11 @@ function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownSty
       });
       break;
     case 'code':
-      Object.assign(node.style, {...markdownStyle.code, lineHeight: 1.5});
+      Object.assign(node.style, {
+        ...markdownStyle.code,
+        padding: `${codeVerticalPadding}px ${codeHorizontalPadding}px`,
+        lineHeight: 1.5,
+      });
       break;
     case 'pre':
       Object.assign(node.style, {
@@ -67,6 +75,7 @@ function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownSty
         width: 'fit-content',
         maxWidth: '100%',
         boxSizing: 'border-box',
+        zIndex: 2,
       });
       break;
 
