@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Button, StyleSheet, Text, View} from 'react-native';
+import {Button, StyleSheet, Text} from 'react-native';
 import Animated from 'react-native-reanimated';
 import {
   MarkdownTextInput,
@@ -7,24 +7,7 @@ import {
 } from '@expensify/react-native-live-markdown';
 import * as TEST_CONST from './testConstants';
 import {PlatformInfo} from './PlatformInfo';
-
-// This is a workaround that ensures that `ReanimatedCommitHook` is registered before `MarkdownCommitHook`.
-// Otherwise, `ReanimatedCommitHook` will cause `AndroidTextInputShadowNode` to be cloned
-// and `AndroidTextInputComponentDescriptor` will overwrite a custom `TextLayoutManager` with the default one,
-// leading to incorrect height of `MarkdownTextInput` component.
-// We don't need this workaround in New Expensify App since Reanimated is imported before Live Markdown.
-console.log(Animated);
-
-function handleFormatSelection(selectedText: string, formatCommand: string) {
-  switch (formatCommand) {
-    case 'formatBold':
-      return `*${selectedText}*`;
-    case 'formatItalic':
-      return `_${selectedText}_`;
-    default:
-      return selectedText;
-  }
-}
+import {handleFormatSelection} from './formatSelectionUtils';
 
 export default function App() {
   const [value, setValue] = React.useState(TEST_CONST.EXAMPLE_CONTENT);
@@ -32,6 +15,7 @@ export default function App() {
   const [linkColorState, setLinkColorState] = React.useState(false);
   const [textFontSizeState, setTextFontSizeState] = React.useState(false);
   const [emojiFontSizeState, setEmojiFontSizeState] = React.useState(false);
+  const [caretHidden, setCaretHidden] = React.useState(false);
   const [selection, setSelection] = React.useState({start: 0, end: 0});
 
   const style = React.useMemo(() => {
@@ -55,12 +39,18 @@ export default function App() {
   const ref = React.useRef<MarkdownTextInput>(null);
 
   return (
-    <View style={styles.container}>
+    // This is a workaround that ensures that `ReanimatedCommitHook` is registered before `MarkdownCommitHook`.
+    // Otherwise, `ReanimatedCommitHook` will cause `AndroidTextInputShadowNode` to be cloned
+    // and `AndroidTextInputComponentDescriptor` will overwrite a custom `TextLayoutManager` with the default one,
+    // leading to incorrect height of `MarkdownTextInput` component.
+    // We don't need this workaround in New Expensify App since Reanimated is imported before Live Markdown.
+    <Animated.View style={styles.container}>
       <PlatformInfo />
       <MarkdownTextInput
         multiline
         formatSelection={handleFormatSelection}
         autoCapitalize="none"
+        caretHidden={caretHidden}
         value={value}
         onChangeText={setValue}
         style={[styles.input, style]}
@@ -130,12 +120,17 @@ export default function App() {
         onPress={() => setEmojiFontSizeState(prev => !prev)}
       />
       <Button
+        title="Toggle caret hidden"
+        onPress={() => setCaretHidden(prev => !prev)}
+      />
+      <Button
         title="Toggle all"
         onPress={() => {
           setTextColorState(prev => !prev);
           setLinkColorState(prev => !prev);
           setTextFontSizeState(prev => !prev);
           setEmojiFontSizeState(prev => !prev);
+          setCaretHidden(prev => !prev);
         }}
       />
       <Button
@@ -148,7 +143,7 @@ export default function App() {
           setSelection({start: 0, end: 20});
         }}
       />
-    </View>
+    </Animated.View>
   );
 }
 

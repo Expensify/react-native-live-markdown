@@ -30,7 +30,7 @@ const useClientEffect = typeof window === 'undefined' ? useEffect : useLayoutEff
 interface MarkdownTextInputProps extends TextInputProps, InlineImagesInputProps {
   markdownStyle?: MarkdownStyle;
   parser: (text: string) => MarkdownRange[];
-  formatSelection?: (selectedText: string, formatCommand: string) => string;
+  formatSelection?: (text: string, selectionStart: number, selectionEnd: number, formatCommand: string) => FormatSelectionResult;
   onClick?: (e: MouseEvent<HTMLDivElement>) => void;
   dir?: string;
   disabled?: boolean;
@@ -52,6 +52,11 @@ type Selection = {
 type Dimensions = {
   width: number;
   height: number;
+};
+
+type FormatSelectionResult = {
+  updatedText: string;
+  cursorOffset: number;
 };
 
 type ParseTextResult = {
@@ -81,6 +86,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
       autoCapitalize = 'sentences',
       autoCorrect = true,
       blurOnSubmit = false,
+      caretHidden,
       clearTextOnFocus,
       dir = 'auto',
       disabled = false,
@@ -205,8 +211,9 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
           {whiteSpace: multiline ? 'pre-wrap' : 'nowrap'},
           disabled && styles.disabledInputStyles,
           parseToReactDOMStyle(flattenedStyle),
+          caretHidden && styles.caretHidden,
         ]) as CSSProperties,
-      [flattenedStyle, multiline, disabled],
+      [flattenedStyle, multiline, disabled, caretHidden],
     );
 
     const undo = useCallback(
@@ -249,19 +256,8 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
           return parseText(parser, target, parsedText, processedMarkdownStyle, cursorPosition);
         }
 
-        const selectedText = parsedText.slice(contentSelection.current.start, contentSelection.current.end);
-        const formattedText = formatSelection(selectedText, formatCommand);
-
-        if (selectedText === formattedText) {
-          return parseText(parser, target, parsedText, processedMarkdownStyle, cursorPosition);
-        }
-
-        const prefix = parsedText.slice(0, contentSelection.current.start);
-        const suffix = parsedText.slice(contentSelection.current.end);
-        const diffLength = formattedText.length - selectedText.length;
-        const text = `${prefix}${formattedText}${suffix}`;
-
-        return parseText(parser, target, text, processedMarkdownStyle, cursorPosition + diffLength, true);
+        const {updatedText, cursorOffset} = formatSelection(parsedText, contentSelection.current.start, contentSelection.current.end, formatCommand);
+        return parseText(parser, target, updatedText, processedMarkdownStyle, cursorPosition + cursorOffset, true);
       },
       [parser, parseText, formatSelection, processedMarkdownStyle],
     );
@@ -811,8 +807,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderStyle: 'solid',
     fontFamily: 'sans-serif',
-    // @ts-expect-error it works on web
     boxSizing: 'border-box',
+    // @ts-expect-error it works on web
     overflowY: 'auto',
     overflowX: 'auto',
     overflowWrap: 'break-word',
@@ -820,6 +816,10 @@ const styles = StyleSheet.create({
   disabledInputStyles: {
     opacity: 0.75,
     cursor: 'auto',
+  },
+  caretHidden: {
+    // @ts-expect-error it works on web
+    caretColor: 'transparent',
   },
 });
 

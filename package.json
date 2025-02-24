@@ -1,6 +1,6 @@
 {
   "name": "@expensify/react-native-live-markdown",
-  "version": "0.1.231",
+  "version": "0.1.236",
   "description": "Drop-in replacement for React Native's TextInput component with Markdown formatting.",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -47,7 +47,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/expensify/react-native-live-markdown.git"
+    "url": "git+https://github.com/Expensify/react-native-live-markdown.git"
   },
   "author": "Expensify, Inc.",
   "license": "MIT",
@@ -67,7 +67,7 @@
     "@react-native-community/cli": "15.0.1",
     "@react-native-community/cli-platform-android": "15.0.1",
     "@react-native-community/cli-platform-ios": "15.0.1",
-    "@react-native/eslint-config": "0.76.3",
+    "@react-native/eslint-config": "0.77.0",
     "@release-it/conventional-changelog": "^5.0.0",
     "@types/jest": "^29.5.14",
     "@types/react": "~18.2.6",
@@ -94,9 +94,9 @@
     "patch-package": "^8.0.0",
     "prettier": "2.8.8",
     "react": "18.3.1",
-    "react-native": "0.76.3",
+    "react-native": "0.77.0",
     "react-native-builder-bob": "^0.20.0",
-    "react-native-reanimated": "3.16.4",
+    "react-native-reanimated": "3.16.7",
     "react-native-web": "^0.19.10",
     "release-it": "^15.0.0",
     "turbo": "^1.10.7",
