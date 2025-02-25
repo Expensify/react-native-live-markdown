@@ -11,7 +11,7 @@ import type {
   TextInputContentSizeChangeEventData,
   GestureResponderEvent,
 } from 'react-native';
-import React, {useEffect, useRef, useCallback, useMemo, useLayoutEffect} from 'react';
+import React, {useEffect, useRef, useCallback, useMemo, useLayoutEffect, useState} from 'react';
 import type {CSSProperties, MutableRefObject, ReactEventHandler, FocusEventHandler, MouseEvent, KeyboardEvent, SyntheticEvent, ClipboardEventHandler, TouchEvent} from 'react';
 import {StyleSheet} from 'react-native';
 import {updateInputStructure} from './web/utils/parserUtils';
@@ -21,8 +21,9 @@ import {getCurrentCursorPosition, removeSelection, setCursorPosition} from './we
 import './web/MarkdownTextInput.css';
 import type {MarkdownStyle} from './MarkdownTextInputDecoratorViewNativeComponent';
 import {getElementHeight, getPlaceholderValue, isEventComposing, normalizeValue, parseInnerHTMLToText} from './web/utils/inputUtils';
-import {parseToReactDOMStyle, processMarkdownStyle} from './web/utils/webStyleUtils';
+import {parseToReactDOMStyle, configureCustomWebStylesheet, handleCustomStyles, idGenerator, processMarkdownStyle} from './web/utils/webStyleUtils';
 import {forceRefreshAllImages} from './web/inputElements/inlineImage';
+import type {PartialMarkdownStyle} from './styleUtils';
 import type {MarkdownRange, InlineImagesInputProps} from './commonTypes';
 
 const useClientEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
@@ -69,6 +70,8 @@ let focusTimeout: NodeJS.Timeout | null = null;
 type MarkdownTextInputElement = HTMLDivElement &
   HTMLInputElement & {
     tree: TreeNode;
+    uniqueId: string;
+    styleSheet: CSSStyleSheet;
     selection: Selection;
     imageElements: HTMLImageElement[];
   };
@@ -131,7 +134,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
     const divRef = useRef<MarkdownTextInputElement | null>(null);
     const currentlyFocusedField = useRef<HTMLDivElement | null>(null);
     const contentSelection = useRef<Selection | null>(null);
-    const className = `react-native-live-markdown-input-${multiline ? 'multiline' : 'singleline'}`;
+    const [className, setClassName] = useState(`react-native-live-markdown-input-${multiline ? 'multiline' : 'singleline'}`);
     const history = useRef<InputHistory>();
     const dimensions = useRef<Dimensions | null>(null);
     const pasteContent = useRef<string | null>(null);
@@ -377,6 +380,14 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
           divRef.current.value = parsedText;
           if (onChangeText) {
             onChangeText(parsedText);
+          }
+          if (processedMarkdownStyle) {
+            const preBlocks = [...divRef.current.querySelectorAll('*[data-type="pre"]')];
+            while (preBlocks.length > 0) {
+              const preBlock = preBlocks.pop() as HTMLElement;
+              preBlock.setAttribute('data-content', parseInnerHTMLToText(preBlock, 0));
+            }
+            handleCustomStyles(divRef.current, processedMarkdownStyle);
           }
           return;
         }
@@ -736,6 +747,14 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
       if (autoFocus) {
         divRef.current.focus();
       }
+
+      const styleSheet = configureCustomWebStylesheet();
+      if (styleSheet) {
+        divRef.current.styleSheet = styleSheet;
+      }
+      divRef.current.uniqueId = idGenerator.next().value as string;
+      setClassName(`${className} ${divRef.current.uniqueId}`);
+      handleCustomStyles(divRef.current, markdownStyle as PartialMarkdownStyle);
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -759,9 +778,18 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
         forceRefreshAllImages(divRef.current as MarkdownTextInputElement, processedMarkdownStyle);
       };
 
+      const handleStyles = () => {
+        if (!divRef.current) {
+          return;
+        }
+        handleCustomStyles(divRef.current, processedMarkdownStyle);
+      };
+
+      window.addEventListener('resize', handleStyles);
       window.addEventListener('online', handleReconnect);
       return () => {
         window.removeEventListener('online', handleReconnect);
+        window.removeEventListener('resize', handleStyles);
       };
     }, [processedMarkdownStyle]);
 
