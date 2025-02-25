@@ -16,7 +16,7 @@ declare global {
   // eslint-disable-next-line no-var
   var jsi_setMarkdownRuntime: (runtime: WorkletRuntime) => void;
   // eslint-disable-next-line no-var
-  var jsi_registerMarkdownWorklet: (shareableWorklet: ShareableRef<WorkletFunction<[string], Range[]>>) => number;
+  var jsi_registerMarkdownWorklet: (shareableWorklet: ShareableRef<WorkletFunction<[string], MarkdownRange[]>>) => number;
   // eslint-disable-next-line no-var
   var jsi_unregisterMarkdownWorklet: (parserId: number) => void;
 }
@@ -50,7 +50,7 @@ function initializeLiveMarkdownIfNeeded() {
 
 function registerParser(parser: (input: string) => MarkdownRange[]): number {
   initializeLiveMarkdownIfNeeded();
-  const shareableWorklet = makeShareableCloneRecursive(parser) as ShareableRef<WorkletFunction<[string], Range[]>>;
+  const shareableWorklet = makeShareableCloneRecursive(parser) as ShareableRef<WorkletFunction<[string], MarkdownRange[]>>;
   const parserId = global.jsi_registerMarkdownWorklet(shareableWorklet);
   return parserId;
 }
