@@ -179,10 +179,11 @@ Currently, `react-native-live-markdown` supports only [ExpensiMark](https://gith
 
 ## Compatibility
 
-`react-native-live-markdown` requires React Native 0.75 or newer.
+`react-native-live-markdown` supports two latest React Native minor releases.
 
 | react-native | @expensify/react-native-live-markdown |
 | :----------: | :-----------------------------------: |
+|     0.77     |               0.1.235+                |
 |     0.76     |               0.1.141+                |
 |     0.75     |               0.1.129+                |
 |     0.74     |           0.1.122 – 0.1.128           |
