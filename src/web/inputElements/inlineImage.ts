@@ -71,7 +71,7 @@ function scaleImageDimensions(imgElement: HTMLImageElement) {
     scaledWidth = scaledHeight * aspectRatio;
   }
 
-  return {height, width};
+  return {height: scaledHeight, width: scaledWidth};
 }
 
 function handleOnLoad(
