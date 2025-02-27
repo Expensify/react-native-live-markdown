@@ -174,7 +174,7 @@ function createImageElement(currentInput: MarkdownTextInputElement, targetNode: 
     img.src = url;
     timeoutMap.delete(targetNode.orderIndex);
   }, INLINE_IMAGE_PREVIEW_DEBOUNCE_TIME_MS);
-  timeoutMap.set(targetNode.orderIndex, {
+  timeoutMap.set(`${currentInput.uniqueId}-${targetNode.orderIndex}`, {
     timeout,
     url,
   });

@@ -21,7 +21,7 @@ import {getCurrentCursorPosition, removeSelection, setCursorPosition} from './we
 import './web/MarkdownTextInput.css';
 import type {MarkdownStyle} from './MarkdownTextInputDecoratorViewNativeComponent';
 import {getElementHeight, getPlaceholderValue, isEventComposing, normalizeValue, parseInnerHTMLToText} from './web/utils/inputUtils';
-import {parseToReactDOMStyle, processMarkdownStyle} from './web/utils/webStyleUtils';
+import {idGenerator, parseToReactDOMStyle, processMarkdownStyle} from './web/utils/webStyleUtils';
 import {forceRefreshAllImages} from './web/inputElements/inlineImage';
 import type {MarkdownRange, InlineImagesInputProps} from './commonTypes';
 
@@ -69,6 +69,7 @@ let focusTimeout: NodeJS.Timeout | null = null;
 type MarkdownTextInputElement = HTMLDivElement &
   HTMLInputElement & {
     tree: TreeNode;
+    uniqueId: string;
     selection: Selection;
     imageElements: HTMLImageElement[];
   };
@@ -736,6 +737,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
       if (autoFocus) {
         divRef.current.focus();
       }
+      divRef.current.uniqueId = idGenerator.next().value as string;
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
