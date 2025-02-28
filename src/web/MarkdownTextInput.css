@@ -33,7 +33,7 @@
   content: attr(placeholder);
 }
 
-*[data-type='pre']::before {
+.react-native-live-markdown-input-multiline *[data-type='pre']::before {
   margin: 0;
   display: block;
   color: transparent;
@@ -45,24 +45,31 @@
   box-sizing: border-box;
 }
 
-*[data-type='pre'] {
+.react-native-live-markdown-input-multiline *[data-type='pre'] {
   line-height: 1.3;
 }
 
-*[data-type='line'] *[data-type='pre'] + *[data-type='syntax'] + *[data-type='text'] {
+.react-native-live-markdown-input-singleline *[data-type='code'] > *[data-type='emoji'],
+.react-native-live-markdown-input-multiline *[data-type='code'] > *[data-type='emoji'] {
+  font-size: inherit !important;
+  line-height: inherit !important;
+  vertical-align: unset !important;
+}
+
+.react-native-live-markdown-input-multiline *[data-type='line'] *[data-type='pre'] + *[data-type='syntax'] + *[data-type='text'] {
   max-width: 100%;
 }
 
-*[data-type='line'] *[data-type='syntax']:has(+ *[data-type='pre']) {
+.react-native-live-markdown-input-multiline *[data-type='line'] *[data-type='syntax']:has(+ *[data-type='pre']) {
   display: grid;
   line-height: 1.3;
 }
 
-*[data-type='line'] *[data-type='syntax']:has(+ *[data-type='pre']) > *:last-child {
+.react-native-live-markdown-input-multiline *[data-type='line'] *[data-type='syntax']:has(+ *[data-type='pre']) > *:last-child {
   display: none;
 }
 
-*[data-type='line'] *[data-type='pre'] + *[data-type='syntax'] {
+.react-native-live-markdown-input-multiline *[data-type='line'] *[data-type='pre'] + *[data-type='syntax'] {
   display: grid;
   line-height: 1.3;
 }

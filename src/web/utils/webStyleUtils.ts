@@ -53,8 +53,6 @@ function parseToReactDOMStyle(style: TextStyle): any {
   return createReactDOMStyle(preprocessStyle(style));
 }
 
-const CUSTOM_WEB_STYLES_ID = 'LiveMarkdownCustomWebStyles';
-
 function* generateUniqueId() {
   let idCounter = 0;
   while (true) {
@@ -65,22 +63,13 @@ function* generateUniqueId() {
 const idGenerator = generateUniqueId();
 
 function configureCustomWebStylesheet(): CSSStyleSheet | null {
-  if (document.getElementById(CUSTOM_WEB_STYLES_ID) !== null) {
-    return null;
-  }
-
-  const customStyleTag = document.createElement('style');
-  customStyleTag.id = CUSTOM_WEB_STYLES_ID;
-  document.head.appendChild(customStyleTag);
-
   const sheet = new CSSStyleSheet();
   document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet];
   return sheet;
 }
 
 function handleCustomStyles(target: MarkdownTextInputElement, markdownStyle: PartialMarkdownStyle) {
-  const styleTag = document.getElementById(CUSTOM_WEB_STYLES_ID) as HTMLStyleElement;
-  if (!styleTag) {
+  if (!target.styleSheet) {
     return;
   }
   generateCodeBlocksRules(target, markdownStyle);
@@ -161,7 +150,7 @@ function generateCodeBlocksRules(target: MarkdownTextInputElement, markdownStyle
     },
   ];
 
-  const preBlocks = [...document.querySelectorAll('*[data-type="pre"]')];
+  const preBlocks = [...target.querySelectorAll('*[data-type="pre"]')];
   for (let i = 0; i < preBlocks.length; i++) {
     const preBlock = preBlocks[i] as HTMLElement;
     const preBlockWidth = preBlock.getBoundingClientRect().width;
@@ -180,9 +169,7 @@ function generateCodeBlocksRules(target: MarkdownTextInputElement, markdownStyle
     });
   }
 
-  if (target.styleSheet) {
-    addStylesheetRules(rules, target.styleSheet);
-  }
+  addStylesheetRules(rules, target.styleSheet);
 }
 
 export {parseToReactDOMStyle, processMarkdownStyle, configureCustomWebStylesheet, idGenerator, handleCustomStyles};

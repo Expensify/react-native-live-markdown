@@ -739,7 +739,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
       [numberOfLines],
     );
 
-    useEffect(() => {
+    useClientEffect(() => {
       if (!divRef.current) {
         return;
       }
@@ -785,11 +785,14 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
         handleCustomStyles(divRef.current, processedMarkdownStyle);
       };
 
-      window.addEventListener('resize', handleStyles);
+      const resizeObserver = new ResizeObserver(handleStyles);
+      if (divRef.current) {
+        resizeObserver.observe(divRef.current);
+      }
       window.addEventListener('online', handleReconnect);
       return () => {
         window.removeEventListener('online', handleReconnect);
-        window.removeEventListener('resize', handleStyles);
+        resizeObserver.disconnect();
       };
     }, [processedMarkdownStyle]);
 
