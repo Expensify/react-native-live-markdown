@@ -112,6 +112,7 @@ function generateCodeBlocksRules(target: MarkdownTextInputElement, markdownStyle
   const contentWidth =
     target.offsetWidth - property(target, 'border-left-width') - property(target, 'border-left-width') - property(target, 'padding-left') - property(target, 'padding-right');
 
+  // General pre block styles
   const rules: Rule[] = [
     {
       selector: `.${target.uniqueId} *[data-type='pre']::before`,
@@ -150,6 +151,7 @@ function generateCodeBlocksRules(target: MarkdownTextInputElement, markdownStyle
     },
   ];
 
+  // Generate style rules for all existing pre blocks
   const preBlocks = [...target.querySelectorAll('*[data-type="pre"]')];
   for (let i = 0; i < preBlocks.length; i++) {
     const preBlock = preBlocks[i] as HTMLElement;
@@ -160,6 +162,7 @@ function generateCodeBlocksRules(target: MarkdownTextInputElement, markdownStyle
     const textElementHeight = preBlock.nextElementSibling?.nextElementSibling?.getBoundingClientRect().height ?? 0;
 
     rules.push({
+      // This selector targets specific pre block
       selector: `.${target.uniqueId} *:nth-child(${i + 1} of [data-type='line']:has(> *[data-type='pre'])) > *[data-type='pre']::before`,
       properties: {
         height: `${preLineHeight - 2 * lineHeight - textElementHeight}px`,

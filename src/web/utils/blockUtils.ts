@@ -69,22 +69,30 @@ function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownSty
       });
       break;
     case 'pre':
-      Object.assign(node.style, {
-        ...markdownStyle.pre,
-        backgroundColor: 'transparent',
-        padding: 0,
-      });
-      Object.assign((node.parentNode as HTMLElement).style, {
-        padding: `${preVerticalPadding}px ${preHorizontalPadding}px`,
-        'line-height': BrowserUtils.isMobile ? 1.3 : 'inherit',
-        position: 'relative',
-        width: 'fit-content',
-        maxWidth: '100%',
-        boxSizing: 'border-box',
-        zIndex: 2,
-      });
+      // In multiline style the pre block using pseudoelements, otherwise default to inline
+      if (isMultiline) {
+        Object.assign(node.style, {
+          ...markdownStyle.pre,
+          backgroundColor: 'transparent',
+          padding: 0,
+        });
+        Object.assign((node.parentNode as HTMLElement).style, {
+          padding: `${preVerticalPadding}px ${preHorizontalPadding}px`,
+          'line-height': BrowserUtils.isMobile ? 1.3 : 'inherit',
+          position: 'relative',
+          width: 'fit-content',
+          maxWidth: '100%',
+          boxSizing: 'border-box',
+          zIndex: 2,
+        });
+      } else {
+        Object.assign(node.style, {
+          ...markdownStyle.code,
+          padding: `${codeVerticalPadding}px ${codeHorizontalPadding}px`,
+          lineHeight: 1.5,
+        });
+      }
       break;
-
     case 'blockquote':
       Object.assign(node.style, {
         ...markdownStyle.blockquote,
