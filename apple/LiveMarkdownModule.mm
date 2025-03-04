@@ -2,10 +2,6 @@
 
 #import <RNLiveMarkdown/RuntimeDecorator.h>
 
-#ifdef RCT_NEW_ARCH_ENABLED
-#import <RNLiveMarkdown/MarkdownCommitHook.h>
-#endif // RCT_NEW_ARCH_ENABLED
-
 #import <React/RCTBridge+Private.h>
 
 #ifdef RCT_NEW_ARCH_ENABLED
@@ -13,22 +9,30 @@
 #import <React/RCTSurfacePresenter.h>
 #endif // RCT_NEW_ARCH_ENABLED
 
-#import "RCTLiveMarkdownModule.h"
+#import <jsi/jsi.h>
+
+using namespace facebook;
+using namespace expensify::livemarkdown;
 
 // A turbomodule used to register the commit hook
 // I think this is the easiest way to access the UIManager, which we need to
 // actually register the hook
 
-@implementation RCTLiveMarkdownModule {
-  BOOL installed_;
+@implementation LiveMarkdownModule {
+#ifdef RCT_NEW_ARCH_ENABLED
   __weak RCTSurfacePresenter *surfacePresenter_;
 #endif // RCT_NEW_ARCH_ENABLED
 }
 
 RCT_EXPORT_MODULE()
 
-- (NSNumber *)install {
-  return @1;
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install)
+{
+  RCTCxxBridge *cxxBridge = (RCTCxxBridge *)self.bridge;
+  jsi::Runtime &rt = *(jsi::Runtime *)cxxBridge.runtime;
+  expensify::livemarkdown::injectJSIBindings(rt);
+  
+  return @(1);
 }
 
 #ifdef RCT_NEW_ARCH_ENABLED

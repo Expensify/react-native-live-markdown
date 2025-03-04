@@ -25,6 +25,7 @@ using namespace facebook::react;
 @implementation MarkdownTextInputDecoratorComponentView {
     RCTMarkdownUtils *_markdownUtils;
     RCTMarkdownStyle *_markdownStyle;
+    NSNumber *_parserId;
   #ifdef RCT_NEW_ARCH_ENABLED
     __weak RCTTextInputComponentView *_textInput;
   #else
@@ -62,8 +63,8 @@ using namespace facebook::react;
   _textInput = (RCTTextInputComponentView *)subview;
   _backedTextInputView = [_textInput valueForKey:@"_backedTextInputView"];
 
-
   _markdownUtils = [[RCTMarkdownUtils alloc] init];
+  [_markdownUtils setParserId:_parserId];
 
   [_textInput setMarkdownUtils:_markdownUtils];
   if ([_backedTextInputView isKindOfClass:[RCTUITextField class]]) {
@@ -115,7 +116,8 @@ using namespace facebook::react;
     const auto &newViewProps = *std::static_pointer_cast<MarkdownTextInputDecoratorViewProps const>(props);
 
     if (oldViewProps.parserId != newViewProps.parserId) {
-      [_view setParserId:@(newViewProps.parserId)];
+      _parserId = [NSNumber numberWithInt:newViewProps.parserId];
+      [_markdownUtils setParserId:_parserId];
     }
 
     // TODO: if (oldViewProps.markdownStyle != newViewProps.markdownStyle)

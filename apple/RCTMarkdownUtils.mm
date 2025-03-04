@@ -29,6 +29,11 @@
     if (input == nil) {
       return nil;
     }
+    
+    // TODO: I don't remember why I added it in the first place
+    if (_markdownStyle == nil) {
+      return nil;
+    }
 
     NSString *inputString = [input string];
     if ([inputString isEqualToString:_prevInputString] && [defaultTextAttributes isEqualToDictionary:_prevDefaultTextAttributes] && [_markdownStyle isEqual:_prevMarkdownStyle] && [_parserId isEqualToNumber:_prevParserId]) {

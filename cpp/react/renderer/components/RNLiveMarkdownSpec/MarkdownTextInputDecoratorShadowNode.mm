@@ -28,9 +28,9 @@ void MarkdownTextInputDecoratorShadowNode::adoptChildren() {
   if (children.size() == 0) {
     return;
   }
-  react_native_assert(
-      children.size() != 1 &&
-      "MarkdownTextInputDecoratorView received more than one child");
+//  react_native_assert(
+//      children.size() != 1 &&
+//      "MarkdownTextInputDecoratorView received more than one child");
 
   if (const auto child = std::dynamic_pointer_cast<const TextInputShadowNode>(
           children.at(0))) {
@@ -135,6 +135,7 @@ void MarkdownTextInputDecoratorShadowNode::applyMarkdown(
       [[RCTMarkdownStyle alloc] initWithStruct:markdownProps.markdownStyle];
   RCTMarkdownUtils *utils = [[RCTMarkdownUtils alloc] init];
   [utils setMarkdownStyle:markdownStyle];
+  [utils setParserId:[NSNumber numberWithInt:markdownProps.parserId]];
 
   // convert the attibuted string stored in state to
   // NSAttributedString
@@ -175,7 +176,7 @@ void MarkdownTextInputDecoratorShadowNode::applyMarkdown(
 
     // apply markdown
     auto newString = [utils parseMarkdown:nsAttributedString
-                           withAttributes:defaultNSTextAttributes];
+                withDefaultTextAttributes:defaultNSTextAttributes];
 
     // create a clone of the old TextInputState and update the
     // attributed string box to point to the string with markdown
@@ -187,7 +188,7 @@ void MarkdownTextInputDecoratorShadowNode::applyMarkdown(
 
     // apply markdown
     auto newString = [utils parseMarkdown:nsAttributedString
-                           withAttributes:defaultNSTextAttributes];
+                withDefaultTextAttributes:defaultNSTextAttributes];
 
     // create a clone of the old TextInputState and update the
     // attributed string box to point to the string with markdown
