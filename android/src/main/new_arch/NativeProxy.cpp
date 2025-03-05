@@ -27,7 +27,7 @@ void NativeProxy::createCommitHook(
         fabricUIManager) {
   const auto &globalUIManager = jni::make_global(fabricUIManager);
 
-  this->commitHook_ = std::make_shared<MarkdownCommitHook>(globalUIManager);
+//  this->commitHook_ = std::make_shared<MarkdownCommitHook>(globalUIManager);
 }
 
 jni::local_ref<NativeProxy::jhybriddata>

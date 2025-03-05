@@ -5,7 +5,7 @@
 
 #include <string>
 
-#include "MarkdownCommitHook.h"
+//#include "MarkdownCommitHook.h"
 
 namespace livemarkdown {
 
@@ -25,7 +25,7 @@ public:
 private:
   friend HybridBase;
   jni::global_ref<NativeProxy::javaobject> javaPart_;
-  std::shared_ptr<MarkdownCommitHook> commitHook_;
+//  std::shared_ptr<MarkdownCommitHook> commitHook_;
 
   explicit NativeProxy(jni::alias_ref<NativeProxy::javaobject> jThis);
 
