@@ -195,7 +195,7 @@ function addInlineImagePreview(
 }
 
 function forceRefreshAllImages(currentInput: MarkdownTextInputElement, markdownStyle: PartialMarkdownStyle) {
-  currentInput.querySelectorAll('img').forEach((img) => {
+  currentInput?.querySelectorAll('img').forEach((img) => {
     // force image reload only if broken image icon is displayed
     if (img.naturalWidth > 0) {
       return;
