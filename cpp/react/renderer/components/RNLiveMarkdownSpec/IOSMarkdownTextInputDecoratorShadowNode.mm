@@ -1,4 +1,6 @@
-#include "MarkdownTextInputDecoratorShadowNode.h"
+#ifndef ANDROID
+
+#include "IOSMarkdownTextInputDecoratorShadowNode.h"
 
 #include <react/renderer/components/iostextinput/TextInputState.h>
 
@@ -255,3 +257,5 @@ MarkdownTextInputDecoratorShadowNode::shadowNodeFromContext(
 
 } // namespace react
 } // namespace facebook
+
+#endif

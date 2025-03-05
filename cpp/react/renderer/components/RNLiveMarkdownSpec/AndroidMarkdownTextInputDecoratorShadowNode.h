@@ -1,10 +1,12 @@
+#ifdef ANDROID
 #pragma once
 
 #include "MarkdownTextInputDecoratorState.h"
 #include "OwningShadowNodeFragment.h"
 #include <react/renderer/components/RNLiveMarkdownSpec/EventEmitters.h>
 #include <react/renderer/components/RNLiveMarkdownSpec/Props.h>
-#include <react/renderer/components/iostextinput/TextInputShadowNode.h>
+#include <react/renderer/components/androidtextinput/AndroidTextInputShadowNode.h>
+
 #include <react/renderer/components/view/ConcreteViewShadowNode.h>
 #include <react/renderer/core/LayoutContext.h>
 
@@ -54,7 +56,7 @@ public:
 private:
   void initialize();
   void adoptChildren();
-  void applyMarkdown(std::shared_ptr<TextInputShadowNode> node,
+  void applyMarkdown(std::shared_ptr<AndroidTextInputShadowNode> node,
                      const LayoutContext &layoutContext) const;
   static YGSize yogaNodeMeasureCallbackConnector(YGNodeConstRef yogaNode,
                                                  float width,
@@ -67,3 +69,5 @@ private:
 
 } // namespace react
 } // namespace facebook
+
+#endif
