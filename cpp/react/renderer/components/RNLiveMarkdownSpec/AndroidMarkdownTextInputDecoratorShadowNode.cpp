@@ -1,5 +1,9 @@
 #ifdef ANDROID
 
+#include <fbjni/fbjni.h>
+#include <react/fabric/JFabricUIManager.h>
+#include <react/jni/ReadableNativeMap.h>
+
 #include "AndroidMarkdownTextInputDecoratorShadowNode.h"
 
 #include <react/renderer/components/androidtextinput/AndroidTextInputState.h>
@@ -21,26 +25,50 @@ void MarkdownTextInputDecoratorShadowNode::initialize() {
 }
 
 void MarkdownTextInputDecoratorShadowNode::adoptChildren() {
-//  const auto &children = getChildren();
-//  if (children.size() == 0) {
-//    return;
-//  }
-////  react_native_assert(
-////      children.size() != 1 &&
-////      "MarkdownTextInputDecoratorView received more than one child");
-//
-//  if (const auto child = std::dynamic_pointer_cast<const AndroidTextInputShadowNode>(
-//          children.at(0))) {
-//    // don't mind this :)
-//    const auto &nodeWithAccessibleYogaNode =
-//        reinterpret_cast<const MarkdownTextInputDecoratorShadowNode *>(&*child);
-//
-//    // decorator node cannot have a measure function since it's not a leaf node
-//    // but we can redirect measuring of the child input to call measureContent
-//    // on the decorator
-//    YGNodeSetMeasureFunc(&nodeWithAccessibleYogaNode->yogaNode_,
-//                         yogaNodeMeasureCallbackConnector);
-//  }
+  const auto &children = getChildren();
+  if (children.size() == 0) {
+    return;
+  }
+//  react_native_assert(
+//      children.size() != 1 &&
+//      "MarkdownTextInputDecoratorView received more than one child");
+
+  if (const auto child = std::dynamic_pointer_cast<const AndroidTextInputShadowNode>(
+          children.at(0))) {
+            static auto customUIManagerClass = jni::findClassStatic(
+                "com/expensify/livemarkdown/CustomFabricUIManager");
+            static auto createCustomUIManager =
+                customUIManagerClass
+                    ->getStaticMethod<JFabricUIManager::javaobject(
+                        JFabricUIManager::javaobject, ReadableMap::javaobject, int)>(
+                        "create");
+
+            const auto markdownStyle =
+              this->getProps()->rawProps["markdownStyle"];
+            const auto currentParserId =
+              this->getProps()->rawProps["parserId"].asInt();
+
+            auto const decoratorPropsRNM =
+                ReadableNativeMap::newObjectCxxArgs(markdownStyle);
+            auto const decoratorPropsRM =
+                jni::make_local(reinterpret_cast<ReadableMap::javaobject>(
+                    decoratorPropsRNM.get()));
+
+      const JFabricUIManager::javaobject& fabricUIManager =
+              this->getContextContainer()->at<JFabricUIManager::javaobject>("FabricUIManager");
+
+
+      const auto customUIManager = jni::make_global(createCustomUIManager(
+                customUIManagerClass, fabricUIManager,
+                decoratorPropsRM.get(), currentParserId));
+            const ContextContainer::Shared contextContainer =
+                std::make_shared<ContextContainer const>();
+            contextContainer->insert("FabricUIManager", customUIManager);
+
+      const auto mutableChild = std::const_pointer_cast<AndroidTextInputShadowNode>(child);
+      mutableChild->setTextLayoutManager(
+              std::make_shared<TextLayoutManager>(contextContainer));
+  }
 }
 
 void MarkdownTextInputDecoratorShadowNode::appendChild(
