@@ -60,36 +60,17 @@ void MarkdownTextInputDecoratorShadowNode::createCustomContextContainer() {
   previousParserId_ = currentParserId;
 }
 
-void MarkdownTextInputDecoratorShadowNode::updateCustomContextContainer() {
-  static auto customUIManagerClass = jni::findClassStatic(
-      "com/expensify/livemarkdown/CustomFabricUIManager");
-  static auto updateCustomUIManager =
-      customUIManagerClass
-          ->getStaticMethod<void(
-              JFabricUIManager::javaobject, ReadableMap::javaobject, int)>(
-              "update");
-
+void MarkdownTextInputDecoratorShadowNode::tryUpdateCustomContextContainer() {
   const auto markdownStyle =
       this->getProps()->rawProps["markdownStyle"];
   const auto currentParserId =
       this->getProps()->rawProps["parserId"].asInt();
 
-  auto const decoratorPropsRNM =
-      ReadableNativeMap::newObjectCxxArgs(markdownStyle);
-  auto const decoratorPropsRM =
-      jni::make_local(reinterpret_cast<ReadableMap::javaobject>(
-                          decoratorPropsRNM.get()));
-  // TODO: Create new one instead of updating? Old nodes would have unmodified one this way but does that matter?
-  // This would only work if custom context container is kept in nodes and not in state.
   if (currentParserId != previousParserId_ || markdownStyle != previousMarkdownStyle_) {
     const JFabricUIManager::javaobject &customUIManager =
         this->customContextContainer_->at<JFabricUIManager::javaobject>("FabricUIManager");
 
-    updateCustomUIManager(customUIManagerClass, customUIManager, decoratorPropsRM.get(),
-                          currentParserId);
-
-    previousMarkdownStyle_ = markdownStyle;
-    previousParserId_ = currentParserId;
+    createCustomContextContainer();
   }
 }
 

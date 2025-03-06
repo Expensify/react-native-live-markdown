@@ -1,7 +1,5 @@
 package com.expensify.livemarkdown;
 
-import androidx.annotation.NonNull;
-
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.fabric.FabricUIManager;
@@ -30,23 +28,6 @@ public class CustomFabricUIManager {
       mountingManagerField.set(customFabricUIManager, new CustomMountingManager(viewManagerRegistry, mountItemExecutor, reactContext, markdownProps, parserId));
 
       return customFabricUIManager;
-    } catch (NoSuchFieldException | IllegalAccessException e) {
-      throw new RuntimeException("[LiveMarkdown] Cannot read data from FabricUIManager");
-    }
-  }
-
-  public static void update(FabricUIManager fabricUIManager, ReadableMap markdownProps, int parserId) {
-    Class<? extends FabricUIManager> uiManagerClass = fabricUIManager.getClass();
-
-    try {
-      Field mountingManagerField = uiManagerClass.getDeclaredField("mMountingManager");
-      mountingManagerField.setAccessible(true);
-
-      CustomMountingManager mountingManager = (CustomMountingManager) mountingManagerField.get(fabricUIManager);
-      assert mountingManager != null;
-      mountingManager.setMarkdownProps(markdownProps);
-      mountingManager.setParserId(parserId);
-
     } catch (NoSuchFieldException | IllegalAccessException e) {
       throw new RuntimeException("[LiveMarkdown] Cannot read data from FabricUIManager");
     }

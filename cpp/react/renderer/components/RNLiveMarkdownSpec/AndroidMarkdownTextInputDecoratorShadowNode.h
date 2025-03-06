@@ -50,7 +50,7 @@ public:
     previousMarkdownStyle_ = sourceDecorator.previousMarkdownStyle_;
     previousParserId_ = sourceDecorator.previousParserId_;
 
-    updateCustomContextContainer();
+    tryUpdateCustomContextContainer();
   }
 
   void appendChild(const ShadowNode::Shared &child) override;
@@ -66,7 +66,6 @@ public:
                  const LayoutConstraints &layoutConstraints) const override;
 
 private:
-  // TODO: should be in state?
   ContextContainer::Shared customContextContainer_;
   folly::dynamic previousMarkdownStyle_;
   int previousParserId_;
@@ -77,7 +76,7 @@ private:
 
   void createCustomContextContainer();
 
-  void updateCustomContextContainer();
+  void tryUpdateCustomContextContainer();
 
   void applyMarkdown(std::shared_ptr<AndroidTextInputShadowNode> node,
                      const LayoutContext &layoutContext) const;
