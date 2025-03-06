@@ -93,7 +93,6 @@ android {
     targetSdkVersion getExtOrIntegerDefault("targetSdkVersion")
 
     buildConfigField "int", "REACT_NATIVE_MINOR_VERSION", REACT_NATIVE_MINOR_VERSION.toString()
-    buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
 
     consumerProguardFiles "proguard-rules.pro"
 
