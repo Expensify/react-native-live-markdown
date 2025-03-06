@@ -27,12 +27,15 @@ void MarkdownTextInputDecoratorShadowNode::initialize() {
 
 void MarkdownTextInputDecoratorShadowNode::adoptChildren() {
   const auto &children = getChildren();
-  if (children.size() == 0) {
+  if (children.empty()) {
     return;
   }
-//  react_native_assert(
-//      children.size() != 1 &&
-//      "MarkdownTextInputDecoratorView received more than one child");
+  react_native_assert(
+      children.size() == 1 &&
+      "MarkdownTextInputDecoratorView received more than one child");
+  react_native_assert(
+      std::dynamic_pointer_cast<const TextInputShadowNode>(children.at(0)) &&
+      "MarkdownTextInputDecoratorView received child other than a TextInput");
 
   if (const auto child = std::dynamic_pointer_cast<const TextInputShadowNode>(
           children.at(0))) {
@@ -93,10 +96,6 @@ void MarkdownTextInputDecoratorShadowNode::layout(LayoutContext layoutContext) {
       "MarkdownTextInputDecoratorView received more than one child");
 
   if (children.size() == 1) {
-    react_native_assert(
-        std::dynamic_pointer_cast<const TextInputShadowNode>(children.at(0)) &&
-        "MarkdownTextInputDecoratorView received a child that's not a "
-        "TextInput");
     const auto child =
         std::static_pointer_cast<const TextInputShadowNode>(children.at(0));
 
