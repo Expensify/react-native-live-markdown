@@ -46,7 +46,7 @@ Pod::Spec.new do |s|
 
   if ENV['RCT_NEW_ARCH_ENABLED'] == '1'
     s.subspec "newarch" do |ss|
-      ss.source_files         = "cpp/**/*.{mm,cpp,h}"
+      ss.source_files         = "cpp/**/*.{cpp,h}"
       ss.header_dir           = "RNLiveMarkdown"
       ss.pod_target_xcconfig  = { "HEADER_SEARCH_PATHS" => "\"$(PODS_TARGET_SRCROOT)/cpp\"" }
     end
