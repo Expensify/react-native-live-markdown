@@ -35,6 +35,23 @@ public class CustomFabricUIManager {
     }
   }
 
+  public static void update(FabricUIManager fabricUIManager, ReadableMap markdownProps, int parserId) {
+    Class<? extends FabricUIManager> uiManagerClass = fabricUIManager.getClass();
+
+    try {
+      Field mountingManagerField = uiManagerClass.getDeclaredField("mMountingManager");
+      mountingManagerField.setAccessible(true);
+
+      CustomMountingManager mountingManager = (CustomMountingManager) mountingManagerField.get(fabricUIManager);
+      assert mountingManager != null;
+      mountingManager.setMarkdownProps(markdownProps);
+      mountingManager.setParserId(parserId);
+
+    } catch (NoSuchFieldException | IllegalAccessException e) {
+      throw new RuntimeException("[LiveMarkdown] Cannot read data from FabricUIManager");
+    }
+  }
+
   @SuppressWarnings("unchecked")
   private static <T> T readPrivateField(Object obj, String name) throws NoSuchFieldException, IllegalAccessException {
     Class<?> clazz = obj.getClass();

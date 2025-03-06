@@ -24,6 +24,75 @@ void MarkdownTextInputDecoratorShadowNode::initialize() {
   ShadowNode::traits_.unset(ShadowNodeTraits::ForceFlattenView);
 }
 
+void MarkdownTextInputDecoratorShadowNode::createCustomContextContainer() {
+  static auto customUIManagerClass = jni::findClassStatic(
+      "com/expensify/livemarkdown/CustomFabricUIManager");
+  static auto createCustomUIManager =
+      customUIManagerClass
+          ->getStaticMethod<JFabricUIManager::javaobject(
+              JFabricUIManager::javaobject, ReadableMap::javaobject, int)>(
+              "create");
+
+  const auto markdownStyle =
+      this->getProps()->rawProps["markdownStyle"];
+  const auto currentParserId =
+      this->getProps()->rawProps["parserId"].asInt();
+
+  auto const decoratorPropsRNM =
+      ReadableNativeMap::newObjectCxxArgs(markdownStyle);
+  auto const decoratorPropsRM =
+      jni::make_local(reinterpret_cast<ReadableMap::javaobject>(
+                          decoratorPropsRNM.get()));
+
+  const JFabricUIManager::javaobject &fabricUIManager =
+      this->getContextContainer()->at<JFabricUIManager::javaobject>("FabricUIManager");
+
+
+  const auto customUIManager = jni::make_global(createCustomUIManager(
+      customUIManagerClass, fabricUIManager,
+      decoratorPropsRM.get(), currentParserId));
+  const ContextContainer::Shared contextContainer =
+      std::make_shared<ContextContainer const>();
+  contextContainer->insert("FabricUIManager", customUIManager);
+
+  customContextContainer_ = contextContainer;
+  previousMarkdownStyle_ = markdownStyle;
+  previousParserId_ = currentParserId;
+}
+
+void MarkdownTextInputDecoratorShadowNode::updateCustomContextContainer() {
+  static auto customUIManagerClass = jni::findClassStatic(
+      "com/expensify/livemarkdown/CustomFabricUIManager");
+  static auto updateCustomUIManager =
+      customUIManagerClass
+          ->getStaticMethod<void(
+              JFabricUIManager::javaobject, ReadableMap::javaobject, int)>(
+              "update");
+
+  const auto markdownStyle =
+      this->getProps()->rawProps["markdownStyle"];
+  const auto currentParserId =
+      this->getProps()->rawProps["parserId"].asInt();
+
+  auto const decoratorPropsRNM =
+      ReadableNativeMap::newObjectCxxArgs(markdownStyle);
+  auto const decoratorPropsRM =
+      jni::make_local(reinterpret_cast<ReadableMap::javaobject>(
+                          decoratorPropsRNM.get()));
+  // TODO: Create new one instead of updating? Old nodes would have unmodified one this way but does that matter?
+  // This would only work if custom context container is kept in nodes and not in state.
+  if (currentParserId != previousParserId_ || markdownStyle != previousMarkdownStyle_) {
+    const JFabricUIManager::javaobject &customUIManager =
+        this->customContextContainer_->at<JFabricUIManager::javaobject>("FabricUIManager");
+
+    updateCustomUIManager(customUIManagerClass, customUIManager, decoratorPropsRM.get(),
+                          currentParserId);
+
+    previousMarkdownStyle_ = markdownStyle;
+    previousParserId_ = currentParserId;
+  }
+}
+
 void MarkdownTextInputDecoratorShadowNode::adoptChildren() {
   const auto &children = getChildren();
   if (children.size() == 0) {
@@ -34,40 +103,10 @@ void MarkdownTextInputDecoratorShadowNode::adoptChildren() {
 //      "MarkdownTextInputDecoratorView received more than one child");
 
   if (const auto child = std::dynamic_pointer_cast<const AndroidTextInputShadowNode>(
-          children.at(0))) {
-            static auto customUIManagerClass = jni::findClassStatic(
-                "com/expensify/livemarkdown/CustomFabricUIManager");
-            static auto createCustomUIManager =
-                customUIManagerClass
-                    ->getStaticMethod<JFabricUIManager::javaobject(
-                        JFabricUIManager::javaobject, ReadableMap::javaobject, int)>(
-                        "create");
-
-            const auto markdownStyle =
-              this->getProps()->rawProps["markdownStyle"];
-            const auto currentParserId =
-              this->getProps()->rawProps["parserId"].asInt();
-
-            auto const decoratorPropsRNM =
-                ReadableNativeMap::newObjectCxxArgs(markdownStyle);
-            auto const decoratorPropsRM =
-                jni::make_local(reinterpret_cast<ReadableMap::javaobject>(
-                    decoratorPropsRNM.get()));
-
-      const JFabricUIManager::javaobject& fabricUIManager =
-              this->getContextContainer()->at<JFabricUIManager::javaobject>("FabricUIManager");
-
-
-      const auto customUIManager = jni::make_global(createCustomUIManager(
-                customUIManagerClass, fabricUIManager,
-                decoratorPropsRM.get(), currentParserId));
-            const ContextContainer::Shared contextContainer =
-                std::make_shared<ContextContainer const>();
-            contextContainer->insert("FabricUIManager", customUIManager);
-
-      const auto mutableChild = std::const_pointer_cast<AndroidTextInputShadowNode>(child);
-      mutableChild->setTextLayoutManager(
-              std::make_shared<TextLayoutManager>(contextContainer));
+      children.at(0))) {
+    const auto mutableChild = std::const_pointer_cast<AndroidTextInputShadowNode>(child);
+    mutableChild->setTextLayoutManager(
+        std::make_shared<TextLayoutManager>(customContextContainer_));
   }
 }
 
@@ -163,27 +202,27 @@ YGSize MarkdownTextInputDecoratorShadowNode::yogaNodeMeasureCallbackConnector(
                           std::numeric_limits<Float>::infinity()};
 
   switch (widthMode) {
-  case YGMeasureModeUndefined:
-    break;
-  case YGMeasureModeExactly:
-    minimumSize.width = floatFromYogaFloat(width);
-    maximumSize.width = floatFromYogaFloat(width);
-    break;
-  case YGMeasureModeAtMost:
-    maximumSize.width = floatFromYogaFloat(width);
-    break;
+    case YGMeasureModeUndefined:
+      break;
+    case YGMeasureModeExactly:
+      minimumSize.width = floatFromYogaFloat(width);
+      maximumSize.width = floatFromYogaFloat(width);
+      break;
+    case YGMeasureModeAtMost:
+      maximumSize.width = floatFromYogaFloat(width);
+      break;
   }
 
   switch (heightMode) {
-  case YGMeasureModeUndefined:
-    break;
-  case YGMeasureModeExactly:
-    minimumSize.height = floatFromYogaFloat(height);
-    maximumSize.height = floatFromYogaFloat(height);
-    break;
-  case YGMeasureModeAtMost:
-    maximumSize.height = floatFromYogaFloat(height);
-    break;
+    case YGMeasureModeUndefined:
+      break;
+    case YGMeasureModeExactly:
+      minimumSize.height = floatFromYogaFloat(height);
+      maximumSize.height = floatFromYogaFloat(height);
+      break;
+    case YGMeasureModeAtMost:
+      maximumSize.height = floatFromYogaFloat(height);
+      break;
   }
 
   const auto parentNode = YGNodeGetParent(const_cast<YGNodeRef>(yogaNode));

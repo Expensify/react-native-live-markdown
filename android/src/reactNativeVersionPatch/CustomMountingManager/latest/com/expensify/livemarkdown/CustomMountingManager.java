@@ -40,6 +40,7 @@ public class CustomMountingManager extends MountingManager {
             }
           };
 
+  private Context context;
   private MarkdownUtils markdownUtils;
 
   public CustomMountingManager(
@@ -49,8 +50,17 @@ public class CustomMountingManager extends MountingManager {
       @NonNull ReadableMap decoratorProps,
       int parserId) {
     super(viewManagerRegistry, mountItemExecutor);
+    this.context = context;
     this.markdownUtils = new MarkdownUtils((ReactContext) context);
     this.markdownUtils.setMarkdownStyle(new MarkdownStyle(decoratorProps, context));
+    this.markdownUtils.setParserId(parserId);
+  }
+
+  public void setMarkdownProps(ReadableMap markdownProps) {
+    this.markdownUtils.setMarkdownStyle(new MarkdownStyle(markdownProps, context));
+  }
+
+  public void setParserId(int parserId) {
     this.markdownUtils.setParserId(parserId);
   }
 

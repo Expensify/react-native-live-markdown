@@ -19,15 +19,16 @@ JSI_EXPORT extern const char MarkdownTextInputDecoratorViewComponentName[];
 
 class JSI_EXPORT MarkdownTextInputDecoratorShadowNode final
     : public ConcreteViewShadowNode<MarkdownTextInputDecoratorViewComponentName,
-                                    MarkdownTextInputDecoratorViewProps,
-                                    MarkdownTextInputDecoratorViewEventEmitter,
-                                    MarkdownTextInputDecoratorState> {
+        MarkdownTextInputDecoratorViewProps,
+        MarkdownTextInputDecoratorViewEventEmitter,
+        MarkdownTextInputDecoratorState> {
 public:
   MarkdownTextInputDecoratorShadowNode(ShadowNodeFragment const &fragment,
                                        ShadowNodeFamily::Shared const &family,
                                        ShadowNodeTraits traits)
       : ConcreteViewShadowNode(fragment, family, traits) {
     initialize();
+    createCustomContextContainer();
 
     if (fragment.children) {
       adoptChildren();
@@ -42,27 +43,51 @@ public:
     if (fragment.children) {
       adoptChildren();
     }
+
+    const auto &sourceDecorator = static_cast<const MarkdownTextInputDecoratorShadowNode &>(sourceShadowNode);
+
+    customContextContainer_ = sourceDecorator.customContextContainer_;
+    previousMarkdownStyle_ = sourceDecorator.previousMarkdownStyle_;
+    previousParserId_ = sourceDecorator.previousParserId_;
+
+    updateCustomContextContainer();
   }
 
   void appendChild(const ShadowNode::Shared &child) override;
+
   void replaceChild(const ShadowNode &oldChild,
                     const ShadowNode::Shared &newChild,
                     size_t suggestedIndex = SIZE_MAX) override;
+
   void layout(LayoutContext layoutContext) override;
+
   Size
   measureContent(const LayoutContext &layoutContext,
                  const LayoutConstraints &layoutConstraints) const override;
 
 private:
+  // TODO: should be in state?
+  ContextContainer::Shared customContextContainer_;
+  folly::dynamic previousMarkdownStyle_;
+  int previousParserId_;
+
   void initialize();
+
   void adoptChildren();
+
+  void createCustomContextContainer();
+
+  void updateCustomContextContainer();
+
   void applyMarkdown(std::shared_ptr<AndroidTextInputShadowNode> node,
                      const LayoutContext &layoutContext) const;
+
   static YGSize yogaNodeMeasureCallbackConnector(YGNodeConstRef yogaNode,
                                                  float width,
                                                  YGMeasureMode widthMode,
                                                  float height,
                                                  YGMeasureMode heightMode);
+
   static YogaLayoutableShadowNode &
   shadowNodeFromContext(YGNodeConstRef yogaNode);
 };
