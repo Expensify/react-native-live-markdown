@@ -19,7 +19,7 @@ public:
 
 #ifdef ANDROID
   folly::dynamic getDynamic() const {
-    return folly::dynamic::object("decoratorFamily", "pointer should be here?");
+    return {};
   }
   MapBuffer getMapBuffer() const { return MapBufferBuilder::EMPTY(); };
 #endif

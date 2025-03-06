@@ -1,7 +1,6 @@
 #pragma once
 
 #include "MarkdownTextInputDecoratorShadowNode.h"
-
 #include <react/debug/react_native_assert.h>
 #include <react/renderer/core/ConcreteComponentDescriptor.h>
 
