@@ -1,6 +1,4 @@
-#ifndef ANDROID
-
-#include "IOSMarkdownTextInputDecoratorShadowNode.h"
+#include "MarkdownTextInputDecoratorShadowNode.h"
 
 #include <react/renderer/components/iostextinput/TextInputState.h>
 
@@ -12,8 +10,6 @@
 
 #include "RCTMarkdownStyle.h"
 #include "RCTMarkdownUtils.h"
-
-using namespace expensify::livemarkdown;
 
 namespace facebook {
 namespace react {
@@ -256,5 +252,3 @@ MarkdownTextInputDecoratorShadowNode::shadowNodeFromContext(
 
 } // namespace react
 } // namespace facebook
-
-#endif

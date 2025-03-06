@@ -1,10 +1,6 @@
 #pragma once
 
-#ifdef ANDROID
-#include "AndroidMarkdownTextInputDecoratorShadowNode.h"
-#else
-#include "IOSMarkdownTextInputDecoratorShadowNode.h"
-#endif
+#include "MarkdownTextInputDecoratorShadowNode.h"
 
 #include <react/debug/react_native_assert.h>
 #include <react/renderer/core/ConcreteComponentDescriptor.h>

@@ -1,18 +1,14 @@
-#ifdef ANDROID
-
 #include <fbjni/fbjni.h>
 #include <react/fabric/JFabricUIManager.h>
 #include <react/jni/ReadableNativeMap.h>
 
-#include "AndroidMarkdownTextInputDecoratorShadowNode.h"
+#include "MarkdownTextInputDecoratorShadowNode.h"
 
 #include <react/renderer/components/androidtextinput/AndroidTextInputState.h>
 
 #include <react/renderer/components/view/conversions.h>
 #include <react/renderer/core/ComponentDescriptor.h>
 #include <yoga/Yoga.h>
-
-using namespace expensify::livemarkdown;
 
 namespace facebook {
 namespace react {
@@ -107,7 +103,21 @@ void MarkdownTextInputDecoratorShadowNode::replaceChild(
   adoptChildren();
 }
 
+void MarkdownTextInputDecoratorShadowNode::layout(LayoutContext layoutContext) {
+  YogaLayoutableShadowNode::layout(layoutContext);
+
+  auto child = std::static_pointer_cast<const YogaLayoutableShadowNode>(getChildren()[0]);
+  auto mutableChild = std::const_pointer_cast<YogaLayoutableShadowNode>(child);
+
+  // TODO: figure out the correct way to setup metrics between wrapper and the child
+  auto metrics = child->getLayoutMetrics();
+  metrics.frame = child->getLayoutMetrics().frame;
+  setLayoutMetrics(metrics);
+
+  auto childMetrics = child->getLayoutMetrics();
+  childMetrics.frame.origin = Point{};
+  mutableChild->setLayoutMetrics(childMetrics);
+}
+
 } // namespace react
 } // namespace facebook
-
-#endif

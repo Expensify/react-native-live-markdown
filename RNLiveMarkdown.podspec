@@ -48,6 +48,7 @@ Pod::Spec.new do |s|
     s.subspec "newarch" do |ss|
       ss.source_files         = "cpp/**/*.{mm,cpp,h}"
       ss.header_dir           = "RNLiveMarkdown"
+      ss.pod_target_xcconfig  = { "HEADER_SEARCH_PATHS" => "\"$(PODS_TARGET_SRCROOT)/cpp\"" }
     end
   end
 end
