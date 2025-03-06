@@ -59,12 +59,6 @@ public:
                     const ShadowNode::Shared &newChild,
                     size_t suggestedIndex = SIZE_MAX) override;
 
-  void layout(LayoutContext layoutContext) override;
-
-  Size
-  measureContent(const LayoutContext &layoutContext,
-                 const LayoutConstraints &layoutConstraints) const override;
-
 private:
   ContextContainer::Shared customContextContainer_;
   folly::dynamic previousMarkdownStyle_;
@@ -77,18 +71,6 @@ private:
   void createCustomContextContainer();
 
   void tryUpdateCustomContextContainer();
-
-  void applyMarkdown(std::shared_ptr<AndroidTextInputShadowNode> node,
-                     const LayoutContext &layoutContext) const;
-
-  static YGSize yogaNodeMeasureCallbackConnector(YGNodeConstRef yogaNode,
-                                                 float width,
-                                                 YGMeasureMode widthMode,
-                                                 float height,
-                                                 YGMeasureMode heightMode);
-
-  static YogaLayoutableShadowNode &
-  shadowNodeFromContext(YGNodeConstRef yogaNode);
 };
 
 } // namespace react
