@@ -106,13 +106,17 @@ void MarkdownTextInputDecoratorShadowNode::replaceChild(
 void MarkdownTextInputDecoratorShadowNode::layout(LayoutContext layoutContext) {
   YogaLayoutableShadowNode::layout(layoutContext);
 
+  const auto &children = getChildren();
+  react_native_assert(
+      children.size() == 1 &&
+      "MarkdownTextInputDecoratorView didn't receive exactly one child");
+
   auto child = std::static_pointer_cast<const YogaLayoutableShadowNode>(getChildren()[0]);
+  child->ensureUnsealed();
   auto mutableChild = std::const_pointer_cast<YogaLayoutableShadowNode>(child);
 
-  // TODO: figure out the correct way to setup metrics between wrapper and the child
-  auto metrics = child->getLayoutMetrics();
-  metrics.frame = child->getLayoutMetrics().frame;
-  setLayoutMetrics(metrics);
+  // TODO: this may not be the correct way to do this
+  setLayoutMetrics(child->getLayoutMetrics());
 
   auto childMetrics = child->getLayoutMetrics();
   childMetrics.frame.origin = Point{};

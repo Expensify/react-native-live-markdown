@@ -88,22 +88,27 @@ void MarkdownTextInputDecoratorShadowNode::layout(LayoutContext layoutContext) {
 
   const auto &children = getChildren();
   react_native_assert(
-      children.size() <= 1 &&
-      "MarkdownTextInputDecoratorView received more than one child");
+      children.size() == 1 &&
+      "MarkdownTextInputDecoratorView didn't receive exactly one child");
 
-  if (children.size() == 1) {
-    const auto child =
-        std::static_pointer_cast<const TextInputShadowNode>(children.at(0));
+  const auto child =
+      std::static_pointer_cast<const TextInputShadowNode>(children.at(0));
 
-    child->ensureUnsealed();
+  child->ensureUnsealed();
 
-    const auto &mutableChild =
-        std::const_pointer_cast<TextInputShadowNode>(child);
+  const auto &mutableChild =
+      std::const_pointer_cast<TextInputShadowNode>(child);
 
-    // apply markdown after updating layout metrics on the child, since text
-    // input updates its state inside its layout method
-    applyMarkdown(mutableChild, layoutContext);
-  }
+  // apply markdown after updating layout metrics on the child, since text
+  // input updates its state inside its layout method
+  applyMarkdown(mutableChild, layoutContext);
+
+  // TODO: this may not be the correct way to do this
+  setLayoutMetrics(child->getLayoutMetrics());
+
+  auto childMetrics = child->getLayoutMetrics();
+  childMetrics.frame.origin = Point{};
+  mutableChild->setLayoutMetrics(childMetrics);
 }
 
 void MarkdownTextInputDecoratorShadowNode::applyMarkdown(
