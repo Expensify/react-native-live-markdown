@@ -56,7 +56,7 @@ By default, the example is configured to build with the old architecture. To run
 2. For iOS, run:
 
    ```sh
-   cd example/ios && bundler install && RCT_NEW_ARCH_ENABLED=1 bundler exec pod install
+   cd example/ios && bundler install && bundler exec pod install
    npm run example ios
    ```
 

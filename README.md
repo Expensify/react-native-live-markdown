@@ -8,7 +8,7 @@
 - 🔧 Customizable logic
 - 🎨 Customizable styles
 - 🌐 Universal support (Android, iOS, web)
-- 🏗️ Supports New Architecture
+- 🏗️ Supports only the New Architecture
 
 ## Installation
 
@@ -179,7 +179,7 @@ Currently, `react-native-live-markdown` supports only [ExpensiMark](https://gith
 
 ## Compatibility
 
-`react-native-live-markdown` supports two latest React Native minor releases.
+`react-native-live-markdown` supports two latest React Native minor releases with the New Architecture enabled.
 
 | react-native | @expensify/react-native-live-markdown |
 | :----------: | :-----------------------------------: |

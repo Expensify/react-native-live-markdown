@@ -22,11 +22,9 @@ public class LiveMarkdownModule extends NativeLiveMarkdownModuleSpec {
 
   @Override
   public boolean install() {
-    if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
-      FabricUIManager uiManager =
-        (FabricUIManager) UIManagerHelper.getUIManager(getReactApplicationContext(), UIManagerType.FABRIC);
-      mNativeProxy.createCommitHook(uiManager);
-    }
+    FabricUIManager uiManager =
+      (FabricUIManager) UIManagerHelper.getUIManager(getReactApplicationContext(), UIManagerType.FABRIC);
+    mNativeProxy.createCommitHook(uiManager);
 
     long jsiRuntime = Objects.requireNonNull(getReactApplicationContext().getJavaScriptContextHolder(), "[react-native-live-markdown] JavaScriptContextHolder is null").get();
     injectJSIBindings(jsiRuntime);

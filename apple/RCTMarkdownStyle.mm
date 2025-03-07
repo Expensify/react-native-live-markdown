@@ -1,14 +1,8 @@
 #import <RNLiveMarkdown/RCTMarkdownStyle.h>
 
-#ifdef RCT_NEW_ARCH_ENABLED
 #import <React/RCTConversions.h>
-#else
-#import <React/RCTConvert.h>
-#endif /* RCT_NEW_ARCH_ENABLED */
 
 @implementation RCTMarkdownStyle
-
-#ifdef RCT_NEW_ARCH_ENABLED
 
 - (instancetype)initWithStruct:(const facebook::react::MarkdownTextInputDecoratorViewMarkdownStyleStruct &)style
 {
@@ -48,48 +42,5 @@
 
   return self;
 }
-
-#else
-
-- (instancetype)initWithDictionary:(NSDictionary *)json
-{
-  if (self = [super init]) {
-    _syntaxColor = [RCTConvert UIColor:json[@"syntax"][@"color"]];
-
-    _linkColor = [RCTConvert UIColor:json[@"link"][@"color"]];
-
-    _h1FontSize = [RCTConvert CGFloat:json[@"h1"][@"fontSize"]];
-
-    _emojiFontSize = [RCTConvert CGFloat:json[@"emoji"][@"fontSize"]];
-
-    _blockquoteBorderColor = [RCTConvert UIColor:json[@"blockquote"][@"borderColor"]];
-    _blockquoteBorderWidth = [RCTConvert CGFloat:json[@"blockquote"][@"borderWidth"]];
-    _blockquoteMarginLeft = [RCTConvert CGFloat:json[@"blockquote"][@"marginLeft"]];
-    _blockquotePaddingLeft = [RCTConvert CGFloat:json[@"blockquote"][@"paddingLeft"]];
-
-    _codeFontFamily = [RCTConvert NSString:json[@"code"][@"fontFamily"]];
-    _codeFontSize = [RCTConvert CGFloat:json[@"code"][@"fontSize"]];
-    _codeColor = [RCTConvert UIColor:json[@"code"][@"color"]];
-    _codeBackgroundColor = [RCTConvert UIColor:json[@"code"][@"backgroundColor"]];
-
-    _preFontFamily = [RCTConvert NSString:json[@"pre"][@"fontFamily"]];
-    _preFontSize = [RCTConvert CGFloat:json[@"pre"][@"fontSize"]];
-    _preColor = [RCTConvert UIColor:json[@"pre"][@"color"]];
-    _preBackgroundColor = [RCTConvert UIColor:json[@"pre"][@"backgroundColor"]];
-
-    _mentionHereColor = [RCTConvert UIColor:json[@"mentionHere"][@"color"]];
-    _mentionHereBackgroundColor = [RCTConvert UIColor:json[@"mentionHere"][@"backgroundColor"]];
-
-    _mentionUserColor = [RCTConvert UIColor:json[@"mentionUser"][@"color"]];
-    _mentionUserBackgroundColor = [RCTConvert UIColor:json[@"mentionUser"][@"backgroundColor"]];
-      
-    _mentionReportColor = [RCTConvert UIColor:json[@"mentionReport"][@"color"]];
-    _mentionReportBackgroundColor = [RCTConvert UIColor:json[@"mentionReport"][@"backgroundColor"]];
-  }
-
-  return self;
-}
-
-#endif /* RCT_NEW_ARCH_ENABLED */
 
 @end
