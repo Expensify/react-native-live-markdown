@@ -24,6 +24,56 @@ function getImagePreviewElement(targetElement: HTMLMarkdownElement) {
   return Array.from(targetElement?.childNodes || []).find((el) => (el as HTMLElement)?.contentEditable === 'false') as HTMLMarkdownElement | undefined;
 }
 
+function scaleImageDimensions(imgElement: HTMLImageElement) {
+  const {height, width} = imgElement;
+  const {maxHeight, maxWidth, minHeight, minWidth} = imgElement.style || {};
+  const maxHeightValue = parseStringWithUnitToNumber(maxHeight);
+  const maxWidthValue = parseStringWithUnitToNumber(maxWidth);
+  const minHeightValue = parseStringWithUnitToNumber(minHeight);
+  const minWidthValue = parseStringWithUnitToNumber(minWidth);
+
+  // Calculate the initial aspect ratio
+  const aspectRatio = width / height;
+
+  // Define scaled dimensions initializing with original dimensions.
+  let scaledWidth = width;
+  let scaledHeight = height;
+
+  // Check and apply maxWidth and maxHeight constraints
+  if (maxWidthValue && scaledWidth > maxWidthValue) {
+    scaledWidth = maxWidthValue;
+    scaledHeight = scaledWidth / aspectRatio;
+  }
+  if (maxHeight && scaledHeight > maxHeightValue) {
+    scaledHeight = maxHeightValue;
+    scaledWidth = scaledHeight * aspectRatio;
+  }
+
+  // Double-check dimensions after first scaling
+  if (scaledWidth > maxWidthValue) {
+    scaledWidth = maxWidthValue;
+    scaledHeight = scaledWidth / aspectRatio;
+  }
+
+  // Check and apply minWidth and minHeight constraints
+  if (minWidthValue && scaledWidth < minWidthValue) {
+    scaledWidth = minWidthValue;
+    scaledHeight = scaledWidth / aspectRatio;
+  }
+  if (minHeightValue && scaledHeight < minHeightValue) {
+    scaledHeight = minHeightValue;
+    scaledWidth = scaledHeight * aspectRatio;
+  }
+
+  // Double-check dimensions after second scaling
+  if (scaledHeight < minHeightValue) {
+    scaledHeight = minHeightValue;
+    scaledWidth = scaledHeight * aspectRatio;
+  }
+
+  return {height: scaledHeight, width: scaledWidth};
+}
+
 function handleOnLoad(
   currentInput: MarkdownTextInputElement,
   target: HTMLMarkdownElement,
@@ -86,14 +136,14 @@ function handleOnLoad(
     currentInputElement.imageElements = [img];
   }
 
-  const imageClientHeight = Math.max(img.clientHeight, imageContainer.clientHeight);
+  const scaledImageHeight = scaleImageDimensions(img).height;
   Object.assign(imageContainer.style, {
-    height: `${imageClientHeight}px`,
+    height: `${scaledImageHeight}px`,
   });
   // Set paddingBottom to the height of the image so it's displayed under the block
   const imageMarginTop = parseStringWithUnitToNumber(`${markdownStyle.inlineImage?.marginTop}`);
   Object.assign(targetElement.style, {
-    paddingBottom: `${imageClientHeight + imageMarginTop}px`,
+    paddingBottom: `${scaledImageHeight + imageMarginTop}px`,
   });
 }
 
@@ -124,7 +174,7 @@ function createImageElement(currentInput: MarkdownTextInputElement, targetNode: 
     img.src = url;
     timeoutMap.delete(targetNode.orderIndex);
   }, INLINE_IMAGE_PREVIEW_DEBOUNCE_TIME_MS);
-  timeoutMap.set(targetNode.orderIndex, {
+  timeoutMap.set(`${currentInput.uniqueId}-${targetNode.orderIndex}`, {
     timeout,
     url,
   });
