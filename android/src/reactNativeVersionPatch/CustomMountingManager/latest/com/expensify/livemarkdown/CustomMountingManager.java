@@ -3,7 +3,6 @@ package com.expensify.livemarkdown;
 import static com.facebook.react.views.text.TextAttributeProps.UNSET;
 
 import android.content.Context;
-import android.content.res.AssetManager;
 import android.text.BoringLayout;
 import android.text.Layout;
 import android.text.Spannable;
