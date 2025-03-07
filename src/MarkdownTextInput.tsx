@@ -94,8 +94,6 @@ function processMarkdownStyle(input: PartialMarkdownStyle | undefined): Markdown
 }
 
 const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputProps>((props, ref) => {
-  const IS_FABRIC = 'nativeFabricUIManager' in global;
-
   const markdownStyle = React.useMemo(() => processMarkdownStyle(props.markdownStyle), [props.markdownStyle]);
 
   if (props.parser === undefined) {
@@ -117,28 +115,22 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
   }, [parserId]);
 
   return (
-    <>
+    <MarkdownTextInputDecoratorViewNativeComponent
+      style={styles.displayContents}
+      markdownStyle={markdownStyle}
+      parserId={parserId}
+    >
       <TextInput
         {...props}
         ref={ref}
       />
-      <MarkdownTextInputDecoratorViewNativeComponent
-        style={IS_FABRIC ? styles.farAway : styles.displayNone}
-        markdownStyle={markdownStyle}
-        parserId={parserId}
-      />
-    </>
+    </MarkdownTextInputDecoratorViewNativeComponent>
   );
 });
 
 const styles = StyleSheet.create({
-  displayNone: {
-    display: 'none',
-  },
-  farAway: {
-    position: 'absolute',
-    top: 1e8,
-    left: 1e8,
+  displayContents: {
+    display: 'contents',
   },
 });
 
