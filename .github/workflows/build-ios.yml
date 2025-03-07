@@ -61,8 +61,6 @@ jobs:
 
       - name: Install Pods
         working-directory: example/ios
-        env:
-          RCT_NEW_ARCH_ENABLED: ${{ matrix.react-native-architecture == 'Fabric' && '1' || '0' }}
         run: |
           bundler install
           bundler exec pod install
