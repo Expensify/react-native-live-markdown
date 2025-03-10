@@ -137,35 +137,22 @@ using namespace facebook::react;
     const auto &newViewProps = *std::static_pointer_cast<MarkdownTextInputDecoratorViewProps const>(props);
 
     if (oldViewProps.parserId != newViewProps.parserId) {
-      [self setParserId:@(newViewProps.parserId)];
+      _parserId = @(newViewProps.parserId);
+      [_markdownUtils setParserId:_parserId];
     }
 
     // TODO: if (oldViewProps.markdownStyle != newViewProps.markdownStyle)
-    RCTMarkdownStyle *markdownStyle = [[RCTMarkdownStyle alloc] initWithStruct:newViewProps.markdownStyle];
-    [self setMarkdownStyle:markdownStyle];
+    _markdownStyle = [[RCTMarkdownStyle alloc] initWithStruct:newViewProps.markdownStyle];
+    [_markdownUtils setMarkdownStyle:_markdownStyle];
+
+    // TODO: call applyNewStyles only if needed
+    [self applyNewStyles];
 
     [super updateProps:props oldProps:oldProps];
 }
 
-- (void)setMarkdownStyle:(RCTMarkdownStyle *)markdownStyle
-{
-  // TODO: move to updateProps method
-  _markdownStyle = markdownStyle;
-  [_markdownUtils setMarkdownStyle:markdownStyle];
-  [self applyNewStyles];
-}
-
-- (void)setParserId:(NSNumber *)parserId
-{
-  // TODO: move to updateProps method
-  _parserId = parserId;
-  [_markdownUtils setParserId:parserId];
-  [self applyNewStyles];
-}
-
 - (void)applyNewStyles
 {
-  // TODO: call applyNewStyles only once if both markdownStyle and parserId change
   if (_textView != nil) {
     // We want to use `textStorage` for applying markdown when possible. Currently it's only available for UITextView
     [_textView textDidChange];
