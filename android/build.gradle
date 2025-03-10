@@ -177,12 +177,6 @@ dependencies {
   implementation project(":react-native-reanimated")
 }
 
-react {
-  jsRootDir = file("../src/")
-  libraryName = "LiveMarkdown"
-  codegenJavaPackageName = "com.expensify.livemarkdown"
-}
-
 // This fixes linking errors due to undefined symbols from libworklets.so.
 // During Gradle Sync, Android Gradle Plugin runs Prefab and treats worklets
 // like a header-only library. During build, config files are not regenerated
