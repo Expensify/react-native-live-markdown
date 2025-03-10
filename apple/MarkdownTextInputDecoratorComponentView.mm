@@ -1,33 +1,28 @@
+#import <react/debug/react_native_assert.h>
 #import <react/renderer/components/RNLiveMarkdownSpec/Props.h>
-
-#import <RNLiveMarkdown/MarkdownTextInputDecoratorComponentView.h>
-#import <RNLiveMarkdown/RCTMarkdownStyle.h>
-
-#import <RNLiveMarkdown/MarkdownTextInputDecoratorViewComponentDescriptor.h>
-#import "RCTFabricComponentsPlugins.h"
-
+#import <React/RCTFabricComponentsPlugins.h>
 #import <React/RCTUITextField.h>
-#import "react_native_assert.h"
 
 #import <RNLiveMarkdown/MarkdownLayoutManager.h>
-#import <RNLiveMarkdown/MarkdownTextInputDecoratorView.h>
+#import <RNLiveMarkdown/MarkdownTextInputDecoratorComponentView.h>
+#import <RNLiveMarkdown/MarkdownTextInputDecoratorViewComponentDescriptor.h>
 #import <RNLiveMarkdown/RCTBackedTextFieldDelegateAdapter+Markdown.h>
-#import <RNLiveMarkdown/RCTUITextView+Markdown.h>
-
+#import <RNLiveMarkdown/RCTMarkdownStyle.h>
 #import <RNLiveMarkdown/RCTTextInputComponentView+Markdown.h>
+#import <RNLiveMarkdown/RCTUITextView+Markdown.h>
 
 #import <objc/runtime.h>
 
 using namespace facebook::react;
 
 @implementation MarkdownTextInputDecoratorComponentView {
-    RCTMarkdownUtils *_markdownUtils;
-    RCTMarkdownStyle *_markdownStyle;
-    NSNumber *_parserId;
-    __weak RCTTextInputComponentView *_textInput;
-    __weak UIView<RCTBackedTextInputViewProtocol> *_backedTextInputView;
-    __weak RCTBackedTextFieldDelegateAdapter *_adapter;
-    __weak RCTUITextView *_textView;
+  RCTMarkdownUtils *_markdownUtils;
+  RCTMarkdownStyle *_markdownStyle;
+  NSNumber *_parserId;
+  __weak RCTTextInputComponentView *_textInput;
+  __weak UIView<RCTBackedTextInputViewProtocol> *_backedTextInputView;
+  __weak RCTBackedTextFieldDelegateAdapter *_adapter;
+  __weak RCTUITextView *_textView;
 }
 
 + (ComponentDescriptorProvider)componentDescriptorProvider
@@ -88,21 +83,21 @@ using namespace facebook::react;
 
 - (void)willMoveToWindow:(UIWindow *)newWindow
 {
-    if (newWindow == nil) {
-        if (_textInput != nil) {
-            [_textInput setMarkdownUtils:nil];
-        }
-        if (_adapter != nil) {
-            [_adapter setMarkdownUtils:nil];
-        }
-        if (_textView != nil) {
-            [_textView setMarkdownUtils:nil];
-            if (_textView.layoutManager != nil && [object_getClass(_textView.layoutManager) isEqual:[MarkdownLayoutManager class]]) {
-                [_textView.layoutManager setValue:nil forKey:@"markdownUtils"];
-                object_setClass(_textView.layoutManager, [NSLayoutManager class]);
-            }
-        }
+  if (newWindow == nil) {
+    if (_textInput != nil) {
+      [_textInput setMarkdownUtils:nil];
     }
+    if (_adapter != nil) {
+      [_adapter setMarkdownUtils:nil];
+    }
+    if (_textView != nil) {
+      [_textView setMarkdownUtils:nil];
+      if (_textView.layoutManager != nil && [object_getClass(_textView.layoutManager) isEqual:[MarkdownLayoutManager class]]) {
+        [_textView.layoutManager setValue:nil forKey:@"markdownUtils"];
+        object_setClass(_textView.layoutManager, [NSLayoutManager class]);
+      }
+    }
+  }
 }
 
 - (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
@@ -111,24 +106,29 @@ using namespace facebook::react;
     const auto &newViewProps = *std::static_pointer_cast<MarkdownTextInputDecoratorViewProps const>(props);
 
     if (oldViewProps.parserId != newViewProps.parserId) {
-      _parserId = [NSNumber numberWithInt:newViewProps.parserId];
+      _parserId = @(newViewProps.parserId);
       [_markdownUtils setParserId:_parserId];
     }
 
     // TODO: if (oldViewProps.markdownStyle != newViewProps.markdownStyle)
-    RCTMarkdownStyle *markdownStyle = [[RCTMarkdownStyle alloc] initWithStruct:newViewProps.markdownStyle];
-    _markdownStyle = markdownStyle;
-    [_markdownUtils setMarkdownStyle:markdownStyle];
+    _markdownStyle = [[RCTMarkdownStyle alloc] initWithStruct:newViewProps.markdownStyle];
+    [_markdownUtils setMarkdownStyle:_markdownStyle];
 
-    if (_textView != nil) {
-      // We want to use `textStorage` for applying markdown when possible. Currently it's only available for UITextView
-      [_textView textDidChange];
-    } else {
-      // apply new styles
-      [_textInput _setAttributedString:_backedTextInputView.attributedText];
-    }
+    // TODO: call applyNewStyles only if needed
+    [self applyNewStyles];
 
     [super updateProps:props oldProps:oldProps];
+}
+
+- (void)applyNewStyles
+{
+  if (_textView != nil) {
+    // We want to use `textStorage` for applying markdown when possible. Currently it's only available for UITextView
+    [_textView textDidChange];
+  } else {
+    // apply new styles
+    [_textInput _setAttributedString:_backedTextInputView.attributedText];
+  }
 }
 
 Class<RCTComponentViewProtocol> MarkdownTextInputDecoratorViewCls(void)
