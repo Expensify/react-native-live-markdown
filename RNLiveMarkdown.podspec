@@ -43,9 +43,4 @@ Pod::Spec.new do |s|
     ])
     add_dependency(s, "React-rendererconsistency")
   end
-
-  s.subspec "newarch" do |ss|
-    ss.source_files         = "cpp/**/*.{cpp,h}"
-    ss.header_dir           = "RNLiveMarkdown"
-  end
 end
