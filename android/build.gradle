@@ -18,15 +18,8 @@ def reactNativeArchitectures() {
   return value ? value.split(",") : ["armeabi-v7a", "x86", "x86_64", "arm64-v8a"]
 }
 
-def isNewArchitectureEnabled() {
-  return rootProject.hasProperty("newArchEnabled") && rootProject.getProperty("newArchEnabled") == "true"
-}
-
 apply plugin: "com.android.library"
-
-if (isNewArchitectureEnabled()) {
-  apply plugin: "com.facebook.react"
-}
+apply plugin: "com.facebook.react"
 
 def getExtOrDefault(name) {
   return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties["LiveMarkdown_" + name]
@@ -93,7 +86,6 @@ android {
     targetSdkVersion getExtOrIntegerDefault("targetSdkVersion")
 
     buildConfigField "int", "REACT_NATIVE_MINOR_VERSION", REACT_NATIVE_MINOR_VERSION.toString()
-    buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
 
     consumerProguardFiles "proguard-rules.pro"
 
@@ -129,15 +121,10 @@ android {
 
   sourceSets {
     main {
-      if (isNewArchitectureEnabled()) {
-        java.srcDirs += [
-          "src/newarch",
-          // This is needed to build Kotlin project with NewArch enabled
-          "${project.buildDir}/generated/source/codegen/java"
-        ]
-      } else {
-        java.srcDirs += ["src/oldarch"]
-      }
+      java.srcDirs += [
+        // This is needed to build Kotlin project with NewArch enabled
+        "${project.buildDir}/generated/source/codegen/java"
+      ]
 
       // TextLayoutManager
       if (REACT_NATIVE_MINOR_VERSION <= 76 ) {
@@ -188,14 +175,6 @@ dependencies {
   implementation "com.facebook.react:react-android" // version substituted by RNGP
   implementation "com.facebook.react:hermes-android" // version substituted by RNGP
   implementation project(":react-native-reanimated")
-}
-
-if (isNewArchitectureEnabled()) {
-  react {
-    jsRootDir = file("../src/")
-    libraryName = "LiveMarkdown"
-    codegenJavaPackageName = "com.expensify.livemarkdown"
-  }
 }
 
 // This fixes linking errors due to undefined symbols from libworklets.so.

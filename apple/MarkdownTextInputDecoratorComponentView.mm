@@ -1,5 +1,3 @@
-// This guard prevent this file to be compiled in the old architecture.
-#ifdef RCT_NEW_ARCH_ENABLED
 #import <react/renderer/components/RNLiveMarkdownSpec/Props.h>
 
 #import <RNLiveMarkdown/MarkdownTextInputDecoratorComponentView.h>
@@ -85,4 +83,3 @@ Class<RCTComponentViewProtocol> MarkdownTextInputDecoratorViewCls(void)
 }
 
 @end
-#endif
