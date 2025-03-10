@@ -1,6 +1,3 @@
-// This guard prevent this file to be compiled in the old architecture.
-#ifdef RCT_NEW_ARCH_ENABLED
-
 #import <RNLiveMarkdown/RCTTextInputComponentView+Markdown.h>
 #import <RNLiveMarkdown/RCTMarkdownUtils.h>
 #import <React/RCTUITextField.h>
@@ -83,5 +80,3 @@
 }
 
 @end
-
-#endif /* RCT_NEW_ARCH_ENABLED */

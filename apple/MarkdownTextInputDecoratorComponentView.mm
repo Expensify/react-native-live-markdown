@@ -1,5 +1,3 @@
-// This guard prevent this file to be compiled in the old architecture.
-#ifdef RCT_NEW_ARCH_ENABLED
 #import <react/renderer/components/RNLiveMarkdownSpec/Props.h>
 
 #import <RNLiveMarkdown/MarkdownTextInputDecoratorComponentView.h>
@@ -26,11 +24,7 @@ using namespace facebook::react;
     RCTMarkdownUtils *_markdownUtils;
     RCTMarkdownStyle *_markdownStyle;
     NSNumber *_parserId;
-  #ifdef RCT_NEW_ARCH_ENABLED
     __weak RCTTextInputComponentView *_textInput;
-  #else
-    __weak RCTBaseTextInputView *_textInput;
-  #endif /* RCT_NEW_ARCH_ENABLED */
     __weak UIView<RCTBackedTextInputViewProtocol> *_backedTextInputView;
     __weak RCTBackedTextFieldDelegateAdapter *_adapter;
     __weak RCTUITextView *_textView;
@@ -143,4 +137,3 @@ Class<RCTComponentViewProtocol> MarkdownTextInputDecoratorViewCls(void)
 }
 
 @end
-#endif

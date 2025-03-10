@@ -3,11 +3,8 @@
 #import <RNLiveMarkdown/RuntimeDecorator.h>
 
 #import <React/RCTBridge+Private.h>
-
-#ifdef RCT_NEW_ARCH_ENABLED
 #import <React/RCTScheduler.h>
 #import <React/RCTSurfacePresenter.h>
-#endif // RCT_NEW_ARCH_ENABLED
 
 #import <jsi/jsi.h>
 
@@ -18,11 +15,7 @@ using namespace expensify::livemarkdown;
 // I think this is the easiest way to access the UIManager, which we need to
 // actually register the hook
 
-@implementation LiveMarkdownModule {
-#ifdef RCT_NEW_ARCH_ENABLED
-  __weak RCTSurfacePresenter *surfacePresenter_;
-#endif // RCT_NEW_ARCH_ENABLED
-}
+@implementation LiveMarkdownModule
 
 RCT_EXPORT_MODULE()
 
@@ -35,38 +28,6 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install)
   return @(1);
 }
 
-#ifdef RCT_NEW_ARCH_ENABLED
-
-- (void)handleJavaScriptDidLoadNotification:(NSNotification *)notification
-{
-  surfacePresenter_ = self.bridge.surfacePresenter;
-}
-
-- (void)setBridge:(RCTBridge *)bridge
-{
-  [super setBridge:bridge];
-
-  [[NSNotificationCenter defaultCenter] addObserver:self
-                                           selector:@selector(handleJavaScriptDidLoadNotification:)
-                                               name:RCTJavaScriptDidLoadNotification
-                                             object:nil];
-
-  // only within the first loading `self.bridge.surfacePresenter` exists
-  // during the reload `self.bridge.surfacePresenter` is null
-  if (self.bridge.surfacePresenter) {
-    surfacePresenter_ = self.bridge.surfacePresenter;
-  }
-}
-
-/*
- * Taken from RCTNativeAnimatedTurboModule:
- * This selector is invoked via BridgelessTurboModuleSetup.
- */
-- (void)setSurfacePresenter:(id<RCTSurfacePresenterStub>)surfacePresenter
-{
-  surfacePresenter_ = surfacePresenter;
-}
-
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
     (const facebook::react::ObjCTurboModule::InitParams &)params {
   return std::make_shared<facebook::react::NativeLiveMarkdownModuleSpecJSI>(
@@ -77,7 +38,5 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install)
   [[NSNotificationCenter defaultCenter] removeObserver:self];
   [super invalidate];
 }
-
-#endif // RCT_NEW_ARCH_ENABLED
 
 @end

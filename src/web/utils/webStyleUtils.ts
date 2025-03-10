@@ -51,4 +51,13 @@ function parseToReactDOMStyle(style: TextStyle): any {
   return createReactDOMStyle(preprocessStyle(style));
 }
 
-export {parseToReactDOMStyle, processMarkdownStyle};
+function* generateUniqueId() {
+  let idCounter = 0;
+  while (true) {
+    yield `live-markdown-input-${idCounter++}`;
+  }
+}
+
+const idGenerator = generateUniqueId();
+
+export {parseToReactDOMStyle, processMarkdownStyle, idGenerator};
