@@ -82,19 +82,20 @@ using namespace facebook::react;
 
 - (void)willMoveToWindow:(UIWindow *)newWindow
 {
-  if (newWindow == nil) {
-    if (_textInput != nil) {
-      [_textInput setMarkdownUtils:nil];
-    }
-    if (_adapter != nil) {
-      [_adapter setMarkdownUtils:nil];
-    }
-    if (_textView != nil) {
-      [_textView setMarkdownUtils:nil];
-      if (_textView.layoutManager != nil && [object_getClass(_textView.layoutManager) isEqual:[MarkdownLayoutManager class]]) {
-        [_textView.layoutManager setValue:nil forKey:@"markdownUtils"];
-        object_setClass(_textView.layoutManager, [NSLayoutManager class]);
-      }
+  if (newWindow != nil) {
+    return;
+  }
+  if (_textInput != nil) {
+    [_textInput setMarkdownUtils:nil];
+  }
+  if (_adapter != nil) {
+    [_adapter setMarkdownUtils:nil];
+  }
+  if (_textView != nil) {
+    [_textView setMarkdownUtils:nil];
+    if (_textView.layoutManager != nil && [object_getClass(_textView.layoutManager) isEqual:[MarkdownLayoutManager class]]) {
+      [_textView.layoutManager setValue:nil forKey:@"markdownUtils"];
+      object_setClass(_textView.layoutManager, [NSLayoutManager class]);
     }
   }
 }
