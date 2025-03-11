@@ -52,8 +52,8 @@ using namespace facebook::react;
   _backedTextInputView = [_textInput valueForKey:@"_backedTextInputView"];
 
   _markdownUtils = [[RCTMarkdownUtils alloc] init];
-  [_markdownUtils setParserId:_parserId];
   [_markdownUtils setMarkdownStyle:_markdownStyle];
+  [_markdownUtils setParserId:_parserId];
 
   [_textInput setMarkdownUtils:_markdownUtils];
   if ([_backedTextInputView isKindOfClass:[RCTUITextField class]]) {
