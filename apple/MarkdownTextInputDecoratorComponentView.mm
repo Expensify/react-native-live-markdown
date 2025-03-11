@@ -48,8 +48,7 @@ using namespace facebook::react;
 
 - (void)didAddSubview:(UIView *)subview
 {
-  react_native_assert([subview isKindOfClass:[RCTTextInputComponentView class]] && "Previous sibling component is not an instance of RCTTextInputComponentView.");
-  _textInput = (RCTTextInputComponentView *)subview;
+  react_native_assert([subview isKindOfClass:[RCTTextInputComponentView class]] && "Child component of MarkdownTextInputDecoratorComponentView is not an instance of RCTTextInputComponentView.");  _textInput = (RCTTextInputComponentView *)subview;
   _backedTextInputView = [_textInput valueForKey:@"_backedTextInputView"];
 
   _markdownUtils = [[RCTMarkdownUtils alloc] init];
