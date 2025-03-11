@@ -34,7 +34,7 @@ Pod::Spec.new do |s|
     ].join(' '),
   }
 
-  s.pod_target_xcconfig  = { "HEADER_SEARCH_PATHS" => "\"$(PODS_TARGET_SRCROOT)/cpp\"" }
+  s.pod_target_xcconfig = { "HEADER_SEARCH_PATHS" => "\"$(PODS_TARGET_SRCROOT)/cpp\"" }
 
   install_modules_dependencies(s)
 
