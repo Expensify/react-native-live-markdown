@@ -1,4 +1,4 @@
-import type {InlineImagesInputProps} from '../../commonTypes';
+import type {InlineImagesInputProps, MarkdownType} from '../../commonTypes';
 import type {MarkdownTextInputElement} from '../../MarkdownTextInput.web';
 import {parseStringWithUnitToNumber} from '../../styleUtils';
 import type {PartialMarkdownStyle} from '../../styleUtils';
@@ -64,6 +64,7 @@ function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownSty
     case 'code':
       Object.assign(node.style, {
         ...markdownStyle.code,
+        fontSize: markdownStyle.code?.h1NestedFontSize && isChildOfMarkdownElement(node, 'h1') ? markdownStyle.code.h1NestedFontSize : markdownStyle.code?.fontSize,
         padding: `${codeVerticalPadding}px ${codeHorizontalPadding}px`,
         lineHeight: 1.5,
       });
@@ -167,6 +168,17 @@ function getTopParentTreeNode(node: TreeNode) {
     currentParentNode = currentParentNode?.parentNode || null;
   }
   return currentParentNode;
+}
+
+function isChildOfMarkdownElement(node: HTMLElement, elementType: MarkdownType): boolean {
+  let currentNode = node.parentNode;
+  while (currentNode && (currentNode as HTMLElement)?.contentEditable !== 'true') {
+    if ((currentNode as HTMLElement)?.getAttribute?.('data-type') === elementType) {
+      return true;
+    }
+    currentNode = currentNode.parentNode;
+  }
+  return false;
 }
 
 export {addStyleToBlock, extendBlockStructure, isBlockMarkdownType, getFirstBlockMarkdownRange, getTopParentTreeNode};

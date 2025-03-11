@@ -25,6 +25,7 @@ interface MarkdownStyle {
   code: {
     fontFamily: string;
     fontSize: Float;
+    h1NestedFontSize?: Float;
     color: ColorValue;
     backgroundColor: ColorValue;
     borderColor: ColorValue;
