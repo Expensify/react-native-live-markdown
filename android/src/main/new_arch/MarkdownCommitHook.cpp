@@ -9,6 +9,7 @@
 using namespace facebook;
 using namespace react;
 
+namespace expensify {
 namespace livemarkdown {
 
 MarkdownCommitHook::MarkdownCommitHook(
@@ -188,3 +189,4 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
 }
 
 } // namespace livemarkdown
+} // namespace expensify
