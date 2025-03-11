@@ -8,7 +8,7 @@
 - 🔧 Customizable logic
 - 🎨 Customizable styles
 - 🌐 Universal support (Android, iOS, web)
-- 🏗️ Supports New Architecture
+- 🏗️ Supports only the New Architecture
 
 ## Installation
 
@@ -20,7 +20,7 @@ npm install @expensify/react-native-live-markdown react-native-reanimated expens
 npx expo install @expensify/react-native-live-markdown react-native-reanimated expensify-common
 ```
 
-React Native Live Markdown requires [react-native-reanimated](https://github.com/software-mansion/react-native-reanimated) 3.16.4 or newer and [expensify-common](https://github.com/Expensify/expensify-common) 2.0.108 or newer.
+React Native Live Markdown requires [react-native-reanimated](https://github.com/software-mansion/react-native-reanimated) 3.17.0 or newer and [expensify-common](https://github.com/Expensify/expensify-common) 2.0.115 or newer.
 
 Then, install the iOS dependencies with CocoaPods:
 
@@ -179,10 +179,11 @@ Currently, `react-native-live-markdown` supports only [ExpensiMark](https://gith
 
 ## Compatibility
 
-`react-native-live-markdown` requires React Native 0.75 or newer.
+`react-native-live-markdown` supports two latest React Native minor releases with the New Architecture enabled.
 
 | react-native | @expensify/react-native-live-markdown |
 | :----------: | :-----------------------------------: |
+|     0.77     |               0.1.235+                |
 |     0.76     |               0.1.141+                |
 |     0.75     |               0.1.129+                |
 |     0.74     |           0.1.122 – 0.1.128           |

@@ -39,40 +39,8 @@ target_link_libraries(
         ${LIB_TARGET_NAME}
         fbjni::fbjni
         ReactAndroid::jsi
+        ReactAndroid::reactnative
 )
-
-if (ReactAndroid_VERSION_MINOR GREATER_EQUAL 76)
-  target_link_libraries(
-          ${LIB_TARGET_NAME}
-          ReactAndroid::reactnative
-  )
-elseif (ReactAndroid_VERSION_MINOR GREATER_EQUAL 75)
-  target_link_libraries(
-          ${LIB_TARGET_NAME}
-          ReactAndroid::fabricjni
-          ReactAndroid::folly_runtime
-          ReactAndroid::glog
-          ReactAndroid::react_debug
-          ReactAndroid::react_nativemodule_core
-          ReactAndroid::react_performance_timeline
-          ReactAndroid::react_render_consistency
-          ReactAndroid::react_render_core
-          ReactAndroid::react_render_debug
-          ReactAndroid::react_render_graphics
-          ReactAndroid::react_render_imagemanager
-          ReactAndroid::react_render_mapbuffer
-          ReactAndroid::react_render_observers_events
-          ReactAndroid::react_render_textlayoutmanager
-          ReactAndroid::reactnativejni
-          ReactAndroid::rrc_text
-          ReactAndroid::rrc_textinput
-          ReactAndroid::rrc_view
-          ReactAndroid::runtimeexecutor
-          ReactAndroid::yoga
-  )
-else ()
-  message(FATAL_ERROR "react-native-live-markdown requires react-native 0.75 or newer.")
-endif ()
 
 target_compile_options(
         ${LIB_TARGET_NAME}
