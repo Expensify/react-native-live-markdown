@@ -7,6 +7,7 @@
 
 #include "MarkdownCommitHook.h"
 
+namespace expensify {
 namespace livemarkdown {
 
 using namespace facebook;
@@ -35,3 +36,4 @@ private:
 };
 
 } // namespace livemarkdown
+} // namespace expensify
