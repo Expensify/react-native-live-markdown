@@ -30,7 +30,7 @@
       return nil;
     }
     
-    // Style and parser Id may not be initialized immediately due to the order of mount instructions
+    // `_markdownStyle` and `_parserId` may not be initialized immediately due to the order of mount instructions
     // props update will be executed after the view hierarchy is initialized.
     if (_markdownStyle == nil || _parserId == nil) {
       return nil;
