@@ -7,10 +7,6 @@
 using namespace facebook;
 using namespace expensify::livemarkdown;
 
-// A turbomodule used to register the commit hook
-// I think this is the easiest way to access the UIManager, which we need to
-// actually register the hook
-
 @implementation LiveMarkdownModule
 
 RCT_EXPORT_MODULE()
