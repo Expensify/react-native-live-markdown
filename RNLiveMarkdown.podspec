@@ -34,6 +34,8 @@ Pod::Spec.new do |s|
     ].join(' '),
   }
 
+  s.pod_target_xcconfig  = { "HEADER_SEARCH_PATHS" => "\"$(PODS_TARGET_SRCROOT)/cpp\"" }
+
   install_modules_dependencies(s)
 
   if ENV['USE_FRAMEWORKS'] != nil
@@ -42,11 +44,5 @@ Pod::Spec.new do |s|
       "react/renderer/components/textinput/platform/ios",
     ])
     add_dependency(s, "React-rendererconsistency")
-  end
-
-  s.subspec "newarch" do |ss|
-    ss.source_files         = "cpp/**/*.{cpp,h}"
-    ss.header_dir           = "RNLiveMarkdown"
-    ss.pod_target_xcconfig  = { "HEADER_SEARCH_PATHS" => "\"$(PODS_TARGET_SRCROOT)/cpp\"" }
   end
 end
