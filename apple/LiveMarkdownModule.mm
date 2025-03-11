@@ -1,11 +1,7 @@
 #import "LiveMarkdownModule.h"
 
 #import <RNLiveMarkdown/RuntimeDecorator.h>
-
 #import <React/RCTBridge+Private.h>
-#import <React/RCTScheduler.h>
-#import <React/RCTSurfacePresenter.h>
-
 #import <jsi/jsi.h>
 
 using namespace facebook;
@@ -24,7 +20,6 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install)
   RCTCxxBridge *cxxBridge = (RCTCxxBridge *)self.bridge;
   jsi::Runtime &rt = *(jsi::Runtime *)cxxBridge.runtime;
   expensify::livemarkdown::injectJSIBindings(rt);
-  
   return @(1);
 }
 
