@@ -1,11 +1,9 @@
+#include "MarkdownTextInputDecoratorShadowNode.h"
+
 #include <fbjni/fbjni.h>
 #include <react/fabric/JFabricUIManager.h>
 #include <react/jni/ReadableNativeMap.h>
-
-#include "MarkdownTextInputDecoratorShadowNode.h"
-
 #include <react/renderer/components/androidtextinput/AndroidTextInputState.h>
-
 #include <react/renderer/components/view/conversions.h>
 #include <react/renderer/core/ComponentDescriptor.h>
 #include <yoga/Yoga.h>
