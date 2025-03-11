@@ -60,9 +60,6 @@ void MarkdownTextInputDecoratorShadowNode::tryUpdateCustomContextContainer() {
       this->getProps()->rawProps["parserId"].asInt();
 
   if (currentParserId != previousParserId_ || markdownStyle != previousMarkdownStyle_) {
-    const JFabricUIManager::javaobject &customUIManager =
-        this->customContextContainer_->at<JFabricUIManager::javaobject>("FabricUIManager");
-
     createCustomContextContainer();
   }
 }
