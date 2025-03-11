@@ -34,9 +34,4 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install)
       params);
 }
 
-- (void)invalidate {
-  [[NSNotificationCenter defaultCenter] removeObserver:self];
-  [super invalidate];
-}
-
 @end
