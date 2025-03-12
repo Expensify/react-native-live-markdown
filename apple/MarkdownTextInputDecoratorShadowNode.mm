@@ -98,11 +98,6 @@ void MarkdownTextInputDecoratorShadowNode::layout(LayoutContext layoutContext) {
   const auto &mutableChild =
       std::const_pointer_cast<TextInputShadowNode>(child);
 
-  // apply markdown after updating layout metrics on the child, since text
-  // input updates its state inside its layout method
-  // TODO: is this actually needed?
-  applyMarkdownStylesToTextInputState(mutableChild, layoutContext);
-
   // TODO: this may not be the correct way to do this
   auto childMetrics = child->getLayoutMetrics();
   setLayoutMetrics(childMetrics);
