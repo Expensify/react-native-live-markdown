@@ -32,9 +32,9 @@ void MarkdownTextInputDecoratorShadowNode::createCustomContextContainer() {
   const auto currentParserId =
       this->getProps()->rawProps["parserId"].asInt();
 
-  auto const decoratorPropsRNM =
+  const auto decoratorPropsRNM =
       ReadableNativeMap::newObjectCxxArgs(markdownStyle);
-  auto const decoratorPropsRM =
+  const auto decoratorPropsRM =
       jni::make_local(reinterpret_cast<ReadableMap::javaobject>(
                           decoratorPropsRNM.get()));
 
