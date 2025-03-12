@@ -111,9 +111,9 @@ void MarkdownTextInputDecoratorShadowNode::layout(LayoutContext layoutContext) {
   auto mutableChild = std::const_pointer_cast<YogaLayoutableShadowNode>(child);
 
   // TODO: this may not be the correct way to do this
-  setLayoutMetrics(child->getLayoutMetrics());
-
   auto childMetrics = child->getLayoutMetrics();
+  setLayoutMetrics(childMetrics); // makes a copy
+
   childMetrics.frame.origin = Point{};
   mutableChild->setLayoutMetrics(childMetrics);
 }
