@@ -19,17 +19,17 @@ void MarkdownTextInputDecoratorShadowNode::initialize() {
 }
 
 void MarkdownTextInputDecoratorShadowNode::createCustomContextContainer() {
-  static auto customUIManagerClass = jni::findClassStatic(
+  static auto customFabricUIManagerClass = jni::findClassStatic(
       "com/expensify/livemarkdown/CustomFabricUIManager");
-  static auto createCustomUIManager =
-      customUIManagerClass
+  static auto createMethod =
+      customFabricUIManagerClass
           ->getStaticMethod<JFabricUIManager::javaobject(
               JFabricUIManager::javaobject, ReadableMap::javaobject, int)>(
               "create");
 
   const auto markdownStyle =
       this->getProps()->rawProps["markdownStyle"];
-  const auto currentParserId =
+  const auto parserId =
       this->getProps()->rawProps["parserId"].asInt();
 
   const auto decoratorPropsRNM =
@@ -38,33 +38,33 @@ void MarkdownTextInputDecoratorShadowNode::createCustomContextContainer() {
       jni::make_local(reinterpret_cast<ReadableMap::javaobject>(
                           decoratorPropsRNM.get()));
 
-  const JFabricUIManager::javaobject &fabricUIManager =
+  const auto &fabricUIManager =
       this->getContextContainer()->at<JFabricUIManager::javaobject>("FabricUIManager");
 
-  const auto customUIManager = jni::make_global(createCustomUIManager(
-      customUIManagerClass, fabricUIManager,
-      decoratorPropsRM.get(), currentParserId));
-  const ContextContainer::Shared contextContainer =
+  const auto customUIManager = jni::make_global(createMethod(
+      customFabricUIManagerClass, fabricUIManager,
+      decoratorPropsRM.get(), parserId));
+  const auto contextContainer =
       std::make_shared<ContextContainer const>();
   contextContainer->insert("FabricUIManager", customUIManager);
 
   customContextContainer_ = contextContainer;
   previousMarkdownStyle_ = markdownStyle;
-  previousParserId_ = currentParserId;
+  previousParserId_ = parserId;
 }
 
-void MarkdownTextInputDecoratorShadowNode::tryUpdateCustomContextContainer() {
+void MarkdownTextInputDecoratorShadowNode::updateCustomContextContainerIfNeeded() {
   const auto markdownStyle =
       this->getProps()->rawProps["markdownStyle"];
-  const auto currentParserId =
+  const auto parserId =
       this->getProps()->rawProps["parserId"].asInt();
 
-  if (currentParserId != previousParserId_ || markdownStyle != previousMarkdownStyle_) {
+  if (parserId != previousParserId_ || markdownStyle != previousMarkdownStyle_) {
     createCustomContextContainer();
   }
 }
 
-void MarkdownTextInputDecoratorShadowNode::adoptChildren() {
+void MarkdownTextInputDecoratorShadowNode::overwriteTextLayoutManager() {
   const auto &children = getChildren();
   if (children.empty()) {
     return;
@@ -72,12 +72,15 @@ void MarkdownTextInputDecoratorShadowNode::adoptChildren() {
   react_native_assert(
       children.size() == 1 &&
       "MarkdownTextInputDecoratorView received more than one child");
-  react_native_assert(
-      std::dynamic_pointer_cast<const AndroidTextInputShadowNode>(children.at(0)) &&
-      "MarkdownTextInputDecoratorView received child other than a TextInput");
 
   const auto child = std::dynamic_pointer_cast<const AndroidTextInputShadowNode>(
       children.at(0));
+
+  react_native_assert(
+      child != nullptr &&
+      "MarkdownTextInputDecoratorView received child other than a TextInput");
+  child->ensureUnsealed();
+
   const auto mutableChild = std::const_pointer_cast<AndroidTextInputShadowNode>(child);
   mutableChild->setTextLayoutManager(
       std::make_shared<TextLayoutManager>(customContextContainer_));
@@ -87,7 +90,7 @@ void MarkdownTextInputDecoratorShadowNode::appendChild(
     const ShadowNode::Shared &child) {
   YogaLayoutableShadowNode::appendChild(child);
 
-  adoptChildren();
+  overwriteTextLayoutManager();
 }
 
 void MarkdownTextInputDecoratorShadowNode::replaceChild(
@@ -95,7 +98,7 @@ void MarkdownTextInputDecoratorShadowNode::replaceChild(
     size_t suggestedIndex) {
   YogaLayoutableShadowNode::replaceChild(oldChild, newChild, suggestedIndex);
 
-  adoptChildren();
+  overwriteTextLayoutManager();
 }
 
 void MarkdownTextInputDecoratorShadowNode::layout(LayoutContext layoutContext) {
@@ -114,7 +117,7 @@ void MarkdownTextInputDecoratorShadowNode::layout(LayoutContext layoutContext) {
   auto childMetrics = child->getLayoutMetrics();
   setLayoutMetrics(childMetrics); // makes a copy
 
-  childMetrics.frame.origin = Point{};
+  childMetrics.frame.origin = Point{}; // origin is relative to the parent
   mutableChild->setLayoutMetrics(childMetrics);
 }
 

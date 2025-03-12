@@ -27,7 +27,7 @@ public:
     createCustomContextContainer();
 
     if (fragment.children) {
-      adoptChildren();
+      overwriteTextLayoutManager();
     }
   }
 
@@ -36,17 +36,17 @@ public:
       : ConcreteViewShadowNode(sourceShadowNode, fragment) {
     initialize();
 
-    if (fragment.children) {
-      adoptChildren();
-    }
-
     const auto &sourceDecorator = static_cast<const MarkdownTextInputDecoratorShadowNode &>(sourceShadowNode);
 
     customContextContainer_ = sourceDecorator.customContextContainer_;
     previousMarkdownStyle_ = sourceDecorator.previousMarkdownStyle_;
     previousParserId_ = sourceDecorator.previousParserId_;
 
-    tryUpdateCustomContextContainer();
+    updateCustomContextContainerIfNeeded();
+
+    if (fragment.children) {
+      overwriteTextLayoutManager();
+    }
   }
 
   void appendChild(const ShadowNode::Shared &child) override;
@@ -64,11 +64,11 @@ private:
 
   void initialize();
 
-  void adoptChildren();
+  void overwriteTextLayoutManager();
 
   void createCustomContextContainer();
 
-  void tryUpdateCustomContextContainer();
+  void updateCustomContextContainerIfNeeded();
 };
 
 } // namespace react
