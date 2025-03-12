@@ -26,7 +26,7 @@ public:
     initialize();
 
     if (fragment.children) {
-      adoptChildren();
+      overwriteMeasureContent();
     }
   }
 
@@ -36,7 +36,7 @@ public:
     initialize();
 
     if (fragment.children) {
-      adoptChildren();
+      overwriteMeasureContent();
     }
   }
 
@@ -51,8 +51,8 @@ public:
 
 private:
   void initialize();
-  void adoptChildren();
-  void applyMarkdown(std::shared_ptr<TextInputShadowNode> node,
+  void overwriteMeasureContent();
+  void applyMarkdownStylesToTextInputState(std::shared_ptr<TextInputShadowNode> node,
                      const LayoutContext &layoutContext) const;
   static YGSize yogaNodeMeasureCallbackConnector(YGNodeConstRef yogaNode,
                                                  float width,

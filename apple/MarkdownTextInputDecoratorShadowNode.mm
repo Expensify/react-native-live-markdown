@@ -21,7 +21,7 @@ void MarkdownTextInputDecoratorShadowNode::initialize() {
   ShadowNode::traits_.unset(ShadowNodeTraits::ForceFlattenView);
 }
 
-void MarkdownTextInputDecoratorShadowNode::adoptChildren() {
+void MarkdownTextInputDecoratorShadowNode::overwriteMeasureContent() {
   const auto &children = getChildren();
   if (children.empty()) {
     return;
@@ -29,29 +29,28 @@ void MarkdownTextInputDecoratorShadowNode::adoptChildren() {
   react_native_assert(
       children.size() == 1 &&
       "MarkdownTextInputDecoratorView received more than one child");
+
+  const auto child = std::dynamic_pointer_cast<const TextInputShadowNode>(children[0]);
   react_native_assert(
-      std::dynamic_pointer_cast<const TextInputShadowNode>(children.at(0)) &&
+      child != nullptr &&
       "MarkdownTextInputDecoratorView received child other than a TextInput");
 
-  if (const auto child = std::dynamic_pointer_cast<const TextInputShadowNode>(
-          children.at(0))) {
-    // don't mind this :)
-    const auto &nodeWithAccessibleYogaNode =
-        reinterpret_cast<const MarkdownTextInputDecoratorShadowNode *>(&*child);
-
-    // decorator node cannot have a measure function since it's not a leaf node
-    // but we can redirect measuring of the child input to call measureContent
-    // on the decorator
-    YGNodeSetMeasureFunc(&nodeWithAccessibleYogaNode->yogaNode_,
-                         yogaNodeMeasureCallbackConnector);
-  }
+  // don't mind this :)
+  const auto &nodeWithAccessibleYogaNode =
+      std::reinterpret_pointer_cast<const MarkdownTextInputDecoratorShadowNode>(child);
+  
+  // decorator node cannot have a measure function since it's not a leaf node
+  // but we can redirect measuring of the child input to call measureContent
+  // on the decorator
+  YGNodeSetMeasureFunc(&nodeWithAccessibleYogaNode->yogaNode_,
+                       yogaNodeMeasureCallbackConnector);
 }
 
 void MarkdownTextInputDecoratorShadowNode::appendChild(
     const ShadowNode::Shared &child) {
   YogaLayoutableShadowNode::appendChild(child);
 
-  adoptChildren();
+  overwriteMeasureContent();
 }
 
 void MarkdownTextInputDecoratorShadowNode::replaceChild(
@@ -59,7 +58,7 @@ void MarkdownTextInputDecoratorShadowNode::replaceChild(
     size_t suggestedIndex) {
   YogaLayoutableShadowNode::replaceChild(oldChild, newChild, suggestedIndex);
 
-  adoptChildren();
+  overwriteMeasureContent();
 };
 
 Size MarkdownTextInputDecoratorShadowNode::measureContent(
@@ -78,7 +77,7 @@ Size MarkdownTextInputDecoratorShadowNode::measureContent(
   // apply markdown formatting before measuring the child
   const auto &mutableChild =
       std::const_pointer_cast<TextInputShadowNode>(child);
-  applyMarkdown(mutableChild, layoutContext);
+  applyMarkdownStylesToTextInputState(mutableChild, layoutContext);
 
   return child->measureContent(layoutContext, layoutConstraints);
 }
@@ -101,7 +100,8 @@ void MarkdownTextInputDecoratorShadowNode::layout(LayoutContext layoutContext) {
 
   // apply markdown after updating layout metrics on the child, since text
   // input updates its state inside its layout method
-  applyMarkdown(mutableChild, layoutContext);
+  // TODO: is this actually needed?
+  applyMarkdownStylesToTextInputState(mutableChild, layoutContext);
 
   // TODO: this may not be the correct way to do this
   auto childMetrics = child->getLayoutMetrics();
@@ -111,7 +111,7 @@ void MarkdownTextInputDecoratorShadowNode::layout(LayoutContext layoutContext) {
   mutableChild->setLayoutMetrics(childMetrics);
 }
 
-void MarkdownTextInputDecoratorShadowNode::applyMarkdown(
+void MarkdownTextInputDecoratorShadowNode::applyMarkdownStylesToTextInputState(
     std::shared_ptr<TextInputShadowNode> textInput,
     const LayoutContext &layoutContext) const {
 
@@ -235,13 +235,14 @@ YGSize MarkdownTextInputDecoratorShadowNode::yogaNodeMeasureCallbackConnector(
     break;
   }
 
-  const auto parentNode = YGNodeGetParent(const_cast<YGNodeRef>(yogaNode));
-  const auto &shadowNode = shadowNodeFromContext(parentNode);
-  LayoutContext context = LayoutContext();
+  // This is where changes begin compared to the copied code
+  const auto decoratorYogaNode = YGNodeGetParent(const_cast<YGNodeRef>(yogaNode));
+  const auto &decoratorShadowNode = shadowNodeFromContext(decoratorYogaNode);
 
+  LayoutContext context = LayoutContext();
   context.fontSizeMultiplier = RCTFontSizeMultiplier();
 
-  auto size = shadowNode.measureContent(context, {minimumSize, maximumSize});
+  auto size = decoratorShadowNode.measureContent(context, {minimumSize, maximumSize});
 
   return YGSize{yogaFloatFromFloat(size.width),
                 yogaFloatFromFloat(size.height)};
