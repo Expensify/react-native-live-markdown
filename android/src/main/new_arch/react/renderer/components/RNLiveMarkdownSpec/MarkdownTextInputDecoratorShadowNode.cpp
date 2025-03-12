@@ -19,9 +19,9 @@ void MarkdownTextInputDecoratorShadowNode::initialize() {
 }
 
 void MarkdownTextInputDecoratorShadowNode::createCustomContextContainer() {
-  static auto customFabricUIManagerClass = jni::findClassStatic(
+  static const auto customFabricUIManagerClass = jni::findClassStatic(
       "com/expensify/livemarkdown/CustomFabricUIManager");
-  static auto createMethod =
+  static const auto createMethod =
       customFabricUIManagerClass
           ->getStaticMethod<JFabricUIManager::javaobject(
               JFabricUIManager::javaobject, ReadableMap::javaobject, int)>(
