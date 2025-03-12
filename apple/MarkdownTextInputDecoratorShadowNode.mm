@@ -104,9 +104,9 @@ void MarkdownTextInputDecoratorShadowNode::layout(LayoutContext layoutContext) {
   applyMarkdown(mutableChild, layoutContext);
 
   // TODO: this may not be the correct way to do this
-  setLayoutMetrics(child->getLayoutMetrics());
-
   auto childMetrics = child->getLayoutMetrics();
+  setLayoutMetrics(childMetrics);
+
   childMetrics.frame.origin = Point{};
   mutableChild->setLayoutMetrics(childMetrics);
 }
