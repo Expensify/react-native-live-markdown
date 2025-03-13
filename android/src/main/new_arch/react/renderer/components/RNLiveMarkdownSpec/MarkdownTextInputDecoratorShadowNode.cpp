@@ -31,10 +31,9 @@ void MarkdownTextInputDecoratorShadowNode::createCustomContextContainer() {
               JFabricUIManager::javaobject, ReadableMap::javaobject, int)>(
               "create");
 
-  const auto markdownStyle =
-      this->getProps()->rawProps["markdownStyle"];
-  const auto parserId =
-      this->getProps()->rawProps["parserId"].asInt();
+  const auto &rawProps = this->getProps()->rawProps;
+  const auto &markdownStyle = rawProps["markdownStyle"];
+  const auto parserId = rawProps["parserId"].asInt();
 
   const auto decoratorPropsRNM =
       ReadableNativeMap::newObjectCxxArgs(markdownStyle);
