@@ -132,7 +132,7 @@ void MarkdownTextInputDecoratorShadowNode::applyMarkdownFormattingToTextInputSta
   const auto &stateData = textInputState.getData();
   const auto fontSizeMultiplier = layoutContext.fontSizeMultiplier;
 
-  const auto &markdownProps =
+  const auto &decoratorProps =
       *std::static_pointer_cast<MarkdownTextInputDecoratorViewProps const>(
           getProps());
   const auto &textInputProps =
@@ -145,10 +145,10 @@ void MarkdownTextInputDecoratorShadowNode::applyMarkdownFormattingToTextInputSta
 
   // this can possibly be optimized
   RCTMarkdownStyle *markdownStyle =
-      [[RCTMarkdownStyle alloc] initWithStruct:markdownProps.markdownStyle];
+      [[RCTMarkdownStyle alloc] initWithStruct:decoratorProps.markdownStyle];
   RCTMarkdownUtils *utils = [[RCTMarkdownUtils alloc] init];
   [utils setMarkdownStyle:markdownStyle];
-  [utils setParserId:[NSNumber numberWithInt:markdownProps.parserId]];
+  [utils setParserId:[NSNumber numberWithInt:decoratorProps.parserId]];
 
   // convert the attibuted string stored in state to
   // NSAttributedString
