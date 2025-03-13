@@ -34,15 +34,20 @@ void MarkdownTextInputDecoratorShadowNode::overwriteMeasureContent() {
   react_native_assert(
       child != nullptr &&
       "MarkdownTextInputDecoratorView received child other than a TextInput");
-
-  // don't mind this :)
+  child->ensureUnsealed();
+  
+  // This is obviously not correct, but since both MarkdownTextInputDecoratorShadowNode and
+  // TextInputShadowNode inherit from YogaLayoutableShadowNode by doing this cast it's
+  // possible to access protected members from TextInputShadowNode like yogaNode_.
+  // As only things from YogaLayoutableShadowNode are accessed, it should be safe,
+  // since the vtable should be the same between them.
   const auto &nodeWithAccessibleYogaNode =
       std::reinterpret_pointer_cast<const MarkdownTextInputDecoratorShadowNode>(child);
   
   // decorator node cannot have a measure function since it's not a leaf node
   // but we can redirect measuring of the child input to call measureContent
   // on the decorator
-  YGNodeSetMeasureFunc(&nodeWithAccessibleYogaNode->yogaNode_,
+  YGNodeSetMeasureFunc(&nodeWithAccessibleYogaNode->YogaLayoutableShadowNode::yogaNode_,
                        yogaNodeMeasureCallbackConnector);
 }
 
