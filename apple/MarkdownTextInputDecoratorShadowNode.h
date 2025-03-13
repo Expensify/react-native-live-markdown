@@ -26,7 +26,7 @@ public:
     initialize();
 
     if (fragment.children) {
-      overwriteMeasureContent();
+      overwriteMeasureCallbackConnector();
     }
   }
 
@@ -36,7 +36,7 @@ public:
     initialize();
 
     if (fragment.children) {
-      overwriteMeasureContent();
+      overwriteMeasureCallbackConnector();
     }
   }
 
@@ -51,8 +51,8 @@ public:
 
 private:
   void initialize();
-  void overwriteMeasureContent();
-  void applyMarkdownStylesToTextInputState(std::shared_ptr<TextInputShadowNode> node,
+  void overwriteMeasureCallbackConnector();
+  void applyMarkdownFormattingToTextInputState(std::shared_ptr<TextInputShadowNode> node,
                      const LayoutContext &layoutContext) const;
   static YGSize yogaNodeMeasureCallbackConnector(YGNodeConstRef yogaNode,
                                                  float width,

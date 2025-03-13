@@ -25,7 +25,7 @@ void MarkdownTextInputDecoratorShadowNode::initialize() {
   ShadowNode::traits_.unset(ShadowNodeTraits::ForceFlattenView);
 }
 
-void MarkdownTextInputDecoratorShadowNode::overwriteMeasureContent() {
+void MarkdownTextInputDecoratorShadowNode::overwriteMeasureCallbackConnector() {
   const auto &children = getChildren();
   if (children.empty()) {
     return;
@@ -59,7 +59,7 @@ void MarkdownTextInputDecoratorShadowNode::appendChild(
     const ShadowNode::Shared &child) {
   YogaLayoutableShadowNode::appendChild(child);
 
-  overwriteMeasureContent();
+  overwriteMeasureCallbackConnector();
 }
 
 void MarkdownTextInputDecoratorShadowNode::replaceChild(
@@ -67,7 +67,7 @@ void MarkdownTextInputDecoratorShadowNode::replaceChild(
     size_t suggestedIndex) {
   YogaLayoutableShadowNode::replaceChild(oldChild, newChild, suggestedIndex);
 
-  overwriteMeasureContent();
+  overwriteMeasureCallbackConnector();
 };
 
 Size MarkdownTextInputDecoratorShadowNode::measureContent(
@@ -86,7 +86,7 @@ Size MarkdownTextInputDecoratorShadowNode::measureContent(
   // apply markdown formatting before measuring the child
   const auto &mutableChild =
       std::const_pointer_cast<TextInputShadowNode>(child);
-  applyMarkdownStylesToTextInputState(mutableChild, layoutContext);
+  applyMarkdownFormattingToTextInputState(mutableChild, layoutContext);
 
   return child->measureContent(layoutContext, layoutConstraints);
 }
@@ -122,7 +122,7 @@ void MarkdownTextInputDecoratorShadowNode::layout(LayoutContext layoutContext) {
   mutableChild->setLayoutMetrics(childMetrics);
 }
 
-void MarkdownTextInputDecoratorShadowNode::applyMarkdownStylesToTextInputState(
+void MarkdownTextInputDecoratorShadowNode::applyMarkdownFormattingToTextInputState(
     std::shared_ptr<TextInputShadowNode> textInput,
     const LayoutContext &layoutContext) const {
 
