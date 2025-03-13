@@ -51,8 +51,8 @@ void MarkdownTextInputDecoratorShadowNode::overwriteMeasureCallbackConnector() {
   // decorator node cannot have a measure function since it's not a leaf node
   // but we can redirect measuring of the child input to call measureContent
   // on the decorator
-  YGNodeSetMeasureFunc(&nodeWithAccessibleYogaNode->YogaLayoutableShadowNode::yogaNode_,
-                       yogaNodeMeasureCallbackConnector);
+  const auto &yogaNode = &nodeWithAccessibleYogaNode->yogaNode_;
+  YGNodeSetMeasureFunc(yogaNode, yogaNodeMeasureCallbackConnector);
 }
 
 void MarkdownTextInputDecoratorShadowNode::appendChild(
