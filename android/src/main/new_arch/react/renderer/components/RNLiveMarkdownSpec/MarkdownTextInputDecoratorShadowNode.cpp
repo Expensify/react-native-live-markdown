@@ -45,12 +45,12 @@ void MarkdownTextInputDecoratorShadowNode::createCustomContextContainer() {
   const auto &fabricUIManager =
       this->getContextContainer()->at<JFabricUIManager::javaobject>("FabricUIManager");
 
-  const auto customUIManager = jni::make_global(createMethod(
+  const auto customFabricUIManager = jni::make_global(createMethod(
       customFabricUIManagerClass, fabricUIManager,
       decoratorPropsRM.get(), parserId));
   const auto contextContainer =
       std::make_shared<ContextContainer const>();
-  contextContainer->insert("FabricUIManager", customUIManager);
+  contextContainer->insert("FabricUIManager", customFabricUIManager);
 
   customContextContainer_ = contextContainer;
   previousMarkdownStyle_ = markdownStyle;
