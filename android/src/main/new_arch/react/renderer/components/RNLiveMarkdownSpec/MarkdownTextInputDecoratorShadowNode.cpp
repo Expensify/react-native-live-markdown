@@ -117,10 +117,17 @@ void MarkdownTextInputDecoratorShadowNode::layout(LayoutContext layoutContext) {
   auto mutableChild = std::const_pointer_cast<YogaLayoutableShadowNode>(child);
 
   // TODO: this may not be the correct way to do this
+  // Since nodes with display: contents are skipped during layout, they have
+  // zero-layout. To properly display the view, assign the layout metrics from
+  // the child (text input, which was calculated by Yoga) to the decorator view.
   auto childMetrics = child->getLayoutMetrics();
   setLayoutMetrics(childMetrics); // makes a copy
 
-  childMetrics.frame.origin = Point{}; // origin is relative to the parent
+  // Then, it's also needed to update the metrics on the child as the position
+  // is relative to the parent, which was just moved above. By zeroing the
+  // origin, the child is effectively moved to the same position it was before
+  // the manipulation here.
+  childMetrics.frame.origin = Point{};
   mutableChild->setLayoutMetrics(childMetrics);
 }
 
