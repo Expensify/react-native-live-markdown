@@ -78,7 +78,7 @@ void MarkdownTextInputDecoratorShadowNode::overwriteTextLayoutManager() {
       "MarkdownTextInputDecoratorView received more than one child");
 
   const auto child = std::dynamic_pointer_cast<const AndroidTextInputShadowNode>(
-      children.at(0));
+      children[0]);
 
   react_native_assert(
       child != nullptr &&

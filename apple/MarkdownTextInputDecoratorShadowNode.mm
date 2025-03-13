@@ -79,7 +79,7 @@ Size MarkdownTextInputDecoratorShadowNode::measureContent(
       "MarkdownTextInputDecoratorView received wrong number of children");
 
   const auto child =
-      std::static_pointer_cast<const TextInputShadowNode>(children.at(0));
+      std::static_pointer_cast<const TextInputShadowNode>(children[0]);
 
   child->ensureUnsealed();
 
@@ -100,7 +100,7 @@ void MarkdownTextInputDecoratorShadowNode::layout(LayoutContext layoutContext) {
       "MarkdownTextInputDecoratorView didn't receive exactly one child");
 
   const auto child =
-      std::static_pointer_cast<const TextInputShadowNode>(children.at(0));
+      std::static_pointer_cast<const TextInputShadowNode>(children[0]);
 
   child->ensureUnsealed();
 
