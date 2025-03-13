@@ -16,7 +16,7 @@ declare global {
   // eslint-disable-next-line no-var
   var jsi_setMarkdownRuntime: (runtime: WorkletRuntime) => void;
   // eslint-disable-next-line no-var
-  var jsi_registerMarkdownWorklet: (shareableWorklet: ShareableRef<WorkletFunction<[string], Range[]>>) => number;
+  var jsi_registerMarkdownWorklet: (shareableWorklet: ShareableRef<WorkletFunction<[string], MarkdownRange[]>>) => number;
   // eslint-disable-next-line no-var
   var jsi_unregisterMarkdownWorklet: (parserId: number) => void;
 }
@@ -50,7 +50,7 @@ function initializeLiveMarkdownIfNeeded() {
 
 function registerParser(parser: (input: string) => MarkdownRange[]): number {
   initializeLiveMarkdownIfNeeded();
-  const shareableWorklet = makeShareableCloneRecursive(parser) as ShareableRef<WorkletFunction<[string], Range[]>>;
+  const shareableWorklet = makeShareableCloneRecursive(parser) as ShareableRef<WorkletFunction<[string], MarkdownRange[]>>;
   const parserId = global.jsi_registerMarkdownWorklet(shareableWorklet);
   return parserId;
 }
@@ -61,9 +61,14 @@ function unregisterParser(parserId: number) {
 
 interface MarkdownTextInputProps extends TextInputProps, InlineImagesInputProps {
   markdownStyle?: PartialMarkdownStyle;
-  formatSelection?: (selectedText: string, formatCommand: string) => string;
+  formatSelection?: (text: string, selectionStart: number, selectionEnd: number, formatCommand: string) => FormatSelectionResult;
   parser: (value: string) => MarkdownRange[];
 }
+
+type FormatSelectionResult = {
+  updatedText: string;
+  cursorOffset: number;
+};
 
 type MarkdownTextInput = TextInput & React.Component<MarkdownTextInputProps>;
 
@@ -89,8 +94,6 @@ function processMarkdownStyle(input: PartialMarkdownStyle | undefined): Markdown
 }
 
 const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputProps>((props, ref) => {
-  const IS_FABRIC = 'nativeFabricUIManager' in global;
-
   const markdownStyle = React.useMemo(() => processMarkdownStyle(props.markdownStyle), [props.markdownStyle]);
 
   if (props.parser === undefined) {
@@ -118,7 +121,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
         ref={ref}
       />
       <MarkdownTextInputDecoratorViewNativeComponent
-        style={IS_FABRIC ? styles.farAway : styles.displayNone}
+        style={styles.farAway}
         markdownStyle={markdownStyle}
         parserId={parserId}
       />
@@ -127,9 +130,6 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
 });
 
 const styles = StyleSheet.create({
-  displayNone: {
-    display: 'none',
-  },
   farAway: {
     position: 'absolute',
     top: 1e8,

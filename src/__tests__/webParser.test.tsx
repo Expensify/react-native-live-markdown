@@ -205,9 +205,15 @@ test('separate blockquotes', () => {
   );
 });
 
-test('nested blockquotes', () => {
+test('blockquote with whitespace between syntaxes', () => {
   expect('> > > > Lorem ipsum dolor sit amet').toBeParsedAsHTML(
-    '<p data-type="line" data-id="0"><span data-type="blockquote" data-id="0,0"><span data-type="blockquote" data-id="0,0,0"><span data-type="blockquote" data-id="0,0,0,0"><span data-type="blockquote" data-id="0,0,0,0,0"><span data-type="syntax" data-id="0,0,0,0,0,0"><span data-type="text" data-id="0,0,0,0,0,0,0">&gt;</span></span><span data-type="text" data-id="0,0,0,0,0,1"> </span><span data-type="syntax" data-id="0,0,0,0,0,2"><span data-type="text" data-id="0,0,0,0,0,2,0">&gt;</span></span><span data-type="text" data-id="0,0,0,0,0,3"> </span><span data-type="syntax" data-id="0,0,0,0,0,4"><span data-type="text" data-id="0,0,0,0,0,4,0">&gt;</span></span><span data-type="text" data-id="0,0,0,0,0,5"> </span><span data-type="syntax" data-id="0,0,0,0,0,6"><span data-type="text" data-id="0,0,0,0,0,6,0">&gt;</span></span><span data-type="text" data-id="0,0,0,0,0,7"> Lorem ipsum dolor sit amet</span></span></span></span></span></p>',
+    '<p data-type="line" data-id="0"><span data-type="blockquote" data-id="0,0"><span data-type="syntax" data-id="0,0,0"><span data-type="text" data-id="0,0,0,0">&gt;</span></span><span data-type="text" data-id="0,0,1"> &gt; &gt; &gt; Lorem ipsum dolor sit amet</span></span></p>',
+  );
+});
+
+test('nested blockquotes', () => {
+  expect('>>>> Lorem ipsum dolor sit amet').toBeParsedAsHTML(
+    '<p data-type="line" data-id="0"><span data-type="blockquote" data-id="0,0"><span data-type="blockquote" data-id="0,0,0"><span data-type="blockquote" data-id="0,0,0,0"><span data-type="syntax" data-id="0,0,0,0,0"><span data-type="text" data-id="0,0,0,0,0,0">&gt;</span></span><span data-type="syntax" data-id="0,0,0,0,1"><span data-type="text" data-id="0,0,0,0,1,0">&gt;</span></span><span data-type="syntax" data-id="0,0,0,0,2"><span data-type="text" data-id="0,0,0,0,2,0">&gt;</span></span><span data-type="text" data-id="0,0,0,0,3">&gt; Lorem ipsum dolor sit amet</span></span></span></span></p>',
   );
 });
 
