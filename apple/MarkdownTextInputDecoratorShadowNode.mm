@@ -250,10 +250,10 @@ YGSize MarkdownTextInputDecoratorShadowNode::yogaNodeMeasureCallbackConnector(
   const auto &decoratorYogaNode = YGNodeGetParent(const_cast<YGNodeRef>(yogaNode));
   const auto &decoratorShadowNode = shadowNodeFromContext(decoratorYogaNode);
 
-  LayoutContext context = LayoutContext();
+  LayoutContext context{};
   context.fontSizeMultiplier = RCTFontSizeMultiplier();
 
-  auto size = decoratorShadowNode.measureContent(context, {minimumSize, maximumSize});
+  const auto size = decoratorShadowNode.measureContent(context, {minimumSize, maximumSize});
 
   return YGSize{yogaFloatFromFloat(size.width),
                 yogaFloatFromFloat(size.height)};
