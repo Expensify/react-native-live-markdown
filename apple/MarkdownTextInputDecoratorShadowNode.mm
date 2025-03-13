@@ -247,7 +247,7 @@ YGSize MarkdownTextInputDecoratorShadowNode::yogaNodeMeasureCallbackConnector(
   }
 
   // This is where changes begin compared to the copied code
-  const auto decoratorYogaNode = YGNodeGetParent(const_cast<YGNodeRef>(yogaNode));
+  const auto &decoratorYogaNode = YGNodeGetParent(const_cast<YGNodeRef>(yogaNode));
   const auto &decoratorShadowNode = shadowNodeFromContext(decoratorYogaNode);
 
   LayoutContext context = LayoutContext();
