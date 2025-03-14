@@ -195,8 +195,8 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
             }
 
             // apply markdown
-            auto newString = [usedUtils parseMarkdown:nsAttributedString
-                            withDefaultTextAttributes:defaultNSTextAttributes];
+            NSMutableAttributedString *newString = [nsAttributedString mutableCopy];
+            [usedUtils applyMarkdownFormatting:newString withDefaultTextAttributes:defaultNSTextAttributes];
 
             // create a clone of the old TextInputState and update the
             // attributed string box to point to the string with markdown
@@ -244,8 +244,8 @@ RootShadowNode::Unshared MarkdownCommitHook::shadowTreeWillCommit(
                     stateData.attributedStringBox);
 
             // apply markdown
-            auto newString = [usedUtils parseMarkdown:nsAttributedString
-                            withDefaultTextAttributes:defaultNSTextAttributes];
+            NSMutableAttributedString *newString = [nsAttributedString mutableCopy];
+            [usedUtils applyMarkdownFormatting:newString withDefaultTextAttributes:defaultNSTextAttributes];
 
             // create a clone of the old TextInputState and update the
             // attributed string box to point to the string with markdown

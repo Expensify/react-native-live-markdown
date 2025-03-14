@@ -2,15 +2,17 @@
 #import <react/renderer/components/RNLiveMarkdownSpec/Props.h>
 #import <React/RCTFabricComponentsPlugins.h>
 #import <React/RCTUITextField.h>
+#import <React/RCTUITextView.h>
+#import <React/RCTTextInputComponentView.h>
 
+#import <RNLiveMarkdown/MarkdownBackedTextInputDelegate.h>
 #import <RNLiveMarkdown/MarkdownLayoutManager.h>
 #import <RNLiveMarkdown/MarkdownShadowFamilyRegistry.h>
+#import <RNLiveMarkdown/MarkdownTextFieldObserver.h>
 #import <RNLiveMarkdown/MarkdownTextInputDecoratorComponentView.h>
 #import <RNLiveMarkdown/MarkdownTextInputDecoratorViewComponentDescriptor.h>
-#import <RNLiveMarkdown/RCTBackedTextFieldDelegateAdapter+Markdown.h>
+#import <RNLiveMarkdown/MarkdownTextStorageDelegate.h>
 #import <RNLiveMarkdown/RCTMarkdownStyle.h>
-#import <RNLiveMarkdown/RCTTextInputComponentView+Markdown.h>
-#import <RNLiveMarkdown/RCTUITextView+Markdown.h>
 
 #import <objc/runtime.h>
 
@@ -20,10 +22,11 @@ using namespace facebook::react;
   RCTMarkdownUtils *_markdownUtils;
   RCTMarkdownStyle *_markdownStyle;
   NSNumber *_parserId;
-  __weak RCTTextInputComponentView *_textInput;
-  __weak UIView<RCTBackedTextInputViewProtocol> *_backedTextInputView;
-  __weak RCTBackedTextFieldDelegateAdapter *_adapter;
+  MarkdownBackedTextInputDelegate *_markdownBackedTextInputDelegate;
+  MarkdownTextStorageDelegate *_markdownTextStorageDelegate;
+  MarkdownTextFieldObserver *_markdownTextFieldObserver;
   __weak RCTUITextView *_textView;
+  __weak RCTUITextField *_textField;
   ShadowNodeFamily::Shared _decoratorFamily;
 }
 
@@ -81,22 +84,47 @@ using namespace facebook::react;
   UIView *view = [viewsArray objectAtIndex:currentIndex - 1];
 
   react_native_assert([view isKindOfClass:[RCTTextInputComponentView class]] && "Previous sibling component is not an instance of RCTTextInputComponentView.");
-  _textInput = (RCTTextInputComponentView *)view;
-  _backedTextInputView = [_textInput valueForKey:@"_backedTextInputView"];
+  RCTTextInputComponentView *textInputComponentView = (RCTTextInputComponentView *)view;
+  UIView<RCTBackedTextInputViewProtocol> *backedTextInputView = [textInputComponentView valueForKey:@"_backedTextInputView"];
 
   _markdownUtils = [[RCTMarkdownUtils alloc] init];
   react_native_assert(_markdownStyle != nil);
   [_markdownUtils setMarkdownStyle:_markdownStyle];
   [_markdownUtils setParserId:_parserId];
 
-  [_textInput setMarkdownUtils:_markdownUtils];
-  if ([_backedTextInputView isKindOfClass:[RCTUITextField class]]) {
-    RCTUITextField *textField = (RCTUITextField *)_backedTextInputView;
-    _adapter = [textField valueForKey:@"textInputDelegateAdapter"];
-    [_adapter setMarkdownUtils:_markdownUtils];
-  } else if ([_backedTextInputView isKindOfClass:[RCTUITextView class]]) {
-    _textView = (RCTUITextView *)_backedTextInputView;
-    [_textView setMarkdownUtils:_markdownUtils];
+  if ([backedTextInputView isKindOfClass:[RCTUITextField class]]) {
+    _textField = (RCTUITextField *)backedTextInputView;
+
+    // make sure `adjustsFontSizeToFitWidth` is disabled, otherwise formatting will be overwritten
+    react_native_assert(_textField.adjustsFontSizeToFitWidth == NO);
+
+    _markdownTextFieldObserver = [[MarkdownTextFieldObserver alloc] initWithTextField:_textField markdownUtils:_markdownUtils];
+
+    // register observers for future edits
+    [_textField addTarget:_markdownTextFieldObserver action:@selector(textFieldDidChange:) forControlEvents:UIControlEventEditingChanged];
+    [_textField addTarget:_markdownTextFieldObserver action:@selector(textFieldDidEndEditing:) forControlEvents:UIControlEventEditingDidEnd];
+    [_textField addObserver:_markdownTextFieldObserver forKeyPath:@"text" options:NSKeyValueObservingOptionNew context:NULL];
+    [_textField addObserver:_markdownTextFieldObserver forKeyPath:@"attributedText" options:NSKeyValueObservingOptionNew context:NULL];
+
+    // format initial value
+    [_markdownTextFieldObserver textFieldDidChange:_textField];
+
+    // TODO: register blockquotes layout manager
+    // https://github.com/Expensify/react-native-live-markdown/issues/87
+  } else if ([backedTextInputView isKindOfClass:[RCTUITextView class]]) {
+    _textView = (RCTUITextView *)backedTextInputView;
+
+    // register delegate for future edits
+    react_native_assert(_textView.textStorage.delegate == nil);
+    _markdownTextStorageDelegate = [[MarkdownTextStorageDelegate alloc] initWithTextView:_textView markdownUtils:_markdownUtils];
+    _textView.textStorage.delegate = _markdownTextStorageDelegate;
+
+    // register delegate for fixing cursor position
+    _markdownBackedTextInputDelegate = [[MarkdownBackedTextInputDelegate alloc] initWithTextView:_textView];
+
+    // format initial value
+    [_textView.textStorage setAttributedString:_textView.attributedText];
+
     NSLayoutManager *layoutManager = _textView.layoutManager; // switching to TextKit 1 compatibility mode
 
     // Correct content height in TextKit 1 compatibility mode. (See https://github.com/Expensify/App/issues/41567)
@@ -116,18 +144,24 @@ using namespace facebook::react;
 
 - (void)willMoveToWindow:(UIWindow *)newWindow
 {
-  if (_textInput != nil) {
-    [_textInput setMarkdownUtils:nil];
-  }
-  if (_adapter != nil) {
-    [_adapter setMarkdownUtils:nil];
-  }
   if (_textView != nil) {
-    [_textView setMarkdownUtils:nil];
     if (_textView.layoutManager != nil && [object_getClass(_textView.layoutManager) isEqual:[MarkdownLayoutManager class]]) {
       [_textView.layoutManager setValue:nil forKey:@"markdownUtils"];
       object_setClass(_textView.layoutManager, [NSLayoutManager class]);
     }
+    _markdownBackedTextInputDelegate = nil;
+    _markdownTextStorageDelegate = nil;
+    _textView.textStorage.delegate = nil;
+    _textView = nil;
+  }
+
+  if (_textField != nil) {
+    [_textField removeTarget:_markdownTextFieldObserver action:@selector(textFieldDidChange:) forControlEvents:UIControlEventEditingChanged];
+    [_textField removeTarget:_markdownTextFieldObserver action:@selector(textFieldDidEndEditing:) forControlEvents:UIControlEventEditingDidEnd];
+    [_textField removeObserver:_markdownTextFieldObserver forKeyPath:@"text" context:NULL];
+    [_textField removeObserver:_markdownTextFieldObserver forKeyPath:@"attributedText" context:NULL];
+    _markdownTextFieldObserver = nil;
+    _textField = nil;
   }
 }
 
@@ -154,11 +188,10 @@ using namespace facebook::react;
 - (void)applyNewStyles
 {
   if (_textView != nil) {
-    // We want to use `textStorage` for applying markdown when possible. Currently it's only available for UITextView
-    [_textView textDidChange];
-  } else {
-    // apply new styles
-    [_textInput _setAttributedString:_backedTextInputView.attributedText];
+    [_textView.textStorage setAttributedString:_textView.attributedText];
+  }
+  if (_textField != nil) {
+    [_markdownTextFieldObserver textFieldDidChange:_textField];
   }
 }
 

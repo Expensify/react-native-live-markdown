@@ -124,6 +124,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
         style={styles.farAway}
         markdownStyle={markdownStyle}
         parserId={parserId}
+        key={String(props.multiline)} // force remount on multiline change
       />
     </>
   );
