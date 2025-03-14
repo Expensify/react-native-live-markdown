@@ -18,8 +18,12 @@
   display: none;
 }
 
-.react-native-live-markdown-input-singleline span[data-type="text"] {
+.react-native-live-markdown-input-singleline span[data-type='text'] {
   vertical-align: middle;
+}
+
+.react-native-live-markdown-input-singleline > p:last-child {
+  padding-right: 1px !important;
 }
 
 .react-native-live-markdown-input-singleline:empty::before,
