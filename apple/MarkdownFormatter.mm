@@ -118,7 +118,7 @@
                                  inRange:range
                                  options:0
                               usingBlock:^(NSParagraphStyle *paragraphStyle, NSRange paragraphRange, BOOL *stop) {
-      if (paragraphStyle && [paragraphStyle isKindOfClass:[NSMutableParagraphStyle class]]) {
+      if (paragraphStyle && paragraphStyle.headIndent && [paragraphStyle isKindOfClass:[NSMutableParagraphStyle class]]) {
         NSMutableParagraphStyle *mutableParagraphStyle = (NSMutableParagraphStyle *)paragraphStyle;
         mutableParagraphStyle.minimumLineHeight = markdownStyle.h1LineHeight;
         mutableParagraphStyle.maximumLineHeight = markdownStyle.h1LineHeight;
