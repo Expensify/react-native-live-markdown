@@ -115,7 +115,8 @@
   } else if (type == "h1" && markdownStyle.h1LineHeight != -1) {
     NSParagraphStyle *defaultParagraphStyle = defaultTextAttributes[NSParagraphStyleAttributeName];
     NSMutableParagraphStyle *paragraphStyle = defaultParagraphStyle != nil ? [defaultParagraphStyle mutableCopy] : [NSMutableParagraphStyle new];
-    paragraphStyle.lineHeightMultiple = markdownStyle.h1LineHeight / markdownStyle.h1FontSize;
+    paragraphStyle.minimumLineHeight = markdownStyle.h1LineHeight;
+    paragraphStyle.maximumLineHeight = markdownStyle.h1LineHeight;
     NSRange rangeWithHashAndSpace = NSMakeRange(range.location - 2, range.length + 2);
     [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:rangeWithHashAndSpace];
   } else if (type == "pre") {
