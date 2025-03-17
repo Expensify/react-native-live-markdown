@@ -3,6 +3,7 @@
 #import <React/RCTFabricComponentsPlugins.h>
 #import <React/RCTUITextField.h>
 
+#import <RNLiveMarkdown/MarkdownBackedTextInputDelegate.h>
 #import <RNLiveMarkdown/MarkdownLayoutManager.h>
 #import <RNLiveMarkdown/MarkdownShadowFamilyRegistry.h>
 #import <RNLiveMarkdown/MarkdownTextInputDecoratorComponentView.h>
@@ -20,6 +21,7 @@ using namespace facebook::react;
   RCTMarkdownUtils *_markdownUtils;
   RCTMarkdownStyle *_markdownStyle;
   NSNumber *_parserId;
+  MarkdownBackedTextInputDelegate *_markdownBackedTextInputDelegate;
   __weak RCTTextInputComponentView *_textInput;
   __weak UIView<RCTBackedTextInputViewProtocol> *_backedTextInputView;
   __weak RCTBackedTextFieldDelegateAdapter *_adapter;
@@ -109,6 +111,9 @@ using namespace facebook::react;
     layoutManager.allowsNonContiguousLayout = NO; // workaround for onScroll issue
     object_setClass(layoutManager, [MarkdownLayoutManager class]);
     [layoutManager setValue:_markdownUtils forKey:@"markdownUtils"];
+
+    // register delegate for fixing cursor position after blockquote
+    _markdownBackedTextInputDelegate = [[MarkdownBackedTextInputDelegate alloc] initWithTextView:_textView];
   } else {
     react_native_assert(false && "Cannot enable Markdown for this type of TextInput.");
   }
@@ -123,6 +128,7 @@ using namespace facebook::react;
     [_adapter setMarkdownUtils:nil];
   }
   if (_textView != nil) {
+    _markdownBackedTextInputDelegate = nil;
     [_textView setMarkdownUtils:nil];
     if (_textView.layoutManager != nil && [object_getClass(_textView.layoutManager) isEqual:[MarkdownLayoutManager class]]) {
       [_textView.layoutManager setValue:nil forKey:@"markdownUtils"];
