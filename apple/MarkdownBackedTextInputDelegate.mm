@@ -21,7 +21,8 @@
   _textView.textInputDelegate = _originalTextInputDelegate;
 }
 
-- (void)textInputDidChangeSelection {
+- (void)textInputDidChangeSelection
+{
   // Delegate the call to the original text input delegate
   [_originalTextInputDelegate textInputDidChangeSelection];
 
@@ -38,39 +39,46 @@
 
 - (void)textInputDidChange
 {
-  // Delegate the call to the original text input delegate
   [_originalTextInputDelegate textInputDidChange];
 }
 
-- (void)textInputDidBeginEditing {
+- (void)textInputDidBeginEditing
+{
   [_originalTextInputDelegate textInputDidBeginEditing];
 }
 
-- (void)textInputDidEndEditing {
+- (void)textInputDidEndEditing
+{
   [_originalTextInputDelegate textInputDidEndEditing];
 }
 
-- (void)textInputDidReturn {
+- (void)textInputDidReturn
+{
   [_originalTextInputDelegate textInputDidReturn];
 }
 
-- (BOOL)textInputShouldBeginEditing {
+- (BOOL)textInputShouldBeginEditing
+{
   return [_originalTextInputDelegate textInputShouldBeginEditing];
 }
 
-- (nonnull NSString *)textInputShouldChangeText:(nonnull NSString *)text inRange:(NSRange)range {
+- (nonnull NSString *)textInputShouldChangeText:(nonnull NSString *)text inRange:(NSRange)range
+{
   return [_originalTextInputDelegate textInputShouldChangeText:text inRange:range];
 }
 
-- (BOOL)textInputShouldEndEditing {
+- (BOOL)textInputShouldEndEditing
+{
   return [_originalTextInputDelegate textInputShouldEndEditing];
 }
 
-- (BOOL)textInputShouldReturn {
+- (BOOL)textInputShouldReturn
+{
   return [_originalTextInputDelegate textInputShouldReturn];
 }
 
-- (BOOL)textInputShouldSubmitOnReturn {
+- (BOOL)textInputShouldSubmitOnReturn
+{
   return [_originalTextInputDelegate textInputShouldSubmitOnReturn];
 }
 
