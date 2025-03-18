@@ -168,6 +168,11 @@
     "jsSrcsDir": "src",
     "android": {
       "javaPackageName": "com.expensify.livemarkdown"
+    },
+    "ios": {
+      "componentProvider": {
+        "MarkdownTextInputDecoratorView": "MarkdownTextInputDecoratorComponentView"
+      }
     }
   }
 }
