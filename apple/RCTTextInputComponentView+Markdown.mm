@@ -44,6 +44,16 @@ using namespace expensify::livemarkdown;
 
   // Call the original method
   [self markdown__setAttributedString:attributedString];
+  
+  if (markdownUtils != nil && backedTextInputView != nil) {
+    // After adding a newline at the end of the blockquote, the typing attributes in the next line still contain
+    // NSParagraphStyle with non-zero firstLineHeadIndent and headIntent added by `_updateTypingAttributes` call.
+    // This causes the cursor to be shifted to the right instead of being located at the beginning of the line.
+    // The following code removes NSParagraphStyle from typing attributes to fix the position of the cursor.
+    NSMutableDictionary *typingAttributes = [backedTextInputView.typingAttributes mutableCopy];
+    [typingAttributes removeObjectForKey:NSParagraphStyleAttributeName];
+    backedTextInputView.typingAttributes = typingAttributes;
+  }
 }
 
 - (BOOL)markdown__textOf:(NSAttributedString *)newText equals:(NSAttributedString *)oldText
