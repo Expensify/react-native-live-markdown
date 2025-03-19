@@ -57,6 +57,8 @@ using namespace expensify::livemarkdown;
       NSMutableParagraphStyle *mutableParagraphStyle = [typingAttributes[NSParagraphStyleAttributeName] mutableCopy];
       mutableParagraphStyle.firstLineHeadIndent = 0;
       mutableParagraphStyle.headIndent = 0;
+      mutableParagraphStyle.minimumLineHeight = 0;
+      mutableParagraphStyle.maximumLineHeight = 0;
       mutableTypingAttributes[NSParagraphStyleAttributeName] = mutableParagraphStyle;
       backedTextInputView.typingAttributes = mutableTypingAttributes;
     }

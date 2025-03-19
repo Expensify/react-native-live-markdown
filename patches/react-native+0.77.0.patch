@@ -1,0 +1,57 @@
+diff --git a/node_modules/react-native/ReactCommon/react/renderer/textlayoutmanager/platform/ios/react/renderer/textlayoutmanager/RCTAttributedTextUtils.h b/node_modules/react-native/ReactCommon/react/renderer/textlayoutmanager/platform/ios/react/renderer/textlayoutmanager/RCTAttributedTextUtils.h
+index 3427663..903344a 100644
+--- a/node_modules/react-native/ReactCommon/react/renderer/textlayoutmanager/platform/ios/react/renderer/textlayoutmanager/RCTAttributedTextUtils.h
++++ b/node_modules/react-native/ReactCommon/react/renderer/textlayoutmanager/platform/ios/react/renderer/textlayoutmanager/RCTAttributedTextUtils.h
+@@ -41,6 +41,8 @@ NSString *RCTNSStringFromStringApplyingTextTransform(NSString *string, facebook:
+ 
+ void RCTApplyBaselineOffset(NSMutableAttributedString *attributedText);
+ 
++void RCTApplyBaselineOffsetForRange(NSMutableAttributedString *attributedText, NSRange attributedTextRange);
++
+ /*
+  * Whether two `NSAttributedString` lead to the same underlying displayed text, even if they are not strictly equal.
+  * I.e. is one string substitutable for the other when backing a control (which may have some ignorable attributes
+diff --git a/node_modules/react-native/ReactCommon/react/renderer/textlayoutmanager/platform/ios/react/renderer/textlayoutmanager/RCTAttributedTextUtils.mm b/node_modules/react-native/ReactCommon/react/renderer/textlayoutmanager/platform/ios/react/renderer/textlayoutmanager/RCTAttributedTextUtils.mm
+index 1e551e4..04c9d3d 100644
+--- a/node_modules/react-native/ReactCommon/react/renderer/textlayoutmanager/platform/ios/react/renderer/textlayoutmanager/RCTAttributedTextUtils.mm
++++ b/node_modules/react-native/ReactCommon/react/renderer/textlayoutmanager/platform/ios/react/renderer/textlayoutmanager/RCTAttributedTextUtils.mm
+@@ -325,11 +325,20 @@ NSMutableDictionary<NSAttributedStringKey, id> *RCTNSTextAttributesFromTextAttri
+ }
+ 
+ void RCTApplyBaselineOffset(NSMutableAttributedString *attributedText)
++{
++  [attributedText.string enumerateSubstringsInRange:NSMakeRange(0, attributedText.length)
++                                            options:NSStringEnumerationByLines | NSStringEnumerationSubstringNotRequired
++                                         usingBlock:^(NSString * _Nullable substring, NSRange substringRange, NSRange enclosingRange, BOOL * _Nonnull stop) {
++    RCTApplyBaselineOffsetForRange(attributedText, enclosingRange);
++  }];
++}
++
++void RCTApplyBaselineOffsetForRange(NSMutableAttributedString *attributedText, NSRange attributedTextRange)
+ {
+   __block CGFloat maximumLineHeight = 0;
+ 
+   [attributedText enumerateAttribute:NSParagraphStyleAttributeName
+-                             inRange:NSMakeRange(0, attributedText.length)
++                             inRange:attributedTextRange
+                              options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired
+                           usingBlock:^(NSParagraphStyle *paragraphStyle, __unused NSRange range, __unused BOOL *stop) {
+                             if (!paragraphStyle) {
+@@ -347,7 +356,7 @@ void RCTApplyBaselineOffset(NSMutableAttributedString *attributedText)
+   __block CGFloat maximumFontLineHeight = 0;
+ 
+   [attributedText enumerateAttribute:NSFontAttributeName
+-                             inRange:NSMakeRange(0, attributedText.length)
++                             inRange:attributedTextRange
+                              options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired
+                           usingBlock:^(UIFont *font, NSRange range, __unused BOOL *stop) {
+                             if (!font) {
+@@ -365,7 +374,7 @@ void RCTApplyBaselineOffset(NSMutableAttributedString *attributedText)
+ 
+   [attributedText addAttribute:NSBaselineOffsetAttributeName
+                          value:@(baseLineOffset)
+-                         range:NSMakeRange(0, attributedText.length)];
++                         range:attributedTextRange];
+ }
+ 
+ static NSMutableAttributedString *RCTNSAttributedStringFragmentFromFragment(
