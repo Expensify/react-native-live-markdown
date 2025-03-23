@@ -25,18 +25,6 @@ target_link_libraries(
         ${CMAKE_PROJECT_NAME}
         fbjni::fbjni
         ReactAndroid::jsi
+        ReactAndroid::reactnative
         react-native-reanimated::worklets
 )
-
-if (ReactAndroid_VERSION_MINOR GREATER_EQUAL 76)
-  target_link_libraries(${CMAKE_PROJECT_NAME} ReactAndroid::reactnative)
-elseif (ReactAndroid_VERSION_MINOR GREATER_EQUAL 75)
-  target_link_libraries(
-          ${CMAKE_PROJECT_NAME}
-          ReactAndroid::react_nativemodule_core
-          ReactAndroid::reactnativejni
-          ReactAndroid::runtimeexecutor
-  )
-else ()
-  message(FATAL_ERROR "react-native-live-markdown requires react-native 0.75 or newer.")
-endif ()

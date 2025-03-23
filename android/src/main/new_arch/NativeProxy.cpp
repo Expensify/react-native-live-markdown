@@ -6,6 +6,7 @@
 
 #include "NativeProxy.h"
 
+namespace expensify {
 namespace livemarkdown {
 
 using namespace facebook;
@@ -36,3 +37,4 @@ NativeProxy::initHybrid(jni::alias_ref<jhybridobject> jThis) {
 }
 
 } // namespace livemarkdown
+} // namespace expensify

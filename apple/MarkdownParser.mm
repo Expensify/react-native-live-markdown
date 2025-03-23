@@ -1,7 +1,6 @@
 #import "MarkdownParser.h"
 #import <RNLiveMarkdown/MarkdownGlobal.h>
 #import <React/RCTLog.h>
-#import <mutex>
 
 @implementation MarkdownParser {
   NSString *_prevText;
@@ -17,13 +16,18 @@
       return _prevMarkdownRanges;
     }
 
-    static std::mutex workletRuntimeMutex; // this needs to be global since the worklet runtime is also global
-    const auto lock = std::lock_guard<std::mutex>(workletRuntimeMutex);
-
     const auto &markdownRuntime = expensify::livemarkdown::getMarkdownRuntime();
     jsi::Runtime &rt = markdownRuntime->getJSIRuntime();
 
-    const auto &markdownWorklet = expensify::livemarkdown::getMarkdownWorklet([parserId intValue]);
+    std::shared_ptr<ShareableWorklet> markdownWorklet;
+    try {
+      markdownWorklet = expensify::livemarkdown::getMarkdownWorklet([parserId intValue]);
+    } catch (const std::out_of_range &error) {
+      _prevText = text;
+      _prevParserId = parserId;
+      _prevMarkdownRanges = @[];
+      return _prevMarkdownRanges;
+    }
 
     const auto &input = jsi::String::createFromUtf8(rt, [text UTF8String]);
 

@@ -37,14 +37,17 @@ interface MarkdownStyle {
   mentionHere: {
     color: ColorValue;
     backgroundColor: ColorValue;
+    borderRadius?: Float;
   };
   mentionUser: {
     color: ColorValue;
     backgroundColor: ColorValue;
+    borderRadius?: Float;
   };
   mentionReport: {
     color: ColorValue;
     backgroundColor: ColorValue;
+    borderRadius?: Float;
   };
   inlineImage: {
     minWidth: Float;
