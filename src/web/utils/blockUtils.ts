@@ -4,8 +4,9 @@ import type {PartialMarkdownStyle} from '../../styleUtils';
 import {addInlineImagePreview} from '../inputElements/inlineImage';
 import type {NodeType, TreeNode} from './treeUtils';
 
-function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownStyle: PartialMarkdownStyle) {
+function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownStyle: PartialMarkdownStyle, isMultiline = true) {
   const node = targetElement;
+
   switch (type) {
     case 'line':
       Object.assign(node.style, {
@@ -26,7 +27,13 @@ function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownSty
       node.style.textDecoration = 'line-through';
       break;
     case 'emoji':
-      Object.assign(node.style, {...markdownStyle.emoji, verticalAlign: 'middle'});
+      Object.assign(node.style, {
+        ...markdownStyle.emoji,
+        verticalAlign: 'middle',
+        fontStyle: 'normal', // remove italic
+        textDecoration: 'none', // remove strikethrough
+        display: 'inline-block',
+      });
       break;
     case 'mention-here':
       Object.assign(node.style, markdownStyle.mentionHere);
@@ -73,6 +80,14 @@ function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownSty
         padding: '0',
         position: 'relative',
       });
+      break;
+    case 'text':
+      if (!isMultiline && targetElement.parentElement?.style) {
+        // Move text background styles from parent to the text node
+        const parentElement = targetElement.parentElement;
+        node.style.cssText = parentElement.style.cssText;
+        parentElement.style.cssText = '';
+      }
       break;
     default:
       break;

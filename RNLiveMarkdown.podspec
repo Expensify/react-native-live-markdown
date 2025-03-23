@@ -36,18 +36,11 @@ Pod::Spec.new do |s|
 
   install_modules_dependencies(s)
 
-  if ENV['USE_FRAMEWORKS'] != nil && ENV['RCT_NEW_ARCH_ENABLED'] == '1'
+  if ENV['USE_FRAMEWORKS'] != nil
     add_dependency(s, "React-FabricComponents", :additional_framework_paths => [
       "react/renderer/textlayoutmanager/platform/ios",
       "react/renderer/components/textinput/platform/ios",
     ])
     add_dependency(s, "React-rendererconsistency")
-  end
-
-  if ENV['RCT_NEW_ARCH_ENABLED'] == '1'
-    s.subspec "newarch" do |ss|
-      ss.source_files         = "cpp/**/*.{cpp,h}"
-      ss.header_dir           = "RNLiveMarkdown"
-    end
   end
 end
