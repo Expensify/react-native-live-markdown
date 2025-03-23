@@ -1,5 +1,4 @@
 #pragma once
-#ifdef RCT_NEW_ARCH_ENABLED
 
 #include <react/renderer/components/iostextinput/TextInputShadowNode.h>
 #include <react/renderer/uimanager/UIManager.h>
@@ -45,5 +44,3 @@ private:
 
 } // namespace livemarkdown
 } // namespace expensify
-
-#endif // RCT_NEW_ARCH_ENABLED
