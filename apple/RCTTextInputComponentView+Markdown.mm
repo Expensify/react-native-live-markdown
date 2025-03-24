@@ -7,12 +7,6 @@
 
 - (void)setMarkdownUtils:(RCTMarkdownUtils *)markdownUtils {
   objc_setAssociatedObject(self, @selector(getMarkdownUtils), markdownUtils, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-
-  if (markdownUtils != nil) {
-    // force Markdown formatting on first render because `_setAttributedText` is called before `setMarkdownUtils`
-    RCTUITextField *backedTextInputView = [self getBackedTextInputView];
-    backedTextInputView.attributedText = [markdownUtils parseMarkdown:backedTextInputView.attributedText withDefaultTextAttributes:backedTextInputView.defaultTextAttributes];
-  }
 }
 
 - (RCTMarkdownUtils *)getMarkdownUtils {
