@@ -11,4 +11,6 @@ const parseExpensiMarkMock: typeof parseExpensiMark = () => {
   return [];
 };
 
-export {MarkdownTextInput, parseExpensiMarkMock as parseExpensiMark};
+const getWorkletRuntimeMock = () => ({});
+
+export {MarkdownTextInput, parseExpensiMarkMock as parseExpensiMark, getWorkletRuntimeMock as getWorkletRuntime};

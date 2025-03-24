@@ -34,6 +34,23 @@
 
   // Call the original method
   [self markdown__setAttributedString:attributedString];
+  
+  if (markdownUtils != nil && backedTextInputView != nil) {
+    // After adding a newline at the end of the blockquote, the typing attributes in the next line still contain
+    // NSParagraphStyle with non-zero firstLineHeadIndent and headIntent added by `_updateTypingAttributes` call.
+    // This causes the cursor to be shifted to the right instead of being located at the beginning of the line.
+    // The following code resets firstLineHeadIndent and headIndent in NSParagraphStyle in typing attributes
+    // in order to fix the position of the cursor.
+    NSDictionary<NSAttributedStringKey, id> *typingAttributes = backedTextInputView.typingAttributes;
+    if (typingAttributes[NSParagraphStyleAttributeName] != nil) {
+      NSMutableDictionary *mutableTypingAttributes = [typingAttributes mutableCopy];
+      NSMutableParagraphStyle *mutableParagraphStyle = [typingAttributes[NSParagraphStyleAttributeName] mutableCopy];
+      mutableParagraphStyle.firstLineHeadIndent = 0;
+      mutableParagraphStyle.headIndent = 0;
+      mutableTypingAttributes[NSParagraphStyleAttributeName] = mutableParagraphStyle;
+      backedTextInputView.typingAttributes = mutableTypingAttributes;
+    }
+  }
 }
 
 - (BOOL)markdown__textOf:(NSAttributedString *)newText equals:(NSAttributedString *)oldText
