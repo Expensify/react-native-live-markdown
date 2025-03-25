@@ -115,26 +115,23 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
   }, [parserId]);
 
   return (
-    <>
+    <MarkdownTextInputDecoratorViewNativeComponent
+      style={styles.displayContents}
+      markdownStyle={markdownStyle}
+      parserId={parserId}
+      key={String(props.multiline)} // force remount on multiline change
+    >
       <TextInput
         {...props}
         ref={ref}
       />
-      <MarkdownTextInputDecoratorViewNativeComponent
-        style={styles.farAway}
-        markdownStyle={markdownStyle}
-        parserId={parserId}
-        key={String(props.multiline)} // force remount on multiline change
-      />
-    </>
+    </MarkdownTextInputDecoratorViewNativeComponent>
   );
 });
 
 const styles = StyleSheet.create({
-  farAway: {
-    position: 'absolute',
-    top: 1e8,
-    left: 1e8,
+  displayContents: {
+    display: 'contents',
   },
 });
 

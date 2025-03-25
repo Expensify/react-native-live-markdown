@@ -7,7 +7,6 @@
 
 #import <RNLiveMarkdown/MarkdownBackedTextInputDelegate.h>
 #import <RNLiveMarkdown/MarkdownLayoutManager.h>
-#import <RNLiveMarkdown/MarkdownShadowFamilyRegistry.h>
 #import <RNLiveMarkdown/MarkdownTextFieldObserver.h>
 #import <RNLiveMarkdown/MarkdownTextInputDecoratorComponentView.h>
 #import <RNLiveMarkdown/MarkdownTextInputDecoratorViewComponentDescriptor.h>
@@ -27,7 +26,6 @@ using namespace facebook::react;
   MarkdownTextFieldObserver *_markdownTextFieldObserver;
   __weak RCTUITextView *_textView;
   __weak RCTUITextField *_textField;
-  ShadowNodeFamily::Shared _decoratorFamily;
 }
 
 + (ComponentDescriptorProvider)componentDescriptorProvider
@@ -51,44 +49,13 @@ using namespace facebook::react;
   return self;
 }
 
-- (void)updateState:(const facebook::react::State::Shared &)state oldState:(const facebook::react::State::Shared &)oldState
+- (void)didAddSubview:(UIView *)subview
 {
-    auto data = std::static_pointer_cast<MarkdownTextInputDecoratorShadowNode::ConcreteState const>(state)->getData();
-
-    if (_decoratorFamily != nullptr) {
-        MarkdownShadowFamilyRegistry::unregisterFamilyForUpdates(_decoratorFamily);
-    }
-
-    _decoratorFamily = data.decoratorFamily;
-    MarkdownShadowFamilyRegistry::registerFamilyForUpdates(_decoratorFamily);
-}
-
-- (void)willMoveToSuperview:(UIView *)newSuperview {
-    if (newSuperview == nil) {
-        MarkdownShadowFamilyRegistry::unregisterFamilyForUpdates(_decoratorFamily);
-      _decoratorFamily = nullptr;
-    }
-
-    [super willMoveToSuperview:newSuperview];
-}
-
-- (void)didMoveToWindow {
-  if (self.superview == nil) {
-    return;
-  }
-
-  NSArray *viewsArray = self.superview.subviews;
-  NSUInteger currentIndex = [viewsArray indexOfObject:self];
-
-  react_native_assert(currentIndex != 0 && currentIndex != NSNotFound && "Error while finding current component.");
-  UIView *view = [viewsArray objectAtIndex:currentIndex - 1];
-
-  react_native_assert([view isKindOfClass:[RCTTextInputComponentView class]] && "Previous sibling component is not an instance of RCTTextInputComponentView.");
-  RCTTextInputComponentView *textInputComponentView = (RCTTextInputComponentView *)view;
+  react_native_assert([subview isKindOfClass:[RCTTextInputComponentView class]] && "Child component of MarkdownTextInputDecoratorComponentView is not an instance of RCTTextInputComponentView.");
+  RCTTextInputComponentView *textInputComponentView = (RCTTextInputComponentView *)subview;
   UIView<RCTBackedTextInputViewProtocol> *backedTextInputView = [textInputComponentView valueForKey:@"_backedTextInputView"];
 
   _markdownUtils = [[RCTMarkdownUtils alloc] init];
-  react_native_assert(_markdownStyle != nil);
   [_markdownUtils setMarkdownStyle:_markdownStyle];
   [_markdownUtils setParserId:_parserId];
 
@@ -147,6 +114,9 @@ using namespace facebook::react;
 
 - (void)willMoveToWindow:(UIWindow *)newWindow
 {
+  if (newWindow != nil) {
+    return;
+  }
   if (_textView != nil) {
     if (_textView.layoutManager != nil && [object_getClass(_textView.layoutManager) isEqual:[MarkdownLayoutManager class]]) {
       [_textView.layoutManager setValue:nil forKey:@"markdownUtils"];

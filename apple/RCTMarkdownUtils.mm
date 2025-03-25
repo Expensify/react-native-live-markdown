@@ -20,6 +20,12 @@
 - (void)applyMarkdownFormatting:(nonnull NSMutableAttributedString *)attributedString
       withDefaultTextAttributes:(nonnull NSDictionary<NSAttributedStringKey, id> *)defaultTextAttributes
 {
+  // `_markdownStyle` and `_parserId` may not be initialized immediately due to the order of mount instructions
+  // props update will be executed after the view hierarchy is initialized.
+  if (_markdownStyle == nil || _parserId == nil) {
+    return;
+  }
+
   NSArray<MarkdownRange *> *markdownRanges = [_markdownParser parse:attributedString.string withParserId:_parserId];
 
   [_markdownFormatter formatAttributedString:attributedString
