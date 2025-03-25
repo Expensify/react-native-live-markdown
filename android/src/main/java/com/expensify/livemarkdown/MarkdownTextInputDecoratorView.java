@@ -1,32 +1,20 @@
 package com.expensify.livemarkdown;
 
-import androidx.annotation.Nullable;
-
 import android.content.Context;
 import android.text.Editable;
 import android.text.SpannableStringBuilder;
 import android.text.TextWatcher;
-import android.util.AttributeSet;
 
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewParent;
 
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.views.textinput.ReactEditText;
+import com.facebook.react.views.view.ReactViewGroup;
 
-public class MarkdownTextInputDecoratorView extends View {
+public class MarkdownTextInputDecoratorView extends ReactViewGroup {
 
   public MarkdownTextInputDecoratorView(Context context) {
     super(context);
-  }
-
-  public MarkdownTextInputDecoratorView(Context context, @Nullable AttributeSet attrs) {
-    super(context, attrs);
-  }
-
-  public MarkdownTextInputDecoratorView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
-    super(context, attrs, defStyleAttr);
   }
 
   private MarkdownStyle mMarkdownStyle;
@@ -43,23 +31,12 @@ public class MarkdownTextInputDecoratorView extends View {
   protected void onAttachedToWindow() {
     super.onAttachedToWindow();
 
-    View previousSibling = null;
-    final ViewParent parent = this.getParent();
-    if (parent instanceof ViewGroup) {
-      final ViewGroup viewGroup = (ViewGroup) parent;
-      for (int i = 1; i < viewGroup.getChildCount(); i++) {
-        if (viewGroup.getChildAt(i) == this) {
-          previousSibling = viewGroup.getChildAt(i - 1);
-          break;
-        }
-      }
-    }
-
-    if (previousSibling instanceof ReactEditText) {
+    View child = getChildAt(0);
+    if (child instanceof ReactEditText) {
       mMarkdownUtils = new MarkdownUtils((ReactContext) getContext());
       mMarkdownUtils.setMarkdownStyle(mMarkdownStyle);
       mMarkdownUtils.setParserId(mParserId);
-      mReactEditText = (ReactEditText) previousSibling;
+      mReactEditText = (ReactEditText) child;
       mTextWatcher = new MarkdownTextWatcher(mMarkdownUtils);
       mReactEditText.addTextChangedListener(mTextWatcher);
       applyNewStyles();
