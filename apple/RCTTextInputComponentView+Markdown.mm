@@ -3,20 +3,10 @@
 #import <React/RCTUITextField.h>
 #import <objc/message.h>
 
-#import "MarkdownShadowFamilyRegistry.h"
-
-using namespace expensify::livemarkdown;
-
 @implementation RCTTextInputComponentView (Markdown)
 
 - (void)setMarkdownUtils:(RCTMarkdownUtils *)markdownUtils {
   objc_setAssociatedObject(self, @selector(getMarkdownUtils), markdownUtils, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-
-  if (markdownUtils != nil) {
-    // force Markdown formatting on first render because `_setAttributedText` is called before `setMarkdownUtils`
-    RCTUITextField *backedTextInputView = [self getBackedTextInputView];
-    backedTextInputView.attributedText = [markdownUtils parseMarkdown:backedTextInputView.attributedText withDefaultTextAttributes:backedTextInputView.defaultTextAttributes];
-  }
 }
 
 - (RCTMarkdownUtils *)getMarkdownUtils {
@@ -34,12 +24,6 @@ using namespace expensify::livemarkdown;
   RCTUITextField *backedTextInputView = [self getBackedTextInputView];
   if (markdownUtils != nil && backedTextInputView != nil) {
     attributedString = [markdownUtils parseMarkdown:attributedString withDefaultTextAttributes:backedTextInputView.defaultTextAttributes];
-  } else {
-    // If markdownUtils is undefined, the text input hasn't been mounted yet. It will
-    // update its state with the unformatted attributed string, we want to prevent displaying
-    // this state by applying markdown in the commit hook where we can read markdown styles
-    // from decorator props.
-    MarkdownShadowFamilyRegistry::forceNextStateUpdate((facebook::react::Tag)self.tag);
   }
 
   // Call the original method
