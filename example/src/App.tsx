@@ -1,6 +1,5 @@
 import * as React from 'react';
-import {Button, StyleSheet, Text} from 'react-native';
-import Animated from 'react-native-reanimated';
+import {Button, StyleSheet, Text, View} from 'react-native';
 import {
   MarkdownTextInput,
   parseExpensiMark,
@@ -39,12 +38,7 @@ export default function App() {
   const ref = React.useRef<MarkdownTextInput>(null);
 
   return (
-    // This is a workaround that ensures that `ReanimatedCommitHook` is registered before `MarkdownCommitHook`.
-    // Otherwise, `ReanimatedCommitHook` will cause `AndroidTextInputShadowNode` to be cloned
-    // and `AndroidTextInputComponentDescriptor` will overwrite a custom `TextLayoutManager` with the default one,
-    // leading to incorrect height of `MarkdownTextInput` component.
-    // We don't need this workaround in New Expensify App since Reanimated is imported before Live Markdown.
-    <Animated.View style={styles.container}>
+    <View style={styles.container}>
       <PlatformInfo />
       <MarkdownTextInput
         multiline
@@ -143,7 +137,7 @@ export default function App() {
           setSelection({start: 0, end: 20});
         }}
       />
-    </Animated.View>
+    </View>
   );
 }
 
