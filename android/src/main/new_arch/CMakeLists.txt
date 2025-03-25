@@ -11,7 +11,7 @@ set(LIB_CUSTOM_SOURCES_DIR ${LIB_CPP_DIR}/react/renderer/components/${LIB_LITERA
 set(LIB_ANDROID_GENERATED_JNI_DIR ${LIB_ANDROID_DIR}/build/generated/source/codegen/jni)
 set(LIB_ANDROID_GENERATED_COMPONENTS_DIR ${LIB_ANDROID_GENERATED_JNI_DIR}/react/renderer/components/${LIB_LITERAL})
 
-file(GLOB LIB_MODULE_SRCS CONFIGURE_DEPENDS *.cpp)
+file(GLOB LIB_MODULE_SRCS CONFIGURE_DEPENDS *.cpp react/renderer/components/RNLiveMarkdownSpec/*.cpp)
 file(GLOB LIB_CUSTOM_SRCS CONFIGURE_DEPENDS ${LIB_CUSTOM_SOURCES_DIR}/*.cpp)
 file(GLOB LIB_CODEGEN_SRCS CONFIGURE_DEPENDS ${LIB_ANDROID_GENERATED_COMPONENTS_DIR}/*.cpp)
 
@@ -27,6 +27,7 @@ target_include_directories(
         ${LIB_TARGET_NAME}
         PUBLIC
         .
+        ./react/renderer/components/RNLiveMarkdownSpec
         ${LIB_ANDROID_GENERATED_JNI_DIR}
         ${LIB_ANDROID_GENERATED_COMPONENTS_DIR}
         ${LIB_CPP_DIR}
