@@ -23,7 +23,7 @@
     try {
       markdownWorklet = expensify::livemarkdown::getMarkdownWorklet([parserId intValue]);
     } catch (const std::out_of_range &error) {
-      _prevText = text;
+      _prevText = [NSString stringWithString:text];
       _prevParserId = parserId;
       _prevMarkdownRanges = @[];
       return _prevMarkdownRanges;
