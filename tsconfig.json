@@ -2,14 +2,19 @@
   "compilerOptions": {
     "rootDir": ".",
     "paths": {
-      "@expensify/react-native-live-markdown": ["./src/index"]
+      "@expensify/react-native-live-markdown": [
+        "./src/index"
+      ]
     },
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "jsx": "react",
-    "lib": ["esnext", "dom"],
+    "lib": [
+      "esnext",
+      "dom"
+    ],
     "module": "esnext",
     "moduleResolution": "node",
     "noFallthroughCasesInSwitch": true,
@@ -24,8 +29,19 @@
     "strict": true,
     "target": "esnext",
     "verbatimModuleSyntax": true,
-    "typeRoots": ["node_modules/@types"]
+    "typeRoots": [
+      "node_modules/@types"
+    ]
   },
-  "include": ["src/**/*", "mock/**/*"],
-  "exclude": ["**/node_modules/**/*", "**/lib/**/*", "example/src/**/*", "WebExample/**/*"]
+  "include": [
+    "src/**/*",
+    "mock/**/*"
+  ],
+  "exclude": [
+    "**/node_modules/**/*",
+    "**/lib/**/*",
+    "example/src/**/*",
+    "WebExample/**/*"
+  ],
+  "extends": "expo/tsconfig.base"
 }
