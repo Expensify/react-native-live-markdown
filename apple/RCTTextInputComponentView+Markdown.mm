@@ -14,7 +14,7 @@
 }
 
 - (RCTUITextView *)getBackedTextInputView {
-  RCTUITextView *backedTextInputView = [self valueForKey:@"wView"];
+  RCTUITextView *backedTextInputView = [self valueForKey:@"_backedTextInputView"];
   return backedTextInputView;
 }
 
