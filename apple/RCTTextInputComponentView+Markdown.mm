@@ -13,15 +13,10 @@
   return objc_getAssociatedObject(self, @selector(getMarkdownUtils));
 }
 
-- (RCTUITextView *)getBackedTextInputView {
-  RCTUITextView *backedTextInputView = [self valueForKey:@"_backedTextInputView"];
-  return backedTextInputView;
-}
-
 - (void)markdown__setAttributedString:(NSAttributedString *)attributedString
 {
   RCTMarkdownUtils *markdownUtils = [self getMarkdownUtils];
-  RCTUITextView *backedTextInputView = [self getBackedTextInputView];
+  RCTUITextView *backedTextInputView = [self valueForKey:@"_backedTextInputView"];
   if (markdownUtils != nil && backedTextInputView != nil) {
     attributedString = [markdownUtils parseMarkdown:attributedString withDefaultTextAttributes:backedTextInputView.defaultTextAttributes];
   }
