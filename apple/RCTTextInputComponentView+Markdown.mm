@@ -1,6 +1,6 @@
 #import <RNLiveMarkdown/RCTTextInputComponentView+Markdown.h>
 #import <RNLiveMarkdown/RCTMarkdownUtils.h>
-#import <React/RCTUITextField.h>
+#import <React/RCTUITextView.h>
 #import <objc/message.h>
 
 @implementation RCTTextInputComponentView (Markdown)
@@ -13,15 +13,15 @@
   return objc_getAssociatedObject(self, @selector(getMarkdownUtils));
 }
 
-- (RCTUITextField *)getBackedTextInputView {
-  RCTUITextField *backedTextInputView = [self valueForKey:@"_backedTextInputView"];
+- (RCTUITextView *)getBackedTextInputView {
+  RCTUITextView *backedTextInputView = [self valueForKey:@"wView"];
   return backedTextInputView;
 }
 
 - (void)markdown__setAttributedString:(NSAttributedString *)attributedString
 {
   RCTMarkdownUtils *markdownUtils = [self getMarkdownUtils];
-  RCTUITextField *backedTextInputView = [self getBackedTextInputView];
+  RCTUITextView *backedTextInputView = [self getBackedTextInputView];
   if (markdownUtils != nil && backedTextInputView != nil) {
     attributedString = [markdownUtils parseMarkdown:attributedString withDefaultTextAttributes:backedTextInputView.defaultTextAttributes];
   }
