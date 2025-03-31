@@ -31,8 +31,10 @@ void MarkdownTextInputDecoratorShadowNode::createCustomContextContainer() {
               "create");
 
   const auto &rawProps = this->getProps()->rawProps;
-  const auto &markdownStyle = rawProps["markdownStyle"];
-  const auto parserId = rawProps["parserId"].asInt();
+  const auto &markdownStyleIt = rawProps.find("markdownStyle");
+  const auto &markdownStyle = markdownStyleIt != rawProps.items().end() ? markdownStyleIt->second : previousMarkdownStyle_;
+  const auto &parserIdIt = rawProps.find("parserId");
+  const auto parserId = parserIdIt != rawProps.items().end() ? parserIdIt->second.asInt() : previousParserId_;
 
   const auto decoratorPropsRNM =
       ReadableNativeMap::newObjectCxxArgs(markdownStyle);
@@ -56,12 +58,14 @@ void MarkdownTextInputDecoratorShadowNode::createCustomContextContainer() {
 }
 
 void MarkdownTextInputDecoratorShadowNode::updateCustomContextContainerIfNeeded() {
-  const auto markdownStyle =
-      this->getProps()->rawProps["markdownStyle"];
-  const auto parserId =
-      this->getProps()->rawProps["parserId"].asInt();
-
-  if (parserId != previousParserId_ || markdownStyle != previousMarkdownStyle_) {
+  const auto &rawProps = this->getProps()->rawProps;
+  const auto &markdownStyleIt = rawProps.find("markdownStyle");
+  if (markdownStyleIt != rawProps.items().end() && markdownStyleIt->second != previousMarkdownStyle_) {
+    createCustomContextContainer();
+    return;
+  }
+  const auto &parserIdIt = rawProps.find("parserId");
+  if (parserIdIt != rawProps.items().end() && parserIdIt->second.asInt() != previousParserId_) {
     createCustomContextContainer();
   }
 }
