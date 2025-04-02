@@ -11,7 +11,7 @@ module.exports = function (api) {
         {
           extensions: ['.tsx', '.ts', '.js', '.json'],
           alias: {
-            react: path.join(__dirname, 'node_modules', 'react'),
+            react: path.join(__dirname, '..', 'node_modules', 'react'),
             'react-native': path.join(__dirname, '..', 'node_modules', 'react-native-web'),
             [pak.name]: path.join(__dirname, '..', pak.source),
           },
