@@ -39,7 +39,7 @@ void MarkdownTextInputDecoratorShadowNode::overwriteMeasureCallbackConnector() {
       child != nullptr &&
       "MarkdownTextInputDecoratorView received child other than a TextInput");
   child->ensureUnsealed();
-  
+
   // This is obviously not correct, but since both MarkdownTextInputDecoratorShadowNode and
   // TextInputShadowNode inherit from YogaLayoutableShadowNode by doing this cast it's
   // possible to access protected members from TextInputShadowNode like yogaNode_.
@@ -47,7 +47,7 @@ void MarkdownTextInputDecoratorShadowNode::overwriteMeasureCallbackConnector() {
   // since the vtable should be the same between them.
   const auto &nodeWithAccessibleYogaNode =
       std::reinterpret_pointer_cast<const MarkdownTextInputDecoratorShadowNode>(child);
-  
+
   // decorator node cannot have a measure function since it's not a leaf node
   // but we can redirect measuring of the child input to call measureContent
   // on the decorator
@@ -88,7 +88,9 @@ Size MarkdownTextInputDecoratorShadowNode::measureContent(
       std::const_pointer_cast<TextInputShadowNode>(child);
   applyMarkdownFormattingToTextInputState(mutableChild, layoutContext);
 
-  return child->measureContent(layoutContext, layoutConstraints);
+  const auto childWithMeasureContentAccess =
+      std::static_pointer_cast<const YogaLayoutableShadowNode>(child);
+  return childWithMeasureContentAccess->measureContent(layoutContext, layoutConstraints);
 }
 
 void MarkdownTextInputDecoratorShadowNode::layout(LayoutContext layoutContext) {
