@@ -1,3 +1,4 @@
+import {InteractionManager} from 'react-native';
 import type {HTMLMarkdownElement, MarkdownTextInputElement} from '../../MarkdownTextInput.web';
 import {addNodeToTree, createRootTreeNode, updateTreeElementRefs} from './treeUtils';
 import type {NodeType, TreeNode} from './treeUtils';
@@ -297,18 +298,20 @@ function updateInputStructure(
   if (text) {
     const {dom, tree} = parseRangesToHTMLNodes(text, markdownRanges, isMultiline, markdownStyle, false, targetElement, inlineImagesProps);
 
-    if (shouldForceDOMUpdate || targetElement.innerHTML !== dom.innerHTML) {
-      const animationTimes = getAnimationCurrentTimes(targetElement);
-      targetElement.innerHTML = '';
-      targetElement.innerText = '';
-      targetElement.innerHTML = dom.innerHTML;
-      updateAnimationsTime(targetElement, animationTimes);
-    }
+    InteractionManager.runAfterInteractions(() => {
+      if (shouldForceDOMUpdate || targetElement.innerHTML !== dom.innerHTML) {
+        const animationTimes = getAnimationCurrentTimes(targetElement);
+        targetElement.innerHTML = '';
+        targetElement.innerText = '';
+        targetElement.innerHTML = dom.innerHTML;
+        updateAnimationsTime(targetElement, animationTimes);
+      }
 
-    updateTreeElementRefs(tree, targetElement);
-    targetElement.tree = tree;
+      updateTreeElementRefs(tree, targetElement);
+      targetElement.tree = tree;
 
-    moveCursor(isFocused, alwaysMoveCursorToTheEnd, cursorPosition, targetElement, shouldScrollIntoView);
+      moveCursor(isFocused, alwaysMoveCursorToTheEnd, cursorPosition, targetElement, shouldScrollIntoView);
+    });
   } else {
     targetElement.tree = createRootTreeNode(targetElement);
   }
