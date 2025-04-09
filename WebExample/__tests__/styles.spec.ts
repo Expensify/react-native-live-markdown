@@ -32,11 +32,20 @@ test.describe('markdown content styling', () => {
   });
 
   test('inline code', async ({page}) => {
-    await testMarkdownContentStyle({testContent: 'inline code', style: 'font-family: monospace; font-size: 20px; color: black; background-color: lightgray;', page});
+    await testMarkdownContentStyle({
+      testContent: 'inline code',
+      style:
+        'font-family: monospace; font-size: 20px; color: black; background-color: lightgray; border-color: gray; border-width: 1px; border-radius: 4px; border-style: solid; padding: 0px; line-height: 1.5;',
+      page,
+    });
   });
 
   test('codeblock', async ({page}) => {
-    await testMarkdownContentStyle({testContent: 'codeblock', style: 'font-family: monospace; font-size: 20px; color: black; background-color: lightgray;', page});
+    await testMarkdownContentStyle({
+      testContent: 'codeblock',
+      style: 'border-color: gray; border-radius: 4px; padding: 0px; font-family: monospace; font-size: 20px; color: black; background-color: transparent;',
+      page,
+    });
   });
 
   test('mention-here', async ({page}) => {
