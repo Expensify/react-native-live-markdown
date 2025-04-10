@@ -16,7 +16,7 @@
     "expo-status-bar": "2.0.2-canary-20250306-d9d3e02",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-native": "0.78.0",
+    "react-native": "0.78.2",
     "react-native-web": "~0.20.0"
   },
   "devDependencies": {
