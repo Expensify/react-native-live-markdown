@@ -3,6 +3,7 @@ import {addNodeToTree, createRootTreeNode, updateTreeElementRefs} from './treeUt
 import type {NodeType, TreeNode} from './treeUtils';
 import type {PartialMarkdownStyle} from '../../styleUtils';
 import {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition} from './cursorUtils';
+import {handleCustomStyles} from './webStyleUtils';
 import {addStyleToBlock, extendBlockStructure, getFirstBlockMarkdownRange, isBlockMarkdownType} from './blockUtils';
 import type {InlineImagesInputProps, MarkdownRange} from '../../commonTypes';
 import {getAnimationCurrentTimes, updateAnimationsTime} from './animationUtils';
@@ -212,12 +213,11 @@ function parseRangesToHTMLNodes(
       // create markdown span element
       const span = document.createElement('span') as HTMLMarkdownElement;
       span.setAttribute('data-type', range.type);
+      const spanNode = appendNode(span, currentParentNode, range.type, range.length);
 
       if (!disableInlineStyles) {
         addStyleToBlock(span, range.type, markdownStyle, isMultiline);
       }
-
-      const spanNode = appendNode(span, currentParentNode, range.type, range.length);
 
       if (isMultiline && !disableInlineStyles && currentInput) {
         currentParentNode = extendBlockStructure(currentInput, currentParentNode, range, lineMarkdownRanges, text, markdownStyle, inlineImagesProps);
@@ -297,7 +297,7 @@ function updateInputStructure(
   if (text) {
     const {dom, tree} = parseRangesToHTMLNodes(text, markdownRanges, isMultiline, markdownStyle, false, targetElement, inlineImagesProps);
 
-    if (shouldForceDOMUpdate || targetElement.innerHTML !== dom.innerHTML) {
+    if (shouldForceDOMUpdate || targetElement.innerHTML.replaceAll(/ data-content="([^"]*)"/g, '') !== dom.innerHTML) {
       const animationTimes = getAnimationCurrentTimes(targetElement);
       targetElement.innerHTML = '';
       targetElement.innerText = '';
@@ -313,6 +313,7 @@ function updateInputStructure(
     targetElement.tree = createRootTreeNode(targetElement);
   }
 
+  handleCustomStyles(target, markdownStyle);
   return {text, cursorPosition: cursorPosition || 0};
 }
 
