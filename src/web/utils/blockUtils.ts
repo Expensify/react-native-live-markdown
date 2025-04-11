@@ -1,10 +1,9 @@
-import type {InlineImagesInputProps, MarkdownType} from '../../commonTypes';
+import type {InlineImagesInputProps, MarkdownRange, MarkdownType} from '../../commonTypes';
 import type {MarkdownTextInputElement} from '../../MarkdownTextInput.web';
 import {parseStringWithUnitToNumber} from '../../styleUtils';
 import type {PartialMarkdownStyle} from '../../styleUtils';
 import {addInlineImagePreview} from '../inputElements/inlineImage';
 import BrowserUtils from './browserUtils';
-import type {MarkdownRange} from './parserUtils';
 import type {NodeType, TreeNode} from './treeUtils';
 
 function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownStyle: PartialMarkdownStyle, isMultiline = true) {
