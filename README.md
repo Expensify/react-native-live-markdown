@@ -183,6 +183,7 @@ Currently, `react-native-live-markdown` supports only [ExpensiMark](https://gith
 
 | react-native | @expensify/react-native-live-markdown |
 | :----------: | :-----------------------------------: |
+|     0.79     |               0.1.260+                |
 |     0.78     |               0.1.260+                |
 |     0.77     |               0.1.235+                |
 |     0.76     |               0.1.141+                |
