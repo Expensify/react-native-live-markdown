@@ -23,7 +23,7 @@
     try {
       markdownWorklet = expensify::livemarkdown::getMarkdownWorklet([parserId intValue]);
     } catch (const std::out_of_range &error) {
-      _prevText = text;
+      _prevText = [NSString stringWithString:text];
       _prevParserId = parserId;
       _prevMarkdownRanges = @[];
       return _prevMarkdownRanges;
@@ -36,7 +36,7 @@
       output = markdownRuntime->runGuarded(markdownWorklet, input);
     } catch (const jsi::JSError &error) {
       // Skip formatting, runGuarded will show the error in LogBox
-      _prevText = text;
+      _prevText = [NSString stringWithString:text];
       _prevParserId = parserId;
       _prevMarkdownRanges = @[];
       return _prevMarkdownRanges;
@@ -62,13 +62,13 @@
       }
     } catch (const jsi::JSError &error) {
       RCTLogWarn(@"[react-native-live-markdown] Incorrect schema of worklet parser output: %s", error.getMessage().c_str());
-      _prevText = text;
+      _prevText = [NSString stringWithString:text];
       _prevParserId = parserId;
       _prevMarkdownRanges = @[];
       return _prevMarkdownRanges;
     }
 
-    _prevText = text;
+    _prevText = [NSString stringWithString:text];
     _prevParserId = parserId;
     _prevMarkdownRanges = markdownRanges;
     return _prevMarkdownRanges;

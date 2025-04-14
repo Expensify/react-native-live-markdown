@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Button, StyleSheet, Text, View} from 'react-native';
+import {Button, ScrollView, StyleSheet, Text} from 'react-native';
 import {
   MarkdownTextInput,
   parseExpensiMark,
@@ -41,7 +41,9 @@ export default function App() {
   const ref = React.useRef<MarkdownTextInput>(null);
 
   return (
-    <View style={styles.container}>
+    <ScrollView
+      contentContainerStyle={styles.container}
+      style={styles.content}>
       <PlatformInfo />
       <MarkdownTextInput
         multiline
@@ -140,14 +142,15 @@ export default function App() {
           setSelection({start: 0, end: 20});
         }}
       />
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     alignItems: 'center',
+  },
+  content: {
     marginTop: 60,
   },
   input: {
