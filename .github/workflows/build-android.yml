@@ -31,10 +31,12 @@ jobs:
       cancel-in-progress: true
     steps:
       - name: Check out Git repository
-        uses: actions/checkout@v4
+        # v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
 
       - name: Setup Java 17
-        uses: actions/setup-java@v4
+        # v4
+        uses: actions/setup-java@3a4f6e1af504cf6a31855fa899c6aa5355ba6c12
         with:
           distribution: 'zulu'
           java-version: 17
