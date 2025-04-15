@@ -1,6 +1,7 @@
 import type {MarkdownTextInputElement} from '../../MarkdownTextInput.web';
 import {parseStringWithUnitToNumber} from '../../styleUtils';
 import type {PartialMarkdownStyle} from '../../styleUtils';
+import {getPropertyValue} from '../utils/webStyleUtils';
 
 type Rule = {selector: string; properties: Record<string, string>};
 
@@ -30,10 +31,6 @@ function addStylesheetRules(rules: Rule[], sheet: CSSStyleSheet) {
     newSheet += `${selector}{${propertiesStr}} `;
   });
   sheet.replaceSync(newSheet);
-}
-
-function getPropertyValue(e: HTMLElement, p: string) {
-  return parseFloat(window.getComputedStyle(e).getPropertyValue(p).replace('px', ''));
 }
 
 function generateCodeBlocksRules(target: MarkdownTextInputElement, markdownStyle: PartialMarkdownStyle): Rule[] {
