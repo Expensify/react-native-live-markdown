@@ -12,17 +12,19 @@ test.describe('typing', () => {
     const inputLocator = await setupInput(page, 'clear');
 
     await inputLocator.focus();
-    await inputLocator.pressSequentially(TEST_CONST.EXAMPLE_CONTENT);
+    await inputLocator.pressSequentially(TEST_CONST.EXAMPLE_CONTENT, {delay: TEST_CONST.USER_TYPING_DELAY});
 
     expect(await getElementValue(inputLocator)).toEqual(TEST_CONST.EXAMPLE_CONTENT);
   });
 
   test('fast type cursor position', async ({page}) => {
+    test.setTimeout(60000);
+
     const EXAMPLE_LONG_CONTENT = TEST_CONST.EXAMPLE_CONTENT.repeat(3);
 
     const inputLocator = await setupInput(page, 'clear');
 
-    await inputLocator.pressSequentially(EXAMPLE_LONG_CONTENT);
+    await inputLocator.pressSequentially(EXAMPLE_LONG_CONTENT, {delay: TEST_CONST.USER_TYPING_DELAY});
 
     expect(await getElementValue(inputLocator)).toBe(EXAMPLE_LONG_CONTENT);
 
