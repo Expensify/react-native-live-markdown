@@ -206,8 +206,8 @@ test('inline code', () => {
 
 test('codeblock', () => {
   expect('```\nHello world!\n```').toBeParsedAs([
-    {type: 'syntax', start: 0, length: 3},
-    {type: 'pre', start: 3, length: 14},
+    {type: 'syntax', start: 0, length: 4},
+    {type: 'pre', start: 4, length: 13},
     {type: 'syntax', start: 17, length: 3},
   ]);
 });

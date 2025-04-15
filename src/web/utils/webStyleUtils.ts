@@ -60,4 +60,10 @@ function* generateUniqueId() {
 
 const idGenerator = generateUniqueId();
 
-export {parseToReactDOMStyle, processMarkdownStyle, idGenerator};
+function configureCustomWebStylesheet(): CSSStyleSheet | null {
+  const sheet = new CSSStyleSheet();
+  document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet];
+  return sheet;
+}
+
+export {parseToReactDOMStyle, processMarkdownStyle, idGenerator, configureCustomWebStylesheet};
