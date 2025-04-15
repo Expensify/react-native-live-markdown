@@ -9,14 +9,6 @@ import type {NodeType, TreeNode} from './treeUtils';
 function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownStyle: PartialMarkdownStyle, isMultiline = true) {
   const node = targetElement;
 
-  const defaultPrePadding = markdownStyle.pre?.padding ?? 2;
-  const preHorizontalPadding = parseStringWithUnitToNumber(markdownStyle.pre?.paddingHorizontal ?? defaultPrePadding).toString();
-  const preVerticalPadding = parseStringWithUnitToNumber(markdownStyle.pre?.paddingVertical ?? defaultPrePadding).toString();
-
-  const defaultCodePadding = markdownStyle.code?.padding ?? 0;
-  const codeHorizontalPadding = parseStringWithUnitToNumber(markdownStyle.code?.paddingHorizontal ?? defaultCodePadding).toString();
-  const codeVerticalPadding = parseStringWithUnitToNumber(markdownStyle.code?.paddingVertical ?? defaultCodePadding).toString();
-
   switch (type) {
     case 'line':
       Object.assign(node.style, {
@@ -61,37 +53,8 @@ function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownSty
       });
       break;
     case 'code':
-      Object.assign(node.style, {
-        ...markdownStyle.code,
-        fontSize: markdownStyle.code?.h1NestedFontSize && isChildOfMarkdownElement(node, 'h1') ? markdownStyle.code.h1NestedFontSize : markdownStyle.code?.fontSize,
-        padding: `${codeVerticalPadding}px ${codeHorizontalPadding}px`,
-        lineHeight: 1.5,
-      });
-      break;
     case 'pre':
-      // In multiline style the pre block using pseudoelements, otherwise default to inline
-      if (isMultiline) {
-        Object.assign(node.style, {
-          ...markdownStyle.pre,
-          backgroundColor: 'transparent',
-          padding: 0,
-        });
-        Object.assign((node.parentNode as HTMLElement).style, {
-          padding: `${preVerticalPadding}px ${preHorizontalPadding}px`,
-          'line-height': BrowserUtils.isMobile ? 1.3 : 'inherit',
-          position: 'relative',
-          width: 'fit-content',
-          maxWidth: '100%',
-          boxSizing: 'border-box',
-          zIndex: 2,
-        });
-      } else {
-        Object.assign(node.style, {
-          ...markdownStyle.code,
-          padding: `${codeVerticalPadding}px ${codeHorizontalPadding}px`,
-          lineHeight: 1.5,
-        });
-      }
+      addCodeBlockStyles(targetElement, type, markdownStyle, isMultiline);
       break;
     case 'blockquote':
       Object.assign(node.style, {
@@ -123,6 +86,56 @@ function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownSty
         const parentElement = targetElement.parentElement;
         node.style.cssText = parentElement.style.cssText;
         parentElement.style.cssText = '';
+      }
+      break;
+    default:
+      break;
+  }
+}
+
+function addCodeBlockStyles(targetElement: HTMLElement, type: NodeType, markdownStyle: PartialMarkdownStyle, isMultiline = true) {
+  const node = targetElement;
+
+  const defaultPrePadding = markdownStyle.pre?.padding ?? 2;
+  const preHorizontalPadding = parseStringWithUnitToNumber(markdownStyle.pre?.paddingHorizontal ?? defaultPrePadding).toString();
+  const preVerticalPadding = parseStringWithUnitToNumber(markdownStyle.pre?.paddingVertical ?? defaultPrePadding).toString();
+
+  const defaultCodePadding = markdownStyle.code?.padding ?? 0;
+  const codeHorizontalPadding = parseStringWithUnitToNumber(markdownStyle.code?.paddingHorizontal ?? defaultCodePadding).toString();
+  const codeVerticalPadding = parseStringWithUnitToNumber(markdownStyle.code?.paddingVertical ?? defaultCodePadding).toString();
+
+  switch (type) {
+    case 'code':
+      Object.assign(node.style, {
+        ...markdownStyle.code,
+        fontSize: markdownStyle.code?.h1NestedFontSize && isChildOfMarkdownElement(node, 'h1') ? markdownStyle.code.h1NestedFontSize : markdownStyle.code?.fontSize,
+        padding: `${codeVerticalPadding}px ${codeHorizontalPadding}px`,
+        lineHeight: 1.5,
+      });
+      break;
+    case 'pre':
+      // In multiline style the pre block using pseudoelements, otherwise default to inline
+      if (isMultiline) {
+        Object.assign(node.style, {
+          ...markdownStyle.pre,
+          backgroundColor: 'transparent',
+          padding: 0,
+        });
+        Object.assign((node.parentNode as HTMLElement).style, {
+          padding: `${preVerticalPadding}px ${preHorizontalPadding}px`,
+          'line-height': BrowserUtils.isMobile ? 1.3 : 'inherit',
+          position: 'relative',
+          width: 'fit-content',
+          maxWidth: '100%',
+          boxSizing: 'border-box',
+          zIndex: 2,
+        });
+      } else {
+        Object.assign(node.style, {
+          ...markdownStyle.code,
+          padding: `${codeVerticalPadding}px ${codeHorizontalPadding}px`,
+          lineHeight: 1.5,
+        });
       }
       break;
     default:

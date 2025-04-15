@@ -21,10 +21,11 @@ import {getCurrentCursorPosition, removeSelection, setCursorPosition} from './we
 import './web/MarkdownTextInput.css';
 import type {MarkdownStyle} from './MarkdownTextInputDecoratorViewNativeComponent';
 import {getElementHeight, getPlaceholderValue, isEventComposing, normalizeValue, parseInnerHTMLToText} from './web/utils/inputUtils';
-import {parseToReactDOMStyle, configureCustomWebStylesheet, handleCustomStyles, idGenerator, processMarkdownStyle} from './web/utils/webStyleUtils';
+import {parseToReactDOMStyle, configureCustomWebStylesheet, idGenerator, processMarkdownStyle} from './web/utils/webStyleUtils';
 import {forceRefreshAllImages} from './web/inputElements/inlineImage';
 import type {PartialMarkdownStyle} from './styleUtils';
 import type {MarkdownRange, InlineImagesInputProps} from './commonTypes';
+import {handleCustomStyles} from './web/inputElements/codeblock';
 
 const useClientEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
 

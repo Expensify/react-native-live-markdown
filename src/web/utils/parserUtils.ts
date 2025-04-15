@@ -4,11 +4,11 @@ import {addNodeToTree, createRootTreeNode, updateTreeElementRefs} from './treeUt
 import type {NodeType, TreeNode} from './treeUtils';
 import type {PartialMarkdownStyle} from '../../styleUtils';
 import {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition} from './cursorUtils';
-import {handleCustomStyles} from './webStyleUtils';
 import {addStyleToBlock, extendBlockStructure, getFirstBlockMarkdownRange, isBlockMarkdownType} from './blockUtils';
 import type {InlineImagesInputProps, MarkdownRange} from '../../commonTypes';
 import {getAnimationCurrentTimes, updateAnimationsTime} from './animationUtils';
 import {sortRanges, ungroupRanges} from '../../rangeUtils';
+import {handleCustomStyles} from '../inputElements/codeblock';
 
 type Paragraph = {
   text: string;
