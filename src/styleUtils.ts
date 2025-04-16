@@ -13,7 +13,7 @@ const FONT_FAMILY_MONOSPACE = Platform.select({
 const FONT_FAMILY_EMOJI = Platform.select({
   ios: 'Apple Color Emoji',
   android: 'Noto Color Emoji',
-  default: 'Apple Color Emoji', // macOS web + Electron
+  default: 'Apple Color Emoji',
 });
 
 function makeDefaultMarkdownStyle(): MarkdownStyle {
