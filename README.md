@@ -78,6 +78,7 @@ const markdownStyle: MarkdownStyle = {
   },
   emoji: {
     fontSize: 20,
+    fontFamily: FONT_FAMILY_EMOJI,
   },
   blockquote: {
     borderColor: 'gray',
