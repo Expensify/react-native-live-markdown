@@ -1,7 +1,5 @@
 #include "MarkdownTextInputDecoratorShadowNode.h"
 
-#include <react/renderer/components/iostextinput/TextInputState.h>
-
 #include <React/RCTUtils.h>
 #include <react/renderer/components/view/conversions.h>
 #include <react/renderer/core/ComponentDescriptor.h>
