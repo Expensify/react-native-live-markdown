@@ -9,9 +9,9 @@
     "start": "react-native start --client-logs"
   },
   "dependencies": {
-    "expensify-common": "2.0.118",
+    "expensify-common": "2.0.134",
     "react": "^19.0.0",
-    "react-native": "0.79.0",
+    "react-native": "0.79.1",
     "react-native-reanimated": "3.17.3"
   },
   "devDependencies": {
@@ -21,10 +21,10 @@
     "@react-native-community/cli": "18.0.0",
     "@react-native-community/cli-platform-android": "18.0.0",
     "@react-native-community/cli-platform-ios": "18.0.0",
-    "@react-native/babel-preset": "0.79.0",
-    "@react-native/eslint-config": "0.79.0",
-    "@react-native/metro-config": "0.79.0",
-    "@react-native/typescript-config": "0.79.0",
+    "@react-native/babel-preset": "0.79.1",
+    "@react-native/eslint-config": "0.79.1",
+    "@react-native/metro-config": "0.79.1",
+    "@react-native/typescript-config": "0.79.1",
     "@types/react": "^19.0.0",
     "@types/react-test-renderer": "^19.0.0",
     "babel-plugin-module-resolver": "^5.0.0",

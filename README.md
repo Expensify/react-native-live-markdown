@@ -179,17 +179,18 @@ Currently, `react-native-live-markdown` supports only [ExpensiMark](https://gith
 
 ## Compatibility
 
-`react-native-live-markdown` supports two latest React Native minor releases with the New Architecture enabled.
+`react-native-live-markdown` supports only latest React Native minor releases with the New Architecture enabled.
 
-| react-native | @expensify/react-native-live-markdown |
-| :----------: | :-----------------------------------: |
-|     0.79     |               0.1.260+                |
-|     0.78     |               0.1.260+                |
-|     0.77     |               0.1.235+                |
-|     0.76     |               0.1.141+                |
-|     0.75     |               0.1.129+                |
-|     0.74     |           0.1.122 – 0.1.128           |
-|     0.73     |           0.1.15 – 0.1.121            |
+| @expensify/react-native-live-markdown | 0.73 | 0.74 | 0.75 | 0.76 | 0.77 | 0.78 | 0.79 |
+| :-----------------------------------: | :--: | :--: | :--: | :--: | :--: | :--: | :--: |
+|               0.1.260+                |  ❌  |  ❌  |  ❌  |  ❌  |  ✅  |  ✅  |  ✅  |
+|           0.1.256 – 0.1.259           |  ❌  |  ❌  |  ❌  |  ❌  |  ✅  |  ❌  |  ❌  |
+|           0.1.248 – 0.1.255           |  ❌  |  ❌  |  ❌  |  ✅  |  ✅  |  ❌  |  ❌  |
+|           0.1.235 – 0.1.247           |  ❌  |  ❌  |  ✅  |  ✅  |  ✅  |  ❌  |  ❌  |
+|           0.1.141 – 0.1.234           |  ❌  |  ❌  |  ✅  |  ✅  |  ❌  |  ❌  |  ❌  |
+|           0.1.129 – 0.1.140           |  ❌  |  ❌  |  ✅  |  ❌  |  ❌  |  ❌  |  ❌  |
+|           0.1.122 – 0.1.128           |  ❌  |  ✅  |  ❌  |  ❌  |  ❌  |  ❌  |  ❌  |
+|           0.1.15 – 0.1.121            |  ✅  |  ❌  |  ❌  |  ❌  |  ❌  |  ❌  |  ❌  |
 
 ## License
 
