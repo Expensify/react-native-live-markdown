@@ -1654,7 +1654,7 @@ PODS:
     - React-logger (= 0.79.1)
     - React-perflogger (= 0.79.1)
     - React-utils (= 0.79.1)
-  - RNLiveMarkdown (0.1.267):
+  - RNLiveMarkdown (0.1.270):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2103,10 +2103,10 @@ SPEC CHECKSUMS:
   ReactAppDependencyProvider: 642d266e12ef5ea8cb22ca9576df1f4e036258a2
   ReactCodegen: bc4c52e5e84a6c9b9d646af077839fc126d8e480
   ReactCommon: aa48e4fddbc6a0afa19dca39a1b6016c150b5db4
-  RNLiveMarkdown: 33023687b14c2fd706bb9320853e93ae01fcaedc
+  RNLiveMarkdown: edbcc52450baccc49b9a7cd42e77e83dcb99a7c6
   RNReanimated: 8011ddcc1f6bc2fc1f27a5ac384d7495829ab6a0
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
-  Yoga: fee373fb83c58550e84555a4e6bdafc34b4c5790
+  Yoga: d15f5aa644c466e917569ac43b19cbf17975239a
 
 PODFILE CHECKSUM: 3f53660915b3f926239de7f89ab29581306a2614
 
