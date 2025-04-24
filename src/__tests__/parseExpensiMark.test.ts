@@ -90,7 +90,10 @@ describe('mention-user', () => {
   });
 
   test('without top-level domain', () => {
-    expect('@mail@mail').toBeParsedAs([]);
+    expect('@mail@mail').toBeParsedAs([
+      {type: 'mention-short', start: 0, length: 5},
+      {type: 'mention-short', start: 5, length: 5},
+    ]);
   });
 
   test('with punctation marks', () => {
