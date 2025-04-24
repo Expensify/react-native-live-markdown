@@ -5,9 +5,9 @@ PODS:
   - FBLazyVector (0.79.1)
   - fmt (11.0.2)
   - glog (0.3.5)
-  - hermes-engine (0.79.0):
-    - hermes-engine/Pre-built (= 0.79.0)
-  - hermes-engine/Pre-built (0.79.0)
+  - hermes-engine (0.79.1):
+    - hermes-engine/Pre-built (= 0.79.1)
+  - hermes-engine/Pre-built (0.79.1)
   - RCT-Folly (2024.11.18.00):
     - boost
     - DoubleConversion
@@ -1654,7 +1654,7 @@ PODS:
     - React-logger (= 0.79.1)
     - React-perflogger (= 0.79.1)
     - React-utils (= 0.79.1)
-  - RNLiveMarkdown (0.1.270):
+  - RNLiveMarkdown (0.1.271):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2040,7 +2040,7 @@ SPEC CHECKSUMS:
   FBLazyVector: abbac80c6f89e71a8c55c7e92ec015c8a9496753
   fmt: a40bb5bd0294ea969aaaba240a927bd33d878cdd
   glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
-  hermes-engine: cd4bd90f051e3658c83cc00e87c603dfe1b75947
+  hermes-engine: c96531e781f1835a2be4bb279cd87eeaad099226
   RCT-Folly: e78785aa9ba2ed998ea4151e314036f6c49e6d82
   RCTDeprecation: 0ada4fb1e5c5637bff940dc40b94e2d3bf96b0ab
   RCTRequired: 76ca80ff10acb3834ed0dacba9645645009578a2
@@ -2053,8 +2053,8 @@ SPEC CHECKSUMS:
   React-debug: 29bd770acc5506c22bde627adcd0b25a4c9db5bb
   React-defaultsnativemodule: 4e6c6c9e6be81e74ef5c0c1065e7bb79b5d405a3
   React-domnativemodule: 4fb2bf30d7687667caad907d77849a3c0a34d62b
-  React-Fabric: 24f23b7c2809bf3eb0eac360e76be359fc792b07
-  React-FabricComponents: b782f3c667008fdb12856b30ad19c04055930751
+  React-Fabric: 60fe3b84b068678879edf693457a3045cd914d28
+  React-FabricComponents: c705c8cc188d17b46c5121b1fb6330db26c5ae83
   React-FabricImage: a58cb067f8a25f66a52e61484f790569b12bed71
   React-featureflags: f7aac85238436b9c5c50056859ff234542fa535a
   React-featureflagsnativemodule: 83299092a3327e4221f964f69b7abb48c2925680
@@ -2103,7 +2103,7 @@ SPEC CHECKSUMS:
   ReactAppDependencyProvider: 642d266e12ef5ea8cb22ca9576df1f4e036258a2
   ReactCodegen: bc4c52e5e84a6c9b9d646af077839fc126d8e480
   ReactCommon: aa48e4fddbc6a0afa19dca39a1b6016c150b5db4
-  RNLiveMarkdown: edbcc52450baccc49b9a7cd42e77e83dcb99a7c6
+  RNLiveMarkdown: 7045926b8a8f34e9db23aa271d48687876668b62
   RNReanimated: 8011ddcc1f6bc2fc1f27a5ac384d7495829ab6a0
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   Yoga: d15f5aa644c466e917569ac43b19cbf17975239a
