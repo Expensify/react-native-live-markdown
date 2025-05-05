@@ -10,6 +10,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) UIColor *linkColor;
 @property (nonatomic) CGFloat h1FontSize;
 @property (nonatomic) CGFloat emojiFontSize;
+@property (nonatomic) NSString *emojiFontFamily;
 @property (nonatomic) UIColor *blockquoteBorderColor;
 @property (nonatomic) CGFloat blockquoteBorderWidth;
 @property (nonatomic) CGFloat blockquoteMarginLeft;
