@@ -91,7 +91,7 @@
                                           variant:nil
                                   scaleMultiplier:0];
     } else if (type == "emoji") {
-      font = [RCTFont updateFont:font withFamily:nil
+      font = [RCTFont updateFont:font withFamily:markdownStyle.emojiFontFamily
                                             size:[NSNumber numberWithFloat:markdownStyle.emojiFontSize]
                                           weight:nil
                                             style:nil
