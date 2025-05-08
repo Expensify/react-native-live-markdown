@@ -5,11 +5,6 @@
 @implementation RCTMarkdownUtils {
   MarkdownParser *_markdownParser;
   MarkdownFormatter *_markdownFormatter;
-  NSString *_prevInputString;
-  NSAttributedString *_prevAttributedString;
-  NSDictionary<NSAttributedStringKey, id> *_prevDefaultTextAttributes;
-  __weak RCTMarkdownStyle *_prevMarkdownStyle;
-  __weak NSNumber *_prevParserId;
 }
 
 - (instancetype)init
@@ -22,39 +17,21 @@
   return self;
 }
 
-- (NSAttributedString *)parseMarkdown:(nullable NSAttributedString *)input
-            withDefaultTextAttributes:(nonnull NSDictionary<NSAttributedStringKey, id> *)defaultTextAttributes
+- (void)applyMarkdownFormatting:(nonnull NSMutableAttributedString *)attributedString
+      withDefaultTextAttributes:(nonnull NSDictionary<NSAttributedStringKey, id> *)defaultTextAttributes
 {
-  @synchronized (self) {
-    if (input == nil) {
-      return nil;
-    }
-    
-    // `_markdownStyle` and `_parserId` may not be initialized immediately due to the order of mount instructions
-    // props update will be executed after the view hierarchy is initialized.
-    if (_markdownStyle == nil || _parserId == nil) {
-      return nil;
-    }
-
-    NSString *inputString = [input string];
-    if ([inputString isEqualToString:_prevInputString] && [defaultTextAttributes isEqualToDictionary:_prevDefaultTextAttributes] && [_markdownStyle isEqual:_prevMarkdownStyle] && [_parserId isEqualToNumber:_prevParserId]) {
-      return _prevAttributedString;
-    }
-
-    NSArray<MarkdownRange *> *markdownRanges = [_markdownParser parse:inputString withParserId:_parserId];
-
-    NSAttributedString *attributedString = [_markdownFormatter format:inputString
-                                            withDefaultTextAttributes:defaultTextAttributes
-                                                   withMarkdownRanges:markdownRanges
-                                                    withMarkdownStyle:_markdownStyle];
-    _prevInputString = inputString;
-    _prevAttributedString = attributedString;
-    _prevDefaultTextAttributes = defaultTextAttributes;
-    _prevMarkdownStyle = _markdownStyle;
-    _prevParserId = _parserId;
-
-    return attributedString;
+  // `_markdownStyle` and `_parserId` may not be initialized immediately due to the order of mount instructions
+  // props update will be executed after the view hierarchy is initialized.
+  if (_markdownStyle == nil || _parserId == nil) {
+    return;
   }
+
+  NSArray<MarkdownRange *> *markdownRanges = [_markdownParser parse:attributedString.string withParserId:_parserId];
+
+  [_markdownFormatter formatAttributedString:attributedString
+                   withDefaultTextAttributes:defaultTextAttributes
+                          withMarkdownRanges:markdownRanges
+                           withMarkdownStyle:_markdownStyle];
 }
 
 @end
