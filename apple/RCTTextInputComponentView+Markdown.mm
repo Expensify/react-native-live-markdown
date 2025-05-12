@@ -6,6 +6,8 @@
 
 - (BOOL)markdown__textOf:(NSAttributedString *)newText equals:(NSAttributedString *)oldText
 {
+  // TODO: fix updating MarkdownTextInput style without changing value
+  
   __block BOOL isMarkdownTextInput = false;
   [oldText enumerateAttribute:RCTLiveMarkdownTextAttributeName
                       inRange:NSMakeRange(0, oldText.length)
