@@ -20,6 +20,7 @@
 
   [attributedString addAttributes:defaultTextAttributes range:fullRange];
 
+  // We add a custom attribute to force a different comparison mode in swizzled `_textOf` method.
   [attributedString addAttribute:RCTLiveMarkdownTextAttributeName value:@(YES) range:fullRange];
 
   for (MarkdownRange *markdownRange in markdownRanges) {
