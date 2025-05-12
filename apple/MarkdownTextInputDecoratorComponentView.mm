@@ -8,6 +8,7 @@
 #import <RNLiveMarkdown/MarkdownBackedTextInputDelegate.h>
 #import <RNLiveMarkdown/MarkdownLayoutManager.h>
 #import <RNLiveMarkdown/MarkdownTextFieldObserver.h>
+#import <RNLiveMarkdown/MarkdownTextViewObserver.h>
 #import <RNLiveMarkdown/MarkdownTextInputDecoratorComponentView.h>
 #import <RNLiveMarkdown/MarkdownTextInputDecoratorViewComponentDescriptor.h>
 #import <RNLiveMarkdown/MarkdownTextStorageDelegate.h>
@@ -23,6 +24,7 @@ using namespace facebook::react;
   NSNumber *_parserId;
   MarkdownBackedTextInputDelegate *_markdownBackedTextInputDelegate;
   MarkdownTextStorageDelegate *_markdownTextStorageDelegate;
+  MarkdownTextViewObserver *_markdownTextViewObserver;
   MarkdownTextFieldObserver *_markdownTextFieldObserver;
   __weak RCTUITextView *_textView;
   __weak RCTUITextField *_textField;
@@ -86,6 +88,10 @@ using namespace facebook::react;
     _markdownTextStorageDelegate = [[MarkdownTextStorageDelegate alloc] initWithTextView:_textView markdownUtils:_markdownUtils];
     _textView.textStorage.delegate = _markdownTextStorageDelegate;
 
+    // register observer for default text attributes
+    _markdownTextViewObserver = [[MarkdownTextViewObserver alloc] initWithTextView:_textView markdownUtils:_markdownUtils];
+    [_textView addObserver:_markdownTextViewObserver forKeyPath:@"defaultTextAttributes" options:NSKeyValueObservingOptionNew context:NULL];
+
     // register delegate for fixing cursor position
     _markdownBackedTextInputDelegate = [[MarkdownBackedTextInputDelegate alloc] initWithTextView:_textView];
 
@@ -120,6 +126,8 @@ using namespace facebook::react;
       object_setClass(_textView.layoutManager, [NSLayoutManager class]);
     }
     _markdownBackedTextInputDelegate = nil;
+    [_textField removeObserver:_markdownTextFieldObserver forKeyPath:@"_defaultTextAttributes" context:NULL];
+    _markdownTextViewObserver = nil;
     _markdownTextStorageDelegate = nil;
     _textView.textStorage.delegate = nil;
     _textView = nil;
