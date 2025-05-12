@@ -20,6 +20,8 @@
 
   [attributedString addAttributes:defaultTextAttributes range:fullRange];
 
+  [attributedString addAttribute:RCTLiveMarkdownTextAttributeName value:@(YES) range:fullRange];
+
   for (MarkdownRange *markdownRange in markdownRanges) {
     [self applyRangeToAttributedString:attributedString
                                   type:std::string([markdownRange.type UTF8String])
