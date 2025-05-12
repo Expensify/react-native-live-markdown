@@ -32,12 +32,6 @@
     RCTApplyBaselineOffset(attributedString, enclosingRange);
   }];
 
-  /*
-  Calling `[attributedString addAttributes:defaultTextAttributes range:fullRange]` breaks the font for emojis.
-  Before, NSFont attribute is ".SFUI-Regular" and NSOriginalFont attribute is ".AppleColorEmoji".
-  After the call, both are set to ".SFUI-Regular" which makes emoji invisible and zero-width.
-  Calling `fixAttributesInRange:` fixes this problem.
-  */
   [attributedString fixAttributesInRange:fullRange];
 
   [attributedString endEditing];
