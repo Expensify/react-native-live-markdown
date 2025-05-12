@@ -104,9 +104,6 @@ using namespace facebook::react;
     layoutManager.allowsNonContiguousLayout = NO; // workaround for onScroll issue
     object_setClass(layoutManager, [MarkdownLayoutManager class]);
     [layoutManager setValue:_markdownUtils forKey:@"markdownUtils"];
-
-    // register delegate for fixing cursor position after blockquote
-    _markdownBackedTextInputDelegate = [[MarkdownBackedTextInputDelegate alloc] initWithTextView:_textView];
   } else {
     react_native_assert(false && "Cannot enable Markdown for this type of TextInput.");
   }
