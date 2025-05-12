@@ -126,7 +126,7 @@ using namespace facebook::react;
       object_setClass(_textView.layoutManager, [NSLayoutManager class]);
     }
     _markdownBackedTextInputDelegate = nil;
-    [_textField removeObserver:_markdownTextFieldObserver forKeyPath:@"_defaultTextAttributes" context:NULL];
+    [_textView removeObserver:_markdownTextViewObserver forKeyPath:@"defaultTextAttributes" context:NULL];
     _markdownTextViewObserver = nil;
     _markdownTextStorageDelegate = nil;
     _textView.textStorage.delegate = nil;
