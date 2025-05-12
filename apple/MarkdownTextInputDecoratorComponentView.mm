@@ -92,9 +92,6 @@ using namespace facebook::react;
     _markdownTextViewObserver = [[MarkdownTextViewObserver alloc] initWithTextView:_textView markdownUtils:_markdownUtils];
     [_textView addObserver:_markdownTextViewObserver forKeyPath:@"defaultTextAttributes" options:NSKeyValueObservingOptionNew context:NULL];
 
-    // register delegate for fixing cursor position
-    _markdownBackedTextInputDelegate = [[MarkdownBackedTextInputDelegate alloc] initWithTextView:_textView];
-
     // format initial value
     [_textView.textStorage setAttributedString:_textView.attributedText];
 
@@ -110,6 +107,9 @@ using namespace facebook::react;
     layoutManager.allowsNonContiguousLayout = NO; // workaround for onScroll issue
     object_setClass(layoutManager, [MarkdownLayoutManager class]);
     [layoutManager setValue:_markdownUtils forKey:@"markdownUtils"];
+
+    // register delegate for fixing cursor position
+    _markdownBackedTextInputDelegate = [[MarkdownBackedTextInputDelegate alloc] initWithTextView:_textView];
   } else {
     react_native_assert(false && "Cannot enable Markdown for this type of TextInput.");
   }
