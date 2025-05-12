@@ -43,16 +43,6 @@
   */
   [attributedString fixAttributesInRange:fullRange];
 
-  /*
-  When updating MarkdownTextInput's `style` property without changing `markdownStyle`,
-  React Native calls `[RCTTextInputComponentView _setAttributedString:]` which skips update if strings are equal.
-  See https://github.com/facebook/react-native/blob/287e20033207df5e59d199a347b7ae2b4cd7a59e/packages/react-native/React/Fabric/Mounting/ComponentViews/TextInput/RCTTextInputComponentView.mm#L680-L684
-  The attributed strings are compared using `[RCTTextInputComponentView _textOf:equals:]` which compares only raw strings
-  if NSOriginalFont attribute is present. So we purposefully remove this attribute to force update.
-  See https://github.com/facebook/react-native/blob/287e20033207df5e59d199a347b7ae2b4cd7a59e/packages/react-native/React/Fabric/Mounting/ComponentViews/TextInput/RCTTextInputComponentView.mm#L751-L784
-  */
-  [attributedString removeAttribute:@"NSOriginalFont" range:fullRange];
-
   [attributedString endEditing];
 }
 
@@ -91,7 +81,8 @@
                                           variant:nil
                                   scaleMultiplier:0];
     } else if (type == "emoji") {
-      font = [RCTFont updateFont:font withFamily:markdownStyle.emojiFontFamily
+      // TODO: set emoji font family
+      font = [RCTFont updateFont:font withFamily:nil
                                             size:[NSNumber numberWithFloat:markdownStyle.emojiFontSize]
                                           weight:nil
                                             style:nil
