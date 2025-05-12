@@ -26,7 +26,7 @@
                  defaultTextAttributes:defaultTextAttributes];
   }
 
-  [attributedString.string enumerateSubstringsInRange:NSMakeRange(0, attributedString.length)
+  [attributedString.string enumerateSubstringsInRange:fullRange
                                               options:NSStringEnumerationByLines | NSStringEnumerationSubstringNotRequired
                                            usingBlock:^(NSString * _Nullable substring, NSRange substringRange, NSRange enclosingRange, BOOL * _Nonnull stop) {
     RCTApplyBaselineOffset(attributedString, enclosingRange);
