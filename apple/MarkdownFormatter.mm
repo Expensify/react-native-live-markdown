@@ -12,13 +12,7 @@
 
   [attributedString beginEditing];
 
-  // We cannot simply call `[attributedString setAttributes:@{} range:fullRange];`
-  // because it makes spellcheck disappear immediately and also makes cursor lag behind while typing fast.
-
-  [attributedString removeAttribute:NSParagraphStyleAttributeName range:fullRange];
-  [attributedString removeAttribute:RCTLiveMarkdownBlockquoteDepthAttributeName range:fullRange];
-
-  [attributedString addAttributes:defaultTextAttributes range:fullRange];
+  [attributedString setAttributes:defaultTextAttributes range:fullRange];
 
   // We add a custom attribute to force a different comparison mode in swizzled `_textOf` method.
   [attributedString addAttribute:RCTLiveMarkdownTextAttributeName value:@(YES) range:fullRange];
@@ -84,7 +78,6 @@
                                           variant:nil
                                   scaleMultiplier:0];
     } else if (type == "emoji") {
-      // TODO: set emoji font family
       font = [RCTFont updateFont:font withFamily:nil
                                             size:[NSNumber numberWithFloat:markdownStyle.emojiFontSize]
                                           weight:nil
