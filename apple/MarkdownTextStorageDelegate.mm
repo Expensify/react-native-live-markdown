@@ -22,8 +22,6 @@
   react_native_assert(_textView.defaultTextAttributes != nil);
 
   [_markdownUtils applyMarkdownFormatting:textStorage withDefaultTextAttributes:_textView.defaultTextAttributes];
-
-  // TODO: fix spellcheck not working for any of previous words when component value is controlled and contains bold (probably not here though)
 }
 
 @end
