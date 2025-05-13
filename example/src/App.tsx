@@ -146,9 +146,10 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
+    paddingVertical: 60,
   },
   content: {
-    marginTop: 60,
+    flex: 1,
   },
   input: {
     fontSize: 20,
