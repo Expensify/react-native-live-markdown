@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <react/renderer/core/ShadowNodeFamily.h>
 
 namespace facebook {
@@ -9,22 +10,16 @@ class JSI_EXPORT MarkdownTextInputDecoratorState final {
 public:
   using Shared = std::shared_ptr<const MarkdownTextInputDecoratorState>;
 
-  MarkdownTextInputDecoratorState() : decoratorFamily(nullptr){};
-  MarkdownTextInputDecoratorState(
-      const ShadowNodeFamily::Shared textInputFamily_)
-      : decoratorFamily(textInputFamily_){};
+  MarkdownTextInputDecoratorState(){};
 
 #ifdef ANDROID
   MarkdownTextInputDecoratorState(
-      MarkdownTextInputDecoratorState const &previousState, folly::dynamic data)
-      : decoratorFamily(previousState.decoratorFamily){};
+      MarkdownTextInputDecoratorState const &previousState, folly::dynamic data){};
 #endif
-
-  const ShadowNodeFamily::Shared decoratorFamily;
 
 #ifdef ANDROID
   folly::dynamic getDynamic() const {
-    return folly::dynamic::object("decoratorFamily", "pointer should be here?");
+    return {};
   }
   MapBuffer getMapBuffer() const { return MapBufferBuilder::EMPTY(); };
 #endif

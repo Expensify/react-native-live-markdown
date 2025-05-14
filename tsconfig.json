@@ -26,6 +26,6 @@
     "verbatimModuleSyntax": true,
     "typeRoots": ["node_modules/@types"]
   },
-  "include": ["src/**/*", "types/global.d.ts"],
-  "exclude": ["**/node_modules/**/*", "parser/**/*", "**/lib/**/*", "example/src/**/*", "WebExample/**/*"]
+  "include": ["src/**/*", "mock/**/*"],
+  "exclude": ["**/node_modules/**/*", "**/lib/**/*", "example/src/**/*", "WebExample/**/*"]
 }

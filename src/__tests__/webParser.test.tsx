@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {expect} from '@jest/globals';
 import {parseRangesToHTMLNodes} from '../web/utils/parserUtils';
-
-require('../../parser/react-native-live-markdown-parser.js');
+import parseExpensiMark from '../parseExpensiMark';
 
 declare module 'expect' {
   interface Matchers<R> {
@@ -15,7 +14,7 @@ const toBeParsedAsHTML = function (actual: string, expectedHTML: string) {
     throw new Error('Actual value must be a string');
   }
   let expected = expectedHTML;
-  const markdownRanges = global.parseExpensiMarkToRanges(actual);
+  const markdownRanges = parseExpensiMark(actual);
 
   const actualDOM = parseRangesToHTMLNodes(actual, markdownRanges, true, {}, true).dom;
   const actualHTML = actualDOM.innerHTML;
@@ -206,9 +205,15 @@ test('separate blockquotes', () => {
   );
 });
 
-test('nested blockquotes', () => {
+test('blockquote with whitespace between syntaxes', () => {
   expect('> > > > Lorem ipsum dolor sit amet').toBeParsedAsHTML(
-    '<p data-type="line" data-id="0"><span data-type="blockquote" data-id="0,0"><span data-type="blockquote" data-id="0,0,0"><span data-type="blockquote" data-id="0,0,0,0"><span data-type="blockquote" data-id="0,0,0,0,0"><span data-type="syntax" data-id="0,0,0,0,0,0"><span data-type="text" data-id="0,0,0,0,0,0,0">&gt;</span></span><span data-type="text" data-id="0,0,0,0,0,1"> </span><span data-type="syntax" data-id="0,0,0,0,0,2"><span data-type="text" data-id="0,0,0,0,0,2,0">&gt;</span></span><span data-type="text" data-id="0,0,0,0,0,3"> </span><span data-type="syntax" data-id="0,0,0,0,0,4"><span data-type="text" data-id="0,0,0,0,0,4,0">&gt;</span></span><span data-type="text" data-id="0,0,0,0,0,5"> </span><span data-type="syntax" data-id="0,0,0,0,0,6"><span data-type="text" data-id="0,0,0,0,0,6,0">&gt;</span></span><span data-type="text" data-id="0,0,0,0,0,7"> Lorem ipsum dolor sit amet</span></span></span></span></span></p>',
+    '<p data-type="line" data-id="0"><span data-type="blockquote" data-id="0,0"><span data-type="syntax" data-id="0,0,0"><span data-type="text" data-id="0,0,0,0">&gt;</span></span><span data-type="text" data-id="0,0,1"> &gt; &gt; &gt; Lorem ipsum dolor sit amet</span></span></p>',
+  );
+});
+
+test('nested blockquotes', () => {
+  expect('>>>> Lorem ipsum dolor sit amet').toBeParsedAsHTML(
+    '<p data-type="line" data-id="0"><span data-type="blockquote" data-id="0,0"><span data-type="blockquote" data-id="0,0,0"><span data-type="blockquote" data-id="0,0,0,0"><span data-type="syntax" data-id="0,0,0,0,0"><span data-type="text" data-id="0,0,0,0,0,0">&gt;</span></span><span data-type="syntax" data-id="0,0,0,0,1"><span data-type="text" data-id="0,0,0,0,1,0">&gt;</span></span><span data-type="syntax" data-id="0,0,0,0,2"><span data-type="text" data-id="0,0,0,0,2,0">&gt;</span></span><span data-type="text" data-id="0,0,0,0,3">&gt; Lorem ipsum dolor sit amet</span></span></span></span></p>',
   );
 });
 

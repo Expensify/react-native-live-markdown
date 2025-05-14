@@ -26,26 +26,24 @@ jobs:
   build:
     if: github.repository == 'Expensify/react-native-live-markdown'
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        react-native-architecture: ['Paper', 'Fabric']
-      fail-fast: false
     concurrency:
-      group: build-android-${{ matrix.react-native-architecture }}-${{ github.ref }}
+      group: build-android-${{ github.ref }}
       cancel-in-progress: true
     steps:
       - name: Check out Git repository
-        uses: actions/checkout@v4
+        # v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
 
       - name: Setup Java 17
-        uses: actions/setup-java@v4
+        # v4
+        uses: actions/setup-java@3a4f6e1af504cf6a31855fa899c6aa5355ba6c12
         with:
           distribution: 'zulu'
           java-version: 17
 
       - name: Install node_modules
-        run: yarn install --immutable
+        run: npm ci
 
       - name: Build app
         working-directory: example/android
-        run: ./gradlew assembleDebug --build-cache -PreactNativeArchitectures=arm64-v8a -PnewArchEnabled=${{ matrix.react-native-architecture == 'Fabric' && 'true' || 'false' }}
+        run: ./gradlew assembleDebug --build-cache -PreactNativeArchitectures=arm64-v8a

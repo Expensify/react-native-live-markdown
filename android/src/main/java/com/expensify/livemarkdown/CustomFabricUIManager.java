@@ -1,7 +1,5 @@
 package com.expensify.livemarkdown;
 
-import androidx.annotation.NonNull;
-
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.fabric.FabricUIManager;
@@ -13,7 +11,7 @@ import java.lang.reflect.Field;
 
 public class CustomFabricUIManager {
 
-  public static FabricUIManager create(FabricUIManager source, ReadableMap markdownProps) {
+  public static FabricUIManager create(FabricUIManager source, ReadableMap markdownProps, int parserId) {
     Class<? extends FabricUIManager> uiManagerClass = source.getClass();
 
     try {
@@ -27,7 +25,7 @@ public class CustomFabricUIManager {
 
       FabricUIManager customFabricUIManager = new FabricUIManager(reactContext, viewManagerRegistry, batchEventDispatchedListener);
 
-      mountingManagerField.set(customFabricUIManager, new CustomMountingManager(viewManagerRegistry, mountItemExecutor, reactContext, markdownProps));
+      mountingManagerField.set(customFabricUIManager, new CustomMountingManager(viewManagerRegistry, mountItemExecutor, reactContext, markdownProps, parserId));
 
       return customFabricUIManager;
     } catch (NoSuchFieldException | IllegalAccessException e) {

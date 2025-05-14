@@ -4,6 +4,10 @@ react_native_node_modules_dir = ENV['REACT_NATIVE_NODE_MODULES_DIR'] || File.joi
 react_native_json = JSON.parse(File.read(File.join(react_native_node_modules_dir, 'react-native/package.json')))
 react_native_minor_version = react_native_json['version'].split('.')[1].to_i
 
+pods_root = Pod::Config.instance.project_pods_root
+react_native_reanimated_node_modules_dir = ENV['REACT_NATIVE_REANIMATED_NODE_MODULES_DIR'] || File.dirname(`cd "#{Pod::Config.instance.installation_root.to_s}" && node --print "require.resolve('react-native-reanimated/package.json')"`)
+react_native_reanimated_node_modules_dir_from_pods_root = Pathname.new(react_native_reanimated_node_modules_dir).relative_path_from(pods_root).to_s
+
 package = JSON.parse(File.read(File.join(__dir__, "package.json")))
 folly_compiler_flags = '-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1 -Wno-comma -Wno-shorten-64-to-32'
 
@@ -18,29 +22,27 @@ Pod::Spec.new do |s|
   s.platforms    = { :ios => "11.0", :visionos => "1.0", :osx => "10.15" }
   s.source       = { :git => "https://github.com/expensify/react-native-live-markdown.git", :tag => "#{s.version}" }
 
-  s.source_files = "apple/**/*.{h,m,mm}"
+  s.source_files = "apple/**/*.{h,m,mm}", "cpp/**/*.{h,cpp}"
 
-  s.resources = "parser/react-native-live-markdown-parser.js"
-
-  s.dependency "hermes-engine"
+  s.dependency "RNReanimated/worklets"
 
   s.xcconfig = {
-    "OTHER_CFLAGS" => "$(inherited) -DREACT_NATIVE_MINOR_VERSION=#{react_native_minor_version}"
+    "OTHER_CFLAGS" => "$(inherited) -DREACT_NATIVE_MINOR_VERSION=#{react_native_minor_version}",
+    "HEADER_SEARCH_PATHS" => [
+      "\"$(PODS_ROOT)/#{react_native_reanimated_node_modules_dir_from_pods_root}/apple\"",
+      "\"$(PODS_ROOT)/#{react_native_reanimated_node_modules_dir_from_pods_root}/Common/cpp\"",
+    ].join(' '),
   }
+
+  s.pod_target_xcconfig = { "HEADER_SEARCH_PATHS" => "\"$(PODS_TARGET_SRCROOT)/cpp\"" }
 
   install_modules_dependencies(s)
 
-  if ENV['USE_FRAMEWORKS'] != nil && ENV['RCT_NEW_ARCH_ENABLED'] == '1'
+  if ENV['USE_FRAMEWORKS'] != nil
     add_dependency(s, "React-FabricComponents", :additional_framework_paths => [
       "react/renderer/textlayoutmanager/platform/ios",
       "react/renderer/components/textinput/platform/ios",
     ])
-  end
-
-  if ENV['RCT_NEW_ARCH_ENABLED'] == '1'
-    s.subspec "newarch" do |ss|
-      ss.source_files         = "cpp/**/*.{cpp,h}"
-      ss.header_dir           = "RNLiveMarkdown"
-    end
+    add_dependency(s, "React-rendererconsistency")
   end
 end

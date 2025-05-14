@@ -25,10 +25,11 @@ jobs:
       cancel-in-progress: true
     steps:
       - name: Check out Git repository
-        uses: actions/checkout@v4
+        # v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
 
       - name: Install node_modules
-        run: yarn install --immutable
+        run: npm ci
 
       - name: Build app
         working-directory: WebExample

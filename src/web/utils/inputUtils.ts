@@ -1,11 +1,11 @@
 import type {CSSProperties} from 'react';
-import type {MarkdownTextInputElement} from '../../MarkdownTextInput.web';
+import type {MarkdownNativeEvent, MarkdownTextInputElement} from '../../MarkdownTextInput.web';
 
 const ZERO_WIDTH_SPACE = '\u200B';
 
 // If an Input Method Editor is processing key input, the 'keyCode' is 229.
 // https://www.w3.org/TR/uievents/#determine-keydown-keyup-keyCode
-function isEventComposing(nativeEvent: globalThis.KeyboardEvent) {
+function isEventComposing(nativeEvent: globalThis.KeyboardEvent | MarkdownNativeEvent) {
   return nativeEvent.isComposing || nativeEvent.keyCode === 229;
 }
 
@@ -37,7 +37,7 @@ function normalizeValue(value: string) {
 }
 
 // Parses the HTML structure of a MarkdownTextInputElement to a plain text string. Used for getting the correct value of the input element.
-function parseInnerHTMLToText(target: MarkdownTextInputElement, inputType: string, cursorPosition: number): string {
+function parseInnerHTMLToText(target: MarkdownTextInputElement, cursorPosition: number, inputType?: string): string {
   // Returns the parent of a given node that is higher in the hierarchy and is of a different type than 'text', 'br' or 'line'
   function getTopParentNode(node: ChildNode) {
     let currentParentNode = node.parentNode;
@@ -65,8 +65,9 @@ function parseInnerHTMLToText(target: MarkdownTextInputElement, inputType: strin
     // If we are operating on the nodes that are children of the MarkdownTextInputElement, we need to add a newline after each
     const isTopComponent = node.parentElement?.contentEditable === 'true';
     if (isTopComponent) {
-      // Replaced text is beeing added as text node, so we need to not add the newline before and after it
-      if (node.nodeType === Node.TEXT_NODE) {
+      // When inputType is undefined, the first part of the replaced text is added as a text node.
+      // Because of it, we need to prevent adding new lines in this case
+      if (!inputType && node.nodeType === Node.TEXT_NODE) {
         shouldAddNewline = false;
       } else {
         const firstChild = node.firstChild as HTMLElement;
@@ -104,7 +105,7 @@ function parseInnerHTMLToText(target: MarkdownTextInputElement, inputType: strin
   text = text.replaceAll('\r\n', '\n');
 
   // Force letter removal if the input value haven't changed but input type is 'delete'
-  if (text === target.value && inputType.includes('delete')) {
+  if (text === target.value && inputType?.includes('delete')) {
     text = text.slice(0, cursorPosition - 1) + text.slice(cursorPosition);
   }
   return text;

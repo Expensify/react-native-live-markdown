@@ -6,6 +6,7 @@ import {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition} from './cu
 import {addStyleToBlock, extendBlockStructure, getFirstBlockMarkdownRange, isBlockMarkdownType} from './blockUtils';
 import type {InlineImagesInputProps, MarkdownRange} from '../../commonTypes';
 import {getAnimationCurrentTimes, updateAnimationsTime} from './animationUtils';
+import {sortRanges, ungroupRanges} from '../../rangeUtils';
 
 type Paragraph = {
   text: string;
@@ -13,20 +14,6 @@ type Paragraph = {
   length: number;
   markdownRanges: MarkdownRange[];
 };
-
-function ungroupRanges(ranges: MarkdownRange[]): MarkdownRange[] {
-  const ungroupedRanges: MarkdownRange[] = [];
-  ranges.forEach((range) => {
-    if (!range.depth) {
-      ungroupedRanges.push(range);
-    }
-    const {depth, ...rangeWithoutDepth} = range;
-    Array.from({length: depth!}).forEach(() => {
-      ungroupedRanges.push(rangeWithoutDepth);
-    });
-  });
-  return ungroupedRanges;
-}
 
 function splitTextIntoLines(text: string): Paragraph[] {
   let lineStartIndex = 0;
@@ -100,7 +87,7 @@ function addBrElement(node: TreeNode) {
   return spanNode;
 }
 
-function addTextToElement(node: TreeNode, text: string) {
+function addTextToElement(node: TreeNode, text: string, isMultiline = true) {
   const lines = text.split('\n');
   lines.forEach((line, index) => {
     if (line !== '') {
@@ -109,6 +96,12 @@ function addTextToElement(node: TreeNode, text: string) {
       span.setAttribute('data-type', 'text');
       span.appendChild(document.createTextNode(line));
       appendNode(span, node, 'text', line.length);
+
+      const parentType = span.parentElement?.dataset.type;
+      if (!isMultiline && parentType && ['pre', 'code', 'mention-here', 'mention-user', 'mention-report'].includes(parentType)) {
+        // this is a fix to background colors being shifted downwards in a singleline input
+        addStyleToBlock(span, 'text', {}, false);
+      }
     }
 
     if (index < lines.length - 1 || (index === 0 && line === '')) {
@@ -117,7 +110,7 @@ function addTextToElement(node: TreeNode, text: string) {
   });
 }
 
-function addParagraph(node: TreeNode, text: string | null = null, length: number, disableInlineStyles = false) {
+function addParagraph(node: TreeNode, text: string | null, length: number, disableInlineStyles = false) {
   const p = document.createElement('p');
   p.setAttribute('data-type', 'line');
   if (!disableInlineStyles) {
@@ -167,7 +160,9 @@ function parseRangesToHTMLNodes(
     return {dom: rootElement, tree: rootNode};
   }
 
-  const markdownRanges = ungroupRanges(ranges);
+  // Sort all ranges by start position, length, and by tag hierarchy so the styles and text are applied in correct order
+  const sortedRanges = sortRanges(ranges);
+  const markdownRanges = ungroupRanges(sortedRanges);
   lines = mergeLinesWithMultilineTags(lines, markdownRanges);
 
   let lastRangeEndIndex = 0;
@@ -219,7 +214,7 @@ function parseRangesToHTMLNodes(
       span.setAttribute('data-type', range.type);
 
       if (!disableInlineStyles) {
-        addStyleToBlock(span, range.type, markdownStyle);
+        addStyleToBlock(span, range.type, markdownStyle, isMultiline);
       }
 
       const spanNode = appendNode(span, currentParentNode, range.type, range.length);
@@ -234,7 +229,7 @@ function parseRangesToHTMLNodes(
         lastRangeEndIndex = range.start;
       } else {
         // adding markdown tag
-        addTextToElement(spanNode, text.substring(range.start, endOfCurrentRange));
+        addTextToElement(spanNode, text.substring(range.start, endOfCurrentRange), isMultiline);
         currentParentNode.element.value = (currentParentNode.element.value || '') + (spanNode.element.value || '');
         lastRangeEndIndex = endOfCurrentRange;
         // tag unnesting and adding text after the tag
@@ -272,6 +267,7 @@ function moveCursor(isFocused: boolean, alwaysMoveCursorToTheEnd: boolean, curso
 }
 
 function updateInputStructure(
+  parserFunction: (input: string) => MarkdownRange[],
   target: MarkdownTextInputElement,
   text: string,
   cursorPositionIndex: number | null,
@@ -291,7 +287,7 @@ function updateInputStructure(
     const selection = getCurrentCursorPosition(target);
     cursorPosition = selection ? selection.start : null;
   }
-  const markdownRanges = global.parseExpensiMarkToRanges(text);
+  const markdownRanges = parserFunction(text);
   if (!text || targetElement.innerHTML === '<br>' || (targetElement && targetElement.innerHTML === '\n')) {
     targetElement.innerHTML = '';
     targetElement.innerText = '';

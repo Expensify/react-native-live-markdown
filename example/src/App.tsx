@@ -1,16 +1,21 @@
 import * as React from 'react';
-import {Button, StyleSheet, Text, View} from 'react-native';
-import {MarkdownTextInput} from '@expensify/react-native-live-markdown';
-import type {TextInput} from 'react-native';
+import {Button, ScrollView, StyleSheet, Text} from 'react-native';
+import {
+  MarkdownTextInput,
+  parseExpensiMark,
+} from '@expensify/react-native-live-markdown';
 import * as TEST_CONST from './testConstants';
 import {PlatformInfo} from './PlatformInfo';
+import {handleFormatSelection} from './formatSelectionUtils';
 
 export default function App() {
   const [value, setValue] = React.useState(TEST_CONST.EXAMPLE_CONTENT);
+  const [multiline, setMultiline] = React.useState(true);
   const [textColorState, setTextColorState] = React.useState(false);
   const [linkColorState, setLinkColorState] = React.useState(false);
   const [textFontSizeState, setTextFontSizeState] = React.useState(false);
   const [emojiFontSizeState, setEmojiFontSizeState] = React.useState(false);
+  const [caretHidden, setCaretHidden] = React.useState(false);
   const [selection, setSelection] = React.useState({start: 0, end: 0});
 
   const style = React.useMemo(() => {
@@ -31,20 +36,24 @@ export default function App() {
     };
   }, [emojiFontSizeState, linkColorState]);
 
-  // TODO: use MarkdownTextInput ref instead of TextInput ref
-  const ref = React.useRef<TextInput>(null);
+  const ref = React.useRef<MarkdownTextInput>(null);
 
   return (
-    <View style={styles.container}>
+    <ScrollView
+      contentContainerStyle={styles.container}
+      style={styles.content}>
       <PlatformInfo />
       <MarkdownTextInput
-        multiline
+        multiline={multiline}
+        formatSelection={handleFormatSelection}
         autoCapitalize="none"
+        caretHidden={caretHidden}
         value={value}
         onChangeText={setValue}
         style={[styles.input, style]}
         ref={ref}
         markdownStyle={markdownStyle}
+        parser={parseExpensiMark}
         placeholder="Type here..."
         onSelectionChange={e => setSelection(e.nativeEvent.selection)}
         selection={selection}
@@ -92,6 +101,10 @@ export default function App() {
         }}
       />
       <Button
+        title="Toggle multiline"
+        onPress={() => setMultiline(prev => !prev)}
+      />
+      <Button
         title="Toggle text color"
         onPress={() => setTextColorState(prev => !prev)}
       />
@@ -108,12 +121,17 @@ export default function App() {
         onPress={() => setEmojiFontSizeState(prev => !prev)}
       />
       <Button
+        title="Toggle caret hidden"
+        onPress={() => setCaretHidden(prev => !prev)}
+      />
+      <Button
         title="Toggle all"
         onPress={() => {
           setTextColorState(prev => !prev);
           setLinkColorState(prev => !prev);
           setTextFontSizeState(prev => !prev);
           setEmojiFontSizeState(prev => !prev);
+          setCaretHidden(prev => !prev);
         }}
       />
       <Button
@@ -126,14 +144,15 @@ export default function App() {
           setSelection({start: 0, end: 20});
         }}
       />
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     alignItems: 'center',
+  },
+  content: {
     marginTop: 60,
   },
   input: {
