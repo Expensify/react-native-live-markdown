@@ -1,5 +1,7 @@
 import type {CSSProperties} from 'react';
 import type {MarkdownNativeEvent, MarkdownTextInputElement} from '../../MarkdownTextInput.web';
+import {isMultilineMarkdownType} from './blockUtils';
+import type {NodeType} from './treeUtils';
 
 const ZERO_WIDTH_SPACE = '\u200B';
 
@@ -36,17 +38,17 @@ function normalizeValue(value: string) {
   return value.replaceAll('\r\n', '\n');
 }
 
+// Returns the parent of a given node that is higher in the hierarchy and is of a different type than 'text', 'br' or 'line'
+function getTopParentNode(node: ChildNode) {
+  let currentParentNode = node.parentNode;
+  while (currentParentNode && ['text', 'br', 'line'].includes(currentParentNode.parentElement?.getAttribute('data-type') || '')) {
+    currentParentNode = currentParentNode?.parentNode || null;
+  }
+  return currentParentNode;
+}
+
 // Parses the HTML structure of a MarkdownTextInputElement to a plain text string. Used for getting the correct value of the input element.
 function parseInnerHTMLToText(target: MarkdownTextInputElement | HTMLElement, cursorPosition: number, inputType?: string): string {
-  // Returns the parent of a given node that is higher in the hierarchy and is of a different type than 'text', 'br' or 'line'
-  function getTopParentNode(node: ChildNode) {
-    let currentParentNode = node.parentNode;
-    while (currentParentNode && ['text', 'br', 'line'].includes(currentParentNode.parentElement?.getAttribute('data-type') || '')) {
-      currentParentNode = currentParentNode?.parentNode || null;
-    }
-    return currentParentNode;
-  }
-
   const stack: ChildNode[] = [target];
   let text = '';
   let shouldAddNewline = false;
@@ -83,6 +85,17 @@ function parseInnerHTMLToText(target: MarkdownTextInputElement | HTMLElement, cu
     if (node.nodeType === Node.TEXT_NODE) {
       // Parse text nodes into text
       text += node.textContent;
+
+      // If we are adding text at the end of a multiline markdown type element, we need to add a newline
+      // because the new text can replace the last <br> element (bug on Firefox)
+      if (
+        !node.parentNode?.nextSibling &&
+        node?.parentElement?.getAttribute?.('data-type') === 'br' &&
+        node?.parentElement?.parentElement &&
+        isMultilineMarkdownType((node.parentElement.parentElement?.getAttribute?.('data-type') || '') as NodeType)
+      ) {
+        text += '\n';
+      }
     } else if (node.nodeName === 'BR') {
       const parentNode = getTopParentNode(node);
       if (parentNode && parentNode.parentElement?.contentEditable !== 'true' && !!(node as HTMLElement).getAttribute('data-id')) {
