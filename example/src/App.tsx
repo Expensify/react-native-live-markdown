@@ -10,6 +10,7 @@ import {handleFormatSelection} from './formatSelectionUtils';
 
 export default function App() {
   const [value, setValue] = React.useState(TEST_CONST.EXAMPLE_CONTENT);
+  const [multiline, setMultiline] = React.useState(true);
   const [textColorState, setTextColorState] = React.useState(false);
   const [linkColorState, setLinkColorState] = React.useState(false);
   const [textFontSizeState, setTextFontSizeState] = React.useState(false);
@@ -46,7 +47,7 @@ export default function App() {
       style={styles.content}>
       <PlatformInfo />
       <MarkdownTextInput
-        multiline
+        multiline={multiline}
         formatSelection={handleFormatSelection}
         autoCapitalize="none"
         caretHidden={caretHidden}
@@ -101,6 +102,10 @@ export default function App() {
         onPress={() => {
           setValue('');
         }}
+      />
+      <Button
+        title="Toggle multiline"
+        onPress={() => setMultiline(prev => !prev)}
       />
       <Button
         title="Toggle text color"

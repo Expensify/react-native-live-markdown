@@ -3,21 +3,19 @@
 
 @implementation MarkdownFormatter
 
-- (nonnull NSAttributedString *)format:(nonnull NSString *)text
-             withDefaultTextAttributes:(nonnull NSDictionary<NSAttributedStringKey, id> *)defaultTextAttributes
-                    withMarkdownRanges:(nonnull NSArray<MarkdownRange *> *)markdownRanges
-                     withMarkdownStyle:(nonnull RCTMarkdownStyle *)markdownStyle
+- (void)formatAttributedString:(nonnull NSMutableAttributedString *)attributedString
+     withDefaultTextAttributes:(nonnull NSDictionary<NSAttributedStringKey, id> *)defaultTextAttributes
+            withMarkdownRanges:(nonnull NSArray<MarkdownRange *> *)markdownRanges
+             withMarkdownStyle:(nonnull RCTMarkdownStyle *)markdownStyle
 {
-  NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:text attributes:defaultTextAttributes];
+  NSRange fullRange = NSMakeRange(0, attributedString.length);
 
   [attributedString beginEditing];
 
-  // If the attributed string ends with underlined text, blurring the single-line input imprints the underline style across the whole string.
-  // It looks like a bug in iOS, as there is no underline style to be found in the attributed string, especially after formatting.
-  // This is a workaround that applies the NSUnderlineStyleNone to the string before iterating over ranges which resolves this problem.
-  [attributedString addAttribute:NSUnderlineStyleAttributeName
-                           value:[NSNumber numberWithInteger:NSUnderlineStyleNone]
-                           range:NSMakeRange(0, attributedString.length)];
+  [attributedString setAttributes:defaultTextAttributes range:fullRange];
+
+  // We add a custom attribute to force a different comparison mode in swizzled `_textOf` method.
+  [attributedString addAttribute:RCTLiveMarkdownTextAttributeName value:@(YES) range:fullRange];
 
   for (MarkdownRange *markdownRange in markdownRanges) {
     [self applyRangeToAttributedString:attributedString
@@ -28,15 +26,15 @@
                  defaultTextAttributes:defaultTextAttributes];
   }
 
-  [attributedString.string enumerateSubstringsInRange:NSMakeRange(0, attributedString.length)
+  [attributedString.string enumerateSubstringsInRange:fullRange
                                               options:NSStringEnumerationByLines | NSStringEnumerationSubstringNotRequired
                                            usingBlock:^(NSString * _Nullable substring, NSRange substringRange, NSRange enclosingRange, BOOL * _Nonnull stop) {
     RCTApplyBaselineOffset(attributedString, enclosingRange);
   }];
 
-  [attributedString endEditing];
+  [attributedString fixAttributesInRange:fullRange];
 
-  return attributedString;
+  [attributedString endEditing];
 }
 
 - (void)applyRangeToAttributedString:(NSMutableAttributedString *)attributedString
@@ -74,7 +72,7 @@
                                           variant:nil
                                   scaleMultiplier:0];
     } else if (type == "emoji") {
-      font = [RCTFont updateFont:font withFamily:nil
+      font = [RCTFont updateFont:font withFamily:markdownStyle.emojiFontFamily
                                             size:[NSNumber numberWithFloat:markdownStyle.emojiFontSize]
                                           weight:nil
                                             style:nil
