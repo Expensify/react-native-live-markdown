@@ -4,14 +4,16 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+const NSAttributedStringKey RCTLiveMarkdownTextAttributeName = @"RCTLiveMarkdownText";
+
 const NSAttributedStringKey RCTLiveMarkdownBlockquoteDepthAttributeName = @"RCTLiveMarkdownBlockquoteDepth";
 
 @interface MarkdownFormatter : NSObject
 
-- (nonnull NSAttributedString *)format:(nonnull NSString *)text
-             withDefaultTextAttributes:(nonnull NSDictionary<NSAttributedStringKey, id> *)defaultTextAttributes
-                    withMarkdownRanges:(nonnull NSArray<MarkdownRange *> *)markdownRanges
-                     withMarkdownStyle:(nonnull RCTMarkdownStyle *)markdownStyle;
+- (void)formatAttributedString:(nonnull NSMutableAttributedString *)attributedString
+     withDefaultTextAttributes:(nonnull NSDictionary<NSAttributedStringKey, id> *)defaultTextAttributes
+            withMarkdownRanges:(nonnull NSArray<MarkdownRange *> *)markdownRanges
+             withMarkdownStyle:(nonnull RCTMarkdownStyle *)markdownStyle;
 
 NS_ASSUME_NONNULL_END
 
