@@ -15,6 +15,9 @@ export default function App() {
   const [linkColorState, setLinkColorState] = React.useState(false);
   const [textFontSizeState, setTextFontSizeState] = React.useState(false);
   const [emojiFontSizeState, setEmojiFontSizeState] = React.useState(false);
+  const [textLineHeightState, setTextLineHeightState] = React.useState(false);
+  const [headingLineHeightState, setHeadingLineHeightState] =
+    React.useState(false);
   const [caretHidden, setCaretHidden] = React.useState(false);
   const [selection, setSelection] = React.useState({start: 0, end: 0});
 
@@ -22,8 +25,9 @@ export default function App() {
     return {
       color: textColorState ? 'gray' : 'black',
       fontSize: textFontSizeState ? 15 : 20,
+      lineHeight: textLineHeightState ? 40 : undefined,
     };
-  }, [textColorState, textFontSizeState]);
+  }, [textColorState, textFontSizeState, textLineHeightState]);
 
   const markdownStyle = React.useMemo(() => {
     return {
@@ -34,17 +38,15 @@ export default function App() {
         color: linkColorState ? 'red' : 'blue',
       },
       h1: {
-        lineHeight: 50,
+        lineHeight: headingLineHeightState ? 60 : undefined,
       },
     };
-  }, [emojiFontSizeState, linkColorState]);
+  }, [emojiFontSizeState, linkColorState, headingLineHeightState]);
 
   const ref = React.useRef<MarkdownTextInput>(null);
 
   return (
-    <ScrollView
-      contentContainerStyle={styles.container}
-      style={styles.content}>
+    <ScrollView contentContainerStyle={styles.container} style={styles.content}>
       <PlatformInfo />
       <MarkdownTextInput
         multiline={multiline}
@@ -122,6 +124,16 @@ export default function App() {
       <Button
         title="Toggle emoji font size"
         onPress={() => setEmojiFontSizeState(prev => !prev)}
+      />
+      <Button
+        title={`${textLineHeightState ? 'Disable' : 'Enable'} text line height`}
+        onPress={() => setTextLineHeightState(prev => !prev)}
+      />
+      <Button
+        title={`${
+          headingLineHeightState ? 'Disable' : 'Enable'
+        } heading line height`}
+        onPress={() => setHeadingLineHeightState(prev => !prev)}
       />
       <Button
         title="Toggle caret hidden"
