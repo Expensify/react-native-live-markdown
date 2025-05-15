@@ -2,6 +2,7 @@ import type {CSSProperties} from 'react';
 import type {MarkdownNativeEvent, MarkdownTextInputElement} from '../../MarkdownTextInput.web';
 import {isMultilineMarkdownType} from './blockUtils';
 import type {NodeType} from './treeUtils';
+import BrowserUtils from './browserUtils';
 
 const ZERO_WIDTH_SPACE = '\u200B';
 
@@ -86,9 +87,10 @@ function parseInnerHTMLToText(target: MarkdownTextInputElement | HTMLElement, cu
       // Parse text nodes into text
       text += node.textContent;
 
-      // If we are adding text at the end of a multiline markdown type element, we need to add a newline
-      // because the new text can replace the last <br> element (bug on Firefox)
+      // Fix for Firefox: If we are adding text at the end of a multiline markdown type element, we need to add a newline
+      // because the new text can replace the last <br> element and it will not be added to the text.
       if (
+        BrowserUtils.isFirefox &&
         !node.parentNode?.nextSibling &&
         node?.parentElement?.getAttribute?.('data-type') === 'br' &&
         node?.parentElement?.parentElement &&
