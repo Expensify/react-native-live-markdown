@@ -96,16 +96,18 @@ function generateCodeBlocksRules(target: MarkdownTextInputElement, markdownStyle
   for (let i = 0; i < preBlocks.length; i++) {
     const preBlock = preBlocks[i] as HTMLElement;
     const preBlockWidth = preBlock.getBoundingClientRect().width;
-    const preLineHeight = preBlock.parentElement?.getBoundingClientRect().height ?? 0;
 
-    // Handle a case where something is written immediately after closing backticks without line-break
-    const textElementHeight = preBlock.nextElementSibling?.nextElementSibling?.getBoundingClientRect().height ?? 0;
+    // Get pre block line height, by calculating height between syntaxes
+    const preLineHeight =
+      (preBlock.nextElementSibling?.getBoundingClientRect().top ?? 0) -
+      (preBlock.previousElementSibling?.getBoundingClientRect().top ?? 0) +
+      (preBlock.nextElementSibling?.getBoundingClientRect().height ?? 0);
 
     rules.push({
       // This selector targets specific pre block
       selector: `.${target.uniqueId} *:nth-child(${i + 1} of [data-type='line']:has(> *[data-type='pre'])) > *[data-type='pre']::before`,
       properties: {
-        height: `${preLineHeight - 2 * lineHeight - textElementHeight}px`,
+        height: `${preLineHeight - 2 * lineHeight}px`,
         'min-width': `min(calc(100% + 2.5px), ${preBlockWidth + horizontalPadding * 2 + 1}px)`,
         'max-width': `min(${preBlockWidth + horizontalPadding * 2 + 2}px, ${contentWidth}px)`,
       },
