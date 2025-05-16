@@ -8,7 +8,7 @@ import type {InlineImagesInputProps, MarkdownRange} from '../../commonTypes';
 import {getAnimationCurrentTimes, updateAnimationsTime} from './animationUtils';
 import {sortRanges, ungroupRanges} from '../../rangeUtils';
 import {handleCustomStyles} from '../inputElements/codeblock';
-import {clearFromPostRenderAttributes} from './inputUtils';
+import {removePostRenderAttributes} from './inputUtils';
 
 type Paragraph = {
   text: string;
@@ -298,7 +298,7 @@ function updateInputStructure(
   if (text) {
     const {dom, tree} = parseRangesToHTMLNodes(text, markdownRanges, isMultiline, markdownStyle, false, targetElement, inlineImagesProps);
 
-    if (shouldForceDOMUpdate || clearFromPostRenderAttributes(targetElement.innerHTML) !== dom.innerHTML) {
+    if (shouldForceDOMUpdate || removePostRenderAttributes(targetElement.innerHTML) !== dom.innerHTML) {
       const animationTimes = getAnimationCurrentTimes(targetElement);
       targetElement.innerHTML = '';
       targetElement.innerText = '';
