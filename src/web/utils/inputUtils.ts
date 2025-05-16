@@ -126,4 +126,9 @@ function parseInnerHTMLToText(target: MarkdownTextInputElement | HTMLElement, cu
   return text;
 }
 
-export {isEventComposing, getPlaceholderValue, getElementHeight, parseInnerHTMLToText, normalizeValue};
+function clearFromPostRenderAttributes(text: string) {
+  const regex = /( )?data-content="[^"]*"/g;
+  return text.replace(regex, '');
+}
+
+export {isEventComposing, getPlaceholderValue, getElementHeight, parseInnerHTMLToText, normalizeValue, clearFromPostRenderAttributes};
