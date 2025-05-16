@@ -26,14 +26,27 @@ interface MarkdownStyle {
   code: {
     fontFamily: string;
     fontSize: Float;
+    h1NestedFontSize?: Float;
     color: ColorValue;
     backgroundColor: ColorValue;
+    borderColor: ColorValue;
+    borderWidth: Float;
+    borderRadius: Float;
+    borderStyle: string;
+    padding?: Float;
+    paddingVertical?: Float;
+    paddingHorizontal?: Float;
   };
   pre: {
     fontFamily: string;
     fontSize: Float;
     color: ColorValue;
     backgroundColor: ColorValue;
+    borderColor: string;
+    borderRadius: Float;
+    padding: Float;
+    paddingVertical?: Float;
+    paddingHorizontal?: Float;
   };
   mentionHere: {
     color: ColorValue;

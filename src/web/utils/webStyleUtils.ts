@@ -60,4 +60,14 @@ function* generateUniqueId() {
 
 const idGenerator = generateUniqueId();
 
-export {parseToReactDOMStyle, processMarkdownStyle, idGenerator};
+function configureCustomWebStylesheet(): CSSStyleSheet | null {
+  const sheet = new CSSStyleSheet();
+  document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet];
+  return sheet;
+}
+
+function getPropertyValue(e: HTMLElement, p: string) {
+  return parseFloat(window.getComputedStyle(e).getPropertyValue(p).replace('px', ''));
+}
+
+export {parseToReactDOMStyle, processMarkdownStyle, idGenerator, configureCustomWebStylesheet, getPropertyValue};
