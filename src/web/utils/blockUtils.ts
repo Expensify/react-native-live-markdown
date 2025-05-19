@@ -118,7 +118,10 @@ function addCodeBlockStyles(targetElement: HTMLElement, type: NodeType, markdown
       if (isMultiline) {
         Object.assign(node.style, {
           ...markdownStyle.pre,
-          backgroundColor: 'transparent',
+          backgroundColor: undefined,
+          borderColor: undefined,
+          borderWidth: undefined,
+          borderStyle: undefined,
           padding: 0,
         });
         Object.assign((node.parentNode as HTMLElement).style, {

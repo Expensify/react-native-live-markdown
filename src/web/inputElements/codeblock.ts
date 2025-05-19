@@ -60,8 +60,10 @@ function generateCodeBlocksRules(target: MarkdownTextInputElement, markdownStyle
         top: `${Math.floor(lineHeight)}px`,
         padding: `${verticalPadding.toString()}px ${horizontalPadding.toString()}px`,
         'background-color': `${(preStyles?.backgroundColor as string) ?? 'lightgray'}`,
-        'border-radius': `${preStyles?.borderRadius?.toString() ?? '4px'}`,
-        'border-color': `${preStyles?.borderColor ?? 'grey'}`,
+        'border-radius': `${preStyles?.borderRadius?.toString()}`,
+        'border-color': `${preStyles?.borderColor?.toString()}`,
+        'border-width': `${preStyles?.borderWidth?.toString()}`,
+        'border-style': `${preStyles?.borderStyle}`,
       },
     },
     {

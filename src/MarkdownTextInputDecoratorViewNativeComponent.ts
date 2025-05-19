@@ -3,6 +3,20 @@ import type {ColorValue, ViewProps} from 'react-native';
 import type {Float, Int32} from 'react-native/Libraries/Types/CodegenTypes';
 import codegenNativeComponent from 'react-native/Libraries/Utilities/codegenNativeComponent';
 
+interface CodeBlockStyle {
+  fontFamily: string;
+  fontSize: Float;
+  color: ColorValue;
+  backgroundColor: ColorValue;
+  borderColor: ColorValue;
+  borderWidth: Float;
+  borderRadius: Float;
+  borderStyle: string;
+  padding?: Float;
+  paddingVertical?: Float;
+  paddingHorizontal?: Float;
+}
+
 interface MarkdownStyle {
   syntax: {
     color: ColorValue;
@@ -23,31 +37,10 @@ interface MarkdownStyle {
     marginLeft: Float;
     paddingLeft: Float;
   };
-  code: {
-    fontFamily: string;
-    fontSize: Float;
+  code: CodeBlockStyle & {
     h1NestedFontSize?: Float;
-    color: ColorValue;
-    backgroundColor: ColorValue;
-    borderColor: ColorValue;
-    borderWidth: Float;
-    borderRadius: Float;
-    borderStyle: string;
-    padding?: Float;
-    paddingVertical?: Float;
-    paddingHorizontal?: Float;
   };
-  pre: {
-    fontFamily: string;
-    fontSize: Float;
-    color: ColorValue;
-    backgroundColor: ColorValue;
-    borderColor: string;
-    borderRadius: Float;
-    padding: Float;
-    paddingVertical?: Float;
-    paddingHorizontal?: Float;
-  };
+  pre: CodeBlockStyle;
   mentionHere: {
     color: ColorValue;
     backgroundColor: ColorValue;
