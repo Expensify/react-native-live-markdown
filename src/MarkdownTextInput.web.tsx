@@ -72,7 +72,7 @@ type MarkdownTextInputElement = HTMLDivElement &
   HTMLInputElement & {
     tree: TreeNode;
     uniqueId: string;
-    styleSheet: CSSStyleSheet;
+    styleSheet?: CSSStyleSheet;
     selection: Selection;
     imageElements: HTMLImageElement[];
   };
@@ -370,7 +370,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
         const newCursorPosition =
           inputType === 'deleteContentForward' && contentSelection.current.start === contentSelection.current.end
             ? Math.max(contentSelection.current.start, 0) // Don't move the caret when deleting forward with no characters selected
-            : Math.max(Math.max(contentSelection.current.end, 0) + (parsedText.length - previousText.length), 0);
+            : Math.max(Math.max(contentSelection.current.end, 0) + (parsedText.length - (previousText?.length ?? 0)), 0);
 
         if (isComposing) {
           updateTextColor(divRef.current, parsedText);
@@ -484,8 +484,8 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
         const previousText = divRef.current.value;
         let insertedText = text;
         let availableLength = text.length;
-        const prefix = divRef.current.value.substring(0, contentSelection.current.start);
-        const suffix = divRef.current.value.substring(contentSelection.current.end);
+        const prefix = divRef.current.value?.substring?.(0, contentSelection.current.start) ?? '';
+        const suffix = divRef.current.value?.substring?.(contentSelection.current.end) ?? '';
         if (maxLength !== undefined) {
           availableLength = maxLength - prefix.length - suffix.length;
           insertedText = text.slice(0, Math.max(availableLength, 0));
