@@ -66,8 +66,15 @@ function configureCustomWebStylesheet(): CSSStyleSheet | null {
   return sheet;
 }
 
+function removeWebStylesheet(sheet: CSSStyleSheet) {
+  const index = document.adoptedStyleSheets.indexOf(sheet);
+  if (index !== -1) {
+    document.adoptedStyleSheets = document.adoptedStyleSheets.filter((_, i) => i !== index);
+  }
+}
+
 function getPropertyValue(e: HTMLElement, p: string) {
   return parseFloat(window.getComputedStyle(e).getPropertyValue(p).replace('px', ''));
 }
 
-export {parseToReactDOMStyle, processMarkdownStyle, idGenerator, configureCustomWebStylesheet, getPropertyValue};
+export {parseToReactDOMStyle, processMarkdownStyle, idGenerator, configureCustomWebStylesheet, removeWebStylesheet, getPropertyValue};
