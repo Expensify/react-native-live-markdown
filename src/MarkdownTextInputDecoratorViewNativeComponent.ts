@@ -8,10 +8,10 @@ interface CodeBlockStyle {
   fontSize: Float;
   color: ColorValue;
   backgroundColor: ColorValue;
-  borderColor: ColorValue;
-  borderWidth: Float;
-  borderRadius: Float;
-  borderStyle: string;
+  borderColor?: ColorValue;
+  borderWidth?: Float;
+  borderRadius?: Float;
+  borderStyle?: string;
   padding?: Float;
   paddingVertical?: Float;
   paddingHorizontal?: Float;
