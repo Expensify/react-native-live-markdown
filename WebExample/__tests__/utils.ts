@@ -53,6 +53,36 @@ const getElementStyle = async (elementHandle: Locator) => {
   return elementStyle;
 };
 
+const getPseudoElementStyle = async (elementHandle: Locator, pseudoElementStyle: Record<string, string>) => {
+  let elementStyle = null;
+
+  if (elementHandle) {
+    await elementHandle.waitFor({state: 'attached'});
+    // We need to get styles from the parent element because every text node is wrapped additionally with a span element
+    const parentElementHandle = await elementHandle.evaluateHandle((element) => {
+      return element.parentElement;
+    });
+
+    // eslint-disable-next-line no-shadow
+    elementStyle = await parentElementHandle.evaluate((element, pseudoElementStyle) => {
+      if (!element) {
+        return null;
+      }
+
+      const style = window.getComputedStyle(element, '::before');
+      const output: Record<string, string> = {};
+      Object.keys(pseudoElementStyle).forEach((key) => {
+        const value = style[key as keyof CSSStyleDeclaration];
+        if (typeof value === 'string') {
+          output[key] = value;
+        }
+      });
+      return output;
+    }, pseudoElementStyle);
+  }
+  return elementStyle;
+};
+
 const pressCmd = async ({inputLocator, command}: {inputLocator: Locator; command: string}) => {
   const OPERATION_MODIFIER = process.platform === 'darwin' ? 'Meta' : 'Control';
 
@@ -65,4 +95,4 @@ const getElementValue = async (elementHandle: Locator) => {
   return value;
 };
 
-export {setupInput, getCursorPosition, setCursorPosition, getElementStyle, pressCmd, getElementValue};
+export {setupInput, getCursorPosition, setCursorPosition, getElementStyle, pressCmd, getElementValue, getPseudoElementStyle};
