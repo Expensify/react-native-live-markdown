@@ -9,7 +9,6 @@ interface MarkdownStyle {
   };
   emoji: {
     fontSize: Float;
-    fontFamily: string;
   };
   link: {
     color: ColorValue;
