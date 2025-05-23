@@ -209,7 +209,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
           flattenedStyle && {
             caretColor: (flattenedStyle as TextStyle).color || 'black',
           },
-          {whiteSpace: multiline ? 'pre-wrap' : 'nowrap'},
+          {whiteSpace: multiline ? 'pre-wrap' : 'pre'},
           disabled && styles.disabledInputStyles,
           parseToReactDOMStyle(flattenedStyle),
           caretHidden && styles.caretHidden,
