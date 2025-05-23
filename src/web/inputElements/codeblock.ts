@@ -91,7 +91,7 @@ function generateCodeBlocksRules(target: MarkdownTextInputElement, markdownStyle
 
     rules.push({
       // This selector targets specific pre block
-      selector: `.${target.uniqueId} *:nth-child(${i + 1} of [data-type='line'] [data-type='codeblock']:has(> *[data-type='pre'])) > *[data-type='pre']::before`,
+      selector: `.${target.uniqueId} *:nth-child(${i + 1} of [data-type='line']:has(> [data-type='codeblock'])) > *[data-type='codeblock'] > *[data-type='pre']::before`,
       properties: {
         height: `${preLineHeight - 2 * lineHeight}px`,
         'min-width': `min(calc(100% + 2.5px), ${preBlockWidth + horizontalPadding * 2 + 1}px)`,
