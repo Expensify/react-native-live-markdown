@@ -1,5 +1,8 @@
 import type {CSSProperties} from 'react';
 import type {MarkdownNativeEvent, MarkdownTextInputElement} from '../../MarkdownTextInput.web';
+import {isMultilineMarkdownType} from './blockUtils';
+import type {NodeType} from './treeUtils';
+import BrowserUtils from './browserUtils';
 
 const ZERO_WIDTH_SPACE = '\u200B';
 
@@ -36,17 +39,17 @@ function normalizeValue(value: string) {
   return value.replaceAll('\r\n', '\n');
 }
 
-// Parses the HTML structure of a MarkdownTextInputElement to a plain text string. Used for getting the correct value of the input element.
-function parseInnerHTMLToText(target: MarkdownTextInputElement, cursorPosition: number, inputType?: string): string {
-  // Returns the parent of a given node that is higher in the hierarchy and is of a different type than 'text', 'br' or 'line'
-  function getTopParentNode(node: ChildNode) {
-    let currentParentNode = node.parentNode;
-    while (currentParentNode && ['text', 'br', 'line'].includes(currentParentNode.parentElement?.getAttribute('data-type') || '')) {
-      currentParentNode = currentParentNode?.parentNode || null;
-    }
-    return currentParentNode;
+// Returns the parent of a given node that is higher in the hierarchy and is of a different type than 'text', 'br' or 'line'
+function getTopParentNode(node: ChildNode) {
+  let currentParentNode = node.parentNode;
+  while (currentParentNode && ['text', 'br', 'line'].includes(currentParentNode.parentElement?.getAttribute('data-type') || '')) {
+    currentParentNode = currentParentNode?.parentNode || null;
   }
+  return currentParentNode;
+}
 
+// Parses the HTML structure of a MarkdownTextInputElement to a plain text string. Used for getting the correct value of the input element.
+function parseInnerHTMLToText(target: MarkdownTextInputElement | HTMLElement, cursorPosition: number, inputType?: string): string {
   const stack: ChildNode[] = [target];
   let text = '';
   let shouldAddNewline = false;
@@ -83,6 +86,18 @@ function parseInnerHTMLToText(target: MarkdownTextInputElement, cursorPosition: 
     if (node.nodeType === Node.TEXT_NODE) {
       // Parse text nodes into text
       text += node.textContent;
+
+      // Fix for Firefox: If we are adding text at the end of a multiline markdown type element, we need to add a newline
+      // because the new text can replace the last <br> element and it will not be added to the text.
+      if (
+        BrowserUtils.isFirefox &&
+        !node.parentNode?.nextSibling &&
+        node?.parentElement?.getAttribute?.('data-type') === 'br' &&
+        node?.parentElement?.parentElement &&
+        isMultilineMarkdownType((node.parentElement.parentElement?.getAttribute?.('data-type') || '') as NodeType)
+      ) {
+        text += '\n';
+      }
     } else if (node.nodeName === 'BR') {
       const parentNode = getTopParentNode(node);
       if (parentNode && parentNode.parentElement?.contentEditable !== 'true' && !!(node as HTMLElement).getAttribute('data-id')) {
@@ -105,10 +120,15 @@ function parseInnerHTMLToText(target: MarkdownTextInputElement, cursorPosition: 
   text = text.replaceAll('\r\n', '\n');
 
   // Force letter removal if the input value haven't changed but input type is 'delete'
-  if (text === target.value && inputType?.includes('delete')) {
+  if ('value' in target && text === target?.value && inputType?.includes('delete')) {
     text = text.slice(0, cursorPosition - 1) + text.slice(cursorPosition);
   }
   return text;
 }
 
-export {isEventComposing, getPlaceholderValue, getElementHeight, parseInnerHTMLToText, normalizeValue};
+function removePostRenderAttributes(text: string) {
+  const regex = /( )?data-content="[^"]*"/g;
+  return text.replace(regex, '');
+}
+
+export {isEventComposing, getPlaceholderValue, getElementHeight, parseInnerHTMLToText, normalizeValue, removePostRenderAttributes};

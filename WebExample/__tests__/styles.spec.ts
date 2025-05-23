@@ -2,15 +2,20 @@ import {test, expect} from '@playwright/test';
 import type {Page} from '@playwright/test';
 // eslint-disable-next-line import/no-relative-packages
 import * as TEST_CONST from '../../example/src/testConstants';
-import {setupInput, getElementStyle} from './utils';
+import {setupInput, getElementStyle, getPseudoElementStyle} from './utils';
 
-const testMarkdownContentStyle = async ({testContent, style, page}: {testContent: string; style: string; page: Page}) => {
+const testMarkdownContentStyle = async ({testContent, style, page, pseudoStyle}: {testContent: string; style: string; page: Page; pseudoStyle?: Record<string, string>}) => {
   const inputLocator = await setupInput(page);
 
   const elementHandle = inputLocator.locator('span', {hasText: testContent}).last();
   const elementStyle = await getElementStyle(elementHandle);
 
   expect(elementStyle).toEqual(style);
+
+  if (pseudoStyle) {
+    const pseudoElementStyle = await getPseudoElementStyle(elementHandle, pseudoStyle);
+    expect(pseudoElementStyle).toEqual(pseudoStyle);
+  }
 };
 
 test.beforeEach(async ({page}) => {
@@ -32,11 +37,28 @@ test.describe('markdown content styling', () => {
   });
 
   test('inline code', async ({page}) => {
-    await testMarkdownContentStyle({testContent: 'inline code', style: 'font-family: monospace; font-size: 20px; color: black; background-color: lightgray;', page});
+    await testMarkdownContentStyle({
+      testContent: 'inline code',
+      style:
+        'font-family: monospace; font-size: 20px; color: black; background-color: lightgray; border-color: gray; border-width: 1px; border-radius: 4px; border-style: solid; padding: 0px; line-height: 1.5;',
+      page,
+    });
   });
 
   test('codeblock', async ({page}) => {
-    await testMarkdownContentStyle({testContent: 'codeblock', style: 'font-family: monospace; font-size: 20px; color: black; background-color: lightgray;', page});
+    await testMarkdownContentStyle({
+      testContent: 'codeblock',
+      style: 'border-radius: 4px; padding: 0px; font-family: monospace; font-size: 20px; color: black;',
+      pseudoStyle: {
+        backgroundColor: 'rgb(211, 211, 211)',
+        padding: '2px',
+        borderWidth: '1px',
+        borderStyle: 'solid',
+        borderColor: 'rgb(128, 128, 128)',
+        borderRadius: '4px',
+      },
+      page,
+    });
   });
 
   test('mention-here', async ({page}) => {
