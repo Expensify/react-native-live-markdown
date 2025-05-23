@@ -22,6 +22,10 @@
   vertical-align: middle;
 }
 
+.react-native-live-markdown-input-singleline span[data-type='link'] span[data-type='text'] {
+  vertical-align: top;
+}
+
 .react-native-live-markdown-input-singleline > p:last-child {
   padding-right: 1px !important;
 }
