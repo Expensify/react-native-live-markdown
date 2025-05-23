@@ -14,7 +14,6 @@
     _h1FontSize = style.h1.fontSize;
 
     _emojiFontSize = style.emoji.fontSize;
-    _emojiFontFamily = RCTNSStringFromString(style.emoji.fontFamily);
 
     _blockquoteBorderColor = RCTUIColorFromSharedColor(style.blockquote.borderColor);
     _blockquoteBorderWidth = style.blockquote.borderWidth;

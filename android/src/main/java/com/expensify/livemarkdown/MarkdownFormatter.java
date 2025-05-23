@@ -70,8 +70,7 @@ public class MarkdownFormatter {
         setSpan(ssb, new MarkdownStrikethroughSpan(), start, end);
         break;
       case "emoji":
-        setSpan(ssb, new MarkdownFontFamilySpan(markdownStyle.getEmojiFontFamily(), mAssetManager), start, end);
-        setSpan(ssb, new MarkdownFontSizeSpan(markdownStyle.getEmojiFontSize()), start, end);
+        setSpan(ssb, new MarkdownEmojiSpan(markdownStyle.getEmojiFontSize()), start, end);
         break;
       case "mention-here":
         setSpan(ssb, new MarkdownForegroundColorSpan(markdownStyle.getMentionHereColor()), start, end);
