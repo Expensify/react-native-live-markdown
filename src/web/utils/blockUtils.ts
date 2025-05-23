@@ -132,6 +132,7 @@ function addCodeBlockStyles(targetElement: HTMLElement, type: NodeType, markdown
           maxWidth: '100%',
           boxSizing: 'border-box',
           zIndex: 2,
+          display: 'block',
         });
       } else {
         Object.assign(node.style, {

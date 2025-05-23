@@ -34,7 +34,7 @@ function addStylesheetRules(rules: Rule[], sheet: CSSStyleSheet) {
 }
 
 function generateCodeBlocksRules(target: MarkdownTextInputElement, markdownStyle: PartialMarkdownStyle): Rule[] {
-  const line = target.querySelector('*[data-type="line"]:has(> *[data-type="pre"]) > span:first-child');
+  const line = target.querySelector('*[data-type="line"] *[data-type="codeblock"]:has(> *[data-type="pre"]) > span:first-child');
   if (!line) {
     return [];
   }
@@ -67,27 +67,14 @@ function generateCodeBlocksRules(target: MarkdownTextInputElement, markdownStyle
       },
     },
     {
-      selector: `.${target.uniqueId} *[data-type='line'] *[data-type='syntax']:has(+ *[data-type='pre'])`,
+      selector: `.${target.uniqueId} *[data-type='line'] *[data-type='codeblock'] *[data-type='syntax']:has(+ *[data-type='pre'])`,
       properties: {
         transform: `translate(-${horizontalPadding}px, -${verticalPadding}px)`,
       },
     },
     {
-      selector: `.${target.uniqueId} *[data-type='line'] *[data-type='pre'] + *[data-type='syntax']`,
+      selector: `.${target.uniqueId} *[data-type='line'] *[data-type='codeblock'] *[data-type='pre'] + *[data-type='syntax']`,
       properties: {
-        transform: `translate(-${horizontalPadding}px, ${verticalPadding}px)`,
-      },
-    },
-    {
-      selector: `.${target.uniqueId} *[data-type='line'] *[data-type='pre'] + *[data-type='syntax'] + *[data-type='text']`,
-      properties: {
-        transform: `translate(-${horizontalPadding}px, ${verticalPadding}px)`,
-      },
-    },
-    {
-      selector: `.${target.uniqueId} *[data-type='line']:has(> *[data-type='pre']) > *:nth-child(n+4)`,
-      properties: {
-        display: 'inline-block',
         transform: `translate(-${horizontalPadding}px, ${verticalPadding}px)`,
       },
     },
@@ -100,14 +87,11 @@ function generateCodeBlocksRules(target: MarkdownTextInputElement, markdownStyle
     const preBlockWidth = preBlock.getBoundingClientRect().width;
 
     // Get pre block line height, by calculating height between syntaxes
-    const preLineHeight =
-      (preBlock.nextElementSibling?.getBoundingClientRect().top ?? 0) -
-      (preBlock.previousElementSibling?.getBoundingClientRect().top ?? 0) +
-      (preBlock.nextElementSibling?.getBoundingClientRect().height ?? 0);
+    const preLineHeight = preBlock.parentElement?.getBoundingClientRect().height ?? 0;
 
     rules.push({
       // This selector targets specific pre block
-      selector: `.${target.uniqueId} *:nth-child(${i + 1} of [data-type='line']:has(> *[data-type='pre'])) > *[data-type='pre']::before`,
+      selector: `.${target.uniqueId} *:nth-child(${i + 1} of [data-type='line'] [data-type='codeblock']:has(> *[data-type='pre'])) > *[data-type='pre']::before`,
       properties: {
         height: `${preLineHeight - 2 * lineHeight}px`,
         'min-width': `min(calc(100% + 2.5px), ${preBlockWidth + horizontalPadding * 2 + 1}px)`,

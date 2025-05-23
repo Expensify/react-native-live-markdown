@@ -176,6 +176,7 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, MarkdownRange[]] {
       } else if (node.tag.startsWith('<pre')) {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const [_, lb, content] = node.children.join('').match(/^(\r?\n)([\s\S]*)$/) as RegExpMatchArray;
+        ranges.push({type: 'codeblock', start: text.length, length: (content?.length ?? 0) + 7});
         appendSyntax(`\`\`\`${lb}`);
         addChildrenWithStyle(`${content}`, 'pre');
         appendSyntax('```');
