@@ -190,7 +190,7 @@ test('inline code', () => {
 
 test('codeblock', () => {
   expect('```\nHello world!\n```').toBeParsedAsHTML(
-    '<p data-type="line" data-id="0"><span data-type="syntax" data-id="0,0"><span data-type="text" data-id="0,0,0">```</span><span data-type="br" data-id="0,0,1"><br data-id="0,0,1,0"></span></span><span data-type="pre" data-id="0,1"><span data-type="text" data-id="0,1,0">Hello world!</span><span data-type="br" data-id="0,1,1"><br data-id="0,1,1,0"></span></span><span data-type="syntax" data-id="0,2"><span data-type="text" data-id="0,2,0">```</span></span></p>',
+    '<p data-type="line" data-id="0"><span data-type="codeblock" data-id="0,0"><span data-type="syntax" data-id="0,0,0"><span data-type="text" data-id="0,0,0,0">```</span><span data-type="br" data-id="0,0,0,1"><br data-id="0,0,0,1,0"></span></span><span data-type="pre" data-id="0,0,1"><span data-type="text" data-id="0,0,1,0">Hello world!</span><span data-type="br" data-id="0,0,1,1"><br data-id="0,0,1,1,0"></span></span><span data-type="syntax" data-id="0,0,2"><span data-type="text" data-id="0,0,2,0">```</span></span></span></p>',
   );
 });
 
