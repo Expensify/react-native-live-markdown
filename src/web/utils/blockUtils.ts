@@ -161,7 +161,7 @@ function isMultilineMarkdownType(type: NodeType) {
 
 function getFirstBlockMarkdownRange(ranges: MarkdownRange[]) {
   const blockMarkdownRange = ranges.find((r) => isBlockMarkdownType(r.type) || FULL_LINE_MARKDOWN_TYPES.includes(r.type));
-  return FULL_LINE_MARKDOWN_TYPES.includes(blockMarkdownRange?.type || '') ? undefined : blockMarkdownRange;
+  return blockMarkdownRange && FULL_LINE_MARKDOWN_TYPES.includes(blockMarkdownRange.type) ? undefined : blockMarkdownRange;
 }
 
 function extendBlockStructure(
@@ -202,4 +202,4 @@ function isChildOfMarkdownElement(node: HTMLElement, elementType: MarkdownType):
   return false;
 }
 
-export {addStyleToBlock, extendBlockStructure, isBlockMarkdownType, getFirstBlockMarkdownRange, getTopParentTreeNode, isMultilineMarkdownType};
+export {addStyleToBlock, extendBlockStructure, isBlockMarkdownType, getFirstBlockMarkdownRange, getTopParentTreeNode, isMultilineMarkdownType, MULTILINE_MARKDOWN_TYPES};
