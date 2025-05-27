@@ -48,7 +48,7 @@ test.describe('markdown content styling', () => {
   test('codeblock', async ({page}) => {
     await testMarkdownContentStyle({
       testContent: 'codeblock',
-      style: 'border-radius: 4px; padding: 0px; font-family: monospace; font-size: 20px; color: black;',
+      style: 'border-radius: 4px; padding: 0px; font-family: monospace; font-size: 20px; color: black; display: inline-block;',
       pseudoStyle: {
         backgroundColor: 'rgb(211, 211, 211)',
         padding: '2px',
