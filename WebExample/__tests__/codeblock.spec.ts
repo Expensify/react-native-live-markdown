@@ -101,3 +101,35 @@ test.describe('modyfying codeblock content', () => {
     await testMarkdownContentStyle(styleProperties);
   });
 });
+
+test('codeblock dimensions after resizing the input', async ({page, browserName}) => {
+  const inputLocator = await setupInput(page, 'clear');
+  await inputLocator.focus();
+  await inputLocator.pressSequentially('```\nCodeblock\nSample very long line of code that should be wrapped\n\n```');
+
+  await testMarkdownContentStyle({
+    testContent: 'codeblock',
+    style: CODEBLOCK_DEFAULT_STYLE,
+    pseudoStyle: {
+      height: '134px',
+      width: '282px',
+    },
+    page,
+  });
+
+  await inputLocator.evaluate((inputElement: HTMLInputElement) => {
+    const element = inputElement;
+    element.style.width = '500px';
+    element.style.height = '200px';
+  });
+
+  await testMarkdownContentStyle({
+    testContent: 'codeblock',
+    style: CODEBLOCK_DEFAULT_STYLE,
+    pseudoStyle: {
+      height: '108px',
+      width: browserName === 'chromium' ? '426px' : '427px',
+    },
+    page,
+  });
+});
