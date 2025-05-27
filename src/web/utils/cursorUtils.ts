@@ -70,6 +70,25 @@ function scrollIntoView(target: MarkdownTextInputElement, node: TreeNode) {
     if (currentLine) {
       scrollTargetElement = currentLine;
     }
+  } else if (node.element.nodeName === 'BR') {
+    // Force scrolling BR into view
+    const selection = window.getSelection();
+    if (selection) {
+      const range = document.createRange();
+
+      range.setStartBefore(node.element);
+      range.collapse(true);
+
+      selection.addRange(range);
+
+      // Scroll to caret
+      const span = document.createElement('span');
+      span.textContent = '\u200B'; // zero-width space
+      range.insertNode(span);
+      span.scrollIntoView({block: 'center'});
+      span.remove(); // cleanup
+      return;
+    }
   }
 
   const caretRect = scrollTargetElement.getBoundingClientRect();

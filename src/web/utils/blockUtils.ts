@@ -154,7 +154,7 @@ function addCodeBlockStyles(targetElement: HTMLElement, type: NodeType, markdown
 
 const BLOCK_MARKDOWN_TYPES = ['inline-image'];
 const FULL_LINE_MARKDOWN_TYPES = ['blockquote'];
-const MULTILINE_MARKDOWN_TYPES = ['pre'];
+const MULTILINE_MARKDOWN_TYPES = ['pre', 'codeblock'];
 
 function isBlockMarkdownType(type: NodeType) {
   return BLOCK_MARKDOWN_TYPES.includes(type);
