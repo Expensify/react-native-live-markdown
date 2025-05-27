@@ -123,7 +123,7 @@ test('codeblock dimensions after resizing the input', async ({page, browserName}
     element.style.width = '500px';
     element.style.height = '200px';
   });
-
+  await page.waitForTimeout(10);
   await testMarkdownContentStyle({
     testContent: 'codeblock',
     style: CODEBLOCK_DEFAULT_STYLE,
