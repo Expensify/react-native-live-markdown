@@ -103,15 +103,16 @@ test.describe('modyfying codeblock content', () => {
 });
 
 test('codeblock dimensions after resizing the input', async ({page, browserName}) => {
+  await page.setViewportSize({width: 1280, height: 720});
   const inputLocator = await setupInput(page, 'clear');
   await inputLocator.focus();
-  await inputLocator.pressSequentially('```\nCodeblock\nSample very long line of code that should be wrapped\n\n```');
+  await inputLocator.pressSequentially('```\nCodeblock\nSample very long line of code that should be wrapped\n```');
 
   await testMarkdownContentStyle({
     testContent: 'codeblock',
     style: CODEBLOCK_DEFAULT_STYLE,
     pseudoStyle: {
-      height: '134px',
+      height: '108px',
       width: '282px',
     },
     page,
@@ -127,7 +128,7 @@ test('codeblock dimensions after resizing the input', async ({page, browserName}
     testContent: 'codeblock',
     style: CODEBLOCK_DEFAULT_STYLE,
     pseudoStyle: {
-      height: '108px',
+      height: '82px',
       width: browserName === 'chromium' ? '426px' : '427px',
     },
     page,
