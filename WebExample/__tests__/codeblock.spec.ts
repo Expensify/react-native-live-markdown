@@ -3,11 +3,37 @@ import {test, expect} from '@playwright/test';
 import * as TEST_CONST from '../../example/src/testConstants';
 import {getElementValue, setCursorPosition, setupInput, testMarkdownContentStyle} from './utils';
 
+const CODEBLOCK_DEFAULT_STYLE = 'border-radius: 4px; padding: 0px; font-family: monospace; font-size: 20px; color: black;';
+
 test.beforeEach(async ({page}) => {
   await page.goto(TEST_CONST.LOCAL_URL, {waitUntil: 'load'});
 });
 
-test.describe('typing', () => {
+test.describe('modyfying codeblock content', () => {
+  test('codeblock content wrapping', async ({page}) => {
+    const LINE_TO_ADD = ' very long line of code that should be wrapped';
+    const inputLocator = await setupInput(page, 'clear');
+    await inputLocator.focus();
+    await inputLocator.pressSequentially('```\nCodeblock\nSample code line\n```');
+
+    await setCursorPosition(page, 3);
+
+    await inputLocator.pressSequentially(LINE_TO_ADD);
+
+    expect(await getElementValue(inputLocator)).toEqual(`\`\`\`\nCodeblock${LINE_TO_ADD}\nSample code line\n\`\`\``);
+
+    // Verify if the codeblock style wasn't appleid
+    await testMarkdownContentStyle({
+      testContent: 'codeblock',
+      style: CODEBLOCK_DEFAULT_STYLE,
+      pseudoStyle: {
+        height: '108px',
+        width: '246px',
+      },
+      page,
+    });
+  });
+
   test('typing after codeblock opening syntax', async ({page}) => {
     const inputLocator = await setupInput(page, 'clear');
     await inputLocator.focus();
@@ -40,7 +66,7 @@ test.describe('typing', () => {
     // Verify if the codeblock style is applied correctly after cahnges
     await testMarkdownContentStyle({
       testContent: 'codeblock',
-      style: 'border-radius: 4px; padding: 0px; font-family: monospace; font-size: 20px; color: black;',
+      style: CODEBLOCK_DEFAULT_STYLE,
       pseudoStyle: {
         height: '82px',
         width: '197px',
@@ -52,7 +78,7 @@ test.describe('typing', () => {
   test('typing after codeblock closing syntax', async ({page}) => {
     const styleProperties = {
       testContent: 'codeblock',
-      style: 'border-radius: 4px; padding: 0px; font-family: monospace; font-size: 20px; color: black;',
+      style: CODEBLOCK_DEFAULT_STYLE,
       pseudoStyle: {
         height: '56px',
         width: '197px',
