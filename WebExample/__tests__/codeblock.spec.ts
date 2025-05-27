@@ -134,3 +134,32 @@ test('codeblock dimensions after resizing the input', async ({page, browserName}
     page,
   });
 });
+
+test.describe('scrolling into view', () => {
+  test('to an empty line inside the codeblock', async ({page}) => {
+    const inputLocator = await setupInput(page, 'clear');
+    await inputLocator.focus();
+
+    await inputLocator.evaluate((inputElement: HTMLInputElement) => {
+      const element = inputElement;
+      element.style.height = '100px';
+    });
+    await inputLocator.pressSequentially('```\nCodeblock start\n\n\n\n\n\n\n\n\nCodeblock end\n```');
+
+    await setCursorPosition(page, 4);
+    await inputLocator.evaluate((inputElement: HTMLInputElement) => {
+      const element = inputElement;
+      element.scrollTop = element.scrollHeight;
+      return element.scrollHeight;
+    });
+    await inputLocator.blur();
+
+    await inputLocator.focus();
+
+    const scrollTop = await inputLocator.evaluate((inputElement: HTMLInputElement) => {
+      const element = inputElement;
+      return element.scrollTop;
+    });
+    expect(scrollTop).toBeLessThanOrEqual(25);
+  });
+});
