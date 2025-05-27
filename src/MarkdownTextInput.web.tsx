@@ -25,7 +25,7 @@ import {idGenerator, parseToReactDOMStyle, processMarkdownStyle} from './web/uti
 import {forceRefreshAllImages} from './web/inputElements/inlineImage';
 import type {MarkdownRange, InlineImagesInputProps} from './commonTypes';
 import BrowserUtils from './web/utils/browserUtils';
-import {handleFirefoxRightArrowKeyNavigation} from './web/utils/firefoxUtils';
+import {handleFirefoxArrowKeyNavigation} from './web/utils/firefoxUtils';
 
 const useClientEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
 
@@ -528,13 +528,13 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
           onKeyPress(event);
         }
 
-        // Handle ArrowRight for consistent navigation across grapheme clusters (like emojis) on Firefox
-        if (BrowserUtils.isFirefox && e.key === 'ArrowRight' && !nativeEvent.altKey) {
+        // Handle Arrow keys for consistent navigation across grapheme clusters (like emojis) on Firefox
+        if (BrowserUtils.isFirefox && ['ArrowRight', 'ArrowLeft'].includes(e.key) && !nativeEvent.altKey) {
           e.preventDefault();
           if (!divRef.current) {
             return;
           }
-          handleFirefoxRightArrowKeyNavigation(divRef.current, nativeEvent?.shiftKey);
+          handleFirefoxArrowKeyNavigation(divRef.current, nativeEvent?.shiftKey, e.key === 'ArrowRight' ? 'right' : 'left');
         }
 
         if (

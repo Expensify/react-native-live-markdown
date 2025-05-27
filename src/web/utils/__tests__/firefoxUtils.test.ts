@@ -1,6 +1,6 @@
 import * as CursorUtils from '../cursorUtils';
 import type {MarkdownTextInputElement} from '../../../MarkdownTextInput.web';
-import {handleFirefoxRightArrowKeyNavigation} from '../firefoxUtils';
+import {handleFirefoxArrowKeyNavigation} from '../firefoxUtils';
 
 const createMockTarget = (value: string): MarkdownTextInputElement => {
   const div = document.createElement('div') as unknown as MarkdownTextInputElement;
@@ -23,7 +23,7 @@ describe('handleFirefoxArrowKeyNavigation', () => {
     const target = createMockTarget('test');
     (CursorUtils.getCurrentCursorPosition as jest.Mock).mockReturnValue(null);
 
-    handleFirefoxRightArrowKeyNavigation(target);
+    handleFirefoxArrowKeyNavigation(target);
     expect(CursorUtils.setCursorPosition).not.toHaveBeenCalled();
   });
 
@@ -31,7 +31,7 @@ describe('handleFirefoxArrowKeyNavigation', () => {
     const target = createMockTarget('hello world');
     (CursorUtils.getCurrentCursorPosition as jest.Mock).mockReturnValue({start: 5, end: 5});
 
-    handleFirefoxRightArrowKeyNavigation(target);
+    handleFirefoxArrowKeyNavigation(target);
     expect(CursorUtils.setCursorPosition).toHaveBeenCalledWith(target, 6, 6);
   });
 
@@ -39,7 +39,7 @@ describe('handleFirefoxArrowKeyNavigation', () => {
     const target = createMockTarget('😀text');
     (CursorUtils.getCurrentCursorPosition as jest.Mock).mockReturnValue({start: 1, end: 1});
 
-    handleFirefoxRightArrowKeyNavigation(target);
+    handleFirefoxArrowKeyNavigation(target);
     expect(CursorUtils.setCursorPosition).toHaveBeenCalledWith(target, 2, 2);
   });
 
@@ -47,27 +47,46 @@ describe('handleFirefoxArrowKeyNavigation', () => {
     const target = createMockTarget('test');
 
     (CursorUtils.getCurrentCursorPosition as jest.Mock).mockReturnValue({start: 4, end: 4});
-    handleFirefoxRightArrowKeyNavigation(target);
+    handleFirefoxArrowKeyNavigation(target);
     expect(CursorUtils.setCursorPosition).toHaveBeenCalledWith(target, 4, 4);
   });
 
-  it('should handle multiple emojis correctly', () => {
+  it('should handle multiple emojis', () => {
     const target = createMockTarget('😀😀text');
     (CursorUtils.getCurrentCursorPosition as jest.Mock).mockReturnValueOnce({start: 0, end: 0}).mockReturnValueOnce({start: 2, end: 2});
 
-    handleFirefoxRightArrowKeyNavigation(target);
+    handleFirefoxArrowKeyNavigation(target);
     expect(CursorUtils.setCursorPosition).toHaveBeenCalledWith(target, 2, 2);
-    handleFirefoxRightArrowKeyNavigation(target);
+    handleFirefoxArrowKeyNavigation(target);
     expect(CursorUtils.setCursorPosition).toHaveBeenCalledWith(target, 4, 4);
+  });
+
+  it('should handle multiple emojis backward navigation', () => {
+    const target = createMockTarget('😀😀text');
+    (CursorUtils.getCurrentCursorPosition as jest.Mock).mockReturnValueOnce({start: 4, end: 4}).mockReturnValueOnce({start: 2, end: 2});
+
+    handleFirefoxArrowKeyNavigation(target, false, 'left');
+    expect(CursorUtils.setCursorPosition).toHaveBeenCalledWith(target, 2, 2);
+    handleFirefoxArrowKeyNavigation(target, false, 'left');
+    expect(CursorUtils.setCursorPosition).toHaveBeenCalledWith(target, 2, 2);
   });
 
   it('should handle emoji selection', () => {
     const target = createMockTarget('😀😀text');
     (CursorUtils.getCurrentCursorPosition as jest.Mock).mockReturnValueOnce({start: 0, end: 0}).mockReturnValueOnce({start: 2, end: 2});
 
-    handleFirefoxRightArrowKeyNavigation(target, true);
+    handleFirefoxArrowKeyNavigation(target, true);
     expect(CursorUtils.setCursorPosition).toHaveBeenCalledWith(target, 0, 2);
-    handleFirefoxRightArrowKeyNavigation(target);
+    handleFirefoxArrowKeyNavigation(target);
     expect(CursorUtils.setCursorPosition).toHaveBeenCalledWith(target, 4, 4);
+  });
+  it('should handle emoji selection backwards', () => {
+    const target = createMockTarget('😀😀text');
+    (CursorUtils.getCurrentCursorPosition as jest.Mock).mockReturnValueOnce({start: 4, end: 4}).mockReturnValueOnce({start: 2, end: 4});
+
+    handleFirefoxArrowKeyNavigation(target, true, 'left');
+    expect(CursorUtils.setCursorPosition).toHaveBeenCalledWith(target, 2, 4);
+    handleFirefoxArrowKeyNavigation(target, true, 'left');
+    expect(CursorUtils.setCursorPosition).toHaveBeenCalledWith(target, 0, 4);
   });
 });
