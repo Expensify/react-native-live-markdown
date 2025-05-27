@@ -18,6 +18,7 @@ describe('handleFirefoxArrowKeyNavigation', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
+
   it('should do nothing if no cursor in target', () => {
     const target = createMockTarget('test');
     (CursorUtils.getCurrentCursorPosition as jest.Mock).mockReturnValue(null);

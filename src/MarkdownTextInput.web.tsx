@@ -528,8 +528,8 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
           onKeyPress(event);
         }
 
-        // Handle ArrowRight for consistent navigation across grapheme clusters (like emojis) on firefox
-        if (e.key === 'ArrowRight' && BrowserUtils.isFirefox && !nativeEvent.altKey) {
+        // Handle ArrowRight for consistent navigation across grapheme clusters (like emojis) on Firefox
+        if (BrowserUtils.isFirefox && e.key === 'ArrowRight' && !nativeEvent.altKey) {
           e.preventDefault();
           if (!divRef.current) {
             return;
