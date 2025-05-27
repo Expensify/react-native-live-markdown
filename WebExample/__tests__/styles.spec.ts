@@ -1,22 +1,7 @@
-import {test, expect} from '@playwright/test';
-import type {Page} from '@playwright/test';
+import {test} from '@playwright/test';
 // eslint-disable-next-line import/no-relative-packages
 import * as TEST_CONST from '../../example/src/testConstants';
-import {setupInput, getElementStyle, getPseudoElementStyle} from './utils';
-
-const testMarkdownContentStyle = async ({testContent, style, page, pseudoStyle}: {testContent: string; style: string; page: Page; pseudoStyle?: Record<string, string>}) => {
-  const inputLocator = await setupInput(page);
-
-  const elementHandle = inputLocator.locator('span', {hasText: testContent}).last();
-  const elementStyle = await getElementStyle(elementHandle);
-
-  expect(elementStyle).toEqual(style);
-
-  if (pseudoStyle) {
-    const pseudoElementStyle = await getPseudoElementStyle(elementHandle, pseudoStyle);
-    expect(pseudoElementStyle).toEqual(pseudoStyle);
-  }
-};
+import {testMarkdownContentStyle} from './utils';
 
 test.beforeEach(async ({page}) => {
   await page.goto(TEST_CONST.LOCAL_URL, {waitUntil: 'load'});

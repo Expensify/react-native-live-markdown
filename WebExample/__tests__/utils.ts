@@ -1,4 +1,5 @@
 import type {Locator, Page} from '@playwright/test';
+import {expect} from '@playwright/test';
 // eslint-disable-next-line import/no-relative-packages
 import * as TEST_CONST from '../../example/src/testConstants';
 
@@ -23,22 +24,30 @@ const getCursorPosition = async (elementHandle: Locator) => {
   return selection;
 };
 
-const setCursorPosition = ({startNode, endNode}: {startNode?: Element; endNode?: Element | null}) => {
-  if (!startNode?.firstChild || !endNode?.lastChild) {
-    return null;
-  }
+const setCursorPosition = async (page: Page, elementIndex: number, offset?: number) => {
+  return page.evaluate(
+    // eslint-disable-next-line no-shadow
+    async ({elementIndex, offset}) => {
+      const filteredNode = Array.from(document.querySelectorAll('span[data-type="text"], span[data-type="br"]'));
 
-  const range = new Range();
-  range.setStart(startNode.firstChild, 2);
-  range.setEnd(endNode.lastChild, endNode.lastChild.textContent?.length ?? 0);
+      const node = filteredNode[elementIndex];
 
-  const selection = window.getSelection();
-  selection?.removeAllRanges();
-  selection?.addRange(range);
+      if (node?.firstChild) {
+        const range = new Range();
+        const offsetValue = offset ?? node.firstChild.textContent?.length ?? 0;
+        range.setStart(node.firstChild, offsetValue);
+        range.setEnd(node.firstChild, offsetValue);
 
-  return selection;
+        const selection = window.getSelection();
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+      }
+
+      return filteredNode;
+    },
+    {elementIndex, offset},
+  );
 };
-
 const getElementStyle = async (elementHandle: Locator) => {
   let elementStyle;
 
@@ -74,7 +83,11 @@ const getPseudoElementStyle = async (elementHandle: Locator, pseudoElementStyle:
       Object.keys(pseudoElementStyle).forEach((key) => {
         const value = style[key as keyof CSSStyleDeclaration];
         if (typeof value === 'string') {
-          output[key] = value;
+          if (key === 'width' || key === 'height') {
+            output[key] = `${Math.floor(parseInt(value.replace('px', ''), 10))}px`;
+          } else {
+            output[key] = value;
+          }
         }
       });
       return output;
@@ -95,4 +108,18 @@ const getElementValue = async (elementHandle: Locator) => {
   return value;
 };
 
-export {setupInput, getCursorPosition, setCursorPosition, getElementStyle, pressCmd, getElementValue, getPseudoElementStyle};
+const testMarkdownContentStyle = async ({testContent, style, page, pseudoStyle}: {testContent: string; style: string; page: Page; pseudoStyle?: Record<string, string>}) => {
+  const inputLocator = await setupInput(page);
+
+  const elementHandle = inputLocator.locator('span', {hasText: testContent}).last();
+  const elementStyle = await getElementStyle(elementHandle);
+
+  expect(elementStyle).toEqual(style);
+
+  if (pseudoStyle) {
+    const pseudoElementStyle = await getPseudoElementStyle(elementHandle, pseudoStyle);
+    expect(pseudoElementStyle).toEqual(pseudoStyle);
+  }
+};
+
+export {setupInput, getCursorPosition, setCursorPosition, getElementStyle, pressCmd, getElementValue, getPseudoElementStyle, testMarkdownContentStyle};
