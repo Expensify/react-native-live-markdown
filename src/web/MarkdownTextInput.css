@@ -47,6 +47,8 @@
 
 .react-native-live-markdown-input-multiline *[data-type='pre'] {
   line-height: 1.3;
+  display: 'inline-block';
+  max-width: 100%;
 }
 
 .react-native-live-markdown-input-singleline *[data-type='code'] > *[data-type='emoji'],

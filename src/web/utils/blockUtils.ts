@@ -118,7 +118,6 @@ function addCodeBlockStyles(targetElement: HTMLElement, type: NodeType, markdown
       if (isMultiline) {
         Object.assign(node.style, {
           ...markdownStyle.pre,
-          display: 'inline-block',
           backgroundColor: undefined,
           borderColor: undefined,
           borderWidth: undefined,
