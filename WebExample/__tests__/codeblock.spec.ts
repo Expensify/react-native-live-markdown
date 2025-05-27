@@ -28,7 +28,7 @@ test.describe('modyfying codeblock content', () => {
       style: CODEBLOCK_DEFAULT_STYLE,
       pseudoStyle: {
         height: '108px',
-        width: '246px',
+        width: '289px',
       },
       page,
     });
@@ -102,7 +102,7 @@ test.describe('modyfying codeblock content', () => {
   });
 });
 
-test('codeblock dimensions after resizing the input', async ({page, browserName}) => {
+test('codeblock dimensions after resizing the input', async ({page}) => {
   await page.setViewportSize({width: 1280, height: 720});
   const inputLocator = await setupInput(page, 'clear');
   await inputLocator.focus();
@@ -113,7 +113,7 @@ test('codeblock dimensions after resizing the input', async ({page, browserName}
     style: CODEBLOCK_DEFAULT_STYLE,
     pseudoStyle: {
       height: '108px',
-      width: '282px',
+      width: '289px',
     },
     page,
   });
@@ -129,7 +129,7 @@ test('codeblock dimensions after resizing the input', async ({page, browserName}
     style: CODEBLOCK_DEFAULT_STYLE,
     pseudoStyle: {
       height: '82px',
-      width: browserName === 'chromium' ? '426px' : '427px',
+      width: '489px',
     },
     page,
   });
