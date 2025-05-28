@@ -70,6 +70,15 @@ test('emoji', () => {
   expect('Hello, 😎').toBeParsedAs([{type: 'emoji', start: 7, length: 2}]);
 });
 
+test('emoji and italic', () => {
+  expect('_😎_').toBeParsedAs([
+    {type: 'syntax', start: 0, length: 1},
+    {type: 'italic', start: 1, length: 2},
+    {type: 'emoji', start: 1, length: 2},
+    {type: 'syntax', start: 3, length: 1},
+  ]);
+});
+
 describe('mention-here', () => {
   test('normal', () => {
     expect('@here Hello!').toBeParsedAs([{type: 'mention-here', start: 0, length: 5}]);
