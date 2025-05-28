@@ -1,6 +1,8 @@
 import type {MarkdownTextInputElement} from '../../MarkdownTextInput.web';
+import {MULTILINE_MARKDOWN_TYPES, getTopParentTreeNode} from './blockUtils';
+import {isChildOfMarkdownElementTypes} from './inputUtils';
 import {findHTMLElementInTree, getTreeNodeByIndex} from './treeUtils';
-import type {TreeNode} from './treeUtils';
+import type {NodeType, TreeNode} from './treeUtils';
 
 function setCursorPosition(target: MarkdownTextInputElement, startIndex: number, endIndex: number | null = null, shouldScrollIntoView = false) {
   // We don't want to move the cursor if the target is not focused
@@ -17,8 +19,15 @@ function setCursorPosition(target: MarkdownTextInputElement, startIndex: number,
   const range = document.createRange();
   range.selectNodeContents(target);
 
-  const startTreeNode = getTreeNodeByIndex(target.tree, start);
-  const endTreeNode = end && startTreeNode && (end < startTreeNode.start || end >= startTreeNode.start + startTreeNode.length) ? getTreeNodeByIndex(target.tree, end) : startTreeNode;
+  let startTreeNode = getTreeNodeByIndex(target.tree, start);
+  let endTreeNode = end && startTreeNode && (end < startTreeNode.start || end >= startTreeNode.start + startTreeNode.length) ? getTreeNodeByIndex(target.tree, end) : startTreeNode;
+
+  const parentLine = startTreeNode?.type === 'br' && getTopParentTreeNode(startTreeNode);
+  if (parentLine && parentLine?.childNodes?.some((e) => e.type === 'pre')) {
+    startTreeNode = getTreeNodeByIndex(target.tree, start - 1);
+    endTreeNode = startTreeNode;
+  }
+
   if (!startTreeNode || !endTreeNode) {
     console.error('Invalid start or end tree node');
     return;
@@ -53,10 +62,35 @@ function setCursorPosition(target: MarkdownTextInputElement, startIndex: number,
 }
 
 function scrollIntoView(target: MarkdownTextInputElement, node: TreeNode) {
+  let scrollTargetElement = node.element;
   const targetElement = target;
-  const orderIndex = Number(node.orderIndex.split(',')[0]);
-  const currentLine = target.tree.childNodes[orderIndex]?.element;
-  const scrollTargetElement = currentLine || node.element;
+
+  if (!isChildOfMarkdownElementTypes(node.element, MULTILINE_MARKDOWN_TYPES as NodeType[])) {
+    const orderIndex = Number(node.orderIndex.split(',')[0]);
+    const currentLine = target.tree.childNodes[orderIndex]?.element;
+    if (currentLine) {
+      scrollTargetElement = currentLine;
+    }
+  } else if (node.element.nodeName === 'BR') {
+    // Force scrolling BR into view
+    const selection = window.getSelection();
+    if (selection) {
+      const range = document.createRange();
+
+      range.setStartBefore(node.element);
+      range.collapse(true);
+
+      selection.addRange(range);
+
+      // Scroll to caret
+      const span = document.createElement('span');
+      span.textContent = '\u200B'; // zero-width space
+      range.insertNode(span);
+      span.scrollIntoView({block: 'center'});
+      span.remove(); // cleanup
+      return;
+    }
+  }
 
   const caretRect = scrollTargetElement.getBoundingClientRect();
   const targetRect = target.getBoundingClientRect();
