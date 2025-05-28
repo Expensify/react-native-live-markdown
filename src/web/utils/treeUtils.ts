@@ -144,16 +144,6 @@ function getTreeNodeByIndex(treeRoot: TreeNode, index: number): TreeNode | null 
   }
   return null;
 }
-function isChildOfMarkdownElementTypes(node: TreeNode, elementTypes: NodeType[]): boolean {
-  let currentNode: TreeNode | null = node;
-  while (currentNode) {
-    if (elementTypes.includes(currentNode.type as MarkdownType)) {
-      return true;
-    }
-    currentNode = currentNode.parentNode;
-  }
-  return false;
-}
-export {addNodeToTree, findHTMLElementInTree, getTreeNodeByIndex, updateTreeElementRefs, createRootTreeNode, isChildOfMarkdownElementTypes};
+export {addNodeToTree, findHTMLElementInTree, getTreeNodeByIndex, updateTreeElementRefs, createRootTreeNode};
 
 export type {TreeNode, NodeType};

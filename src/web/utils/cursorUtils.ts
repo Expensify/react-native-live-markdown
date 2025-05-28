@@ -1,6 +1,7 @@
 import type {MarkdownTextInputElement} from '../../MarkdownTextInput.web';
 import {MULTILINE_MARKDOWN_TYPES, getTopParentTreeNode} from './blockUtils';
-import {findHTMLElementInTree, getTreeNodeByIndex, isChildOfMarkdownElementTypes} from './treeUtils';
+import {isChildOfMarkdownElementTypes} from './inputUtils';
+import {findHTMLElementInTree, getTreeNodeByIndex} from './treeUtils';
 import type {NodeType, TreeNode} from './treeUtils';
 
 function setCursorPosition(target: MarkdownTextInputElement, startIndex: number, endIndex: number | null = null, shouldScrollIntoView = false) {
@@ -64,7 +65,7 @@ function scrollIntoView(target: MarkdownTextInputElement, node: TreeNode) {
   let scrollTargetElement = node.element;
   const targetElement = target;
 
-  if (!isChildOfMarkdownElementTypes(node, MULTILINE_MARKDOWN_TYPES as NodeType[])) {
+  if (!isChildOfMarkdownElementTypes(node.element, MULTILINE_MARKDOWN_TYPES as NodeType[])) {
     const orderIndex = Number(node.orderIndex.split(',')[0]);
     const currentLine = target.tree.childNodes[orderIndex]?.element;
     if (currentLine) {

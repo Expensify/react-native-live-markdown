@@ -141,4 +141,4 @@ function removePostRenderAttributes(text: string) {
   return text.replace(regex, '');
 }
 
-export {isEventComposing, getPlaceholderValue, getElementHeight, parseInnerHTMLToText, normalizeValue, removePostRenderAttributes};
+export {isEventComposing, getPlaceholderValue, getElementHeight, parseInnerHTMLToText, normalizeValue, removePostRenderAttributes, isChildOfMarkdownElementTypes};
