@@ -25,23 +25,19 @@ export default function App() {
     };
   }, [textColorState, textFontSizeState]);
 
-  const markdownStyle = React.useMemo(() => {
-    return {
-      emoji: {
-        fontSize: emojiFontSizeState ? 15 : 20,
-      },
-      link: {
+  const markdownStyle = {
+    emoji: {
+      fontSize: emojiFontSizeState ? 15 : 20,
+    },
+    link: {
         color: linkColorState ? 'red' : 'blue',
-      },
-    };
-  }, [emojiFontSizeState, linkColorState]);
+    },
+  };
 
   const ref = React.useRef<MarkdownTextInput>(null);
 
   return (
-    <ScrollView
-      contentContainerStyle={styles.container}
-      style={styles.content}>
+    <ScrollView contentContainerStyle={styles.container} style={styles.content}>
       <PlatformInfo />
       <MarkdownTextInput
         multiline={multiline}
