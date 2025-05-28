@@ -1,8 +1,7 @@
 import type {CSSProperties} from 'react';
 import type {MarkdownNativeEvent, MarkdownTextInputElement} from '../../MarkdownTextInput.web';
-import {isMultilineMarkdownType} from './blockUtils';
-import type {NodeType} from './treeUtils';
 import BrowserUtils from './browserUtils';
+import {MULTILINE_MARKDOWN_TYPES} from './blockUtils';
 
 const ZERO_WIDTH_SPACE = '\u200B';
 
@@ -46,6 +45,17 @@ function getTopParentNode(node: ChildNode) {
     currentParentNode = currentParentNode?.parentNode || null;
   }
   return currentParentNode;
+}
+
+function isChildOfMarkdownElementTypes(node: ChildNode, types: string[]) {
+  let currentParentNode: ParentNode | null = node.parentNode;
+  while (currentParentNode && (currentParentNode as HTMLElement).contentEditable !== 'true') {
+    if (types.includes(currentParentNode.parentElement?.getAttribute('data-type') ?? '')) {
+      return true;
+    }
+    currentParentNode = currentParentNode?.parentNode || null;
+  }
+  return false;
 }
 
 // Parses the HTML structure of a MarkdownTextInputElement to a plain text string. Used for getting the correct value of the input element.
@@ -94,7 +104,7 @@ function parseInnerHTMLToText(target: MarkdownTextInputElement | HTMLElement, cu
         !node.parentNode?.nextSibling &&
         node?.parentElement?.getAttribute?.('data-type') === 'br' &&
         node?.parentElement?.parentElement &&
-        isMultilineMarkdownType((node.parentElement.parentElement?.getAttribute?.('data-type') || '') as NodeType)
+        isChildOfMarkdownElementTypes(node.parentElement, MULTILINE_MARKDOWN_TYPES)
       ) {
         text += '\n';
       }
