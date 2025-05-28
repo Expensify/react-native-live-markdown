@@ -65,4 +65,11 @@ const getElementValue = async (elementHandle: Locator) => {
   return value;
 };
 
-export {setupInput, getCursorPosition, setCursorPosition, getElementStyle, pressCmd, getElementValue};
+const changeMarkdownStyle = async (page: Page) => {
+  await page.click(`[data-testid="${TEST_CONST.TOGGLE_LINK_COLOR}"]`);
+};
+
+const setSelection = async (page: Page) => {
+  await page.click(`[data-testid="${TEST_CONST.CHANGE_SELECTION}"]`);
+};
+export {setupInput, getCursorPosition, setCursorPosition, getElementStyle, pressCmd, getElementValue, changeMarkdownStyle, setSelection};

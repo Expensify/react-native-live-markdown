@@ -30,7 +30,7 @@ export default function App() {
       fontSize: emojiFontSizeState ? 15 : 20,
     },
     link: {
-        color: linkColorState ? 'red' : 'blue',
+      color: linkColorState ? 'red' : 'blue',
     },
   };
 
@@ -105,6 +105,7 @@ export default function App() {
         onPress={() => setTextColorState(prev => !prev)}
       />
       <Button
+        testID={TEST_CONST.TOGGLE_LINK_COLOR}
         title="Toggle link color"
         onPress={() => setLinkColorState(prev => !prev)}
       />
@@ -131,6 +132,7 @@ export default function App() {
         }}
       />
       <Button
+        testID={TEST_CONST.CHANGE_SELECTION}
         title="Change selection"
         onPress={() => {
           if (!ref.current) {
