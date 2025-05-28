@@ -6,13 +6,13 @@ import type {MarkdownRange, MarkdownType} from './commonTypes';
 function getTagPriority(tag: string) {
   switch (tag) {
     case 'blockquote':
-      return 3;
-    case 'h1':
       return 2;
-    case 'emoji':
-      return 0;
-    default:
+    case 'h1':
       return 1;
+    case 'emoji':
+      return -1;
+    default:
+      return 0;
   }
 }
 
