@@ -72,4 +72,5 @@ const changeMarkdownStyle = async (page: Page) => {
 const setSelection = async (page: Page) => {
   await page.click(`[data-testid="${TEST_CONST.CHANGE_SELECTION}"]`);
 };
+
 export {setupInput, getCursorPosition, setCursorPosition, getElementStyle, pressCmd, getElementValue, changeMarkdownStyle, setSelection};
