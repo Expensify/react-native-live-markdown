@@ -1,7 +1,7 @@
 import {test, expect} from '@playwright/test';
 // eslint-disable-next-line import/no-relative-packages
 import * as TEST_CONST from '../../example/src/testConstants';
-import {getElementValue, setCursorPosition, setupInput, testMarkdownContentStyle} from './utils';
+import {getElementValue, pressCmd, setCursorPosition, setupInput, testMarkdownContentStyle} from './utils';
 
 const CODEBLOCK_DEFAULT_STYLE = 'border-radius: 4px; padding: 0px; font-family: monospace; font-size: 20px; color: black;';
 
@@ -99,6 +99,17 @@ test.describe('modyfying codeblock content', () => {
 
     // Verify if when typing after codeblock closing syntax, its height is not changed
     await testMarkdownContentStyle(styleProperties);
+  });
+
+  test('removing whole codeblock', async ({page}) => {
+    const inputLocator = await setupInput(page, 'clear');
+    await inputLocator.focus();
+    await inputLocator.pressSequentially('```\nCodeblock\nSample code line\n```');
+
+    await pressCmd({inputLocator, command: 'a'});
+    await inputLocator.press('Backspace');
+
+    expect(await getElementValue(inputLocator)).toEqual('');
   });
 });
 
