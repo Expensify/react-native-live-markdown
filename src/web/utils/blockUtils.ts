@@ -134,11 +134,6 @@ function addCodeBlockStyles(targetElement: HTMLElement, type: NodeType, markdown
           zIndex: 2,
           display: 'block',
         });
-
-        const syntax = node.previousElementSibling as HTMLElement;
-        if (syntax) {
-          syntax.style.display = 'block';
-        }
       } else {
         Object.assign(node.style, {
           ...markdownStyle.code,
