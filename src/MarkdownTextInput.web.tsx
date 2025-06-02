@@ -13,7 +13,7 @@ import type {
 } from 'react-native';
 import React, {useEffect, useRef, useCallback, useMemo, useLayoutEffect} from 'react';
 import type {CSSProperties, MutableRefObject, ReactEventHandler, FocusEventHandler, MouseEvent, KeyboardEvent, SyntheticEvent, ClipboardEventHandler, TouchEvent} from 'react';
-import {StyleSheet} from 'react-native';
+import {StyleSheet, TextInput as RNTextInput} from 'react-native';
 import {updateInputStructure} from './web/utils/parserUtils';
 import InputHistory from './web/InputHistory';
 import type {TreeNode} from './web/utils/treeUtils';
@@ -212,7 +212,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
           flattenedStyle && {
             caretColor: (flattenedStyle as TextStyle).color || 'black',
           },
-          {whiteSpace: multiline ? 'pre-wrap' : 'nowrap'},
+          {whiteSpace: multiline ? 'pre-wrap' : 'pre'},
           disabled && styles.disabledInputStyles,
           parseToReactDOMStyle(flattenedStyle),
           caretHidden && styles.caretHidden,
@@ -556,6 +556,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
       (event) => {
         hasJustBeenFocused.current = true;
         const e = event as unknown as NativeSyntheticEvent<TextInputFocusEventData>;
+        RNTextInput.State.focusTextInput?.(e.target);
         const hostNode = e.target as unknown as HTMLDivElement;
         currentlyFocusedField.current = hostNode;
         setEventProps(e);
@@ -603,6 +604,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
     const handleBlur: FocusEventHandler<HTMLDivElement> = useCallback(
       (event) => {
         const e = event as unknown as NativeSyntheticEvent<TextInputFocusEventData>;
+        RNTextInput.State.blurTextInput?.(e.target);
         removeSelection();
         currentlyFocusedField.current = null;
         if (onBlur) {
