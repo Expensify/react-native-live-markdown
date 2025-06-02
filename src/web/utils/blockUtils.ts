@@ -127,12 +127,6 @@ function addCodeBlockStyles(targetElement: HTMLElement, type: NodeType, markdown
         Object.assign((node.parentNode as HTMLElement).style, {
           padding: `${preVerticalPadding}px ${preHorizontalPadding}px`,
           'line-height': BrowserUtils.isMobile ? 1.3 : 'inherit',
-          position: 'relative',
-          width: 'fit-content',
-          maxWidth: '100%',
-          boxSizing: 'border-box',
-          zIndex: 2,
-          display: 'block',
         });
       } else {
         Object.assign(node.style, {

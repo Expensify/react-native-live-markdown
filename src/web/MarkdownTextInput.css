@@ -51,6 +51,15 @@
   max-width: 100%;
 }
 
+.react-native-live-markdown-input-multiline *[data-type='codeblock'] {
+  position: relative;
+  width: fit-content;
+  max-width: 100%;
+  box-sizing: border-box;
+  z-index: 2;
+  display: block;
+}
+
 .react-native-live-markdown-input-singleline *[data-type='code'] > *[data-type='emoji'],
 .react-native-live-markdown-input-multiline *[data-type='code'] > *[data-type='emoji'] {
   font-size: inherit !important;
