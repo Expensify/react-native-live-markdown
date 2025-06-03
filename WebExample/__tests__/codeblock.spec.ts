@@ -10,31 +10,7 @@ test.beforeEach(async ({page}) => {
 });
 
 test.describe('modyfying codeblock content', () => {
-  test('codeblock content wrapping', async ({page}) => {
-    const LINE_TO_ADD = ' very long line of code that should be wrapped';
-    const inputLocator = await setupInput(page, 'clear');
-    await inputLocator.focus();
-    await inputLocator.pressSequentially('```\nCodeblock\nSample code line\n```');
-
-    await setCursorPosition(page, 3);
-
-    await inputLocator.pressSequentially(LINE_TO_ADD);
-
-    expect(await getElementValue(inputLocator)).toEqual(`\`\`\`\nCodeblock${LINE_TO_ADD}\nSample code line\n\`\`\``);
-
-    // Verify if the codeblock style wasn't appleid
-    await testMarkdownContentStyle({
-      testContent: 'codeblock',
-      style: CODEBLOCK_DEFAULT_STYLE,
-      pseudoStyle: {
-        height: '108px',
-        width: '289px',
-      },
-      page,
-    });
-  });
-
-  test('typing after codeblock opening syntax', async ({page}) => {
+  test('keep newlines when writing after opening syntax', async ({page}) => {
     const inputLocator = await setupInput(page, 'clear');
     await inputLocator.focus();
     await inputLocator.pressSequentially('```\nCodeblock\nSample code line\n```');
@@ -53,7 +29,7 @@ test.describe('modyfying codeblock content', () => {
     });
   });
 
-  test('typing in the empty last codeblock line', async ({page}) => {
+  test('keep codeblock structure when writing in the empty last line', async ({page}) => {
     const inputLocator = await setupInput(page, 'clear');
     await inputLocator.focus();
     await inputLocator.pressSequentially('```\nCodeblock\nSample code line\n\n```');
@@ -63,7 +39,6 @@ test.describe('modyfying codeblock content', () => {
     await inputLocator.pressSequentially('test');
     expect(await getElementValue(inputLocator)).toEqual('```\nCodeblock\nSample code line\ntest\n```');
 
-    // Verify if the codeblock style is applied correctly after cahnges
     await testMarkdownContentStyle({
       testContent: 'codeblock',
       style: CODEBLOCK_DEFAULT_STYLE,
@@ -75,7 +50,7 @@ test.describe('modyfying codeblock content', () => {
     });
   });
 
-  test('typing after codeblock closing syntax', async ({page}) => {
+  test('allow writing after closing syntax', async ({page}) => {
     const styleProperties = {
       testContent: 'codeblock',
       style: CODEBLOCK_DEFAULT_STYLE,
@@ -101,7 +76,7 @@ test.describe('modyfying codeblock content', () => {
     await testMarkdownContentStyle(styleProperties);
   });
 
-  test('removing whole codeblock', async ({page}) => {
+  test('remove whole codeblock', async ({page}) => {
     const inputLocator = await setupInput(page, 'clear');
     await inputLocator.focus();
     await inputLocator.pressSequentially('```\nCodeblock\nSample code line\n```');
@@ -111,9 +86,32 @@ test.describe('modyfying codeblock content', () => {
 
     expect(await getElementValue(inputLocator)).toEqual('');
   });
+
+  test('wrap content', async ({page}) => {
+    const LINE_TO_ADD = ' very long line of code that should be wrapped';
+    const inputLocator = await setupInput(page, 'clear');
+    await inputLocator.focus();
+    await inputLocator.pressSequentially('```\nCodeblock\nSample code line\n```');
+
+    await setCursorPosition(page, 3);
+
+    await inputLocator.pressSequentially(LINE_TO_ADD);
+
+    expect(await getElementValue(inputLocator)).toEqual(`\`\`\`\nCodeblock${LINE_TO_ADD}\nSample code line\n\`\`\``);
+
+    await testMarkdownContentStyle({
+      testContent: 'codeblock',
+      style: CODEBLOCK_DEFAULT_STYLE,
+      pseudoStyle: {
+        height: '108px',
+        width: '289px',
+      },
+      page,
+    });
+  });
 });
 
-test('codeblock dimensions after resizing the input', async ({page}) => {
+test('update codeblock dimensions when resizing the input', async ({page}) => {
   await page.setViewportSize({width: 1280, height: 720});
   const inputLocator = await setupInput(page, 'clear');
   await inputLocator.focus();
@@ -147,7 +145,7 @@ test('codeblock dimensions after resizing the input', async ({page}) => {
 });
 
 test.describe('scrolling into view', () => {
-  test('to an empty line inside the codeblock', async ({page}) => {
+  test('scroll to an empty codeblock line', async ({page}) => {
     const inputLocator = await setupInput(page, 'clear');
     await inputLocator.focus();
     await inputLocator.evaluate((inputElement: HTMLInputElement) => {
@@ -171,7 +169,7 @@ test.describe('scrolling into view', () => {
     expect(scrollTop).toBeLessThanOrEqual(25);
   });
 
-  test('to the cursor after opening codeblock syntax', async ({page}) => {
+  test('scroll to the cursor after opening syntax', async ({page}) => {
     const inputLocator = await setupInput(page, 'clear');
     await inputLocator.focus();
     await inputLocator.evaluate((inputElement: HTMLInputElement) => {
