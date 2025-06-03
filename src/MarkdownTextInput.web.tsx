@@ -143,6 +143,8 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
     }
 
     const flattenedStyle = useMemo(() => StyleSheet.flatten(style), [style]);
+    // Using JSON.stringify(flattenedMarkdownStyle) as a simple styles object hash to avoid rerenders when not memoized markdownStyle is passed
+    const hashedMarkdownStyle = useMemo(() => JSON.stringify(StyleSheet.flatten(markdownStyle)), [markdownStyle]);
 
     // Empty placeholder would collapse the div, so we need to use zero-width space to prevent it
     const heightSafePlaceholder = useMemo(() => getPlaceholderValue(placeholder), [placeholder]);
@@ -200,7 +202,8 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
         parseText(parser, divRef.current, divRef.current.value, newMarkdownStyle, null, false, false);
       }
       return newMarkdownStyle;
-    }, [parser, markdownStyle, parseText]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [hashedMarkdownStyle, parser, parseText]);
 
     const inputStyles = useMemo(
       () =>
