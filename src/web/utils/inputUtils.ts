@@ -47,7 +47,7 @@ function getTopParentNode(node: ChildNode) {
 }
 
 function isChildOfMarkdownElementTypes(node: ChildNode, types: string[]) {
-  let currentParentNode: ParentNode | null = node.parentNode;
+  let currentParentNode: ParentNode | null = node as unknown as ParentNode;
   while (currentParentNode && (currentParentNode as HTMLElement).contentEditable !== 'true') {
     if (types.includes(currentParentNode.parentElement?.getAttribute('data-type') ?? '')) {
       return true;
@@ -93,6 +93,7 @@ function parseInnerHTMLToText(target: MarkdownTextInputElement | HTMLElement, cu
     }
 
     if (node.nodeType === Node.TEXT_NODE) {
+      let hasAddedNewline = false;
       // Fix for codeblocks: Removing last cedblock newline, moves codeblock syntax too far into the codeblock content
       // leaving on <br> after the codeblock syntax. We need to force parsing it before the text node is added.
       if (node.parentElement && !node.parentElement.getAttribute?.('data-type') && isChildOfMarkdownElementTypes(node, ['pre'])) {
@@ -101,16 +102,17 @@ function parseInnerHTMLToText(target: MarkdownTextInputElement | HTMLElement, cu
         if (nextBR && nextBR.tagName === 'BR') {
           nextBR.remove();
         }
+        hasAddedNewline = true;
       }
 
       // Parse text nodes into text
       text += node.textContent;
-      // console.log(inputType);
       // Fix for Firefox: If we are adding text at the end of a multiline markdown type element, we need to add a newline
       // because the new text can replace the last <br> element and it will not be added to the text.
       if (
+        !hasAddedNewline &&
         !node.parentNode?.nextSibling &&
-        node?.parentElement?.getAttribute?.('data-type') === 'br' &&
+        isChildOfMarkdownElementTypes(node, ['br']) &&
         node?.parentElement?.parentElement &&
         isChildOfMarkdownElementTypes(node.parentElement, MULTILINE_MARKDOWN_TYPES)
       ) {
