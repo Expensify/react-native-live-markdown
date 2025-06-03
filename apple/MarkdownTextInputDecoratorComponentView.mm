@@ -28,6 +28,7 @@ using namespace facebook::react;
   MarkdownTextFieldObserver *_markdownTextFieldObserver;
   __weak RCTUITextView *_textView;
   __weak RCTUITextField *_textField;
+  bool _observersAdded;
 }
 
 + (ComponentDescriptorProvider)componentDescriptorProvider
@@ -46,6 +47,7 @@ using namespace facebook::react;
   if (self = [super initWithFrame:frame]) {
     static const auto defaultProps = std::make_shared<const MarkdownTextInputDecoratorViewProps>();
     _props = defaultProps;
+    _observersAdded = false;
   }
 
   return self;
@@ -53,14 +55,36 @@ using namespace facebook::react;
 
 - (void)didAddSubview:(UIView *)subview
 {
-  react_native_assert([subview isKindOfClass:[RCTTextInputComponentView class]] && "Child component of MarkdownTextInputDecoratorComponentView is not an instance of RCTTextInputComponentView.");
-  RCTTextInputComponentView *textInputComponentView = (RCTTextInputComponentView *)subview;
-  UIView<RCTBackedTextInputViewProtocol> *backedTextInputView = [textInputComponentView valueForKey:@"_backedTextInputView"];
-
   _markdownUtils = [[RCTMarkdownUtils alloc] init];
   [_markdownUtils setMarkdownStyle:_markdownStyle];
   [_markdownUtils setParserId:_parserId];
 
+  [self addTextInputObservers:subview];
+}
+
+- (void)willMoveToWindow:(UIWindow *)newWindow
+{
+  if (newWindow != nil) {
+    if (self.subviews.count > 0) {
+      [self addTextInputObservers:self.subviews[0]];
+    }
+  } else {
+    [self removeTextInputObservers];
+  }
+}
+
+- (void)addTextInputObservers:(UIView *)textInput
+{
+  if (_observersAdded) {
+    return;
+  }
+  
+  react_native_assert([textInput isKindOfClass:[RCTTextInputComponentView class]] && "Child component of MarkdownTextInputDecoratorComponentView is not an instance of RCTTextInputComponentView.");
+  RCTTextInputComponentView *textInputComponentView = (RCTTextInputComponentView *)textInput;
+  UIView<RCTBackedTextInputViewProtocol> *backedTextInputView = [textInputComponentView valueForKey:@"_backedTextInputView"];
+ 
+  _observersAdded = true;
+  
   if ([backedTextInputView isKindOfClass:[RCTUITextField class]]) {
     _textField = (RCTUITextField *)backedTextInputView;
 
@@ -115,11 +139,14 @@ using namespace facebook::react;
   }
 }
 
-- (void)willMoveToWindow:(UIWindow *)newWindow
+- (void)removeTextInputObservers
 {
-  if (newWindow != nil) {
+  if (!_observersAdded) {
     return;
   }
+  
+  _observersAdded = false;
+  
   if (_textView != nil) {
     if (_textView.layoutManager != nil && [object_getClass(_textView.layoutManager) isEqual:[MarkdownLayoutManager class]]) {
       [_textView.layoutManager setValue:nil forKey:@"markdownUtils"];
