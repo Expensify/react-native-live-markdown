@@ -109,6 +109,64 @@ test.describe('modyfying codeblock content', () => {
       page,
     });
   });
+
+  test('remove newline after opening syntax', async ({page}) => {
+    const inputLocator = await setupInput(page, 'clear');
+    await inputLocator.focus();
+    await inputLocator.pressSequentially('```\nCodeblock\nSample code line\n```');
+
+    await setCursorPosition(page, 2, 0);
+    await inputLocator.press('Backspace');
+
+    expect(await getElementValue(inputLocator)).toEqual('```Codeblock\nSample code line\n```');
+
+    // Verify if the codeblock style wasn't appleid
+    await testMarkdownContentStyle({
+      testContent: 'codeblock',
+      style: 'margin: 0px; padding: 0px;',
+      page,
+    });
+  });
+
+  test('remove newline before closing syntax', async ({page}) => {
+    const inputLocator = await setupInput(page, 'clear');
+    await inputLocator.focus();
+    await inputLocator.pressSequentially('```\nCodeblock\nSample code line\n```');
+
+    await setCursorPosition(page, 6, 0);
+    await inputLocator.press('Backspace');
+
+    expect(await getElementValue(inputLocator)).toEqual('```\nCodeblock\nSample code line```');
+
+    // Verify if the codeblock style wasn't appleid
+    await testMarkdownContentStyle({
+      testContent: 'codeblock',
+      style: 'margin: 0px; padding: 0px;',
+      page,
+    });
+  });
+
+  test('remove newline before closing syntax with one empy line at the end', async ({page}) => {
+    const inputLocator = await setupInput(page, 'clear');
+    await inputLocator.focus();
+    await inputLocator.pressSequentially('```\nCodeblock\nSample code line\n\n```');
+
+    await setCursorPosition(page, 6, 0);
+    await inputLocator.press('Backspace');
+
+    expect(await getElementValue(inputLocator)).toEqual('```\nCodeblock\nSample code line\n```');
+  });
+
+  test('remove newline before closing syntax with two empy lines at the end', async ({page}) => {
+    const inputLocator = await setupInput(page, 'clear');
+    await inputLocator.focus();
+    await inputLocator.pressSequentially('```\nCodeblock\nSample code line\n\n\n```');
+
+    await setCursorPosition(page, 6, 0);
+    await inputLocator.press('Backspace');
+
+    expect(await getElementValue(inputLocator)).toEqual('```\nCodeblock\nSample code line\n\n```');
+  });
 });
 
 test('update codeblock dimensions when resizing the input', async ({page}) => {
