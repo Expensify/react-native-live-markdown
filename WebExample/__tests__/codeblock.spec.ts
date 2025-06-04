@@ -9,7 +9,7 @@ test.beforeEach(async ({page}) => {
   await page.goto(TEST_CONST.LOCAL_URL, {waitUntil: 'load'});
 });
 
-test.describe('modyfying codeblock content', () => {
+test.describe('modifying codeblock content', () => {
   test('keep newlines when writing after opening syntax', async ({page}) => {
     const inputLocator = await setupInput(page, 'clear');
     await inputLocator.focus();
@@ -156,6 +156,32 @@ test.describe('modyfying codeblock content', () => {
     await inputLocator.press('Backspace');
 
     expect(await getElementValue(inputLocator)).toEqual('```\nCodeblock\nSample code line\n\n```');
+  });
+
+  test('remove newline before opening syntax', async ({page}) => {
+    const inputLocator = await setupInput(page, 'clear');
+    await inputLocator.focus();
+    await inputLocator.pressSequentially('\n\n```\nCodeblock\nSample code line\n```');
+
+    await setCursorPosition(page, 2, 0);
+    await inputLocator.press('Backspace');
+
+    expect(await getElementValue(inputLocator)).toEqual('\n```\nCodeblock\nSample code line\n```');
+  });
+
+  test('remove newline between two codeblocks', async ({page}) => {
+    const inputLocator = await setupInput(page, 'clear');
+    await inputLocator.focus();
+    await inputLocator.pressSequentially('```\nCodeblock\nSample code line\n```\n```\nCodeblock\nSample code line\n```');
+
+    await setCursorPosition(page, 7, 0);
+    await inputLocator.press('Backspace');
+
+    expect(await getElementValue(inputLocator)).toEqual('```\nCodeblock\nSample code line\n``````\nCodeblock\nSample code line\n```');
+
+    await inputLocator.press('Enter');
+
+    await inputLocator.pressSequentially('```\nCodeblock\nSample code line\n```\n```\nCodeblock\nSample code line\n```');
   });
 });
 
