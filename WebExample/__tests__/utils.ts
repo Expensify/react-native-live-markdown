@@ -108,6 +108,14 @@ const getElementValue = async (elementHandle: Locator) => {
   return value;
 };
 
+const changeMarkdownStyle = async (page: Page) => {
+  await page.click(`[data-testid="${TEST_CONST.TOGGLE_LINK_COLOR}"]`);
+};
+
+const setSelection = async (page: Page) => {
+  await page.click(`[data-testid="${TEST_CONST.CHANGE_SELECTION}"]`);
+};
+
 const testMarkdownContentStyle = async ({testContent, style, page, pseudoStyle}: {testContent: string; style: string; page: Page; pseudoStyle?: Record<string, string>}) => {
   const inputLocator = await setupInput(page);
 
@@ -122,4 +130,4 @@ const testMarkdownContentStyle = async ({testContent, style, page, pseudoStyle}:
   }
 };
 
-export {setupInput, getCursorPosition, setCursorPosition, getElementStyle, pressCmd, getElementValue, getPseudoElementStyle, testMarkdownContentStyle};
+export {setupInput, getCursorPosition, setCursorPosition, getElementStyle, pressCmd, getElementValue, changeMarkdownStyle, setSelection, testMarkdownContentStyle};

@@ -10,6 +10,7 @@ import {handleFormatSelection} from './formatSelectionUtils';
 
 export default function App() {
   const [value, setValue] = React.useState(TEST_CONST.EXAMPLE_CONTENT);
+  const [multiline, setMultiline] = React.useState(true);
   const [textColorState, setTextColorState] = React.useState(false);
   const [linkColorState, setLinkColorState] = React.useState(false);
   const [textFontSizeState, setTextFontSizeState] = React.useState(false);
@@ -24,26 +25,22 @@ export default function App() {
     };
   }, [textColorState, textFontSizeState]);
 
-  const markdownStyle = React.useMemo(() => {
-    return {
-      emoji: {
-        fontSize: emojiFontSizeState ? 15 : 20,
-      },
-      link: {
-        color: linkColorState ? 'red' : 'blue',
-      },
-    };
-  }, [emojiFontSizeState, linkColorState]);
+  const markdownStyle = {
+    emoji: {
+      fontSize: emojiFontSizeState ? 15 : 20,
+    },
+    link: {
+      color: linkColorState ? 'red' : 'blue',
+    },
+  };
 
   const ref = React.useRef<MarkdownTextInput>(null);
 
   return (
-    <ScrollView
-      contentContainerStyle={styles.container}
-      style={styles.content}>
+    <ScrollView contentContainerStyle={styles.container} style={styles.content}>
       <PlatformInfo />
       <MarkdownTextInput
-        multiline
+        multiline={multiline}
         formatSelection={handleFormatSelection}
         autoCapitalize="none"
         caretHidden={caretHidden}
@@ -100,10 +97,15 @@ export default function App() {
         }}
       />
       <Button
+        title="Toggle multiline"
+        onPress={() => setMultiline(prev => !prev)}
+      />
+      <Button
         title="Toggle text color"
         onPress={() => setTextColorState(prev => !prev)}
       />
       <Button
+        testID={TEST_CONST.TOGGLE_LINK_COLOR}
         title="Toggle link color"
         onPress={() => setLinkColorState(prev => !prev)}
       />
@@ -130,6 +132,7 @@ export default function App() {
         }}
       />
       <Button
+        testID={TEST_CONST.CHANGE_SELECTION}
         title="Change selection"
         onPress={() => {
           if (!ref.current) {
