@@ -7,7 +7,7 @@ const spinnerDefaultStyles = {
 };
 const spinnerContainerDefaultStyles = {
   position: 'absolute',
-  bottom: '0',
+  bottom: '1px',
   left: '0',
   display: 'flex',
   justifyContent: 'center',
