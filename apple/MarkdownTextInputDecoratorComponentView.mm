@@ -65,10 +65,7 @@ using namespace facebook::react;
 
 - (void)addTextInputObservers
 {
-  if (_observersAdded) {
-    return;
-  }
-
+  react_native_assert(!_observersAdded && "MarkdownTextInputDecoratorComponentView tried to add TextInput observers while they were attached");
   react_native_assert(self.subviews.count > 0 && "MarkdownTextInputDecoratorComponentView is mounted without any children")
   UIView* childView = self.subviews[0];
   react_native_assert([childView isKindOfClass:[RCTTextInputComponentView class]] && "Child component of MarkdownTextInputDecoratorComponentView is not an instance of RCTTextInputComponentView.");
@@ -133,10 +130,7 @@ using namespace facebook::react;
 
 - (void)removeTextInputObservers
 {
-  if (!_observersAdded) {
-    return;
-  }
-  
+  react_native_assert(_observersAdded && "MarkdownTextInputDecoratorComponentView tried to remove TextInput observers while they were detached");
   _observersAdded = false;
   
   if (_textView != nil) {
@@ -190,6 +184,12 @@ using namespace facebook::react;
   if (_textField != nil) {
     [_markdownTextFieldObserver textFieldDidChange:_textField];
   }
+}
+
+- (void)prepareForRecycle
+{
+  [super prepareForRecycle];
+  _markdownUtils = [[RCTMarkdownUtils alloc] init];
 }
 
 Class<RCTComponentViewProtocol> MarkdownTextInputDecoratorViewCls(void)
