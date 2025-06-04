@@ -72,13 +72,12 @@
 }
 
 .react-native-live-markdown-input-multiline *[data-type='line'] *[data-type='syntax']:has(+ *[data-type='pre']) {
-  display: grid;
-  grid-template-columns: auto 1fr;
+  display: block;
   line-height: 1.3;
 }
 
 .react-native-live-markdown-input-multiline *[data-type='line'] *[data-type='pre'] + *[data-type='syntax'] {
-  display: grid;
+  display: block;
   line-height: 1.3;
 }
 

@@ -111,11 +111,11 @@ function parseInnerHTMLToText(target: MarkdownTextInputElement | HTMLElement, cu
       // Fix for codeblocks: If we are adding text at the end of a multiline markdown type element, we need to add a newline
       // because the new text can replace the last <br> element and it will not be added to the text.
       if (
-        !hasAddedNewline &&
+        node.parentElement &&
+        node.parentNode?.parentElement?.nextSibling &&
         !node.parentNode?.nextSibling &&
-        isChildOfMarkdownElementTypes(node, ['br']) &&
-        node?.parentElement?.parentElement &&
-        isChildOfMarkdownElementTypes(node.parentElement, MULTILINE_MARKDOWN_TYPES)
+        isChildOfMarkdownElementTypes(node, MULTILINE_MARKDOWN_TYPES) &&
+        ((!hasAddedNewline && isChildOfMarkdownElementTypes(node, ['br'])) || (!node.parentElement.getAttribute?.('data-type') && isChildOfMarkdownElementTypes(node, ['syntax'])))
       ) {
         text += '\n';
       }
