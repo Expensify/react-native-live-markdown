@@ -145,6 +145,15 @@ test.describe('modifying codeblock content', () => {
     await inputLocator.press('Backspace');
 
     expect(await getElementValue(inputLocator)).toEqual('```\nCodeblock\nSample code line\n```');
+    await testMarkdownContentStyle({
+      testContent: 'codeblock',
+      style: CODEBLOCK_DEFAULT_STYLE,
+      pseudoStyle: {
+        height: '56px',
+        width: '197px',
+      },
+      page,
+    });
   });
 
   test('remove newline before closing syntax with two empy lines at the end', async ({page}) => {
@@ -156,6 +165,15 @@ test.describe('modifying codeblock content', () => {
     await inputLocator.press('Backspace');
 
     expect(await getElementValue(inputLocator)).toEqual('```\nCodeblock\nSample code line\n\n```');
+    await testMarkdownContentStyle({
+      testContent: 'codeblock',
+      style: CODEBLOCK_DEFAULT_STYLE,
+      pseudoStyle: {
+        height: '82px',
+        width: '197px',
+      },
+      page,
+    });
   });
 
   test('remove newline before opening syntax', async ({page}) => {
@@ -167,21 +185,45 @@ test.describe('modifying codeblock content', () => {
     await inputLocator.press('Backspace');
 
     expect(await getElementValue(inputLocator)).toEqual('\n```\nCodeblock\nSample code line\n```');
+    await testMarkdownContentStyle({
+      testContent: 'codeblock',
+      style: CODEBLOCK_DEFAULT_STYLE,
+      pseudoStyle: {
+        height: '56px',
+        width: '197px',
+      },
+      page,
+    });
   });
 
   test('remove newline between two codeblocks', async ({page}) => {
     const inputLocator = await setupInput(page, 'clear');
     await inputLocator.focus();
-    await inputLocator.pressSequentially('```\nCodeblock\nSample code line\n```\n```\nCodeblock\nSample code line\n```');
+    await inputLocator.pressSequentially('```\nCodeblock\nSample code line\n```\n```\nCodeblock\nSecond sample code line\n```');
 
     await setCursorPosition(page, 7, 0);
     await inputLocator.press('Backspace');
 
-    expect(await getElementValue(inputLocator)).toEqual('```\nCodeblock\nSample code line\n``````\nCodeblock\nSample code line\n```');
+    expect(await getElementValue(inputLocator)).toEqual('```\nCodeblock\nSample code line\n``````\nCodeblock\nSecond sample code line\n```');
+    // Verify if the codeblock style wasn't applied
+    await testMarkdownContentStyle({
+      testContent: 'codeblock',
+      style: 'margin: 0px; padding: 0px;',
+      page,
+    });
 
     await inputLocator.press('Enter');
 
-    await inputLocator.pressSequentially('```\nCodeblock\nSample code line\n```\n```\nCodeblock\nSample code line\n```');
+    expect(await getElementValue(inputLocator)).toEqual('```\nCodeblock\nSample code line\n```\n```\nCodeblock\nSecond sample code line\n```');
+    await testMarkdownContentStyle({
+      testContent: 'codeblock',
+      style: CODEBLOCK_DEFAULT_STYLE,
+      pseudoStyle: {
+        height: '56px',
+        width: '281px',
+      },
+      page,
+    });
   });
 });
 
