@@ -94,8 +94,8 @@ function parseInnerHTMLToText(target: MarkdownTextInputElement | HTMLElement, cu
 
     if (node.nodeType === Node.TEXT_NODE) {
       let hasAddedNewline = false;
-      // Fix for codeblocks: Removing last cedblock newline, moves codeblock syntax too far into the codeblock content
-      // leaving on <br> after the codeblock syntax. We need to force parsing it before the text node is added.
+      // Fix for codeblocks: Removing last codeblock newline, moves codeblock syntax too far into the codeblock content
+      // skipping one <br> after the codeblock syntax. We need to force parsing it before the text node is added.
       if (node.parentElement && !node.parentElement.getAttribute?.('data-type') && isChildOfMarkdownElementTypes(node, ['pre'])) {
         text += '\n';
         const nextBR = node.parentElement?.nextElementSibling?.firstElementChild ?? node.parentElement?.nextElementSibling;
@@ -107,7 +107,8 @@ function parseInnerHTMLToText(target: MarkdownTextInputElement | HTMLElement, cu
 
       // Parse text nodes into text
       text += node.textContent;
-      // Fix for Firefox: If we are adding text at the end of a multiline markdown type element, we need to add a newline
+
+      // Fix for codeblocks: If we are adding text at the end of a multiline markdown type element, we need to add a newline
       // because the new text can replace the last <br> element and it will not be added to the text.
       if (
         !hasAddedNewline &&
