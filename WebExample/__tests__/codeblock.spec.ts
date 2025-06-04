@@ -16,12 +16,10 @@ test.describe('modyfying codeblock content', () => {
     await inputLocator.pressSequentially('```\nCodeblock\nSample code line\n```');
 
     await setCursorPosition(page, 0);
-
     await inputLocator.pressSequentially('test');
 
     expect(await getElementValue(inputLocator)).toEqual('```test\nCodeblock\nSample code line\n```');
-
-    // Verify if the codeblock style wasn't appleid
+    // Verify if the codeblock style wasn't applied
     await testMarkdownContentStyle({
       testContent: 'codeblock',
       style: 'margin: 0px; padding: 0px;',
@@ -35,10 +33,9 @@ test.describe('modyfying codeblock content', () => {
     await inputLocator.pressSequentially('```\nCodeblock\nSample code line\n\n```');
 
     await setCursorPosition(page, 6, 0);
-
     await inputLocator.pressSequentially('test');
-    expect(await getElementValue(inputLocator)).toEqual('```\nCodeblock\nSample code line\ntest\n```');
 
+    expect(await getElementValue(inputLocator)).toEqual('```\nCodeblock\nSample code line\ntest\n```');
     await testMarkdownContentStyle({
       testContent: 'codeblock',
       style: CODEBLOCK_DEFAULT_STYLE,
@@ -60,18 +57,15 @@ test.describe('modyfying codeblock content', () => {
       },
       page,
     };
-
     const inputLocator = await setupInput(page, 'clear');
     await inputLocator.focus();
     await inputLocator.pressSequentially('```\nCodeblock\nSample code line\n```');
 
     await setCursorPosition(page, 6);
-
     await testMarkdownContentStyle(styleProperties);
-
     await inputLocator.pressSequentially('test');
-    expect(await getElementValue(inputLocator)).toEqual('```\nCodeblock\nSample code line\n```test');
 
+    expect(await getElementValue(inputLocator)).toEqual('```\nCodeblock\nSample code line\n```test');
     // Verify if when typing after codeblock closing syntax, its height is not changed
     await testMarkdownContentStyle(styleProperties);
   });
@@ -94,11 +88,9 @@ test.describe('modyfying codeblock content', () => {
     await inputLocator.pressSequentially('```\nCodeblock\nSample code line\n```');
 
     await setCursorPosition(page, 3);
-
     await inputLocator.pressSequentially(LINE_TO_ADD);
 
     expect(await getElementValue(inputLocator)).toEqual(`\`\`\`\nCodeblock${LINE_TO_ADD}\nSample code line\n\`\`\``);
-
     await testMarkdownContentStyle({
       testContent: 'codeblock',
       style: CODEBLOCK_DEFAULT_STYLE,
@@ -119,8 +111,7 @@ test.describe('modyfying codeblock content', () => {
     await inputLocator.press('Backspace');
 
     expect(await getElementValue(inputLocator)).toEqual('```Codeblock\nSample code line\n```');
-
-    // Verify if the codeblock style wasn't appleid
+    // Verify if the codeblock style wasn't applied
     await testMarkdownContentStyle({
       testContent: 'codeblock',
       style: 'margin: 0px; padding: 0px;',
@@ -137,8 +128,7 @@ test.describe('modyfying codeblock content', () => {
     await inputLocator.press('Backspace');
 
     expect(await getElementValue(inputLocator)).toEqual('```\nCodeblock\nSample code line```');
-
-    // Verify if the codeblock style wasn't appleid
+    // Verify if the codeblock style wasn't applied
     await testMarkdownContentStyle({
       testContent: 'codeblock',
       style: 'margin: 0px; padding: 0px;',
@@ -191,6 +181,7 @@ test('update codeblock dimensions when resizing the input', async ({page}) => {
     element.style.height = '200px';
   });
   await page.waitForTimeout(10);
+
   await testMarkdownContentStyle({
     testContent: 'codeblock',
     style: CODEBLOCK_DEFAULT_STYLE,
@@ -219,11 +210,13 @@ test.describe('scrolling into view', () => {
       element.scrollTop = element.scrollHeight;
       return element.scrollHeight;
     });
+
     await inputLocator.focus();
     const scrollTop = await inputLocator.evaluate((inputElement: HTMLInputElement) => {
       const element = inputElement;
       return element.scrollTop;
     });
+
     expect(scrollTop).toBeLessThanOrEqual(25);
   });
 
