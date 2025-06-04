@@ -1,6 +1,7 @@
 import type {CSSProperties} from 'react';
 import type {MarkdownNativeEvent, MarkdownTextInputElement} from '../../MarkdownTextInput.web';
 import {MULTILINE_MARKDOWN_TYPES} from './blockUtils';
+import BrowserUtils from './browserUtils';
 
 const ZERO_WIDTH_SPACE = '\u200B';
 
@@ -57,6 +58,11 @@ function isChildOfMarkdownElementTypes(node: ChildNode, types: string[]) {
   return false;
 }
 
+// On Firefox, when breaking one codeblock, its syntax and the <br> after it can be merged into the closing syntax of the previous codeblock.
+function didTwoCodeblocksMerged(node: ChildNode | null) {
+  return BrowserUtils.isFirefox && node && (node.lastChild as HTMLElement)?.getAttribute('data-type') === 'codeblock' && node.lastChild?.lastChild?.lastChild?.lastChild?.nodeName === 'BR';
+}
+
 // Parses the HTML structure of a MarkdownTextInputElement to a plain text string. Used for getting the correct value of the input element.
 function parseInnerHTMLToText(target: MarkdownTextInputElement | HTMLElement, cursorPosition: number, inputType?: string): string {
   const stack: ChildNode[] = [target];
@@ -84,7 +90,7 @@ function parseInnerHTMLToText(target: MarkdownTextInputElement | HTMLElement, cu
       } else {
         const firstChild = node.firstChild as HTMLElement;
         const containsEmptyBlockElement = firstChild?.getAttribute?.('data-type') === 'block' && firstChild.textContent === '';
-        if (firstChild && shouldAddNewline && !containsEmptyBlockElement) {
+        if (firstChild && shouldAddNewline && !containsEmptyBlockElement && !didTwoCodeblocksMerged(node.previousSibling)) {
           text += '\n';
           shouldAddNewline = false;
         }
