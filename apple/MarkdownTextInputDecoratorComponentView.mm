@@ -48,43 +48,35 @@ using namespace facebook::react;
     static const auto defaultProps = std::make_shared<const MarkdownTextInputDecoratorViewProps>();
     _props = defaultProps;
     _observersAdded = false;
+    _markdownUtils = [[RCTMarkdownUtils alloc] init];
   }
 
   return self;
 }
 
-- (void)didAddSubview:(UIView *)subview
-{
-  _markdownUtils = [[RCTMarkdownUtils alloc] init];
-  [_markdownUtils setMarkdownStyle:_markdownStyle];
-  [_markdownUtils setParserId:_parserId];
-
-  [self addTextInputObservers:subview];
-}
-
 - (void)willMoveToWindow:(UIWindow *)newWindow
 {
   if (newWindow != nil) {
-    if (self.subviews.count > 0) {
-      [self addTextInputObservers:self.subviews[0]];
-    }
+    [self addTextInputObservers];
   } else {
     [self removeTextInputObservers];
   }
 }
 
-- (void)addTextInputObservers:(UIView *)textInput
+- (void)addTextInputObservers
 {
   if (_observersAdded) {
     return;
   }
-  
-  react_native_assert([textInput isKindOfClass:[RCTTextInputComponentView class]] && "Child component of MarkdownTextInputDecoratorComponentView is not an instance of RCTTextInputComponentView.");
-  RCTTextInputComponentView *textInputComponentView = (RCTTextInputComponentView *)textInput;
+
+  react_native_assert(self.subviews.count > 0 && "MarkdownTextInputDecoratorComponentView is mounted without any children")
+  UIView* childView = self.subviews[0];
+  react_native_assert([childView isKindOfClass:[RCTTextInputComponentView class]] && "Child component of MarkdownTextInputDecoratorComponentView is not an instance of RCTTextInputComponentView.");
+  RCTTextInputComponentView *textInputComponentView = (RCTTextInputComponentView *)childView;
   UIView<RCTBackedTextInputViewProtocol> *backedTextInputView = [textInputComponentView valueForKey:@"_backedTextInputView"];
  
   _observersAdded = true;
-  
+
   if ([backedTextInputView isKindOfClass:[RCTUITextField class]]) {
     _textField = (RCTUITextField *)backedTextInputView;
 
