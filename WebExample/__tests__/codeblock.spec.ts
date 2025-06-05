@@ -1,5 +1,5 @@
 import {test, expect} from '@playwright/test';
-import type {Page} from '@playwright/test';
+import type {Locator, Page} from '@playwright/test';
 // eslint-disable-next-line import/no-relative-packages
 import * as TEST_CONST from '../../example/src/testConstants';
 import {getElementValue, pressCmd, setCursorPosition, setupInput, testMarkdownContentStyle} from './utils';
@@ -22,6 +22,10 @@ async function testCodeblockStyle(page: Page, pseudoStyle: {height?: string; wid
     pseudoStyle: pseudoStyle as Record<string, string>,
     page,
   });
+}
+
+async function getCodeblockElementCount(inputLocator: Locator) {
+  return inputLocator.locator(`span[data-type="codeblock"]`).count();
 }
 
 test.beforeEach(async ({page}) => {
@@ -179,16 +183,12 @@ test.describe('modifying codeblock content', () => {
     await inputLocator.press('Backspace');
 
     expect(await getElementValue(inputLocator)).toEqual('```\nCodeblock\nSample code line\n``````\nCodeblock\nSecond sample code line\n```');
-    // Verify if the codeblock style wasn't applied
-    await testCodeblockStyle(page, null, null);
+    expect(await getCodeblockElementCount(inputLocator)).toEqual(1);
 
     await inputLocator.press('Enter');
 
     expect(await getElementValue(inputLocator)).toEqual('```\nCodeblock\nSample code line\n```\n```\nCodeblock\nSecond sample code line\n```');
-    await testCodeblockStyle(page, {
-      height: '56px',
-      width: '281px',
-    });
+    expect(await getCodeblockElementCount(inputLocator)).toEqual(2);
   });
 });
 
