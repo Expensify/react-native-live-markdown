@@ -54,6 +54,18 @@ using namespace facebook::react;
   return self;
 }
 
+- (void)didAddSubview:(UIView *)subview
+{
+  [super didAddSubview:subview];
+  [self addTextInputObservers];
+}
+
+- (void)willRemoveSubview:(UIView *)subview
+{
+  [self removeTextInputObservers];
+  [super willRemoveSubview:subview];
+}
+
 - (void)willMoveToWindow:(UIWindow *)newWindow
 {
   if (newWindow != nil) {
@@ -65,7 +77,10 @@ using namespace facebook::react;
 
 - (void)addTextInputObservers
 {
-  react_native_assert(!_observersAdded && "MarkdownTextInputDecoratorComponentView tried to add TextInput observers while they were attached");
+  if (_observersAdded) {
+    return;
+  }
+
   react_native_assert(self.subviews.count > 0 && "MarkdownTextInputDecoratorComponentView is mounted without any children")
   UIView* childView = self.subviews[0];
   react_native_assert([childView isKindOfClass:[RCTTextInputComponentView class]] && "Child component of MarkdownTextInputDecoratorComponentView is not an instance of RCTTextInputComponentView.");
@@ -130,9 +145,11 @@ using namespace facebook::react;
 
 - (void)removeTextInputObservers
 {
-  react_native_assert(_observersAdded && "MarkdownTextInputDecoratorComponentView tried to remove TextInput observers while they were detached");
+  if (!_observersAdded) {
+    return;
+  }
+
   _observersAdded = false;
-  
   if (_textView != nil) {
     if (_textView.layoutManager != nil && [object_getClass(_textView.layoutManager) isEqual:[MarkdownLayoutManager class]]) {
       [_textView.layoutManager setValue:nil forKey:@"markdownUtils"];
