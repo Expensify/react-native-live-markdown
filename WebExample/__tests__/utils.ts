@@ -48,6 +48,7 @@ const setCursorPosition = async (page: Page, elementIndex: number, offset?: numb
     {elementIndex, offset},
   );
 };
+
 const getElementStyle = async (elementHandle: Locator) => {
   let elementStyle;
 
@@ -84,6 +85,7 @@ const getPseudoElementStyle = async (elementHandle: Locator, pseudoElementStyle:
         const value = style[key as keyof CSSStyleDeclaration];
         if (typeof value === 'string') {
           if (key === 'width' || key === 'height') {
+            // We need to floor the value because it can slightly differ on different browsers
             output[key] = `${Math.floor(parseInt(value.replace('px', ''), 10))}px`;
           } else {
             output[key] = value;

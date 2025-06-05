@@ -385,6 +385,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
           if (onChangeText) {
             onChangeText(parsedText);
           }
+
           if (processedMarkdownStyle) {
             const preBlocks = [...divRef.current.querySelectorAll('*[data-type="pre"]')];
             while (preBlocks.length > 0) {
@@ -761,7 +762,6 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
       divRef.current.uniqueId = idGenerator.next().value as string;
       setClassName(`${className} ${divRef.current.uniqueId}`);
       handleCustomStyles(divRef.current, markdownStyle as PartialMarkdownStyle);
-      // eslint-disable-next-line react-hooks/exhaustive-deps
 
       return () => {
         if (!divRef.current || !divRef.current.styleSheet) {
