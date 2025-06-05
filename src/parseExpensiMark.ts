@@ -256,7 +256,7 @@ function parseExpensiMark(markdown: string): MarkdownRange[] {
   }
   let markdownRanges = sortRanges(ranges);
   if (isNative) {
-    // Blocks applying italic and strikethrough styles to emojis on Native
+    // Blocks applying italic and strikethrough styles to emojis on Android and iOS
     // TODO: Remove this condition when splitting emojis inside the inline code block will be fixed on the web
     markdownRanges = splitRangesOnEmojis(markdownRanges, 'italic');
     markdownRanges = splitRangesOnEmojis(markdownRanges, 'strikethrough');
