@@ -1,6 +1,6 @@
 import type {CSSProperties} from 'react';
 import type {MarkdownNativeEvent, MarkdownTextInputElement} from '../../MarkdownTextInput.web';
-import {MULTILINE_MARKDOWN_TYPES} from './blockUtils';
+import {isChildOfMarkdownElement, isChildOfMultilineMarkdownElement} from './blockUtils';
 import BrowserUtils from './browserUtils';
 
 const ZERO_WIDTH_SPACE = '\u200B';
@@ -47,17 +47,6 @@ function getTopParentNode(node: ChildNode) {
   return currentParentNode;
 }
 
-function isChildOfMarkdownElementTypes(node: ChildNode, types: string[]) {
-  let currentParentNode: ParentNode | null = node as unknown as ParentNode;
-  while (currentParentNode && (currentParentNode as HTMLElement).contentEditable !== 'true') {
-    if (types.includes(currentParentNode.parentElement?.getAttribute('data-type') ?? '')) {
-      return true;
-    }
-    currentParentNode = currentParentNode?.parentNode || null;
-  }
-  return false;
-}
-
 // On Firefox, when breaking one codeblock, its syntax and the <br> after it can be merged into the closing syntax of the previous codeblock.
 function didTwoCodeblocksMerged(node: ChildNode | null) {
   return BrowserUtils.isFirefox && node && (node.lastChild as HTMLElement)?.getAttribute('data-type') === 'codeblock' && node.lastChild?.lastChild?.lastChild?.lastChild?.nodeName === 'BR';
@@ -75,7 +64,7 @@ function parseInnerHTMLToText(target: MarkdownTextInputElement | HTMLElement, cu
   }
 
   while (stack.length > 0) {
-    const node = stack.pop();
+    const node = stack.pop() as HTMLElement;
     if (!node) {
       break;
     }
@@ -102,7 +91,7 @@ function parseInnerHTMLToText(target: MarkdownTextInputElement | HTMLElement, cu
       let hasAddedNewline = false;
       // Fix for codeblocks: Removing last codeblock newline, moves codeblock syntax too far into the codeblock content
       // skipping one <br> after the codeblock syntax. We need to force parsing it before the text node is added.
-      if (node.parentElement && !node.parentElement.getAttribute?.('data-type') && isChildOfMarkdownElementTypes(node, ['pre'])) {
+      if (node.parentElement && !node.parentElement.getAttribute?.('data-type') && isChildOfMarkdownElement(node, 'pre')) {
         text += '\n';
         const nextBR = node.parentElement?.nextElementSibling?.firstElementChild ?? node.parentElement?.nextElementSibling;
         if (nextBR && nextBR.tagName === 'BR') {
@@ -120,8 +109,8 @@ function parseInnerHTMLToText(target: MarkdownTextInputElement | HTMLElement, cu
         node.parentElement &&
         node.parentNode?.parentElement?.nextSibling &&
         !node.parentNode?.nextSibling &&
-        isChildOfMarkdownElementTypes(node, MULTILINE_MARKDOWN_TYPES) &&
-        ((!hasAddedNewline && isChildOfMarkdownElementTypes(node, ['br'])) || (!node.parentElement.getAttribute?.('data-type') && isChildOfMarkdownElementTypes(node, ['syntax'])))
+        isChildOfMultilineMarkdownElement(node) &&
+        ((!hasAddedNewline && isChildOfMarkdownElement(node, 'br')) || (!node.parentElement.getAttribute?.('data-type') && isChildOfMarkdownElement(node, 'syntax')))
       ) {
         text += '\n';
       }
@@ -162,4 +151,4 @@ function removePostRenderAttributes(text: string) {
   return text.replace(regex, '');
 }
 
-export {isEventComposing, getPlaceholderValue, getElementHeight, parseInnerHTMLToText, normalizeValue, removePostRenderAttributes, isChildOfMarkdownElementTypes};
+export {isEventComposing, getPlaceholderValue, getElementHeight, parseInnerHTMLToText, normalizeValue, removePostRenderAttributes};

@@ -1,4 +1,4 @@
-import type {InlineImagesInputProps, MarkdownRange, MarkdownType} from '../../commonTypes';
+import type {InlineImagesInputProps, MarkdownRange} from '../../commonTypes';
 import type {MarkdownTextInputElement} from '../../MarkdownTextInput.web';
 import {parseStringWithUnitToNumber} from '../../styleUtils';
 import type {PartialMarkdownStyle} from '../../styleUtils';
@@ -149,10 +149,6 @@ function isBlockMarkdownType(type: NodeType) {
   return BLOCK_MARKDOWN_TYPES.includes(type);
 }
 
-function isMultilineMarkdownType(type: NodeType) {
-  return MULTILINE_MARKDOWN_TYPES.includes(type);
-}
-
 function getFirstBlockMarkdownRange(ranges: MarkdownRange[]) {
   const blockMarkdownRange = ranges.find((r) => isBlockMarkdownType(r.type) || FULL_LINE_MARKDOWN_TYPES.includes(r.type));
   return blockMarkdownRange && FULL_LINE_MARKDOWN_TYPES.includes(blockMarkdownRange.type) ? undefined : blockMarkdownRange;
@@ -185,7 +181,7 @@ function getTopParentTreeNode(node: TreeNode) {
   return currentParentNode;
 }
 
-function isChildOfMarkdownElement(node: HTMLElement, elementType: MarkdownType): boolean {
+function isChildOfMarkdownElement(node: HTMLElement, elementType: NodeType): boolean {
   let currentNode = node.parentNode;
   while (currentNode && (currentNode as HTMLElement)?.contentEditable !== 'true') {
     if ((currentNode as HTMLElement)?.getAttribute?.('data-type') === elementType) {
@@ -196,4 +192,24 @@ function isChildOfMarkdownElement(node: HTMLElement, elementType: MarkdownType):
   return false;
 }
 
-export {addStyleToBlock, extendBlockStructure, isBlockMarkdownType, getFirstBlockMarkdownRange, getTopParentTreeNode, isMultilineMarkdownType, MULTILINE_MARKDOWN_TYPES};
+function isChildOfMultilineMarkdownElement(node: HTMLElement) {
+  let currentNode = node.parentNode;
+  while (currentNode && (currentNode as HTMLElement)?.contentEditable !== 'true') {
+    if (MULTILINE_MARKDOWN_TYPES.includes((currentNode as HTMLElement)?.getAttribute?.('data-type') as NodeType)) {
+      return true;
+    }
+    currentNode = currentNode.parentNode;
+  }
+  return false;
+}
+
+export {
+  addStyleToBlock,
+  extendBlockStructure,
+  isBlockMarkdownType,
+  getFirstBlockMarkdownRange,
+  getTopParentTreeNode,
+  isChildOfMarkdownElement,
+  isChildOfMultilineMarkdownElement,
+  MULTILINE_MARKDOWN_TYPES,
+};
