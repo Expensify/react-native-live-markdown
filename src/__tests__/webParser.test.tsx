@@ -3,6 +3,21 @@ import {expect} from '@jest/globals';
 import {parseRangesToHTMLNodes} from '../web/utils/parserUtils';
 import parseExpensiMark from '../parseExpensiMark';
 
+jest.mock('react-native-web/dist/exports/StyleSheet/compiler/createReactDOMStyle', () => ({
+  __esModule: true,
+  default: jest.fn((style) => style),
+}));
+
+jest.mock('react-native-web/dist/exports/StyleSheet/preprocess', () => ({
+  __esModule: true,
+  default: jest.fn((style) => style),
+}));
+
+jest.mock('react-native-web/dist/modules/setValueForStyles/dangerousStyleValue', () => ({
+  __esModule: true,
+  default: jest.fn(() => null),
+}));
+
 declare module 'expect' {
   interface Matchers<R> {
     toBeParsedAsHTML(expectedHTML: string): R;
@@ -175,7 +190,7 @@ test('inline code', () => {
 
 test('codeblock', () => {
   expect('```\nHello world!\n```').toBeParsedAsHTML(
-    '<p data-type="line" data-id="0"><span data-type="syntax" data-id="0,0"><span data-type="text" data-id="0,0,0">```</span></span><span data-type="pre" data-id="0,1"><span data-type="br" data-id="0,1,0"><br data-id="0,1,0,0"></span><span data-type="text" data-id="0,1,1">Hello world!</span><span data-type="br" data-id="0,1,2"><br data-id="0,1,2,0"></span></span><span data-type="syntax" data-id="0,2"><span data-type="text" data-id="0,2,0">```</span></span></p>',
+    '<p data-type="line" data-id="0"><span data-type="codeblock" data-id="0,0"><span data-type="syntax" data-id="0,0,0"><span data-type="text" data-id="0,0,0,0">```</span><span data-type="br" data-id="0,0,0,1"><br data-id="0,0,0,1,0"></span></span><span data-type="pre" data-id="0,0,1"><span data-type="text" data-id="0,0,1,0">Hello world!</span><span data-type="br" data-id="0,0,1,1"><br data-id="0,0,1,1,0"></span></span><span data-type="syntax" data-id="0,0,2"><span data-type="text" data-id="0,0,2,0">```</span></span></span></p>',
   );
 });
 
