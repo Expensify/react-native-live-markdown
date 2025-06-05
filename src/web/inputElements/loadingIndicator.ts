@@ -7,6 +7,7 @@ const spinnerDefaultStyles = {
 };
 const spinnerContainerDefaultStyles = {
   position: 'absolute',
+  // This fixes a bug with scrollbar flashing when spinner is shown. Context: https://github.com/Expensify/react-native-live-markdown/pull/688#pullrequestreview-2891335403
   bottom: '1px',
   left: '0',
   display: 'flex',
