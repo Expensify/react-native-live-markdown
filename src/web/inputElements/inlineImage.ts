@@ -6,6 +6,7 @@ import type {TreeNode} from '../utils/treeUtils';
 import {createLoadingIndicator} from './loadingIndicator';
 
 const INLINE_IMAGE_PREVIEW_DEBOUNCE_TIME_MS = 300;
+const INLINE_IMAGE_MIN_HEIGHT = 40;
 
 const inlineImageDefaultStyles = {
   position: 'absolute',
@@ -22,6 +23,10 @@ const timeoutMap = new Map<string, DebouncePreviewItem>();
 
 function getImagePreviewElement(targetElement: HTMLMarkdownElement) {
   return Array.from(targetElement?.childNodes || []).find((el) => (el as HTMLElement)?.contentEditable === 'false') as HTMLMarkdownElement | undefined;
+}
+
+function getContainerPaddingBottom(imageHeight: number, imagePaddingTop: number) {
+  return `${Math.max(INLINE_IMAGE_MIN_HEIGHT, imageHeight) + imagePaddingTop}px`;
 }
 
 function scaleImageDimensions(imgElement: HTMLImageElement) {
@@ -143,7 +148,7 @@ function handleOnLoad(
   // Set paddingBottom to the height of the image so it's displayed under the block
   const imageMarginTop = parseStringWithUnitToNumber(`${markdownStyle.inlineImage?.marginTop}`);
   Object.assign(targetElement.style, {
-    paddingBottom: `${scaledImageHeight + imageMarginTop}px`,
+    paddingBottom: getContainerPaddingBottom(scaledImageHeight, imageMarginTop),
   });
 }
 
@@ -182,7 +187,7 @@ function createImageElement(currentInput: MarkdownTextInputElement, targetNode: 
 
 /** Adds already loaded image element from current input content to the tree node */
 function updateImageTreeNode(targetNode: TreeNode, newElement: HTMLMarkdownElement, imageMarginTop = 0) {
-  const paddingBottom = `${parseStringWithUnitToNumber(newElement.style.height) + imageMarginTop}px`;
+  const paddingBottom = getContainerPaddingBottom(parseStringWithUnitToNumber(newElement.style.height), imageMarginTop);
   targetNode.element.appendChild(newElement.cloneNode(true));
 
   let currentParent = targetNode.element;
