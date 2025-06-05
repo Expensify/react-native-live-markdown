@@ -39,6 +39,7 @@ export default function App() {
   return (
     <ScrollView contentContainerStyle={styles.container} style={styles.content}>
       <PlatformInfo />
+      <Text>{multiline ? 'multiline' : 'singleline'}</Text>
       <MarkdownTextInput
         multiline={multiline}
         formatSelection={handleFormatSelection}
