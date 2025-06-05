@@ -25,23 +25,19 @@ export default function App() {
     };
   }, [textColorState, textFontSizeState]);
 
-  const markdownStyle = React.useMemo(() => {
-    return {
-      emoji: {
-        fontSize: emojiFontSizeState ? 15 : 20,
-      },
-      link: {
-        color: linkColorState ? 'red' : 'blue',
-      },
-    };
-  }, [emojiFontSizeState, linkColorState]);
+  const markdownStyle = {
+    emoji: {
+      fontSize: emojiFontSizeState ? 15 : 20,
+    },
+    link: {
+      color: linkColorState ? 'red' : 'blue',
+    },
+  };
 
   const ref = React.useRef<MarkdownTextInput>(null);
 
   return (
-    <ScrollView
-      contentContainerStyle={styles.container}
-      style={styles.content}>
+    <ScrollView contentContainerStyle={styles.container} style={styles.content}>
       <PlatformInfo />
       <MarkdownTextInput
         multiline={multiline}
@@ -109,6 +105,7 @@ export default function App() {
         onPress={() => setTextColorState(prev => !prev)}
       />
       <Button
+        testID={TEST_CONST.TOGGLE_LINK_COLOR}
         title="Toggle link color"
         onPress={() => setLinkColorState(prev => !prev)}
       />
@@ -135,6 +132,7 @@ export default function App() {
         }}
       />
       <Button
+        testID={TEST_CONST.CHANGE_SELECTION}
         title="Change selection"
         onPress={() => {
           if (!ref.current) {
