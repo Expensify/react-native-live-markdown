@@ -66,21 +66,9 @@ using namespace facebook::react;
   [super willRemoveSubview:subview];
 }
 
-- (void)willMoveToWindow:(UIWindow *)newWindow
-{
-  if (newWindow != nil) {
-    [self addTextInputObservers];
-  } else {
-    [self removeTextInputObservers];
-  }
-}
-
 - (void)addTextInputObservers
 {
-  if (_observersAdded) {
-    return;
-  }
-
+  react_native_assert(!_observersAdded && "MarkdownTextInputDecoratorComponentView tried to add TextInput observers while they were attached");
   react_native_assert(self.subviews.count > 0 && "MarkdownTextInputDecoratorComponentView is mounted without any children")
   UIView* childView = self.subviews[0];
   react_native_assert([childView isKindOfClass:[RCTTextInputComponentView class]] && "Child component of MarkdownTextInputDecoratorComponentView is not an instance of RCTTextInputComponentView.");
@@ -145,11 +133,9 @@ using namespace facebook::react;
 
 - (void)removeTextInputObservers
 {
-  if (!_observersAdded) {
-    return;
-  }
-
+  react_native_assert(_observersAdded && "MarkdownTextInputDecoratorComponentView tried to remove TextInput observers while they were detached");
   _observersAdded = false;
+
   if (_textView != nil) {
     if (_textView.layoutManager != nil && [object_getClass(_textView.layoutManager) isEqual:[MarkdownLayoutManager class]]) {
       [_textView.layoutManager setValue:nil forKey:@"markdownUtils"];
@@ -205,7 +191,11 @@ using namespace facebook::react;
 
 - (void)prepareForRecycle
 {
+  react_native_assert(!_observersAdded && "MarkdownTextInputDecoratorComponentView was being recycled with TextInput observers still attached");
   [super prepareForRecycle];
+  
+  static const auto defaultProps = std::make_shared<const MarkdownTextInputDecoratorViewProps>();
+  _props = defaultProps;
   _markdownUtils = [[RCTMarkdownUtils alloc] init];
 }
 
