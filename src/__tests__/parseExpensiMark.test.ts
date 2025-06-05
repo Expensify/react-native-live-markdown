@@ -19,6 +19,12 @@ const toBeParsedAs = function (actual: string, expectedRanges: MarkdownRange[]) 
   return {pass: true, message: () => ''};
 };
 
+jest.mock('react-native', () => ({
+  Platform: {
+    OS: 'web',
+  },
+}));
+
 expect.extend({
   toBeParsedAs,
 });
