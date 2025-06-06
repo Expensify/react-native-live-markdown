@@ -69,7 +69,7 @@ using namespace facebook::react;
 - (void)addTextInputObservers
 {
   react_native_assert(!_observersAdded && "MarkdownTextInputDecoratorComponentView tried to add TextInput observers while they were attached");
-  react_native_assert(self.subviews.count > 0 && "MarkdownTextInputDecoratorComponentView is mounted without any children")
+  react_native_assert(self.subviews.count > 0 && "MarkdownTextInputDecoratorComponentView is mounted without any children");
   UIView* childView = self.subviews[0];
   react_native_assert([childView isKindOfClass:[RCTTextInputComponentView class]] && "Child component of MarkdownTextInputDecoratorComponentView is not an instance of RCTTextInputComponentView.");
   RCTTextInputComponentView *textInputComponentView = (RCTTextInputComponentView *)childView;
