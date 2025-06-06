@@ -42,13 +42,15 @@ function makeDefaultMarkdownStyle(): MarkdownStyle {
       padding: 0,
     },
     pre: {
-      borderColor: 'gray',
-      borderRadius: 4,
-      padding: 2,
       fontFamily: FONT_FAMILY_MONOSPACE,
       fontSize: 20,
       color: 'black',
       backgroundColor: 'lightgray',
+      borderColor: 'gray',
+      borderWidth: 1,
+      borderRadius: 4,
+      borderStyle: 'solid',
+      padding: 2,
     },
     mentionHere: {
       color: 'green',

@@ -118,11 +118,7 @@ function addCodeBlockStyles(targetElement: HTMLElement, type: NodeType, markdown
       if (isMultiline) {
         Object.assign(node.style, {
           ...markdownStyle.pre,
-          backgroundColor: undefined,
-          borderColor: undefined,
-          borderWidth: undefined,
-          borderStyle: undefined,
-          padding: 0,
+          width: 'content-fit',
         });
         Object.assign((node.parentNode as HTMLElement).style, {
           padding: `${preVerticalPadding}px ${preHorizontalPadding}px`,

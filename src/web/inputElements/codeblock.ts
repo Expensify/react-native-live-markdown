@@ -38,6 +38,7 @@ function generateCodeBlocksRules(target: MarkdownTextInputElement, markdownStyle
   if (!line) {
     return [];
   }
+  return [];
 
   const lineHeight = line.getBoundingClientRect()?.height;
   const preStyles = markdownStyle.pre;
