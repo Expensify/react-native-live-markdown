@@ -139,6 +139,7 @@ function getTreeNodeByIndex(treeRoot: TreeNode, index: number): TreeNode | null 
   }
   return null;
 }
+
 export {addNodeToTree, findHTMLElementInTree, getTreeNodeByIndex, updateTreeElementRefs, createRootTreeNode};
 
 export type {TreeNode, NodeType};

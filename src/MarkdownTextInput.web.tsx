@@ -743,7 +743,6 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
       if (autoFocus) {
         divRef.current.focus();
       }
-
       divRef.current.uniqueId = idGenerator.next().value as string;
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
