@@ -30,6 +30,7 @@
   padding-right: 1px !important;
 }
 
+.react-native-live-markdown-input-singleline *[data-type='pre'],
 .react-native-live-markdown-input-multiline *[data-type='pre'] {
   line-height: 1.3;
   display: block;
@@ -38,6 +39,7 @@
   box-sizing: border-box;
 }
 
+.react-native-live-markdown-input-singleline *[data-type='codeblock'],
 .react-native-live-markdown-input-multiline *[data-type='codeblock'] {
   position: relative;
   width: fit-content;
@@ -54,15 +56,7 @@
   vertical-align: unset !important;
 }
 
-.react-native-live-markdown-input-multiline *[data-type='line'] *[data-type='pre'] + *[data-type='syntax'] + *[data-type='text'] {
-  max-width: 100%;
-}
-
-.react-native-live-markdown-input-multiline *[data-type='line'] *[data-type='syntax']:has(+ *[data-type='pre']) {
-  display: block;
-  line-height: 1.3;
-}
-
+.react-native-live-markdown-input-multiline *[data-type='line'] *[data-type='syntax']:has(+ *[data-type='pre']),
 .react-native-live-markdown-input-multiline *[data-type='line'] *[data-type='pre'] + *[data-type='syntax'] {
   display: block;
   line-height: 1.3;
