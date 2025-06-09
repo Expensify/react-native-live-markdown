@@ -21,7 +21,7 @@ import {getCurrentCursorPosition, removeSelection, setCursorPosition} from './we
 import './web/MarkdownTextInput.css';
 import type {MarkdownStyle} from './MarkdownTextInputDecoratorViewNativeComponent';
 import {getElementHeight, getPlaceholderValue, isEventComposing, normalizeValue, parseInnerHTMLToText} from './web/utils/inputUtils';
-import {parseToReactDOMStyle, idGenerator, processMarkdownStyle} from './web/utils/webStyleUtils';
+import {idGenerator, parseToReactDOMStyle, processMarkdownStyle} from './web/utils/webStyleUtils';
 import {forceRefreshAllImages} from './web/inputElements/inlineImage';
 import type {MarkdownRange, InlineImagesInputProps} from './commonTypes';
 
@@ -70,7 +70,6 @@ type MarkdownTextInputElement = HTMLDivElement &
   HTMLInputElement & {
     tree: TreeNode;
     uniqueId: string;
-    styleSheet?: CSSStyleSheet;
     selection: Selection;
     imageElements: HTMLImageElement[];
   };
