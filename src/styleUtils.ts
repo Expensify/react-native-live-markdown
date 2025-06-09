@@ -10,6 +10,12 @@ const FONT_FAMILY_MONOSPACE = Platform.select({
   default: 'monospace',
 });
 
+const FONT_FAMILY_EMOJI = Platform.select({
+  ios: 'System',
+  android: 'Noto Color Emoji',
+  default: 'System, Apple Color Emoji, Segoe UI Emoji, Noto Color Emoji',
+});
+
 function makeDefaultMarkdownStyle(): MarkdownStyle {
   return {
     syntax: {
@@ -23,6 +29,7 @@ function makeDefaultMarkdownStyle(): MarkdownStyle {
     },
     emoji: {
       fontSize: 20,
+      fontFamily: FONT_FAMILY_EMOJI,
     },
     blockquote: {
       borderColor: 'gray',
