@@ -34,14 +34,6 @@ test.describe('markdown content styling', () => {
     await testMarkdownContentStyle({
       testContent: 'codeblock',
       style: 'border-radius: 4px; padding: 0px; font-family: monospace; font-size: 20px; color: black;',
-      pseudoStyle: {
-        backgroundColor: 'rgb(211, 211, 211)',
-        padding: '2px',
-        borderWidth: '1px',
-        borderStyle: 'solid',
-        borderColor: 'rgb(128, 128, 128)',
-        borderRadius: '4px',
-      },
       page,
     });
   });

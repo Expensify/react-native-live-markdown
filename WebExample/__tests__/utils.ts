@@ -63,41 +63,6 @@ const getElementStyle = async (elementHandle: Locator) => {
   return elementStyle;
 };
 
-const getPseudoElementStyle = async (elementHandle: Locator, pseudoElementStyle: Record<string, string>) => {
-  let elementStyle = null;
-
-  if (elementHandle) {
-    await elementHandle.waitFor({state: 'attached'});
-    // We need to get styles from the parent element because every text node is wrapped additionally with a span element
-    const parentElementHandle = await elementHandle.evaluateHandle((element) => {
-      return element.parentElement;
-    });
-
-    // eslint-disable-next-line no-shadow
-    elementStyle = await parentElementHandle.evaluate((element, pseudoElementStyle) => {
-      if (!element) {
-        return null;
-      }
-
-      const style = window.getComputedStyle(element, '::before');
-      const output: Record<string, string> = {};
-      Object.keys(pseudoElementStyle).forEach((key) => {
-        const value = style[key as keyof CSSStyleDeclaration];
-        if (typeof value === 'string') {
-          if (key === 'width' || key === 'height') {
-            // We need to floor the value because it can slightly differ on different browsers
-            output[key] = `${Math.floor(parseInt(value.replace('px', ''), 10))}px`;
-          } else {
-            output[key] = value;
-          }
-        }
-      });
-      return output;
-    }, pseudoElementStyle);
-  }
-  return elementStyle;
-};
-
 const pressCmd = async ({inputLocator, command}: {inputLocator: Locator; command: string}) => {
   const OPERATION_MODIFIER = process.platform === 'darwin' ? 'Meta' : 'Control';
 
@@ -118,7 +83,7 @@ const setSelection = async (page: Page) => {
   await page.click(`[data-testid="${TEST_CONST.CHANGE_SELECTION}"]`);
 };
 
-const testMarkdownContentStyle = async ({testContent, style, page, pseudoStyle}: {testContent: string; style: string; page: Page; pseudoStyle?: Record<string, string>}) => {
+const testMarkdownContentStyle = async ({testContent, style, page, dimmensions}: {testContent: string; style: string; page: Page; dimmensions?: {height: number; width: number}}) => {
   const inputLocator = await setupInput(page);
 
   const elementHandle = inputLocator.locator('span', {hasText: testContent}).last();
@@ -126,9 +91,15 @@ const testMarkdownContentStyle = async ({testContent, style, page, pseudoStyle}:
 
   expect(elementStyle).toEqual(style);
 
-  if (pseudoStyle) {
-    const pseudoElementStyle = await getPseudoElementStyle(elementHandle, pseudoStyle);
-    expect(pseudoElementStyle).toEqual(pseudoStyle);
+  if (dimmensions && elementHandle) {
+    await elementHandle.waitFor({state: 'attached'});
+    // We need to get styles from the parent element because every text node is wrapped additionally with a span element
+    const parentElementHandle = await elementHandle.evaluateHandle((element) => {
+      return element.parentElement;
+    });
+    const elementDimmensions = await parentElementHandle.asElement()?.boundingBox();
+    expect(Math.floor(elementDimmensions?.height ?? 0)).toEqual(dimmensions.height);
+    expect(Math.floor(elementDimmensions?.width ?? 0)).toEqual(dimmensions.width);
   }
 };
 

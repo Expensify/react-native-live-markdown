@@ -4,23 +4,24 @@ import type {Locator, Page} from '@playwright/test';
 import * as TEST_CONST from '../../example/src/testConstants';
 import {getElementValue, pressCmd, setCursorPosition, setupInput, testMarkdownContentStyle} from './utils';
 
-const CODEBLOCK_DEFAULT_STYLE = 'border-radius: 4px; padding: 0px; font-family: monospace; font-size: 20px; color: black;';
+const CODEBLOCK_DEFAULT_STYLE =
+  'font-family: monospace; font-size: 20px; color: black; background-color: lightgray; border-color: gray; border-width: 1px; border-radius: 4px; border-style: solid; padding: 2px;';
 
-async function testCodeblockStyle(page: Page, pseudoStyle: {height?: string; width?: string} | null, style?: string | null) {
-  // if (style === null) {
-  //   await testMarkdownContentStyle({
-  //     testContent: 'codeblock',
-  //     style: 'margin: 0px; padding: 0px;',
-  //     page,
-  //   });
-  //   return;
-  // }
-  // await testMarkdownContentStyle({
-  //   testContent: 'codeblock',
-  //   style: style ?? CODEBLOCK_DEFAULT_STYLE,
-  //   pseudoStyle: pseudoStyle as Record<string, string>,
-  //   page,
-  // });
+async function testCodeblockStyle(page: Page, dimmensions: {height: number; width: number} | null, style?: string | null) {
+  if (style === null) {
+    await testMarkdownContentStyle({
+      testContent: 'Codeblock',
+      style: 'margin: 0px; padding: 0px;',
+      page,
+    });
+    return;
+  }
+  await testMarkdownContentStyle({
+    testContent: 'Codeblock',
+    style: style ?? CODEBLOCK_DEFAULT_STYLE,
+    dimmensions: dimmensions ?? undefined,
+    page,
+  });
 }
 
 async function getCodeblockElementCount(inputLocator: Locator) {
@@ -54,25 +55,28 @@ test.describe('modifying codeblock content', () => {
     await inputLocator.pressSequentially('test');
 
     expect(await getElementValue(inputLocator)).toEqual('```\nCodeblock\nSample code line\ntest\n```');
-    await testCodeblockStyle(page, {height: '82px', width: '197px'});
+    await testCodeblockStyle(page, {
+      height: 84,
+      width: 198,
+    });
   });
 
   test('allow writing after closing syntax', async ({page}) => {
-    const styleProperties = {
-      height: '56px',
-      width: '197px',
+    const codeblockDimmensions = {
+      height: 58,
+      width: 198,
     };
     const inputLocator = await setupInput(page, 'clear');
     await inputLocator.focus();
     await inputLocator.pressSequentially('```\nCodeblock\nSample code line\n```');
 
     await setCursorPosition(page, 6);
-    await testCodeblockStyle(page, styleProperties);
+    await testCodeblockStyle(page, codeblockDimmensions);
     await inputLocator.pressSequentially('test');
 
     expect(await getElementValue(inputLocator)).toEqual('```\nCodeblock\nSample code line\n```test');
     // Verify if when typing after codeblock closing syntax, its height is not changed
-    await testCodeblockStyle(page, styleProperties);
+    await testCodeblockStyle(page, codeblockDimmensions);
   });
 
   test('remove whole codeblock', async ({page}) => {
@@ -97,8 +101,8 @@ test.describe('modifying codeblock content', () => {
 
     expect(await getElementValue(inputLocator)).toEqual(`\`\`\`\nCodeblock${LINE_TO_ADD}\nSample code line\n\`\`\``);
     await testCodeblockStyle(page, {
-      height: '108px',
-      width: '289px',
+      height: 110,
+      width: 288,
     });
   });
 
@@ -151,8 +155,8 @@ test.describe('modifying codeblock content', () => {
 
     expect(await getElementValue(inputLocator)).toEqual('```\nCodeblock\nSample code line\n```');
     await testCodeblockStyle(page, {
-      height: '56px',
-      width: '197px',
+      height: 58,
+      width: 198,
     });
   });
 
@@ -166,8 +170,8 @@ test.describe('modifying codeblock content', () => {
 
     expect(await getElementValue(inputLocator)).toEqual('```\nCodeblock\nSample code line\n\n```');
     await testCodeblockStyle(page, {
-      height: '82px',
-      width: '197px',
+      height: 84,
+      width: 198,
     });
   });
 
@@ -181,8 +185,8 @@ test.describe('modifying codeblock content', () => {
 
     expect(await getElementValue(inputLocator)).toEqual('\n```\nCodeblock\nSample code line\n```');
     await testCodeblockStyle(page, {
-      height: '56px',
-      width: '197px',
+      height: 58,
+      width: 198,
     });
   });
 
@@ -211,8 +215,8 @@ test('update codeblock dimensions when resizing the input', async ({page}) => {
   await inputLocator.pressSequentially('```\nCodeblock\nSample very long line of code that should be wrapped\n```');
 
   await testCodeblockStyle(page, {
-    height: '108px',
-    width: '289px',
+    height: 110,
+    width: 288,
   });
 
   await inputLocator.evaluate((inputElement: HTMLInputElement) => {
@@ -223,8 +227,8 @@ test('update codeblock dimensions when resizing the input', async ({page}) => {
   await page.waitForTimeout(10);
 
   await testCodeblockStyle(page, {
-    height: '82px',
-    width: '489px',
+    height: 84,
+    width: 488,
   });
 });
 
