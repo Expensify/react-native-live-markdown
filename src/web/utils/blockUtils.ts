@@ -3,7 +3,6 @@ import type {MarkdownTextInputElement} from '../../MarkdownTextInput.web';
 import {parseStringWithUnitToNumber} from '../../styleUtils';
 import type {PartialMarkdownStyle} from '../../styleUtils';
 import {addInlineImagePreview} from '../inputElements/inlineImage';
-import BrowserUtils from './browserUtils';
 import type {NodeType, TreeNode} from './treeUtils';
 
 function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownStyle: PartialMarkdownStyle, isMultiline = true) {
@@ -96,10 +95,6 @@ function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownSty
 function addCodeBlockStyles(targetElement: HTMLElement, type: NodeType, markdownStyle: PartialMarkdownStyle, isMultiline = true) {
   const node = targetElement;
 
-  const defaultPrePadding = markdownStyle.pre?.padding ?? 2;
-  const preHorizontalPadding = parseStringWithUnitToNumber(markdownStyle.pre?.paddingHorizontal ?? defaultPrePadding).toString();
-  const preVerticalPadding = parseStringWithUnitToNumber(markdownStyle.pre?.paddingVertical ?? defaultPrePadding).toString();
-
   const defaultCodePadding = markdownStyle.code?.padding ?? 0;
   const codeHorizontalPadding = parseStringWithUnitToNumber(markdownStyle.code?.paddingHorizontal ?? defaultCodePadding).toString();
   const codeVerticalPadding = parseStringWithUnitToNumber(markdownStyle.code?.paddingVertical ?? defaultCodePadding).toString();
@@ -114,15 +109,9 @@ function addCodeBlockStyles(targetElement: HTMLElement, type: NodeType, markdown
       });
       break;
     case 'pre':
-      // In multiline style the pre block using pseudoelements, otherwise default to inline
       if (isMultiline) {
         Object.assign(node.style, {
           ...markdownStyle.pre,
-          width: 'content-fit',
-        });
-        Object.assign((node.parentNode as HTMLElement).style, {
-          padding: `${preVerticalPadding}px ${preHorizontalPadding}px`,
-          'line-height': BrowserUtils.isMobile ? 1.3 : 'inherit',
         });
       } else {
         Object.assign(node.style, {
@@ -169,14 +158,6 @@ function extendBlockStructure(
   return targetNode;
 }
 
-function getTopParentTreeNode(node: TreeNode) {
-  let currentParentNode = node.parentNode;
-  while (currentParentNode && ['text', 'br', 'line', 'syntax'].includes(currentParentNode.parentNode?.type || '')) {
-    currentParentNode = currentParentNode?.parentNode || null;
-  }
-  return currentParentNode;
-}
-
 function isChildOfMarkdownElement(node: HTMLElement, elementType: NodeType): boolean {
   let currentNode = node.parentNode;
   while (currentNode && (currentNode as HTMLElement)?.contentEditable !== 'true') {
@@ -199,13 +180,4 @@ function isChildOfMultilineMarkdownElement(node: HTMLElement) {
   return false;
 }
 
-export {
-  addStyleToBlock,
-  extendBlockStructure,
-  isBlockMarkdownType,
-  getFirstBlockMarkdownRange,
-  getTopParentTreeNode,
-  isChildOfMarkdownElement,
-  isChildOfMultilineMarkdownElement,
-  MULTILINE_MARKDOWN_TYPES,
-};
+export {addStyleToBlock, extendBlockStructure, isBlockMarkdownType, getFirstBlockMarkdownRange, isChildOfMarkdownElement, isChildOfMultilineMarkdownElement, MULTILINE_MARKDOWN_TYPES};

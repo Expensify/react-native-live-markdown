@@ -53,8 +53,7 @@ function didTwoCodeblocksMerged(node: ChildNode | null) {
 }
 
 // Parses the HTML structure of a MarkdownTextInputElement to a plain text string. Used for getting the correct value of the input element.
-function parseInnerHTMLToText(target: MarkdownTextInputElement | HTMLElement, cursorPosition: number, inputType?: string): string {
-  console.log(target.innerHTML);
+function parseInnerHTMLToText(target: MarkdownTextInputElement, cursorPosition: number, inputType?: string): string {
   const stack: ChildNode[] = [target];
   let text = '';
   let shouldAddNewline = false;
@@ -143,15 +142,10 @@ function parseInnerHTMLToText(target: MarkdownTextInputElement | HTMLElement, cu
   text = text.replaceAll('\r\n', '\n');
 
   // Force letter removal if the input value haven't changed but input type is 'delete'
-  if ('value' in target && text === target?.value && inputType?.includes('delete')) {
+  if (text === target.value && inputType?.includes('delete')) {
     text = text.slice(0, cursorPosition - 1) + text.slice(cursorPosition);
   }
   return text;
 }
 
-function removePostRenderAttributes(text: string) {
-  const regex = /( )?data-content="[^"]*"/g;
-  return text.replace(regex, '');
-}
-
-export {isEventComposing, getPlaceholderValue, getElementHeight, parseInnerHTMLToText, normalizeValue, removePostRenderAttributes};
+export {isEventComposing, getPlaceholderValue, getElementHeight, parseInnerHTMLToText, normalizeValue};
