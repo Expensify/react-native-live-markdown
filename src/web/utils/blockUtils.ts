@@ -1,5 +1,6 @@
-import type {MarkdownTextInputElement} from '../../MarkdownTextInput.web';
 import type {InlineImagesInputProps, MarkdownRange} from '../../commonTypes';
+import type {MarkdownTextInputElement} from '../../MarkdownTextInput.web';
+import {parseStringWithUnitToNumber} from '../../styleUtils';
 import type {PartialMarkdownStyle} from '../../styleUtils';
 import {addInlineImagePreview} from '../inputElements/inlineImage';
 import type {NodeType, TreeNode} from './treeUtils';
@@ -51,12 +52,9 @@ function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownSty
       });
       break;
     case 'code':
-      Object.assign(node.style, markdownStyle.code);
-      break;
     case 'pre':
-      Object.assign(node.style, markdownStyle.pre);
+      addCodeBlockStyles(targetElement, type, markdownStyle, isMultiline);
       break;
-
     case 'blockquote':
       Object.assign(node.style, {
         ...markdownStyle.blockquote,
@@ -94,8 +92,43 @@ function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownSty
   }
 }
 
+function addCodeBlockStyles(targetElement: HTMLElement, type: NodeType, markdownStyle: PartialMarkdownStyle, isMultiline = true) {
+  const node = targetElement;
+
+  const defaultCodePadding = markdownStyle.code?.padding ?? 0;
+  const codeHorizontalPadding = parseStringWithUnitToNumber(markdownStyle.code?.paddingHorizontal ?? defaultCodePadding).toString();
+  const codeVerticalPadding = parseStringWithUnitToNumber(markdownStyle.code?.paddingVertical ?? defaultCodePadding).toString();
+
+  switch (type) {
+    case 'code':
+      Object.assign(node.style, {
+        ...markdownStyle.code,
+        fontSize: markdownStyle.code?.h1NestedFontSize && isChildOfMarkdownElement(node, 'h1') ? markdownStyle.code.h1NestedFontSize : markdownStyle.code?.fontSize,
+        padding: `${codeVerticalPadding}px ${codeHorizontalPadding}px`,
+        lineHeight: 1.5,
+      });
+      break;
+    case 'pre':
+      if (isMultiline) {
+        Object.assign(node.style, {
+          ...markdownStyle.pre,
+        });
+      } else {
+        Object.assign(node.style, {
+          ...markdownStyle.code,
+          padding: `${codeVerticalPadding}px ${codeHorizontalPadding}px`,
+          lineHeight: 1.5,
+        });
+      }
+      break;
+    default:
+      break;
+  }
+}
+
 const BLOCK_MARKDOWN_TYPES = ['inline-image'];
 const FULL_LINE_MARKDOWN_TYPES = ['blockquote'];
+const MULTILINE_MARKDOWN_TYPES = ['codeblock'];
 
 function isBlockMarkdownType(type: NodeType) {
   return BLOCK_MARKDOWN_TYPES.includes(type);
@@ -103,7 +136,7 @@ function isBlockMarkdownType(type: NodeType) {
 
 function getFirstBlockMarkdownRange(ranges: MarkdownRange[]) {
   const blockMarkdownRange = ranges.find((r) => isBlockMarkdownType(r.type) || FULL_LINE_MARKDOWN_TYPES.includes(r.type));
-  return FULL_LINE_MARKDOWN_TYPES.includes(blockMarkdownRange?.type || '') ? undefined : blockMarkdownRange;
+  return blockMarkdownRange && FULL_LINE_MARKDOWN_TYPES.includes(blockMarkdownRange.type) ? undefined : blockMarkdownRange;
 }
 
 function extendBlockStructure(
@@ -125,4 +158,26 @@ function extendBlockStructure(
   return targetNode;
 }
 
-export {addStyleToBlock, extendBlockStructure, isBlockMarkdownType, getFirstBlockMarkdownRange};
+function isChildOfMarkdownElement(node: HTMLElement, elementType: NodeType): boolean {
+  let currentNode = node.parentNode;
+  while (currentNode && (currentNode as HTMLElement)?.contentEditable !== 'true') {
+    if ((currentNode as HTMLElement)?.getAttribute?.('data-type') === elementType) {
+      return true;
+    }
+    currentNode = currentNode.parentNode;
+  }
+  return false;
+}
+
+function isChildOfMultilineMarkdownElement(node: HTMLElement) {
+  let currentNode = node.parentNode;
+  while (currentNode && (currentNode as HTMLElement)?.contentEditable !== 'true') {
+    if (MULTILINE_MARKDOWN_TYPES.includes((currentNode as HTMLElement)?.getAttribute?.('data-type') as NodeType)) {
+      return true;
+    }
+    currentNode = currentNode.parentNode;
+  }
+  return false;
+}
+
+export {addStyleToBlock, extendBlockStructure, isBlockMarkdownType, getFirstBlockMarkdownRange, isChildOfMarkdownElement, isChildOfMultilineMarkdownElement, MULTILINE_MARKDOWN_TYPES};
