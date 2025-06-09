@@ -33,7 +33,8 @@ test.describe('markdown content styling', () => {
   test('codeblock', async ({page}) => {
     await testMarkdownContentStyle({
       testContent: 'codeblock',
-      style: 'border-radius: 4px; padding: 0px; font-family: monospace; font-size: 20px; color: black;',
+      style:
+        'font-family: monospace; font-size: 20px; color: black; background-color: lightgray; border-color: gray; border-width: 1px; border-radius: 4px; border-style: solid; padding: 2px;',
       page,
     });
   });
