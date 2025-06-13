@@ -236,7 +236,7 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, MarkdownRange[]] {
   return [text, ranges];
 }
 
-const isAndroid = Platform.OS === 'android';
+const isNative = Platform.OS === 'android' || Platform.OS === 'ios';
 
 function parseExpensiMark(markdown: string): MarkdownRange[] {
   if (markdown.length > MAX_PARSABLE_LENGTH) {
@@ -255,8 +255,8 @@ function parseExpensiMark(markdown: string): MarkdownRange[] {
     return [];
   }
   let markdownRanges = sortRanges(ranges);
-  if (isAndroid) {
-    // Blocks applying italic and strikethrough styles to emojis on Android
+  if (isNative) {
+    // Blocks applying italic and strikethrough styles to emojis on Android and iOS
     // TODO: Remove this condition when splitting emojis inside the inline code block will be fixed on the web
     markdownRanges = splitRangesOnEmojis(markdownRanges, 'italic');
     markdownRanges = splitRangesOnEmojis(markdownRanges, 'strikethrough');
