@@ -3,7 +3,7 @@ import {addNodeToTree, createRootTreeNode, updateTreeElementRefs} from './treeUt
 import type {NodeType, TreeNode} from './treeUtils';
 import type {PartialMarkdownStyle} from '../../styleUtils';
 import {getCurrentCursorPosition, moveCursorToEnd, setCursorPosition} from './cursorUtils';
-import {addStyleToBlock, extendBlockStructure, getFirstBlockMarkdownRange, isBlockMarkdownType} from './blockUtils';
+import {addStyleToBlock, extendBlockStructure, getFirstBlockMarkdownRange, isBlockMarkdownType, isMultilineMarkdownType} from './blockUtils';
 import type {InlineImagesInputProps, MarkdownRange} from '../../commonTypes';
 import {getAnimationCurrentTimes, updateAnimationsTime} from './animationUtils';
 import {sortRanges, ungroupRanges} from '../../rangeUtils';
@@ -31,8 +31,10 @@ function splitTextIntoLines(text: string): Paragraph[] {
   return lines;
 }
 
-/** Merges lines that contain multiline markdown tags into one line */
-function mergeLinesWithMultilineTags(lines: Paragraph[], ranges: MarkdownRange[]) {
+/** For singleline markdown types, the function splits markdown ranges that spread beyond the line length into separate lines.
+ * For multiline markdown types (like `pre`), it merges them into one line.
+ */
+function normalizeLines(lines: Paragraph[], ranges: MarkdownRange[]) {
   let mergedLines = [...lines];
   const lineIndexes = mergedLines.map((_line, index) => index);
 
@@ -44,19 +46,48 @@ function mergeLinesWithMultilineTags(lines: Paragraph[], ranges: MarkdownRange[]
     if (correspondingLineIndexes.length > 0) {
       const mainLineIndex = correspondingLineIndexes[0] as number;
       const mainLine = mergedLines[mainLineIndex] as Paragraph;
-
-      mainLine.markdownRanges.push(range);
-
       const otherLineIndexes = correspondingLineIndexes.slice(1);
-      otherLineIndexes.forEach((lineIndex) => {
-        const otherLine = mergedLines[lineIndex] as Paragraph;
 
-        mainLine.text += `\n${otherLine.text}`;
-        mainLine.length += otherLine.length + 1;
-        mainLine.markdownRanges.push(...otherLine.markdownRanges);
-      });
-      if (otherLineIndexes.length > 0) {
-        mergedLines = mergedLines.filter((_line, index) => !otherLineIndexes.includes(index));
+      if (isMultilineMarkdownType(range.type)) {
+        mainLine.markdownRanges.push(range);
+
+        otherLineIndexes.forEach((lineIndex) => {
+          const otherLine = mergedLines[lineIndex] as Paragraph;
+
+          mainLine.text += `\n${otherLine.text}`;
+          mainLine.length += otherLine.length + 1;
+          mainLine.markdownRanges.push(...otherLine.markdownRanges);
+        });
+        if (otherLineIndexes.length > 0) {
+          mergedLines = mergedLines.filter((_line, index) => !otherLineIndexes.includes(index));
+        }
+      } else if (otherLineIndexes.length > 0) {
+        const mainLineRangeLength = mainLine.start + mainLine.length - range.start;
+        mainLine.markdownRanges.push({
+          ...range,
+          length: mainLineRangeLength,
+        });
+
+        let rangeLength = range.length - mainLineRangeLength;
+        otherLineIndexes.forEach((lineIndex) => {
+          const otherLine = mergedLines[lineIndex] as Paragraph;
+          let currentLength = otherLine.length;
+          if (rangeLength <= currentLength) {
+            currentLength = rangeLength - 1;
+          }
+
+          if (currentLength > 0) {
+            mergedLines[lineIndex]?.markdownRanges.push({
+              ...range,
+              start: otherLine.start,
+              length: currentLength,
+            });
+          }
+
+          rangeLength -= currentLength;
+        });
+      } else {
+        mainLine.markdownRanges.push(range);
       }
     }
   });
@@ -163,7 +194,7 @@ function parseRangesToHTMLNodes(
   // Sort all ranges by start position, length, and by tag hierarchy so the styles and text are applied in correct order
   const sortedRanges = sortRanges(ranges);
   const markdownRanges = ungroupRanges(sortedRanges);
-  lines = mergeLinesWithMultilineTags(lines, markdownRanges);
+  lines = normalizeLines(lines, markdownRanges);
 
   let lastRangeEndIndex = 0;
   while (lines.length > 0) {
