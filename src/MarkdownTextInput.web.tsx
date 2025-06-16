@@ -314,19 +314,10 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
 
     const handleOnSelect = useCallback(
       (e: React.SyntheticEvent<HTMLDivElement>) => {
-        if (!divRef.current) {
-          return;
-        }
-        // contentSelection has already been updated in the onKeyDown event (handleOnChangeText).
-        // We need to force a reset of the already known selection since keyup can break it
-        if (contentSelection.current && e.nativeEvent.type === 'keyup') {
-          setCursorPosition(divRef.current, contentSelection.current?.start, contentSelection.current?.end, false);
-        } else {
-          updateSelection(e);
-        }
+        updateSelection(e);
 
         // If the input has just been focused, we need to scroll the cursor into view
-        if (contentSelection.current && hasJustBeenFocused.current) {
+        if (divRef.current && contentSelection.current && hasJustBeenFocused.current) {
           setCursorPosition(divRef.current, contentSelection.current?.start, contentSelection.current?.end, true);
           hasJustBeenFocused.current = false;
         }
