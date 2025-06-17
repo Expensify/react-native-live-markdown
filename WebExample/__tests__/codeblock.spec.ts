@@ -7,7 +7,7 @@ import {getElementValue, pressCmd, setCursorPosition, setupInput, testMarkdownCo
 const CODEBLOCK_DEFAULT_STYLE =
   'font-family: monospace; font-size: 20px; color: black; background-color: lightgray; border-color: gray; border-width: 1px; border-radius: 4px; border-style: solid; padding: 2px;';
 
-async function testCodeblockStyle(page: Page, dimmensions: {height: number; width: number} | null, style?: string | null) {
+async function testCodeblockStyle(page: Page, dimmensions: {height: number; width: number} | null, style: string | null = CODEBLOCK_DEFAULT_STYLE) {
   if (style === null) {
     await testMarkdownContentStyle({
       testContent: 'Codeblock',
@@ -18,7 +18,7 @@ async function testCodeblockStyle(page: Page, dimmensions: {height: number; widt
   }
   await testMarkdownContentStyle({
     testContent: 'Codeblock',
-    style: style ?? CODEBLOCK_DEFAULT_STYLE,
+    style,
     dimmensions: dimmensions ?? undefined,
     page,
   });

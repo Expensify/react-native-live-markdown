@@ -3,21 +3,6 @@ import {expect} from '@jest/globals';
 import {parseRangesToHTMLNodes} from '../web/utils/parserUtils';
 import parseExpensiMark from '../parseExpensiMark';
 
-jest.mock('react-native-web/dist/exports/StyleSheet/compiler/createReactDOMStyle', () => ({
-  __esModule: true,
-  default: jest.fn((style) => style),
-}));
-
-jest.mock('react-native-web/dist/exports/StyleSheet/preprocess', () => ({
-  __esModule: true,
-  default: jest.fn((style) => style),
-}));
-
-jest.mock('react-native-web/dist/modules/setValueForStyles/dangerousStyleValue', () => ({
-  __esModule: true,
-  default: jest.fn(() => null),
-}));
-
 declare module 'expect' {
   interface Matchers<R> {
     toBeParsedAsHTML(expectedHTML: string): R;

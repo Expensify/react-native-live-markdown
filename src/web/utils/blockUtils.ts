@@ -117,7 +117,6 @@ function addCodeBlockStyles(targetElement: HTMLElement, type: NodeType, markdown
         Object.assign(node.style, {
           ...markdownStyle.code,
           padding: `${codeVerticalPadding}px ${codeHorizontalPadding}px`,
-          lineHeight: 1.5,
         });
       }
       break;
@@ -158,10 +157,11 @@ function extendBlockStructure(
   return targetNode;
 }
 
-function isChildOfMarkdownElement(node: HTMLElement, elementType: NodeType): boolean {
+function isDescendantOfMarkdownElement(node: HTMLElement, predicate: (type: string | null) => boolean): boolean {
   let currentNode = node.parentNode;
   while (currentNode && (currentNode as HTMLElement)?.contentEditable !== 'true') {
-    if ((currentNode as HTMLElement)?.getAttribute?.('data-type') === elementType) {
+    const elementType = (currentNode as HTMLElement).getAttribute?.('data-type');
+    if (predicate(elementType)) {
       return true;
     }
     currentNode = currentNode.parentNode;
@@ -169,15 +169,11 @@ function isChildOfMarkdownElement(node: HTMLElement, elementType: NodeType): boo
   return false;
 }
 
-function isChildOfMultilineMarkdownElement(node: HTMLElement) {
-  let currentNode = node.parentNode;
-  while (currentNode && (currentNode as HTMLElement)?.contentEditable !== 'true') {
-    if (MULTILINE_MARKDOWN_TYPES.includes((currentNode as HTMLElement)?.getAttribute?.('data-type') as NodeType)) {
-      return true;
-    }
-    currentNode = currentNode.parentNode;
-  }
-  return false;
+function isChildOfMarkdownElement(node: HTMLElement, elementType: NodeType): boolean {
+  return isDescendantOfMarkdownElement(node, (type) => type === elementType);
+}
+function isChildOfMultilineMarkdownElement(node: HTMLElement): boolean {
+  return isDescendantOfMarkdownElement(node, (type) => MULTILINE_MARKDOWN_TYPES.includes(type as NodeType));
 }
 
 export {addStyleToBlock, extendBlockStructure, isBlockMarkdownType, getFirstBlockMarkdownRange, isChildOfMarkdownElement, isChildOfMultilineMarkdownElement, MULTILINE_MARKDOWN_TYPES};

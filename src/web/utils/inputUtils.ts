@@ -38,7 +38,9 @@ function normalizeValue(value: string) {
   return value.replaceAll('\r\n', '\n');
 }
 
-// Returns the parent of a given node that is higher in the hierarchy and is of a different type than 'text', 'br' or 'line'
+/**
+ * Returns the parent of a given node that is higher in the hierarchy and is of a different type than 'text', 'br' or 'line'
+ */
 function getTopParentNode(node: ChildNode) {
   let currentParentNode = node.parentNode;
   while (currentParentNode && ['text', 'br', 'line'].includes(currentParentNode.parentElement?.getAttribute('data-type') || '')) {
@@ -47,12 +49,21 @@ function getTopParentNode(node: ChildNode) {
   return currentParentNode;
 }
 
-// On Firefox, when breaking one codeblock, its syntax and the <br> after it can be merged into the closing syntax of the previous codeblock.
-function didTwoCodeblocksMerged(node: ChildNode | null) {
-  return BrowserUtils.isFirefox && node && (node.lastChild as HTMLElement)?.getAttribute('data-type') === 'codeblock' && node.lastChild?.lastChild?.lastChild?.lastChild?.nodeName === 'BR';
+/**
+ * On Firefox, when breaking one codeblock, its syntax and the <br> after it can be merged into the closing syntax of the previous codeblock.
+ */
+function didTwoCodeblocksMerge(node: ChildNode | null) {
+  if (!node || !BrowserUtils.isFirefox) {
+    return;
+  }
+  // To identify that two codeblock has merged, we check if current line ends with <br> tag, that previously was second codeblock's opening syntax line break
+  const hasPartOfBrokenCodeblock = node.lastChild?.lastChild?.lastChild?.lastChild?.nodeName === 'BR';
+  return BrowserUtils.isFirefox && (node.lastChild as HTMLElement)?.getAttribute('data-type') === 'codeblock' && hasPartOfBrokenCodeblock;
 }
 
-// Parses the HTML structure of a MarkdownTextInputElement to a plain text string. Used for getting the correct value of the input element.
+/**
+ * Parses the HTML structure of a MarkdownTextInputElement to a plain text string. Used for getting the correct value of the input element.
+ */
 function parseInnerHTMLToText(target: MarkdownTextInputElement, cursorPosition: number, inputType?: string): string {
   const stack: ChildNode[] = [target];
   let text = '';
@@ -79,7 +90,7 @@ function parseInnerHTMLToText(target: MarkdownTextInputElement, cursorPosition: 
       } else {
         const firstChild = node.firstChild as HTMLElement;
         const containsEmptyBlockElement = firstChild?.getAttribute?.('data-type') === 'block' && firstChild.textContent === '';
-        if (firstChild && shouldAddNewline && !containsEmptyBlockElement && !didTwoCodeblocksMerged(node.previousSibling)) {
+        if (firstChild && shouldAddNewline && !containsEmptyBlockElement && !didTwoCodeblocksMerge(node.previousSibling)) {
           text += '\n';
           shouldAddNewline = false;
         }
