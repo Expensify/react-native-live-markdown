@@ -1,4 +1,5 @@
 import type {MarkdownTextInputElement} from '../../MarkdownTextInput.web';
+import {isChildOfMultilineMarkdownElement} from './blockUtils';
 import {findHTMLElementInTree, getTreeNodeByIndex} from './treeUtils';
 import type {TreeNode} from './treeUtils';
 
@@ -53,10 +54,35 @@ function setCursorPosition(target: MarkdownTextInputElement, startIndex: number,
 }
 
 function scrollIntoView(target: MarkdownTextInputElement, node: TreeNode) {
+  let scrollTargetElement = node.element;
   const targetElement = target;
-  const orderIndex = Number(node.orderIndex.split(',')[0]);
-  const currentLine = target.tree.childNodes[orderIndex]?.element;
-  const scrollTargetElement = currentLine || node.element;
+
+  if (!isChildOfMultilineMarkdownElement(node.element)) {
+    const orderIndex = Number(node.orderIndex.split(',')[0]);
+    const currentLine = target.tree.childNodes[orderIndex]?.element;
+    if (currentLine) {
+      scrollTargetElement = currentLine;
+    }
+  } else if (node.element.nodeName === 'BR') {
+    // Force scrolling BR into view
+    const selection = window.getSelection();
+    if (selection) {
+      const range = document.createRange();
+
+      range.setStartBefore(node.element);
+      range.collapse(true);
+
+      selection.addRange(range);
+
+      // Scroll to caret
+      const span = document.createElement('span');
+      span.textContent = '\u200B'; // zero-width space
+      range.insertNode(span);
+      span.scrollIntoView({block: 'center'});
+      span.remove(); // cleanup
+      return;
+    }
+  }
 
   const caretRect = scrollTargetElement.getBoundingClientRect();
   const targetRect = target.getBoundingClientRect();

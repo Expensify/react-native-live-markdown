@@ -132,7 +132,7 @@ test('cut content changes', async ({page, browserName}) => {
 
   expect(await getElementValue(inputLocator)).toBe(EXPECTED_CONTENT);
 
-  // Ckeck if there is no markdown elements after the cut operation
+  // Check if there is no markdown elements after the cut operation
   const spans = await inputLocator.locator('span[data-type="text"]');
   expect(await spans.count()).toBe(1);
 });
