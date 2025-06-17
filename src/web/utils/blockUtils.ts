@@ -96,9 +96,14 @@ function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownSty
 
 const BLOCK_MARKDOWN_TYPES = ['inline-image'];
 const FULL_LINE_MARKDOWN_TYPES = ['blockquote'];
+const MULTILINE_MARKDOWN_TYPES = ['pre'];
 
 function isBlockMarkdownType(type: NodeType) {
   return BLOCK_MARKDOWN_TYPES.includes(type);
+}
+
+function isMultilineMarkdownType(type: NodeType) {
+  return MULTILINE_MARKDOWN_TYPES.includes(type);
 }
 
 function getFirstBlockMarkdownRange(ranges: MarkdownRange[]) {
@@ -125,4 +130,4 @@ function extendBlockStructure(
   return targetNode;
 }
 
-export {addStyleToBlock, extendBlockStructure, isBlockMarkdownType, getFirstBlockMarkdownRange};
+export {addStyleToBlock, extendBlockStructure, isBlockMarkdownType, isMultilineMarkdownType, getFirstBlockMarkdownRange};
