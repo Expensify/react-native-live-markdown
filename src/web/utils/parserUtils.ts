@@ -31,8 +31,9 @@ function splitTextIntoLines(text: string): Paragraph[] {
   return lines;
 }
 
-/** For singleline markdown types, the function splits markdown ranges that spread beyond the line length into separate lines.
- * For multiline markdown types (like `pre`), it merges them into one line.
+/**
+ * For singleline markdown types, the function splits markdown ranges that spread beyond the line length into separate lines.
+ * For multiline markdown types (like `pre`), it merges them and corresponsing text into one line.
  */
 function normalizeLines(lines: Paragraph[], ranges: MarkdownRange[]) {
   let mergedLines = [...lines];
