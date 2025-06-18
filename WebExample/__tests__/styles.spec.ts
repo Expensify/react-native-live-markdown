@@ -1,17 +1,7 @@
-import {test, expect} from '@playwright/test';
-import type {Page} from '@playwright/test';
+import {test} from '@playwright/test';
 // eslint-disable-next-line import/no-relative-packages
 import * as TEST_CONST from '../../example/src/testConstants';
-import {setupInput, getElementStyle} from './utils';
-
-const testMarkdownContentStyle = async ({testContent, style, page}: {testContent: string; style: string; page: Page}) => {
-  const inputLocator = await setupInput(page);
-
-  const elementHandle = inputLocator.locator('span', {hasText: testContent}).last();
-  const elementStyle = await getElementStyle(elementHandle);
-
-  expect(elementStyle).toEqual(style);
-};
+import {testMarkdownContentStyle} from './utils';
 
 test.beforeEach(async ({page}) => {
   await page.goto(TEST_CONST.LOCAL_URL, {waitUntil: 'load'});
@@ -32,11 +22,21 @@ test.describe('markdown content styling', () => {
   });
 
   test('inline code', async ({page}) => {
-    await testMarkdownContentStyle({testContent: 'inline code', style: 'font-family: monospace; font-size: 20px; color: black; background-color: lightgray;', page});
+    await testMarkdownContentStyle({
+      testContent: 'inline code',
+      style:
+        'font-family: monospace; font-size: 20px; color: black; background-color: lightgray; border-color: gray; border-width: 1px; border-radius: 4px; border-style: solid; padding: 0px; line-height: 1.5;',
+      page,
+    });
   });
 
   test('codeblock', async ({page}) => {
-    await testMarkdownContentStyle({testContent: 'codeblock', style: 'font-family: monospace; font-size: 20px; color: black; background-color: lightgray;', page});
+    await testMarkdownContentStyle({
+      testContent: 'codeblock',
+      style:
+        'font-family: monospace; font-size: 20px; color: black; background-color: lightgray; border-color: gray; border-width: 1px; border-radius: 4px; border-style: solid; padding: 2px;',
+      page,
+    });
   });
 
   test('mention-here', async ({page}) => {

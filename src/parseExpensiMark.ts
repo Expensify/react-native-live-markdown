@@ -174,9 +174,12 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, MarkdownRange[]] {
       } else if (node.tag === '<br />') {
         text += '\n';
       } else if (node.tag.startsWith('<pre')) {
-        appendSyntax('```');
-        const content = node.children.join('');
-        addChildrenWithStyle(content, 'pre');
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const [_, lb, content] = node.children.join('').match(/^(\r?\n)([\s\S]*)$/) as RegExpMatchArray;
+        const dataCodeVariant = node.tag.match(/data-code-variant="([^"]*)"/)?.[1];
+        ranges.push({type: 'codeblock', start: text.length, length: (content?.length ?? 0) + (dataCodeVariant?.length ?? 0) + 7});
+        appendSyntax(`\`\`\`${dataCodeVariant ?? ''}${lb}`);
+        addChildrenWithStyle(`${content}`, 'pre');
         appendSyntax('```');
       } else if (node.tag.startsWith('<a href="')) {
         const rawHref = node.tag.match(/href="([^"]*)"/)![1]!; // always present
@@ -245,6 +248,7 @@ function parseExpensiMark(markdown: string): MarkdownRange[] {
   const html = parseMarkdownToHTML(markdown);
   const tokens = parseHTMLToTokens(html);
   const tree = parseTokensToTree(tokens);
+
   const [text, ranges] = parseTreeToTextAndRanges(tree);
   if (text !== markdown) {
     console.error(
@@ -263,6 +267,7 @@ function parseExpensiMark(markdown: string): MarkdownRange[] {
   }
 
   const groupedRanges = groupRanges(markdownRanges);
+
   return groupedRanges;
 }
 
