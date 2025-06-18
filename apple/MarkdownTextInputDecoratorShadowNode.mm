@@ -15,6 +15,9 @@ namespace react {
 extern const char MarkdownTextInputDecoratorViewComponentName[] =
     "MarkdownTextInputDecoratorView";
 
+thread_local LayoutContext decoratorLayoutContext{.fontSizeMultiplier =
+                                                      RCTFontSizeMultiplier()};
+
 void MarkdownTextInputDecoratorShadowNode::initialize() {
   // Setting display: contents style results in ForceFlattenView trait being set
   // on the shadow node. This trait causes the node not to have a host view. By
@@ -93,6 +96,7 @@ Size MarkdownTextInputDecoratorShadowNode::measureContent(
 
 void MarkdownTextInputDecoratorShadowNode::layout(LayoutContext layoutContext) {
   YogaLayoutableShadowNode::layout(layoutContext);
+  decoratorLayoutContext = layoutContext;
 
   const auto &children = getChildren();
   react_native_assert(
@@ -250,10 +254,8 @@ YGSize MarkdownTextInputDecoratorShadowNode::yogaNodeMeasureCallbackConnector(
   const auto &decoratorYogaNode = YGNodeGetParent(const_cast<YGNodeRef>(yogaNode));
   const auto &decoratorShadowNode = shadowNodeFromContext(decoratorYogaNode);
 
-  LayoutContext context{};
-  context.fontSizeMultiplier = RCTFontSizeMultiplier();
-
-  const auto size = decoratorShadowNode.measureContent(context, {minimumSize, maximumSize});
+  const auto size = decoratorShadowNode.measureContent(
+      decoratorLayoutContext, {minimumSize, maximumSize});
 
   return YGSize{yogaFloatFromFloat(size.width),
                 yogaFloatFromFloat(size.height)};
