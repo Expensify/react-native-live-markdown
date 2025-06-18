@@ -52,7 +52,9 @@ function didTwoCodeblocksMerged(node: ChildNode | null) {
   return BrowserUtils.isFirefox && node && (node.lastChild as HTMLElement)?.getAttribute('data-type') === 'codeblock' && node.lastChild?.lastChild?.lastChild?.lastChild?.nodeName === 'BR';
 }
 
-// Parses the HTML structure of a MarkdownTextInputElement to a plain text string. Used for getting the correct value of the input element.
+/**
+ * Parses the HTML structure of a MarkdownTextInputElement to a plain text string. Used for getting the correct value of the input element.
+ */
 function parseInnerHTMLToText(target: MarkdownTextInputElement, cursorPosition: number, inputType?: string): string {
   const stack: ChildNode[] = [target];
   let text = '';
@@ -62,7 +64,6 @@ function parseInnerHTMLToText(target: MarkdownTextInputElement, cursorPosition: 
   if (lastNode?.nodeName === 'DIV' && (lastNode as HTMLElement)?.innerHTML === '<br>') {
     target.removeChild(lastNode);
   }
-
   while (stack.length > 0) {
     const node = stack.pop() as HTMLElement;
     if (!node) {
@@ -145,6 +146,7 @@ function parseInnerHTMLToText(target: MarkdownTextInputElement, cursorPosition: 
   if (text === target.value && inputType?.includes('delete')) {
     text = text.slice(0, cursorPosition - 1) + text.slice(cursorPosition);
   }
+
   return text;
 }
 
