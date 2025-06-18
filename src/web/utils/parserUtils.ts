@@ -32,11 +32,61 @@ function splitTextIntoLines(text: string): Paragraph[] {
 }
 
 /**
+ * Merges lines with multiline markdown tags (like `pre`) into a single line.
+ * The main line will contain the text and all markdown ranges from the other lines.
+ */
+function mergeLinesWithMultilineTags(lines: Paragraph[], currentLine: Paragraph, range: MarkdownRange, correspondingLineIndexes: number[]) {
+  const mainLine = currentLine;
+  currentLine.markdownRanges.push(range);
+
+  correspondingLineIndexes.forEach((lineIndex) => {
+    const otherLine = lines[lineIndex] as Paragraph;
+    mainLine.text += `\n${otherLine.text}`;
+    mainLine.length += otherLine.length + 1;
+    mainLine.markdownRanges.push(...otherLine.markdownRanges);
+  });
+
+  if (correspondingLineIndexes.length > 0 && correspondingLineIndexes[0] !== undefined) {
+    lines.splice(correspondingLineIndexes[0], correspondingLineIndexes.length);
+  }
+}
+
+/**
+ * Splits a markdown range that spans multiple lines into separate lines.
+ */
+function splitRangeIntoSeparateLines(lines: Paragraph[], currentLine: Paragraph, range: MarkdownRange, correspondingLineIndexes: number[]) {
+  const mainLineRangeLength = currentLine.start + currentLine.length - range.start;
+  currentLine.markdownRanges.push({
+    ...range,
+    length: mainLineRangeLength,
+  });
+
+  let rangeLength = range.length - mainLineRangeLength;
+  correspondingLineIndexes.forEach((lineIndex) => {
+    const otherLine = lines[lineIndex] as Paragraph;
+    let currentLength = otherLine.length;
+    if (rangeLength <= currentLength) {
+      currentLength = rangeLength - 1;
+    }
+
+    if (currentLength > 0) {
+      lines[lineIndex]?.markdownRanges.push({
+        ...range,
+        start: otherLine.start,
+        length: currentLength,
+      });
+    }
+
+    rangeLength -= currentLength;
+  });
+}
+
+/**
  * For singleline markdown types, the function splits markdown ranges that spread beyond the line length into separate lines.
- * For multiline markdown types (like `pre`), it merges them and corresponsing text into one line.
+ * For multiline markdown types (like `pre`), it merges them and corresponding text into one line.
  */
 function normalizeLines(lines: Paragraph[], ranges: MarkdownRange[]) {
-  let mergedLines = [...lines];
+  const mergedLines = [...lines];
   const lineIndexes = mergedLines.map((_line, index) => index);
 
   ranges.forEach((range) => {
@@ -50,43 +100,9 @@ function normalizeLines(lines: Paragraph[], ranges: MarkdownRange[]) {
       const otherLineIndexes = correspondingLineIndexes.slice(1);
 
       if (isMultilineMarkdownType(range.type)) {
-        mainLine.markdownRanges.push(range);
-
-        otherLineIndexes.forEach((lineIndex) => {
-          const otherLine = mergedLines[lineIndex] as Paragraph;
-
-          mainLine.text += `\n${otherLine.text}`;
-          mainLine.length += otherLine.length + 1;
-          mainLine.markdownRanges.push(...otherLine.markdownRanges);
-        });
-        if (otherLineIndexes.length > 0) {
-          mergedLines = mergedLines.filter((_line, index) => !otherLineIndexes.includes(index));
-        }
+        mergeLinesWithMultilineTags(mergedLines, mainLine, range, otherLineIndexes);
       } else if (otherLineIndexes.length > 0) {
-        const mainLineRangeLength = mainLine.start + mainLine.length - range.start;
-        mainLine.markdownRanges.push({
-          ...range,
-          length: mainLineRangeLength,
-        });
-
-        let rangeLength = range.length - mainLineRangeLength;
-        otherLineIndexes.forEach((lineIndex) => {
-          const otherLine = mergedLines[lineIndex] as Paragraph;
-          let currentLength = otherLine.length;
-          if (rangeLength <= currentLength) {
-            currentLength = rangeLength - 1;
-          }
-
-          if (currentLength > 0) {
-            mergedLines[lineIndex]?.markdownRanges.push({
-              ...range,
-              start: otherLine.start,
-              length: currentLength,
-            });
-          }
-
-          rangeLength -= currentLength;
-        });
+        splitRangeIntoSeparateLines(mergedLines, mainLine, range, otherLineIndexes);
       } else {
         mainLine.markdownRanges.push(range);
       }
