@@ -163,10 +163,6 @@ android {
       "**/libreact_render*.so",
       "**/librrc_root.so",
     ]
-
-    jniLibs {
-      useLegacyPackaging = true
-    }
   }
 }
 
