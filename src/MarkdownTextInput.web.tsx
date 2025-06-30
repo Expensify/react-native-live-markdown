@@ -156,7 +156,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
           // TODO: change the logic here so every event have value property
           (e.target as unknown as HTMLInputElement).value = text;
         }
-        if (e.nativeEvent && e.nativeEvent.text) {
+        if (e.nativeEvent?.text) {
           e.nativeEvent.text = text;
         }
       }

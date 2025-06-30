@@ -42,12 +42,22 @@ function makeDefaultMarkdownStyle(): MarkdownStyle {
       fontSize: 20,
       color: 'black',
       backgroundColor: 'lightgray',
+      borderColor: 'gray',
+      borderWidth: 1,
+      borderRadius: 4,
+      borderStyle: 'solid',
+      padding: 0,
     },
     pre: {
       fontFamily: FONT_FAMILY_MONOSPACE,
       fontSize: 20,
       color: 'black',
       backgroundColor: 'lightgray',
+      borderColor: 'gray',
+      borderWidth: 1,
+      borderRadius: 4,
+      borderStyle: 'solid',
+      padding: 2,
     },
     mentionHere: {
       color: 'green',
@@ -96,7 +106,10 @@ function mergeMarkdownStyleWithDefault(input: PartialMarkdownStyle | undefined):
   return output;
 }
 
-function parseStringWithUnitToNumber(value: string | null): number {
+function parseStringWithUnitToNumber(value: string | number | null): number {
+  if (typeof value === 'number') {
+    return value;
+  }
   return value ? parseInt(value.replace('px', ''), 10) : 0;
 }
 

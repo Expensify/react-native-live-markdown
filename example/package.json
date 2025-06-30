@@ -9,7 +9,7 @@
     "start": "react-native start --client-logs"
   },
   "dependencies": {
-    "expensify-common": "2.0.134",
+    "expensify-common": "2.0.141",
     "react": "^19.0.0",
     "react-native": "0.79.2",
     "react-native-reanimated": "3.17.3"
