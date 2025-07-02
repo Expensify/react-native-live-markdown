@@ -364,4 +364,5 @@ function updateInputStructure(
   return {text, cursorPosition: cursorPosition || 0};
 }
 
-export {updateInputStructure, parseRangesToHTMLNodes};
+export {updateInputStructure, parseRangesToHTMLNodes, normalizeLines};
+export type {Paragraph};
