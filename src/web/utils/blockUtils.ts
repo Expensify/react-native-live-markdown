@@ -95,6 +95,10 @@ function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownSty
 function addCodeBlockStyles(targetElement: HTMLElement, type: NodeType, markdownStyle: PartialMarkdownStyle, isMultiline = true) {
   const node = targetElement;
 
+  const defaultPrePadding = markdownStyle.pre?.padding ?? 2;
+  const preHorizontalPadding = parseStringWithUnitToNumber(markdownStyle.pre?.paddingHorizontal ?? defaultPrePadding).toString();
+  const preVerticalPadding = parseStringWithUnitToNumber(markdownStyle.pre?.paddingVertical ?? defaultPrePadding).toString();
+
   const defaultCodePadding = markdownStyle.code?.padding ?? 0;
   const codeHorizontalPadding = parseStringWithUnitToNumber(markdownStyle.code?.paddingHorizontal ?? defaultCodePadding).toString();
   const codeVerticalPadding = parseStringWithUnitToNumber(markdownStyle.code?.paddingVertical ?? defaultCodePadding).toString();
@@ -109,14 +113,17 @@ function addCodeBlockStyles(targetElement: HTMLElement, type: NodeType, markdown
       });
       break;
     case 'pre':
+      // In multiline style the pre block using pseudoelements, otherwise default to inline
       if (isMultiline) {
         Object.assign(node.style, {
           ...markdownStyle.pre,
+          padding: `${preVerticalPadding}px ${preHorizontalPadding}px`,
         });
       } else {
         Object.assign(node.style, {
           ...markdownStyle.code,
           padding: `${codeVerticalPadding}px ${codeHorizontalPadding}px`,
+          lineHeight: 1.5,
         });
       }
       break;

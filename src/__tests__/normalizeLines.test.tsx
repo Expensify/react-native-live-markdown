@@ -121,6 +121,11 @@ describe('normalizeLines', () => {
 
     const ranges: MarkdownRange[] = [
       {
+        type: 'codeblock',
+        start: 19,
+        length: 56,
+      },
+      {
         type: 'syntax',
         start: 19,
         length: 3,
@@ -142,8 +147,8 @@ describe('normalizeLines', () => {
     expect(result.length).toBe(2);
     const paragraph = result[1] as Paragraph;
     expect(paragraph.text).toEqual("```\nconst text = 'Hello, World!';\nconsole.log(text);\n```");
-    expect(paragraph.markdownRanges.length).toEqual(3);
-    expect((paragraph.markdownRanges[1] as MarkdownRange).type).toEqual('pre');
+    expect(paragraph.markdownRanges.length).toEqual(4);
+    expect((paragraph.markdownRanges[0] as MarkdownRange).type).toEqual('codeblock');
   });
 
   it('should correctly handle multiple adjacent ranges', () => {
