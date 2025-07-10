@@ -20,6 +20,18 @@ void MarkdownTextInputDecoratorShadowNode::initialize() {
   // removing the trait, it's possible to force RN to create a host view, layout
   // of which can then be customized.
   ShadowNode::traits_.unset(ShadowNodeTraits::ForceFlattenView);
+
+  // When the decorator is cloned and has a child node, the child node should be
+  // cloned as well to ensure it is mutable.
+  const auto &children = getChildren();
+  if (!children.empty()) {
+    react_native_assert(
+        children.size() == 1 &&
+        "MarkdownTextInputDecoratorView received more than one child");
+    
+    const auto clonedChild = children[0]->clone({});
+    replaceChild(*children[0], clonedChild);
+  }
 }
 
 void MarkdownTextInputDecoratorShadowNode::createCustomContextContainer() {
