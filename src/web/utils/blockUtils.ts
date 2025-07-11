@@ -1,5 +1,6 @@
-import type {MarkdownTextInputElement} from '../../MarkdownTextInput.web';
 import type {InlineImagesInputProps, MarkdownRange} from '../../commonTypes';
+import type {MarkdownTextInputElement} from '../../MarkdownTextInput.web';
+import {parseStringWithUnitToNumber} from '../../styleUtils';
 import type {PartialMarkdownStyle} from '../../styleUtils';
 import {addInlineImagePreview} from '../inputElements/inlineImage';
 import type {NodeType, TreeNode} from './treeUtils';
@@ -51,12 +52,9 @@ function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownSty
       });
       break;
     case 'code':
-      Object.assign(node.style, markdownStyle.code);
-      break;
     case 'pre':
-      Object.assign(node.style, markdownStyle.pre);
+      addCodeBlockStyles(targetElement, type, markdownStyle, isMultiline);
       break;
-
     case 'blockquote':
       Object.assign(node.style, {
         ...markdownStyle.blockquote,
@@ -94,9 +92,49 @@ function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownSty
   }
 }
 
+function addCodeBlockStyles(targetElement: HTMLElement, type: NodeType, markdownStyle: PartialMarkdownStyle, isMultiline = true) {
+  const node = targetElement;
+
+  const defaultPrePadding = markdownStyle.pre?.padding ?? 2;
+  const preHorizontalPadding = parseStringWithUnitToNumber(markdownStyle.pre?.paddingHorizontal ?? defaultPrePadding).toString();
+  const preVerticalPadding = parseStringWithUnitToNumber(markdownStyle.pre?.paddingVertical ?? defaultPrePadding).toString();
+
+  const defaultCodePadding = markdownStyle.code?.padding ?? 0;
+  const codeHorizontalPadding = parseStringWithUnitToNumber(markdownStyle.code?.paddingHorizontal ?? defaultCodePadding).toString();
+  const codeVerticalPadding = parseStringWithUnitToNumber(markdownStyle.code?.paddingVertical ?? defaultCodePadding).toString();
+
+  switch (type) {
+    case 'code':
+      Object.assign(node.style, {
+        ...markdownStyle.code,
+        fontSize: markdownStyle.code?.h1NestedFontSize && isChildOfMarkdownElement(node, 'h1') ? markdownStyle.code.h1NestedFontSize : markdownStyle.code?.fontSize,
+        padding: `${codeVerticalPadding}px ${codeHorizontalPadding}px`,
+        lineHeight: 1.5,
+      });
+      break;
+    case 'pre':
+      // In multiline style the pre block using pseudoelements, otherwise default to inline
+      if (isMultiline) {
+        Object.assign(node.style, {
+          ...markdownStyle.pre,
+          padding: `${preVerticalPadding}px ${preHorizontalPadding}px`,
+        });
+      } else {
+        Object.assign(node.style, {
+          ...markdownStyle.code,
+          padding: `${codeVerticalPadding}px ${codeHorizontalPadding}px`,
+          lineHeight: 1.5,
+        });
+      }
+      break;
+    default:
+      break;
+  }
+}
+
 const BLOCK_MARKDOWN_TYPES = ['inline-image'];
 const FULL_LINE_MARKDOWN_TYPES = ['blockquote'];
-const MULTILINE_MARKDOWN_TYPES = ['pre'];
+const MULTILINE_MARKDOWN_TYPES = ['codeblock'];
 
 function isBlockMarkdownType(type: NodeType) {
   return BLOCK_MARKDOWN_TYPES.includes(type);
@@ -108,7 +146,7 @@ function isMultilineMarkdownType(type: NodeType) {
 
 function getFirstBlockMarkdownRange(ranges: MarkdownRange[]) {
   const blockMarkdownRange = ranges.find((r) => isBlockMarkdownType(r.type) || FULL_LINE_MARKDOWN_TYPES.includes(r.type));
-  return FULL_LINE_MARKDOWN_TYPES.includes(blockMarkdownRange?.type || '') ? undefined : blockMarkdownRange;
+  return blockMarkdownRange && FULL_LINE_MARKDOWN_TYPES.includes(blockMarkdownRange.type) ? undefined : blockMarkdownRange;
 }
 
 function extendBlockStructure(
@@ -130,4 +168,32 @@ function extendBlockStructure(
   return targetNode;
 }
 
-export {addStyleToBlock, extendBlockStructure, isBlockMarkdownType, isMultilineMarkdownType, getFirstBlockMarkdownRange};
+function isDescendantOfMarkdownElement(node: HTMLElement, predicate: (type: string | null) => boolean): boolean {
+  let currentNode = node.parentNode;
+  while (currentNode && (currentNode as HTMLElement)?.contentEditable !== 'true') {
+    const elementType = (currentNode as HTMLElement).getAttribute?.('data-type');
+    if (predicate(elementType)) {
+      return true;
+    }
+    currentNode = currentNode.parentNode;
+  }
+  return false;
+}
+
+function isChildOfMarkdownElement(node: HTMLElement, elementType: NodeType): boolean {
+  return isDescendantOfMarkdownElement(node, (type) => type === elementType);
+}
+function isChildOfMultilineMarkdownElement(node: HTMLElement): boolean {
+  return isDescendantOfMarkdownElement(node, (type) => MULTILINE_MARKDOWN_TYPES.includes(type as NodeType));
+}
+
+export {
+  addStyleToBlock,
+  extendBlockStructure,
+  isBlockMarkdownType,
+  isMultilineMarkdownType,
+  getFirstBlockMarkdownRange,
+  isChildOfMarkdownElement,
+  isChildOfMultilineMarkdownElement,
+  MULTILINE_MARKDOWN_TYPES,
+};
