@@ -1,5 +1,9 @@
 #import "RCTTextInput+AdaptiveImageGlyph.h"
 #import <objc/runtime.h>
+#import <UIKit/UIKit.h>
+
+// Forward declare NSAdaptiveImageGlyph in order to fix failing 'Test iOS build / build' GH workflow
+@class NSAdaptiveImageGlyph;
 
 // Helper method to process genmoji and convert to pasteable image
 static UIImage *processGenmojiImage(NSAdaptiveImageGlyph *glyph) API_AVAILABLE(ios(18.2)) {
