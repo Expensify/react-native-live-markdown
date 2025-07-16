@@ -86,8 +86,8 @@ using namespace facebook::react;
     // make sure `adjustsFontSizeToFitWidth` is disabled, otherwise formatting will be overwritten
     react_native_assert(_textField.adjustsFontSizeToFitWidth == NO);
 
-    // Enable TextField genmoji support for iOS 18.2+
-    [self enableGenmojiSupport:_textField];
+    // Enable TextField AdaptiveImageGlyph support for iOS 18.0+
+    [self enableAdaptiveImageGlyphSupport:_textField];
 
     _markdownTextFieldObserver = [[MarkdownTextFieldObserver alloc] initWithTextField:_textField markdownUtils:_markdownUtils];
 
@@ -105,8 +105,8 @@ using namespace facebook::react;
   } else if ([backedTextInputView isKindOfClass:[RCTUITextView class]]) {
     _textView = (RCTUITextView *)backedTextInputView;
 
-    // Enable TextView genmoji support for iOS 18.2+
-    [self enableGenmojiSupport:_textView];
+    // Enable TextView AdaptiveImageGlyph support for iOS 18.0+
+    [self enableAdaptiveImageGlyphSupport:_textView];
 
     // register delegate for future edits
     react_native_assert(_textView.textStorage.delegate == nil);
@@ -147,8 +147,8 @@ using namespace facebook::react;
   }
 }
 
-- (void)enableGenmojiSupport:(UIView *)textInputView {
-    if (@available(iOS 18.2, *)) {
+- (void)enableAdaptiveImageGlyphSupport:(UIView *)textInputView {
+    if (@available(iOS 18.0, *)) {
         if ([textInputView respondsToSelector:@selector(setSupportsAdaptiveImageGlyph:)]) {
             [textInputView setValue:@YES forKey:@"supportsAdaptiveImageGlyph"];
         }
