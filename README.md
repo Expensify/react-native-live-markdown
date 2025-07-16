@@ -15,12 +15,12 @@
 First, install the library from npm with the package manager of your choice:
 
 ```sh
-yarn add @expensify/react-native-live-markdown react-native-reanimated expensify-common
-npm install @expensify/react-native-live-markdown react-native-reanimated expensify-common --save
-npx expo install @expensify/react-native-live-markdown react-native-reanimated expensify-common
+yarn add @expensify/react-native-live-markdown react-native-reanimated expensify-common html-entities@2.5.3
+npm install @expensify/react-native-live-markdown react-native-reanimated expensify-common html-entities@2.5.3 --save
+npx expo install @expensify/react-native-live-markdown react-native-reanimated expensify-common html-entities@2.5.3
 ```
 
-React Native Live Markdown requires [react-native-reanimated](https://github.com/software-mansion/react-native-reanimated) 3.17.0 or newer and [expensify-common](https://github.com/Expensify/expensify-common) 2.0.115 or newer.
+React Native Live Markdown requires [react-native-reanimated](https://github.com/software-mansion/react-native-reanimated) 3.17.0 or newer as well as [expensify-common](https://github.com/Expensify/expensify-common) 2.0.115 and [html-entities](https://github.com/mdevils/html-entities) 2.5.3 exactly if using the default built-in ExpensiMark parser.
 
 Then, install the iOS dependencies with CocoaPods:
 
