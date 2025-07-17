@@ -19,7 +19,7 @@ function isJest() {
 // eslint-disable-next-line no-underscore-dangle
 if (__DEV__ && !isWeb() && !isJest() && (decode as WorkletFunction).__workletHash === undefined) {
   throw new Error(
-    "[react-native-live-markdown] `parseExpensiMark` requires `html-entities` package to be workletized. Please add `'worklet';` directive at the top of `node_modules/html-entities/lib/index.js` using patch-package.",
+    "[react-native-live-markdown] `parseExpensiMark` requires `html-entities` package to be workletized. Please add `'worklet';` directive at the top of `node_modules/html-entities/lib/index.js` using patch-package. Make sure you've installed `html-entities` version 2.5.3 exactly as otherwise there is no `lib/` directory.",
   );
 }
 
@@ -236,7 +236,7 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, MarkdownRange[]] {
   return [text, ranges];
 }
 
-const isAndroid = Platform.OS === 'android';
+const isNative = Platform.OS === 'android' || Platform.OS === 'ios';
 
 function parseExpensiMark(markdown: string): MarkdownRange[] {
   if (markdown.length > MAX_PARSABLE_LENGTH) {
@@ -255,8 +255,8 @@ function parseExpensiMark(markdown: string): MarkdownRange[] {
     return [];
   }
   let markdownRanges = sortRanges(ranges);
-  if (isAndroid) {
-    // Blocks applying italic and strikethrough styles to emojis on Android
+  if (isNative) {
+    // Blocks applying italic and strikethrough styles to emojis on Android and iOS
     // TODO: Remove this condition when splitting emojis inside the inline code block will be fixed on the web
     markdownRanges = splitRangesOnEmojis(markdownRanges, 'italic');
     markdownRanges = splitRangesOnEmojis(markdownRanges, 'strikethrough');

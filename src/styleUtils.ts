@@ -11,9 +11,9 @@ const FONT_FAMILY_MONOSPACE = Platform.select({
 });
 
 const FONT_FAMILY_EMOJI = Platform.select({
-  ios: 'Apple Color Emoji',
+  ios: 'System',
   android: 'Noto Color Emoji',
-  default: 'Apple Color Emoji, Segoe UI Emoji, Noto Color Emoji',
+  default: 'System, Apple Color Emoji, Segoe UI Emoji, Noto Color Emoji',
 });
 
 function makeDefaultMarkdownStyle(): MarkdownStyle {

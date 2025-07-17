@@ -21,24 +21,10 @@ class JSI_EXPORT MarkdownTextInputDecoratorShadowNode final
 public:
   MarkdownTextInputDecoratorShadowNode(ShadowNodeFragment const &fragment,
                                        ShadowNodeFamily::Shared const &family,
-                                       ShadowNodeTraits traits)
-      : ConcreteViewShadowNode(fragment, family, traits) {
-    initialize();
-
-    if (fragment.children) {
-      overwriteMeasureCallbackConnector();
-    }
-  }
+                                       ShadowNodeTraits traits);
 
   MarkdownTextInputDecoratorShadowNode(ShadowNode const &sourceShadowNode,
-                                       ShadowNodeFragment const &fragment)
-      : ConcreteViewShadowNode(sourceShadowNode, fragment) {
-    initialize();
-
-    if (fragment.children) {
-      overwriteMeasureCallbackConnector();
-    }
-  }
+                                       ShadowNodeFragment const &fragment);
 
   void appendChild(const ShadowNode::Shared &child) override;
   void replaceChild(const ShadowNode &oldChild,
@@ -52,6 +38,7 @@ public:
 private:
   void initialize();
   void overwriteMeasureCallbackConnector();
+  void makeChildNodeMutable();
   void applyMarkdownFormattingToTextInputState(std::shared_ptr<TextInputShadowNode> node,
                      const LayoutContext &layoutContext) const;
   static YGSize yogaNodeMeasureCallbackConnector(YGNodeConstRef yogaNode,

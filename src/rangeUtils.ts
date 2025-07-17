@@ -9,6 +9,8 @@ function getTagPriority(tag: string) {
       return 2;
     case 'h1':
       return 1;
+    case 'emoji':
+      return -1;
     default:
       return 0;
   }

@@ -3,6 +3,7 @@
 #include <fbjni/fbjni.h>
 #include <react/fabric/JFabricUIManager.h>
 #include <react/jni/ReadableNativeMap.h>
+#include <react/jni/SafeReleaseJniRef.h>
 #include <react/renderer/components/view/conversions.h>
 #include <react/renderer/core/ComponentDescriptor.h>
 #include <yoga/Yoga.h>
@@ -13,12 +14,60 @@ namespace react {
 extern const char MarkdownTextInputDecoratorViewComponentName[] =
     "MarkdownTextInputDecoratorView";
 
+MarkdownTextInputDecoratorShadowNode::MarkdownTextInputDecoratorShadowNode(
+    ShadowNodeFragment const &fragment,
+    ShadowNodeFamily::Shared const &family,
+    ShadowNodeTraits traits)
+    : ConcreteViewShadowNode(fragment, family, traits) {
+  initialize();
+  createCustomContextContainer();
+  makeChildNodeMutable();
+
+  if (fragment.children) {
+    overwriteTextLayoutManager();
+  }
+}
+
+MarkdownTextInputDecoratorShadowNode::MarkdownTextInputDecoratorShadowNode(
+    ShadowNode const &sourceShadowNode,
+    ShadowNodeFragment const &fragment)
+    : ConcreteViewShadowNode(sourceShadowNode, fragment) {
+  initialize();
+
+  const auto &sourceDecorator = static_cast<const MarkdownTextInputDecoratorShadowNode &>(sourceShadowNode);
+
+  customContextContainer_ = sourceDecorator.customContextContainer_;
+  previousMarkdownStyle_ = sourceDecorator.previousMarkdownStyle_;
+  previousParserId_ = sourceDecorator.previousParserId_;
+
+  updateCustomContextContainerIfNeeded();
+  makeChildNodeMutable();
+
+  if (fragment.children) {
+    overwriteTextLayoutManager();
+  }
+}
+
 void MarkdownTextInputDecoratorShadowNode::initialize() {
   // Setting display: contents style results in ForceFlattenView trait being set
   // on the shadow node. This trait causes the node not to have a host view. By
   // removing the trait, it's possible to force RN to create a host view, layout
   // of which can then be customized.
   ShadowNode::traits_.unset(ShadowNodeTraits::ForceFlattenView);
+}
+
+void MarkdownTextInputDecoratorShadowNode::makeChildNodeMutable() {
+  // When the decorator is cloned and has a child node, the child node should be
+  // cloned as well to ensure it is mutable.
+  const auto &children = getChildren();
+  if (!children.empty()) {
+    react_native_assert(
+        children.size() == 1 &&
+        "MarkdownTextInputDecoratorView received more than one child");
+
+    const auto clonedChild = children[0]->clone({});
+    replaceChild(*children[0], clonedChild);
+  }
 }
 
 void MarkdownTextInputDecoratorShadowNode::createCustomContextContainer() {
@@ -45,9 +94,9 @@ void MarkdownTextInputDecoratorShadowNode::createCustomContextContainer() {
   const auto &fabricUIManager =
       this->getContextContainer()->at<JFabricUIManager::javaobject>("FabricUIManager");
 
-  const auto customFabricUIManager = jni::make_global(createMethod(
+  const auto customFabricUIManager = SafeReleaseJniRef(jni::make_global(createMethod(
       customFabricUIManagerClass, fabricUIManager,
-      decoratorPropsRM.get(), parserId));
+      decoratorPropsRM.get(), parserId)));
   const auto contextContainer =
       std::make_shared<ContextContainer const>();
   contextContainer->insert("FabricUIManager", customFabricUIManager);

@@ -21,33 +21,10 @@ class JSI_EXPORT MarkdownTextInputDecoratorShadowNode final
 public:
   MarkdownTextInputDecoratorShadowNode(ShadowNodeFragment const &fragment,
                                        ShadowNodeFamily::Shared const &family,
-                                       ShadowNodeTraits traits)
-      : ConcreteViewShadowNode(fragment, family, traits) {
-    initialize();
-    createCustomContextContainer();
-
-    if (fragment.children) {
-      overwriteTextLayoutManager();
-    }
-  }
+                                       ShadowNodeTraits traits);
 
   MarkdownTextInputDecoratorShadowNode(ShadowNode const &sourceShadowNode,
-                                       ShadowNodeFragment const &fragment)
-      : ConcreteViewShadowNode(sourceShadowNode, fragment) {
-    initialize();
-
-    const auto &sourceDecorator = static_cast<const MarkdownTextInputDecoratorShadowNode &>(sourceShadowNode);
-
-    customContextContainer_ = sourceDecorator.customContextContainer_;
-    previousMarkdownStyle_ = sourceDecorator.previousMarkdownStyle_;
-    previousParserId_ = sourceDecorator.previousParserId_;
-
-    updateCustomContextContainerIfNeeded();
-
-    if (fragment.children) {
-      overwriteTextLayoutManager();
-    }
-  }
+                                       ShadowNodeFragment const &fragment);
 
   void appendChild(const ShadowNode::Shared &child) override;
 
@@ -69,6 +46,8 @@ private:
   void createCustomContextContainer();
 
   void updateCustomContextContainerIfNeeded();
+
+  void makeChildNodeMutable();
 };
 
 } // namespace react
