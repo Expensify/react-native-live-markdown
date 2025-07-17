@@ -1,29 +1,31 @@
 #import "RCTTextInput+AdaptiveImageGlyph.h"
 #import <objc/runtime.h>
-
-// Forward declare NSAdaptiveImageGlyph in order to fix failing 'Test iOS build / build' GH workflow
-@class NSAdaptiveImageGlyph;
+#import <UIKit/UIKit.h>
 
 // Helper method to setup method swizzling for adaptive image glyph
 static void setupAdaptiveImageGlyphSwizzling(Class targetClass, SEL swizzledSelector) {
     if (@available(iOS 18.0, *)) {
         SEL originalSelector = @selector(insertAdaptiveImageGlyph:replacementRange:);
         
-        Method originalMethod = class_getInstanceMethod(targetClass, originalSelector);
-        Method swizzledMethod = class_getInstanceMethod(targetClass, swizzledSelector);
-        
-        BOOL didAddMethod = class_addMethod(targetClass,
-                                            originalSelector,
-                                            method_getImplementation(swizzledMethod),
-                                            method_getTypeEncoding(swizzledMethod));
-        
-        if (didAddMethod) {
-            class_replaceMethod(targetClass,
-                                swizzledSelector,
-                                method_getImplementation(originalMethod),
-                                method_getTypeEncoding(originalMethod));
-        } else {
-            method_exchangeImplementations(originalMethod, swizzledMethod);
+        if ([targetClass instancesRespondToSelector:originalSelector]) {
+            Method originalMethod = class_getInstanceMethod(targetClass, originalSelector);
+            Method swizzledMethod = class_getInstanceMethod(targetClass, swizzledSelector);
+            
+            if (originalMethod && swizzledMethod) {
+                BOOL didAddMethod = class_addMethod(targetClass,
+                                                    originalSelector,
+                                                    method_getImplementation(swizzledMethod),
+                                                    method_getTypeEncoding(swizzledMethod));
+                
+                if (didAddMethod) {
+                    class_replaceMethod(targetClass,
+                                        swizzledSelector,
+                                        method_getImplementation(originalMethod),
+                                        method_getTypeEncoding(originalMethod));
+                } else {
+                    method_exchangeImplementations(originalMethod, swizzledMethod);
+                }
+            }
         }
     }
 }
@@ -34,7 +36,11 @@ static UIImage *processGenmojiImage(NSAdaptiveImageGlyph *glyph) API_AVAILABLE(i
         return nil;
     }
     
-    NSData *imageData = [glyph performSelector:@selector(imageContent)];
+    NSData *imageData = nil;
+    if ([glyph respondsToSelector:@selector(imageContent)]) {
+        imageData = [glyph performSelector:@selector(imageContent)];
+    }
+    
     if (!imageData) {
         return nil;
     }
