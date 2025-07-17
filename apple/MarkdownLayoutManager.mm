@@ -20,7 +20,7 @@
     CGFloat width = markdownUtils.markdownStyle.blockquoteBorderWidth;
     CGFloat height = rect.size.height;
     CGFloat shift = markdownUtils.markdownStyle.blockquoteMarginLeft + markdownUtils.markdownStyle.blockquoteBorderWidth + markdownUtils.markdownStyle.blockquotePaddingLeft;
-
+  
     for (NSUInteger level = 0; level < [depth unsignedIntValue]; level++) {
       CGFloat x = paddingLeft + (level * shift) + markdownUtils.markdownStyle.blockquoteMarginLeft;
       CGRect lineRect = CGRectMake(x, y, width, height);
