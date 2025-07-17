@@ -1654,7 +1654,7 @@ PODS:
     - React-logger (= 0.79.2)
     - React-perflogger (= 0.79.2)
     - React-utils (= 0.79.2)
-  - RNLiveMarkdown (0.1.275):
+  - RNLiveMarkdown (0.1.294):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2040,7 +2040,7 @@ SPEC CHECKSUMS:
   FBLazyVector: 84b955f7b4da8b895faf5946f73748267347c975
   fmt: a40bb5bd0294ea969aaaba240a927bd33d878cdd
   glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
-  hermes-engine: 314be5250afa5692b57b4dd1705959e1973a8ebe
+  hermes-engine: 0ff81d3257189f36a893ddd99f71a1eb0f49b12e
   RCT-Folly: e78785aa9ba2ed998ea4151e314036f6c49e6d82
   RCTDeprecation: 83ffb90c23ee5cea353bd32008a7bca100908f8c
   RCTRequired: eb7c0aba998009f47a540bec9e9d69a54f68136e
@@ -2103,7 +2103,7 @@ SPEC CHECKSUMS:
   ReactAppDependencyProvider: 04d5eb15eb46be6720e17a4a7fa92940a776e584
   ReactCodegen: 913f5c1e00981f2366e36dcb9ae5caa01c2745f4
   ReactCommon: 76d2dc87136d0a667678668b86f0fca0c16fdeb0
-  RNLiveMarkdown: 8e3138ad83b620aee2bf490f309312b335c6011b
+  RNLiveMarkdown: 046fe9fdaa4ffc7edffcbcaedb9b6e8b519eedc9
   RNReanimated: 8011ddcc1f6bc2fc1f27a5ac384d7495829ab6a0
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   Yoga: c758bfb934100bb4bf9cbaccb52557cee35e8bdf
