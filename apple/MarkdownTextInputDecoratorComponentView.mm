@@ -6,6 +6,7 @@
 #import <React/RCTTextInputComponentView.h>
 
 #import <RNLiveMarkdown/MarkdownBackedTextInputDelegate.h>
+#import <RNLiveMarkdown/MarkdownLayoutManager.h>
 #import <RNLiveMarkdown/MarkdownTextLayoutManagerDelegate.h>
 #import <RNLiveMarkdown/MarkdownTextFieldObserver.h>
 #import <RNLiveMarkdown/MarkdownTextViewObserver.h>
