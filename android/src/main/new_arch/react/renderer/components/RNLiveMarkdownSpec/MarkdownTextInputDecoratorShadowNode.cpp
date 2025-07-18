@@ -3,7 +3,9 @@
 #include <fbjni/fbjni.h>
 #include <react/fabric/JFabricUIManager.h>
 #include <react/jni/ReadableNativeMap.h>
+#if REACT_NATIVE_MINOR_VERSION < 80
 #include <react/jni/SafeReleaseJniRef.h>
+#endif // REACT_NATIVE_MINOR_VERSION < 80
 #include <react/renderer/components/view/conversions.h>
 #include <react/renderer/core/ComponentDescriptor.h>
 #include <yoga/Yoga.h>
