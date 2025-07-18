@@ -51,6 +51,7 @@ target_compile_options(
         -frtti
         -Wall
         -std=c++20
+        -DREACT_NATIVE_MINOR_VERSION=${ReactAndroid_VERSION_MINOR}
 )
 
 target_include_directories(
