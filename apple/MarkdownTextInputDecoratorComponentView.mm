@@ -14,7 +14,7 @@
 #import <RNLiveMarkdown/MarkdownTextInputDecoratorViewComponentDescriptor.h>
 #import <RNLiveMarkdown/MarkdownTextStorageDelegate.h>
 #import <RNLiveMarkdown/RCTMarkdownStyle.h>
-#import "RCTTextInput+AdaptiveImageGlyph.h"
+#import <RNLiveMarkdown/RCTTextInput+AdaptiveImageGlyph.h>
 
 #import <objc/runtime.h>
 
@@ -148,11 +148,19 @@ using namespace facebook::react;
 }
 
 - (void)enableAdaptiveImageGlyphSupport:(UIView *)textInputView {
-    if (@available(iOS 18.0, *)) {
-        if ([textInputView respondsToSelector:@selector(setSupportsAdaptiveImageGlyph:)]) {
-            [textInputView setValue:@YES forKey:@"supportsAdaptiveImageGlyph"];
-        }
+  if (@available(iOS 18.0, *)) {
+    if ([textInputView respondsToSelector:@selector(setSupportsAdaptiveImageGlyph:)]) {
+      [textInputView setValue:@YES forKey:@"supportsAdaptiveImageGlyph"];
     }
+  }
+}
+
+- (void)disableAdaptiveImageGlyphSupport:(UIView *)textInputView {
+  if (@available(iOS 18.0, *)) {
+    if ([textInputView respondsToSelector:@selector(setSupportsAdaptiveImageGlyph:)]) {
+      [textInputView setValue:@NO forKey:@"supportsAdaptiveImageGlyph"];
+    }
+  }
 }
 
 - (void)removeTextInputObservers
@@ -169,6 +177,7 @@ using namespace facebook::react;
     }
     _markdownBackedTextInputDelegate = nil;
     [_textView removeObserver:_markdownTextViewObserver forKeyPath:@"defaultTextAttributes" context:NULL];
+    [self disableAdaptiveImageGlyphSupport:_textView];
     _markdownTextViewObserver = nil;
     _markdownTextStorageDelegate = nil;
     _textView.textStorage.delegate = nil;
@@ -180,6 +189,7 @@ using namespace facebook::react;
     [_textField removeTarget:_markdownTextFieldObserver action:@selector(textFieldDidEndEditing:) forControlEvents:UIControlEventEditingDidEnd];
     [_textField removeObserver:_markdownTextFieldObserver forKeyPath:@"text" context:NULL];
     [_textField removeObserver:_markdownTextFieldObserver forKeyPath:@"attributedText" context:NULL];
+    [self disableAdaptiveImageGlyphSupport:_textField];
     _markdownTextFieldObserver = nil;
     _textField = nil;
   }
