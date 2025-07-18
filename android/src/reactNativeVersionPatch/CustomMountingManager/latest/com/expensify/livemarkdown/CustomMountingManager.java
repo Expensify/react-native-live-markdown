@@ -8,6 +8,7 @@ import android.text.Layout;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.TextPaint;
+import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,8 +16,10 @@ import androidx.core.util.Preconditions;
 
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.common.ReactConstants;
 import com.facebook.react.common.mapbuffer.MapBuffer;
 import com.facebook.react.fabric.mounting.MountingManager;
+import com.facebook.react.fabric.mounting.SurfaceMountingManager;
 import com.facebook.react.uimanager.PixelUtil;
 import com.facebook.react.uimanager.ViewManagerRegistry;
 import com.facebook.react.views.text.TextAttributeProps;
@@ -39,18 +42,26 @@ public class CustomMountingManager extends MountingManager {
             }
           };
 
+  private MountingManager sourceMountingManager;
   private MarkdownUtils markdownUtils;
 
   public CustomMountingManager(
+      @NonNull MountingManager sourceMountingManager,
       @NonNull ViewManagerRegistry viewManagerRegistry,
       @NonNull MountItemExecutor mountItemExecutor,
       @NonNull Context context,
       @NonNull ReadableMap decoratorProps,
       int parserId) {
     super(viewManagerRegistry, mountItemExecutor);
+    this.sourceMountingManager = sourceMountingManager;
     this.markdownUtils = new MarkdownUtils((ReactContext) context);
     this.markdownUtils.setMarkdownStyle(new MarkdownStyle(decoratorProps, context));
     this.markdownUtils.setParserId(parserId);
+  }
+
+  @Override
+  public SurfaceMountingManager getSurfaceManagerEnforced(int surfaceId, String context) {
+    return sourceMountingManager.getSurfaceManagerEnforced(surfaceId, context);
   }
 
   @Override
@@ -125,8 +136,19 @@ public class CustomMountingManager extends MountingManager {
 
       BoringLayout.Metrics boring = BoringLayout.isBoring(text, paint);
 
-      Method createLayoutMethod = textLayoutManagerClass.getDeclaredMethod("createLayout", Spannable.class, BoringLayout.Metrics.class, float.class, YogaMeasureMode.class, boolean.class, int.class, int.class, Layout.Alignment.class, int.class, TextPaint.class);
+      Method createLayoutMethod = textLayoutManagerClass.getDeclaredMethod("createLayout", Spannable.class, BoringLayout.Metrics.class, float.class, YogaMeasureMode.class, boolean.class, int.class, int.class, Layout.Alignment.class, int.class, TextUtils.TruncateAt.class, int.class, TextPaint.class);
       createLayoutMethod.setAccessible(true);
+
+      int maximumNumberOfLines =
+        paragraphAttributes.contains(TextLayoutManager.PA_KEY_MAX_NUMBER_OF_LINES)
+          ? paragraphAttributes.getInt(TextLayoutManager.PA_KEY_MAX_NUMBER_OF_LINES)
+          : ReactConstants.UNSET;
+      @Nullable
+      TextUtils.TruncateAt ellipsizeMode =
+        paragraphAttributes.contains(TextLayoutManager.PA_KEY_ELLIPSIZE_MODE)
+          ? TextAttributeProps.getEllipsizeMode(
+          paragraphAttributes.getString(TextLayoutManager.PA_KEY_ELLIPSIZE_MODE))
+          : null;
 
       Layout layout = (Layout)createLayoutMethod.invoke(
         null,
@@ -139,12 +161,9 @@ public class CustomMountingManager extends MountingManager {
         hyphenationFrequency,
         alignment,
         justificationMode,
+        ellipsizeMode,
+        maximumNumberOfLines,
         paint);
-
-      int maximumNumberOfLines =
-        paragraphAttributes.contains(TextLayoutManager.PA_KEY_MAX_NUMBER_OF_LINES)
-          ? paragraphAttributes.getInt(TextLayoutManager.PA_KEY_MAX_NUMBER_OF_LINES)
-          : UNSET;
 
       int calculatedLineCount =
         maximumNumberOfLines == UNSET || maximumNumberOfLines == 0
