@@ -9,7 +9,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonnull, atomic) RCTMarkdownUtils *markdownUtils;
 
-
 @end
 
 NS_ASSUME_NONNULL_END

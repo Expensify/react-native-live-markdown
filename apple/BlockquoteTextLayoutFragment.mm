@@ -15,7 +15,7 @@
       fragmentTextBounds = CGRectUnion(fragmentTextBounds, lineFragmentBounds);
     }
   }
-
+  
   CGFloat marginLeft = _markdownUtils.markdownStyle.blockquoteMarginLeft;
   CGFloat borderWidth = _markdownUtils.markdownStyle.blockquoteBorderWidth;
   CGFloat paddingLeft = _markdownUtils.markdownStyle.blockquotePaddingLeft;
