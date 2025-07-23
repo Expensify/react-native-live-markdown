@@ -97,7 +97,7 @@
     "react-dom": "19.1.0",
     "react-native": "0.80.1",
     "react-native-builder-bob": "^0.30.2",
-    "react-native-reanimated": "3.18.0",
+    "react-native-reanimated": "3.19.0",
     "react-native-web": "^0.20.0",
     "release-it": "^15.0.0",
     "turbo": "^1.10.7",
