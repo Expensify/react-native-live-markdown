@@ -37,7 +37,7 @@ function normalizeValue(value: string) {
 }
 
 // Parses the HTML structure of a MarkdownTextInputElement to a plain text string. Used for getting the correct value of the input element.
-function parseInnerHTMLToText(target: MarkdownTextInputElement, cursorPosition: number, inputType?: string): string {
+function parseInnerHTMLToText(target: MarkdownTextInputElement, cursorPosition: number, inputType?: string, isMultiline = true): string {
   // Returns the parent of a given node that is higher in the hierarchy and is of a different type than 'text', 'br' or 'line'
   function getTopParentNode(node: ChildNode) {
     let currentParentNode = node.parentNode;
@@ -72,11 +72,12 @@ function parseInnerHTMLToText(target: MarkdownTextInputElement, cursorPosition: 
       } else {
         const firstChild = node.firstChild as HTMLElement;
         const containsEmptyBlockElement = firstChild?.getAttribute?.('data-type') === 'block' && firstChild.textContent === '';
-        if (shouldAddNewline && !containsEmptyBlockElement) {
+        // Only add newlines for multiline inputs
+        if (isMultiline && shouldAddNewline && !containsEmptyBlockElement) {
           text += '\n';
           shouldAddNewline = false;
         }
-        shouldAddNewline = true;
+        shouldAddNewline = isMultiline;
       }
     }
 
@@ -85,9 +86,9 @@ function parseInnerHTMLToText(target: MarkdownTextInputElement, cursorPosition: 
       text += node.textContent;
     } else if (node.nodeName === 'BR') {
       const parentNode = getTopParentNode(node);
-      if (parentNode && parentNode.parentElement?.contentEditable !== 'true' && !!(node as HTMLElement).getAttribute('data-id')) {
+      if (isMultiline && parentNode && parentNode.parentElement?.contentEditable !== 'true' && !!(node as HTMLElement).getAttribute('data-id')) {
         // Parse br elements into newlines only if their parent is not a child of the MarkdownTextInputElement (a paragraph when writing or a div when pasting).
-        // It prevents adding extra newlines when entering text
+        // It prevents adding extra newlines when entering text - and now only for multiline inputs
         text += '\n';
       }
     } else {
