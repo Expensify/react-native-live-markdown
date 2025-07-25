@@ -152,7 +152,8 @@ function addTextToElement(node: TreeNode, text: string, isMultiline = true) {
       }
     }
 
-    if (index < lines.length - 1 || (index === 0 && line === '')) {
+    // Only add BR elements for multiline inputs or when there are actual line breaks
+    if (isMultiline && (index < lines.length - 1 || (index === 0 && line === ''))) {
       addBrElement(node);
     }
   });
@@ -228,7 +229,7 @@ function parseRangesToHTMLNodes(
     }
 
     if (line.markdownRanges.length === 0) {
-      addTextToElement(currentParentNode, line.text);
+      addTextToElement(currentParentNode, line.text, isMultiline);
     }
 
     let wasBlockGenerated = false;
@@ -254,7 +255,7 @@ function parseRangesToHTMLNodes(
       // add text before the markdown range
       const textBeforeRange = line.text.substring(lastRangeEndIndex - line.start, range.start - line.start);
       if (textBeforeRange) {
-        addTextToElement(currentParentNode, textBeforeRange);
+        addTextToElement(currentParentNode, textBeforeRange, isMultiline);
       }
 
       // create markdown span element
@@ -284,7 +285,7 @@ function parseRangesToHTMLNodes(
         while (currentParentNode.parentNode !== null && nextRangeStartIndex >= currentParentNode.start + currentParentNode.length) {
           const textAfterRange = line.text.substring(lastRangeEndIndex - line.start, currentParentNode.start - line.start + currentParentNode.length);
           if (textAfterRange) {
-            addTextToElement(currentParentNode, textAfterRange);
+            addTextToElement(currentParentNode, textAfterRange, isMultiline);
           }
           lastRangeEndIndex = currentParentNode.start + currentParentNode.length;
           if (currentParentNode.parentNode.type !== 'root') {
