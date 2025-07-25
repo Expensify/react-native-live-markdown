@@ -144,14 +144,14 @@ void MarkdownTextInputDecoratorShadowNode::overwriteTextLayoutManager() {
 }
 
 void MarkdownTextInputDecoratorShadowNode::appendChild(
-    const ShadowNode::Shared &child) {
+    const std::shared_ptr<const ShadowNode> &child) {
   YogaLayoutableShadowNode::appendChild(child);
 
   overwriteTextLayoutManager();
 }
 
 void MarkdownTextInputDecoratorShadowNode::replaceChild(
-    const ShadowNode &oldChild, const ShadowNode::Shared &newChild,
+    const ShadowNode &oldChild, const std::shared_ptr<const ShadowNode> &newChild,
     size_t suggestedIndex) {
   YogaLayoutableShadowNode::replaceChild(oldChild, newChild, suggestedIndex);
 
