@@ -67,17 +67,16 @@ function parseInnerHTMLToText(target: MarkdownTextInputElement, cursorPosition: 
     if (isTopComponent) {
       // When inputType is undefined, the first part of the replaced text is added as a text node.
       // Because of it, we need to prevent adding new lines in this case
-      if (!inputType && node.nodeType === Node.TEXT_NODE) {
+      if (!isMultiline || (!inputType && node.nodeType === Node.TEXT_NODE)) {
         shouldAddNewline = false;
       } else {
         const firstChild = node.firstChild as HTMLElement;
         const containsEmptyBlockElement = firstChild?.getAttribute?.('data-type') === 'block' && firstChild.textContent === '';
-        // Only add newlines for multiline inputs
-        if (isMultiline && shouldAddNewline && !containsEmptyBlockElement) {
+        if (shouldAddNewline && !containsEmptyBlockElement) {
           text += '\n';
           shouldAddNewline = false;
         }
-        shouldAddNewline = isMultiline;
+        shouldAddNewline = true;
       }
     }
 
