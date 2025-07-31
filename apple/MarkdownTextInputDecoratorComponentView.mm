@@ -14,6 +14,7 @@
 #import <RNLiveMarkdown/MarkdownTextInputDecoratorViewComponentDescriptor.h>
 #import <RNLiveMarkdown/MarkdownTextStorageDelegate.h>
 #import <RNLiveMarkdown/RCTMarkdownStyle.h>
+#import <RNLiveMarkdown/RCTTextInput+AdaptiveImageGlyph.h>
 
 #import <objc/runtime.h>
 
@@ -85,6 +86,9 @@ using namespace facebook::react;
     // make sure `adjustsFontSizeToFitWidth` is disabled, otherwise formatting will be overwritten
     react_native_assert(_textField.adjustsFontSizeToFitWidth == NO);
 
+    // Enable TextField AdaptiveImageGlyph support for iOS 18.0+
+    [self enableAdaptiveImageGlyphSupport:_textField];
+
     _markdownTextFieldObserver = [[MarkdownTextFieldObserver alloc] initWithTextField:_textField markdownUtils:_markdownUtils];
 
     // register observers for future edits
@@ -100,6 +104,9 @@ using namespace facebook::react;
     // https://github.com/Expensify/react-native-live-markdown/issues/87
   } else if ([backedTextInputView isKindOfClass:[RCTUITextView class]]) {
     _textView = (RCTUITextView *)backedTextInputView;
+
+    // Enable TextView AdaptiveImageGlyph support for iOS 18.0+
+    [self enableAdaptiveImageGlyphSupport:_textView];
 
     // register delegate for future edits
     react_native_assert(_textView.textStorage.delegate == nil);
@@ -140,6 +147,22 @@ using namespace facebook::react;
   }
 }
 
+- (void)enableAdaptiveImageGlyphSupport:(UIView *)textInputView {
+  if (@available(iOS 18.0, *)) {
+    if ([textInputView respondsToSelector:@selector(setSupportsAdaptiveImageGlyph:)]) {
+      [textInputView setValue:@YES forKey:@"supportsAdaptiveImageGlyph"];
+    }
+  }
+}
+
+- (void)disableAdaptiveImageGlyphSupport:(UIView *)textInputView {
+  if (@available(iOS 18.0, *)) {
+    if ([textInputView respondsToSelector:@selector(setSupportsAdaptiveImageGlyph:)]) {
+      [textInputView setValue:@NO forKey:@"supportsAdaptiveImageGlyph"];
+    }
+  }
+}
+
 - (void)removeTextInputObservers
 {
   react_native_assert(_observersAdded && "MarkdownTextInputDecoratorComponentView tried to remove TextInput observers while they were detached");
@@ -154,6 +177,7 @@ using namespace facebook::react;
     }
     _markdownBackedTextInputDelegate = nil;
     [_textView removeObserver:_markdownTextViewObserver forKeyPath:@"defaultTextAttributes" context:NULL];
+    [self disableAdaptiveImageGlyphSupport:_textView];
     _markdownTextViewObserver = nil;
     _markdownTextStorageDelegate = nil;
     _textView.textStorage.delegate = nil;
@@ -165,6 +189,7 @@ using namespace facebook::react;
     [_textField removeTarget:_markdownTextFieldObserver action:@selector(textFieldDidEndEditing:) forControlEvents:UIControlEventEditingDidEnd];
     [_textField removeObserver:_markdownTextFieldObserver forKeyPath:@"text" context:NULL];
     [_textField removeObserver:_markdownTextFieldObserver forKeyPath:@"attributedText" context:NULL];
+    [self disableAdaptiveImageGlyphSupport:_textField];
     _markdownTextFieldObserver = nil;
     _textField = nil;
   }
