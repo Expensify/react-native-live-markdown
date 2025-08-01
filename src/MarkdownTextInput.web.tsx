@@ -355,7 +355,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
         updateTextColor(divRef.current, e.target.textContent ?? '');
         const previousText = divRef.current.value;
         let parsedText = normalizeValue(
-          inputType === 'pasteText' ? pasteContent.current || '' : parseInnerHTMLToText(e.target as MarkdownTextInputElement, contentSelection.current.start, inputType),
+          inputType === 'pasteText' ? pasteContent.current || '' : parseInnerHTMLToText(e.target as MarkdownTextInputElement, contentSelection.current.start, inputType, multiline),
         );
 
         if (pasteContent.current) {
@@ -451,8 +451,9 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
         handleContentSizeChange();
       },
       [
-        parser,
         updateTextColor,
+        multiline,
+        maxLength,
         updateSelection,
         onChange,
         onChangeText,
@@ -461,9 +462,9 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
         redo,
         handleFormatSelection,
         parseText,
+        parser,
         processedMarkdownStyle,
         setEventProps,
-        maxLength,
       ],
     );
 

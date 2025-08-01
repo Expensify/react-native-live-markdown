@@ -64,7 +64,7 @@ function didTwoCodeblocksMerge(node: ChildNode | null) {
 /**
  * Parses the HTML structure of a MarkdownTextInputElement to a plain text string. Used for getting the correct value of the input element.
  */
-function parseInnerHTMLToText(target: MarkdownTextInputElement, cursorPosition: number, inputType?: string): string {
+function parseInnerHTMLToText(target: MarkdownTextInputElement, cursorPosition: number, inputType?: string, isMultiline = true): string {
   const stack: ChildNode[] = [target];
   let text = '';
   let shouldAddNewline = false;
@@ -85,7 +85,7 @@ function parseInnerHTMLToText(target: MarkdownTextInputElement, cursorPosition: 
     if (isTopComponent) {
       // When inputType is undefined, the first part of the replaced text is added as a text node.
       // Because of it, we need to prevent adding new lines in this case
-      if (!inputType && node.nodeType === Node.TEXT_NODE) {
+      if (!isMultiline || (!inputType && node.nodeType === Node.TEXT_NODE)) {
         shouldAddNewline = false;
       } else {
         const firstChild = node.firstChild as HTMLElement;
@@ -129,13 +129,14 @@ function parseInnerHTMLToText(target: MarkdownTextInputElement, cursorPosition: 
       const parentNode = getTopParentNode(node);
 
       if (
-        (parentNode &&
+        (isMultiline &&
+          parentNode &&
           parentNode.parentElement?.contentEditable !== 'true' &&
           !!((node as HTMLElement).getAttribute('data-id') || (node.parentElement as HTMLElement).getAttribute('data-type') === 'br')) ||
         (node.parentElement?.getAttribute('data-type') === 'text' && isChildOfMultilineMarkdownElement(node))
       ) {
         // Parse br elements into newlines only if their parent is not a child of the MarkdownTextInputElement (a paragraph when writing or a div when pasting).
-        // It prevents adding extra newlines when entering text
+        // It prevents adding extra newlines when entering text - and now only for multiline inputs
         text += '\n';
       }
     } else {

@@ -19,7 +19,7 @@ function isJest() {
 // eslint-disable-next-line no-underscore-dangle
 if (__DEV__ && !isWeb() && !isJest() && (decode as WorkletFunction).__workletHash === undefined) {
   throw new Error(
-    "[react-native-live-markdown] `parseExpensiMark` requires `html-entities` package to be workletized. Please add `'worklet';` directive at the top of `node_modules/html-entities/lib/index.js` using patch-package.",
+    "[react-native-live-markdown] `parseExpensiMark` requires `html-entities` package to be workletized. Please add `'worklet';` directive at the top of `node_modules/html-entities/lib/index.js` using patch-package. Make sure you've installed `html-entities` version 2.5.3 exactly as otherwise there is no `lib/` directory.",
   );
 }
 
