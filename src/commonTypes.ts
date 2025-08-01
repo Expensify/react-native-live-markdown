@@ -13,7 +13,8 @@ type MarkdownType =
   | 'blockquote'
   | 'h1'
   | 'syntax'
-  | 'inline-image';
+  | 'inline-image'
+  | 'codeblock';
 
 interface MarkdownRange {
   type: MarkdownType;

@@ -451,8 +451,9 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
         handleContentSizeChange();
       },
       [
-        parser,
         updateTextColor,
+        multiline,
+        maxLength,
         updateSelection,
         onChange,
         onChangeText,
@@ -461,9 +462,9 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
         redo,
         handleFormatSelection,
         parseText,
+        parser,
         processedMarkdownStyle,
         setEventProps,
-        maxLength,
       ],
     );
 
