@@ -174,9 +174,11 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, MarkdownRange[]] {
       } else if (node.tag === '<br />') {
         text += '\n';
       } else if (node.tag.startsWith('<pre')) {
-        appendSyntax('```');
-        const content = node.children.join('');
-        addChildrenWithStyle(content, 'pre');
+        const [_, lb, content] = node.children.join('').match(/^(\r?\n)([\s\S]*)$/) ?? [];
+        // Adding opening ("```${lb}") and closing ("```") codeblock syntax length, equal to 7, to the content length
+        ranges.push({type: 'codeblock', start: text.length, length: (content?.length ?? 0) + 7});
+        appendSyntax(`\`\`\`${lb}`);
+        addChildrenWithStyle(`${content}`, 'pre');
         appendSyntax('```');
       } else if (node.tag.startsWith('<a href="')) {
         const rawHref = node.tag.match(/href="([^"]*)"/)![1]!; // always present
