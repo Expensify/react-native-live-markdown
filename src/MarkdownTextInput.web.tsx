@@ -13,7 +13,7 @@ import type {
 } from 'react-native';
 import React, {useEffect, useRef, useCallback, useMemo, useLayoutEffect} from 'react';
 import type {CSSProperties, MutableRefObject, ReactEventHandler, FocusEventHandler, MouseEvent, KeyboardEvent, SyntheticEvent, ClipboardEventHandler, TouchEvent} from 'react';
-import {StyleSheet} from 'react-native';
+import {StyleSheet, TextInput as RNTextInput} from 'react-native';
 import {updateInputStructure} from './web/utils/parserUtils';
 import InputHistory from './web/InputHistory';
 import type {TreeNode} from './web/utils/treeUtils';
@@ -143,6 +143,8 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
     }
 
     const flattenedStyle = useMemo(() => StyleSheet.flatten(style), [style]);
+    // Using JSON.stringify(flattenedMarkdownStyle) as a simple styles object hash to avoid rerenders when not memoized markdownStyle is passed
+    const hashedMarkdownStyle = useMemo(() => JSON.stringify(StyleSheet.flatten(markdownStyle)), [markdownStyle]);
 
     // Empty placeholder would collapse the div, so we need to use zero-width space to prevent it
     const heightSafePlaceholder = useMemo(() => getPlaceholderValue(placeholder), [placeholder]);
@@ -200,7 +202,8 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
         parseText(parser, divRef.current, divRef.current.value, newMarkdownStyle, null, false, false);
       }
       return newMarkdownStyle;
-    }, [parser, markdownStyle, parseText]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [hashedMarkdownStyle, parser, parseText]);
 
     const inputStyles = useMemo(
       () =>
@@ -209,7 +212,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
           flattenedStyle && {
             caretColor: (flattenedStyle as TextStyle).color || 'black',
           },
-          {whiteSpace: multiline ? 'pre-wrap' : 'nowrap'},
+          {whiteSpace: multiline ? 'pre-wrap' : 'pre'},
           disabled && styles.disabledInputStyles,
           parseToReactDOMStyle(flattenedStyle),
           caretHidden && styles.caretHidden,
@@ -352,7 +355,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
         updateTextColor(divRef.current, e.target.textContent ?? '');
         const previousText = divRef.current.value;
         let parsedText = normalizeValue(
-          inputType === 'pasteText' ? pasteContent.current || '' : parseInnerHTMLToText(e.target as MarkdownTextInputElement, contentSelection.current.start, inputType),
+          inputType === 'pasteText' ? pasteContent.current || '' : parseInnerHTMLToText(e.target as MarkdownTextInputElement, contentSelection.current.start, inputType, multiline),
         );
 
         if (pasteContent.current) {
@@ -448,8 +451,9 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
         handleContentSizeChange();
       },
       [
-        parser,
         updateTextColor,
+        multiline,
+        maxLength,
         updateSelection,
         onChange,
         onChangeText,
@@ -458,9 +462,9 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
         redo,
         handleFormatSelection,
         parseText,
+        parser,
         processedMarkdownStyle,
         setEventProps,
-        maxLength,
       ],
     );
 
@@ -553,6 +557,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
       (event) => {
         hasJustBeenFocused.current = true;
         const e = event as unknown as NativeSyntheticEvent<TextInputFocusEventData>;
+        RNTextInput.State.focusTextInput?.(e.target);
         const hostNode = e.target as unknown as HTMLDivElement;
         currentlyFocusedField.current = hostNode;
         setEventProps(e);
@@ -600,6 +605,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
     const handleBlur: FocusEventHandler<HTMLDivElement> = useCallback(
       (event) => {
         const e = event as unknown as NativeSyntheticEvent<TextInputFocusEventData>;
+        RNTextInput.State.blurTextInput?.(e.target);
         removeSelection();
         currentlyFocusedField.current = null;
         if (onBlur) {

@@ -155,8 +155,8 @@ It's possible to locally develop this repo such with live-reload in another Reac
 1. Clone this repo
 2. Run `npm install`
 3. Run `npm run build:watch`
-4. In Expensify/App, run `npm install`.
-   - _Note:_ There is a patch for the `link` dev dependency in this repo. If you want these steps to work reliably, you'll likely need to copy that patch over.
+4. In **Expensify/App**, run `npm install`.
+   - _Note:_ There is a patch for the `link` dev dependency in **Expensify/App** repo. If you want these steps to work reliably, you'll likely need to copy that patch over.
 5. In Expensify/App, run `npx link publish --watch ~/react-native-live-markdown --litmus .build_complete`
 6. In E/App, run the app with `npm run web`/`npm run ios`/etc...
 

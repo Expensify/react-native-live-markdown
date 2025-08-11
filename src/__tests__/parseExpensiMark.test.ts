@@ -19,6 +19,12 @@ const toBeParsedAs = function (actual: string, expectedRanges: MarkdownRange[]) 
   return {pass: true, message: () => ''};
 };
 
+jest.mock('react-native', () => ({
+  Platform: {
+    OS: 'web',
+  },
+}));
+
 expect.extend({
   toBeParsedAs,
 });
@@ -68,6 +74,15 @@ test('strikethrough', () => {
 
 test('emoji', () => {
   expect('Hello, 😎').toBeParsedAs([{type: 'emoji', start: 7, length: 2}]);
+});
+
+test('emoji and italic', () => {
+  expect('_😎_').toBeParsedAs([
+    {type: 'syntax', start: 0, length: 1},
+    {type: 'italic', start: 1, length: 2},
+    {type: 'emoji', start: 1, length: 2},
+    {type: 'syntax', start: 3, length: 1},
+  ]);
 });
 
 describe('mention-here', () => {
@@ -216,8 +231,9 @@ test('inline code', () => {
 
 test('codeblock', () => {
   expect('```\nHello world!\n```').toBeParsedAs([
-    {type: 'syntax', start: 0, length: 3},
-    {type: 'pre', start: 3, length: 14},
+    {type: 'codeblock', start: 0, length: 20},
+    {type: 'syntax', start: 0, length: 4},
+    {type: 'pre', start: 4, length: 13},
     {type: 'syntax', start: 17, length: 3},
   ]);
 });

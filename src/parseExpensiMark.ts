@@ -19,7 +19,7 @@ function isJest() {
 // eslint-disable-next-line no-underscore-dangle
 if (__DEV__ && !isWeb() && !isJest() && (decode as WorkletFunction).__workletHash === undefined) {
   throw new Error(
-    "[react-native-live-markdown] `parseExpensiMark` requires `html-entities` package to be workletized. Please add `'worklet';` directive at the top of `node_modules/html-entities/lib/index.js` using patch-package.",
+    "[react-native-live-markdown] `parseExpensiMark` requires `html-entities` package to be workletized. Please add `'worklet';` directive at the top of `node_modules/html-entities/lib/index.js` using patch-package. Make sure you've installed `html-entities` version 2.5.3 exactly as otherwise there is no `lib/` directory.",
   );
 }
 
@@ -174,9 +174,11 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, MarkdownRange[]] {
       } else if (node.tag === '<br />') {
         text += '\n';
       } else if (node.tag.startsWith('<pre')) {
-        appendSyntax('```');
-        const content = node.children.join('');
-        addChildrenWithStyle(content, 'pre');
+        const [_, lb, content] = node.children.join('').match(/^(\r?\n)([\s\S]*)$/) ?? [];
+        // Adding opening ("```${lb}") and closing ("```") codeblock syntax length, equal to 7, to the content length
+        ranges.push({type: 'codeblock', start: text.length, length: (content?.length ?? 0) + 7});
+        appendSyntax(`\`\`\`${lb}`);
+        addChildrenWithStyle(`${content}`, 'pre');
         appendSyntax('```');
       } else if (node.tag.startsWith('<a href="')) {
         const rawHref = node.tag.match(/href="([^"]*)"/)![1]!; // always present
@@ -236,7 +238,7 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, MarkdownRange[]] {
   return [text, ranges];
 }
 
-const isAndroid = Platform.OS === 'android';
+const isNative = Platform.OS === 'android' || Platform.OS === 'ios';
 
 function parseExpensiMark(markdown: string): MarkdownRange[] {
   if (markdown.length > MAX_PARSABLE_LENGTH) {
@@ -255,8 +257,8 @@ function parseExpensiMark(markdown: string): MarkdownRange[] {
     return [];
   }
   let markdownRanges = sortRanges(ranges);
-  if (isAndroid) {
-    // Blocks applying italic and strikethrough styles to emojis on Android
+  if (isNative) {
+    // Blocks applying italic and strikethrough styles to emojis on Android and iOS
     // TODO: Remove this condition when splitting emojis inside the inline code block will be fixed on the web
     markdownRanges = splitRangesOnEmojis(markdownRanges, 'italic');
     markdownRanges = splitRangesOnEmojis(markdownRanges, 'strikethrough');

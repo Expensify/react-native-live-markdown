@@ -48,6 +48,7 @@ export default function App() {
   return (
     <ScrollView contentContainerStyle={styles.container} style={styles.content}>
       <PlatformInfo />
+      <Text>{multiline ? 'multiline' : 'singleline'}</Text>
       <MarkdownTextInput
         multiline={multiline}
         formatSelection={handleFormatSelection}
@@ -114,6 +115,7 @@ export default function App() {
         onPress={() => setTextColorState(prev => !prev)}
       />
       <Button
+        testID={TEST_CONST.TOGGLE_LINK_COLOR}
         title="Toggle link color"
         onPress={() => setLinkColorState(prev => !prev)}
       />
@@ -150,6 +152,7 @@ export default function App() {
         }}
       />
       <Button
+        testID={TEST_CONST.CHANGE_SELECTION}
         title="Change selection"
         onPress={() => {
           if (!ref.current) {

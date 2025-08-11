@@ -7,12 +7,14 @@
 
 #import <RNLiveMarkdown/MarkdownBackedTextInputDelegate.h>
 #import <RNLiveMarkdown/MarkdownLayoutManager.h>
+#import <RNLiveMarkdown/MarkdownTextLayoutManagerDelegate.h>
 #import <RNLiveMarkdown/MarkdownTextFieldObserver.h>
 #import <RNLiveMarkdown/MarkdownTextViewObserver.h>
 #import <RNLiveMarkdown/MarkdownTextInputDecoratorComponentView.h>
 #import <RNLiveMarkdown/MarkdownTextInputDecoratorViewComponentDescriptor.h>
 #import <RNLiveMarkdown/MarkdownTextStorageDelegate.h>
 #import <RNLiveMarkdown/RCTMarkdownStyle.h>
+#import <RNLiveMarkdown/RCTTextInput+AdaptiveImageGlyph.h>
 
 #import <objc/runtime.h>
 
@@ -22,12 +24,14 @@ using namespace facebook::react;
   RCTMarkdownUtils *_markdownUtils;
   RCTMarkdownStyle *_markdownStyle;
   NSNumber *_parserId;
+  MarkdownTextLayoutManagerDelegate *_markdownTextLayoutManagerDelegate;
   MarkdownBackedTextInputDelegate *_markdownBackedTextInputDelegate;
   MarkdownTextStorageDelegate *_markdownTextStorageDelegate;
   MarkdownTextViewObserver *_markdownTextViewObserver;
   MarkdownTextFieldObserver *_markdownTextFieldObserver;
   __weak RCTUITextView *_textView;
   __weak RCTUITextField *_textField;
+  bool _observersAdded;
 }
 
 + (ComponentDescriptorProvider)componentDescriptorProvider
@@ -46,6 +50,8 @@ using namespace facebook::react;
   if (self = [super initWithFrame:frame]) {
     static const auto defaultProps = std::make_shared<const MarkdownTextInputDecoratorViewProps>();
     _props = defaultProps;
+    _observersAdded = false;
+    _markdownUtils = [[RCTMarkdownUtils alloc] init];
   }
 
   return self;
@@ -53,19 +59,35 @@ using namespace facebook::react;
 
 - (void)didAddSubview:(UIView *)subview
 {
-  react_native_assert([subview isKindOfClass:[RCTTextInputComponentView class]] && "Child component of MarkdownTextInputDecoratorComponentView is not an instance of RCTTextInputComponentView.");
-  RCTTextInputComponentView *textInputComponentView = (RCTTextInputComponentView *)subview;
-  UIView<RCTBackedTextInputViewProtocol> *backedTextInputView = [textInputComponentView valueForKey:@"_backedTextInputView"];
+  [super didAddSubview:subview];
+  [self addTextInputObservers];
+}
 
-  _markdownUtils = [[RCTMarkdownUtils alloc] init];
-  [_markdownUtils setMarkdownStyle:_markdownStyle];
-  [_markdownUtils setParserId:_parserId];
+- (void)willRemoveSubview:(UIView *)subview
+{
+  [self removeTextInputObservers];
+  [super willRemoveSubview:subview];
+}
+
+- (void)addTextInputObservers
+{
+  react_native_assert(!_observersAdded && "MarkdownTextInputDecoratorComponentView tried to add TextInput observers while they were attached");
+  react_native_assert(self.subviews.count > 0 && "MarkdownTextInputDecoratorComponentView is mounted without any children");
+  UIView* childView = self.subviews[0];
+  react_native_assert([childView isKindOfClass:[RCTTextInputComponentView class]] && "Child component of MarkdownTextInputDecoratorComponentView is not an instance of RCTTextInputComponentView.");
+  RCTTextInputComponentView *textInputComponentView = (RCTTextInputComponentView *)childView;
+  UIView<RCTBackedTextInputViewProtocol> *backedTextInputView = [textInputComponentView valueForKey:@"_backedTextInputView"];
+ 
+  _observersAdded = true;
 
   if ([backedTextInputView isKindOfClass:[RCTUITextField class]]) {
     _textField = (RCTUITextField *)backedTextInputView;
 
     // make sure `adjustsFontSizeToFitWidth` is disabled, otherwise formatting will be overwritten
     react_native_assert(_textField.adjustsFontSizeToFitWidth == NO);
+
+    // Enable TextField AdaptiveImageGlyph support for iOS 18.0+
+    [self enableAdaptiveImageGlyphSupport:_textField];
 
     _markdownTextFieldObserver = [[MarkdownTextFieldObserver alloc] initWithTextField:_textField markdownUtils:_markdownUtils];
 
@@ -83,6 +105,9 @@ using namespace facebook::react;
   } else if ([backedTextInputView isKindOfClass:[RCTUITextView class]]) {
     _textView = (RCTUITextView *)backedTextInputView;
 
+    // Enable TextView AdaptiveImageGlyph support for iOS 18.0+
+    [self enableAdaptiveImageGlyphSupport:_textView];
+
     // register delegate for future edits
     react_native_assert(_textView.textStorage.delegate == nil);
     _markdownTextStorageDelegate = [[MarkdownTextStorageDelegate alloc] initWithTextView:_textView markdownUtils:_markdownUtils];
@@ -95,18 +120,25 @@ using namespace facebook::react;
     // format initial value
     [_textView.textStorage setAttributedString:_textView.attributedText];
 
-    NSLayoutManager *layoutManager = _textView.layoutManager; // switching to TextKit 1 compatibility mode
+    if (@available(iOS 16.0, *)) {
+      _markdownTextLayoutManagerDelegate = [[MarkdownTextLayoutManagerDelegate alloc] init];
+      _markdownTextLayoutManagerDelegate.textStorage = _textView.textStorage;
+      _markdownTextLayoutManagerDelegate.markdownUtils = _markdownUtils;
+      _textView.textLayoutManager.delegate = _markdownTextLayoutManagerDelegate;
+    } else {
+      NSLayoutManager *layoutManager = _textView.layoutManager; // switching to TextKit 1 compatibility mode
 
-    // Correct content height in TextKit 1 compatibility mode. (See https://github.com/Expensify/App/issues/41567)
-    // Consider removing this fix if it is no longer needed after migrating to TextKit 2.
-    CGSize contentSize = _textView.contentSize;
-    CGRect textBounds = [layoutManager usedRectForTextContainer:_textView.textContainer];
-    contentSize.height = textBounds.size.height + _textView.textContainerInset.top + _textView.textContainerInset.bottom;
-    [_textView setContentSize:contentSize];
+      // Correct content height in TextKit 1 compatibility mode. (See https://github.com/Expensify/App/issues/41567)
+      // Consider removing this fix if it is no longer needed after migrating to TextKit 2.
+      CGSize contentSize = _textView.contentSize;
+      CGRect textBounds = [layoutManager usedRectForTextContainer:_textView.textContainer];
+      contentSize.height = textBounds.size.height + _textView.textContainerInset.top + _textView.textContainerInset.bottom;
+      [_textView setContentSize:contentSize];
 
-    layoutManager.allowsNonContiguousLayout = NO; // workaround for onScroll issue
-    object_setClass(layoutManager, [MarkdownLayoutManager class]);
-    [layoutManager setValue:_markdownUtils forKey:@"markdownUtils"];
+      layoutManager.allowsNonContiguousLayout = NO; // workaround for onScroll issue
+      object_setClass(layoutManager, [MarkdownLayoutManager class]);
+      [layoutManager setValue:_markdownUtils forKey:@"markdownUtils"];
+    }
 
     // register delegate for fixing cursor position after blockquote
     _markdownBackedTextInputDelegate = [[MarkdownBackedTextInputDelegate alloc] initWithTextView:_textView];
@@ -115,18 +147,37 @@ using namespace facebook::react;
   }
 }
 
-- (void)willMoveToWindow:(UIWindow *)newWindow
-{
-  if (newWindow != nil) {
-    return;
+- (void)enableAdaptiveImageGlyphSupport:(UIView *)textInputView {
+  if (@available(iOS 18.0, *)) {
+    if ([textInputView respondsToSelector:@selector(setSupportsAdaptiveImageGlyph:)]) {
+      [textInputView setValue:@YES forKey:@"supportsAdaptiveImageGlyph"];
+    }
   }
+}
+
+- (void)disableAdaptiveImageGlyphSupport:(UIView *)textInputView {
+  if (@available(iOS 18.0, *)) {
+    if ([textInputView respondsToSelector:@selector(setSupportsAdaptiveImageGlyph:)]) {
+      [textInputView setValue:@NO forKey:@"supportsAdaptiveImageGlyph"];
+    }
+  }
+}
+
+- (void)removeTextInputObservers
+{
+  react_native_assert(_observersAdded && "MarkdownTextInputDecoratorComponentView tried to remove TextInput observers while they were detached");
+  _observersAdded = false;
+
   if (_textView != nil) {
-    if (_textView.layoutManager != nil && [object_getClass(_textView.layoutManager) isEqual:[MarkdownLayoutManager class]]) {
+    if (@available(iOS 16.0, *)) {
+      _textView.textLayoutManager.delegate = nil;
+    } else if (_textView.layoutManager != nil && [object_getClass(_textView.layoutManager) isEqual:[MarkdownLayoutManager class]]) {
       [_textView.layoutManager setValue:nil forKey:@"markdownUtils"];
       object_setClass(_textView.layoutManager, [NSLayoutManager class]);
     }
     _markdownBackedTextInputDelegate = nil;
     [_textView removeObserver:_markdownTextViewObserver forKeyPath:@"defaultTextAttributes" context:NULL];
+    [self disableAdaptiveImageGlyphSupport:_textView];
     _markdownTextViewObserver = nil;
     _markdownTextStorageDelegate = nil;
     _textView.textStorage.delegate = nil;
@@ -138,6 +189,7 @@ using namespace facebook::react;
     [_textField removeTarget:_markdownTextFieldObserver action:@selector(textFieldDidEndEditing:) forControlEvents:UIControlEventEditingDidEnd];
     [_textField removeObserver:_markdownTextFieldObserver forKeyPath:@"text" context:NULL];
     [_textField removeObserver:_markdownTextFieldObserver forKeyPath:@"attributedText" context:NULL];
+    [self disableAdaptiveImageGlyphSupport:_textField];
     _markdownTextFieldObserver = nil;
     _textField = nil;
   }
@@ -171,6 +223,16 @@ using namespace facebook::react;
   if (_textField != nil) {
     [_markdownTextFieldObserver textFieldDidChange:_textField];
   }
+}
+
+- (void)prepareForRecycle
+{
+  react_native_assert(!_observersAdded && "MarkdownTextInputDecoratorComponentView was being recycled with TextInput observers still attached");
+  [super prepareForRecycle];
+  
+  static const auto defaultProps = std::make_shared<const MarkdownTextInputDecoratorViewProps>();
+  _props = defaultProps;
+  _markdownUtils = [[RCTMarkdownUtils alloc] init];
 }
 
 Class<RCTComponentViewProtocol> MarkdownTextInputDecoratorViewCls(void)

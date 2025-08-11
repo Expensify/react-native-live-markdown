@@ -79,3 +79,6 @@ lib/
 
 # react-native-live-markdown
 .build_complete
+
+# jest
+coverage/
