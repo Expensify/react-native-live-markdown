@@ -2122,7 +2122,7 @@ PODS:
     - React-perflogger (= 0.80.1)
     - React-utils (= 0.80.1)
     - SocketRocket
-  - RNLiveMarkdown (0.1.296):
+  - RNLiveMarkdown (0.1.300):
     - boost
     - DoubleConversion
     - fast_float
@@ -2544,7 +2544,7 @@ SPEC CHECKSUMS:
   FBLazyVector: 09f03e4b6f42f955734b64a118f86509cc719427
   fmt: a40bb5bd0294ea969aaaba240a927bd33d878cdd
   glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
-  hermes-engine: 4f07404533b808de66cf48ac4200463068d0e95a
+  hermes-engine: 47c54213afbdb49fcf0aa16eea5a01060d8c41b3
   RCT-Folly: 846fda9475e61ec7bcbf8a3fe81edfcaeb090669
   RCTDeprecation: efa5010912100e944a7ac9a93a157e1def1988fe
   RCTRequired: bbc4cf999ddc4a4b076e076c74dd1d39d0254630
@@ -2557,8 +2557,8 @@ SPEC CHECKSUMS:
   React-debug: deb3a146ef717fa3e8f4c23e0288369fe53199b7
   React-defaultsnativemodule: 11e2948787a15d3cf1b66d7f29f13770a177bff7
   React-domnativemodule: 2f4b279acdb2963736fb5de2f585811dd90070b5
-  React-Fabric: 6f8d1a303c96f1d078c14d74c4005bf457e5b782
-  React-FabricComponents: b106410970e9a0c4e592da656c7a7e0947306c23
+  React-Fabric: 885f08b2c693523059a1721262e78271bccb69e4
+  React-FabricComponents: 13a35051a4bfd84ea46515b07430f30f55f3f313
   React-FabricImage: 1abaf230dfce9b58fdf53c4128f3f40c6e64af6a
   React-featureflags: f7ef58d91079efde3ad223bcca6d197e845d5bcf
   React-featureflagsnativemodule: ae5abc9849d1696f4f8f11ee3744bf5715e032cf
@@ -2609,7 +2609,7 @@ SPEC CHECKSUMS:
   ReactAppDependencyProvider: afd905e84ee36e1678016ae04d7370c75ed539be
   ReactCodegen: 62690fdeb185860673cb78e3d9b049c7e1d40531
   ReactCommon: 17fd88849a174bf9ce45461912291aca711410fc
-  RNLiveMarkdown: e110927c17781579c6b833012482001d181707cd
+  RNLiveMarkdown: 520b4739cbfc17778a14bd6731f49d412057029a
   RNReanimated: 237d420b7bb4378ef1dacc7d7a5c674fddb4b5d2
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   Yoga: daa1e4de4b971b977b23bc842aaa3e135324f1f3

@@ -15,6 +15,9 @@ export default function App() {
   const [linkColorState, setLinkColorState] = React.useState(false);
   const [textFontSizeState, setTextFontSizeState] = React.useState(false);
   const [emojiFontSizeState, setEmojiFontSizeState] = React.useState(false);
+  const [textLineHeightState, setTextLineHeightState] = React.useState(false);
+  const [headingLineHeightState, setHeadingLineHeightState] =
+    React.useState(false);
   const [caretHidden, setCaretHidden] = React.useState(false);
   const [selection, setSelection] = React.useState({start: 0, end: 0});
 
@@ -22,17 +25,23 @@ export default function App() {
     return {
       color: textColorState ? 'gray' : 'black',
       fontSize: textFontSizeState ? 15 : 20,
+      lineHeight: textLineHeightState ? 40 : undefined,
     };
-  }, [textColorState, textFontSizeState]);
+  }, [textColorState, textFontSizeState, textLineHeightState]);
 
-  const markdownStyle = {
-    emoji: {
-      fontSize: emojiFontSizeState ? 15 : 20,
-    },
-    link: {
-      color: linkColorState ? 'red' : 'blue',
-    },
-  };
+  const markdownStyle = React.useMemo(() => {
+    return {
+      emoji: {
+        fontSize: emojiFontSizeState ? 15 : 20,
+      },
+      link: {
+        color: linkColorState ? 'red' : 'blue',
+      },
+      h1: {
+        lineHeight: headingLineHeightState ? 60 : undefined,
+      },
+    };
+  }, [emojiFontSizeState, linkColorState, headingLineHeightState]);
 
   const ref = React.useRef<MarkdownTextInput>(null);
 
@@ -117,6 +126,16 @@ export default function App() {
       <Button
         title="Toggle emoji font size"
         onPress={() => setEmojiFontSizeState(prev => !prev)}
+      />
+      <Button
+        title={`${textLineHeightState ? 'Disable' : 'Enable'} text line height`}
+        onPress={() => setTextLineHeightState(prev => !prev)}
+      />
+      <Button
+        title={`${
+          headingLineHeightState ? 'Disable' : 'Enable'
+        } heading line height`}
+        onPress={() => setHeadingLineHeightState(prev => !prev)}
       />
       <Button
         title="Toggle caret hidden"

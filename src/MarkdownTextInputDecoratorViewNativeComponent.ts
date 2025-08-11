@@ -30,6 +30,7 @@ interface MarkdownStyle {
   };
   h1: {
     fontSize: Float;
+    lineHeight: Float;
   };
   blockquote: {
     borderColor: ColorValue;
