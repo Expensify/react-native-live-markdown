@@ -95,7 +95,7 @@
   } else if (type == "mention-user") {
     // TODO: change mention color when it mentions current user
     [attributedString addAttribute:NSForegroundColorAttributeName value:markdownStyle.mentionUserColor range:range];
-    [attributedString addAttribute:NSBackgroundColorAttributeName value:markdownStyle.mentionUserBackgroundColor range:range];
+    [attributedString addAttribute:RCTLiveMarkdownMentionUserAttributeName value:@(YES) range:range];
   } else if (type == "mention-report") {
     [attributedString addAttribute:NSForegroundColorAttributeName value:markdownStyle.mentionReportColor range:range];
     [attributedString addAttribute:NSBackgroundColorAttributeName value:markdownStyle.mentionReportBackgroundColor range:range];

@@ -1,6 +1,7 @@
 #import <RNLiveMarkdown/MarkdownTextLayoutManagerDelegate.h>
 #import <RNLiveMarkdown/BlockquoteTextLayoutFragment.h>
 #import <RNLiveMarkdown/MarkdownFormatter.h>
+#import <RNLiveMarkdown/MentionBorderLayoutFragment.h>
 
 @implementation MarkdownTextLayoutManagerDelegate
 
@@ -13,6 +14,13 @@ API_AVAILABLE(ios(15.0)){
       BlockquoteTextLayoutFragment *textLayoutFragment = [[BlockquoteTextLayoutFragment alloc] initWithTextElement:textElement range:textElement.elementRange];
       textLayoutFragment.markdownUtils = _markdownUtils;
       textLayoutFragment.depth = [depth unsignedIntValue];
+      return textLayoutFragment;
+    }
+
+    NSNumber *isMentionUser = [self.textStorage attribute:RCTLiveMarkdownMentionUserAttributeName atIndex:index effectiveRange:nil];
+    if (isMentionUser) {
+      MentionBorderLayoutFragment *textLayoutFragment = [[MentionBorderLayoutFragment alloc] initWithTextElement:textElement range:textElement.elementRange];
+      textLayoutFragment.markdownUtils = _markdownUtils;
       return textLayoutFragment;
     }
   }
