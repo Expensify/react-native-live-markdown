@@ -1,4 +1,5 @@
 #import <RNLiveMarkdown/MentionBorderLayoutFragment.h>
+#import <RNLiveMarkdown/MarkdownFormatter.h>
 
 static const CGFloat kCornerRadius = 5.0;
 
@@ -13,29 +14,39 @@ static const CGFloat kCornerRadius = 5.0;
     [_markdownUtils.markdownStyle.mentionUserBackgroundColor setFill];
 
     UIBezierPath *fullPath = [UIBezierPath new];
-    NSUInteger lineCount = self.textLineFragments.count;
 
     [self.textLineFragments enumerateObjectsUsingBlock:^(NSTextLineFragment * _Nonnull lineFragment, NSUInteger idx, BOOL * _Nonnull stop) {
         if (lineFragment.characterRange.length == 0) {
             return;
         }
 
-        CGRect lineBounds = lineFragment.typographicBounds;
-        CGRect paddedRect = CGRectInset(lineBounds, 0, 0);
+        NSAttributedString *attributedString = [lineFragment attributedString];
+        NSMutableArray<NSValue *> *rangesWithAttribute = [NSMutableArray array];
+        [attributedString enumerateAttribute:RCTLiveMarkdownMentionUserAttributeName
+                                     inRange:lineFragment.characterRange
+                                     options:0
+                                  usingBlock:^(id value, NSRange range, BOOL *stop) {
+            if ([attributedString attribute:RCTLiveMarkdownMentionUserAttributeName atIndex:range.location effectiveRange:nil]) {
+                [rangesWithAttribute addObject:[NSValue valueWithRange:range]];
+            }
+        }];
 
-        UIRectCorner cornersToRound = 0;
-        if (lineCount == 1) {
-            cornersToRound = UIRectCornerAllCorners;
-        } else if (idx == 0) {
-            cornersToRound = UIRectCornerTopLeft | UIRectCornerBottomLeft;
-        } else if (idx == lineCount - 1) {
-            cornersToRound = UIRectCornerTopRight | UIRectCornerBottomRight;
-        }
+      for (NSValue *rangeValue in rangesWithAttribute) {
+        NSRange range = [rangeValue rangeValue];
+        CGRect lineBounds = lineFragment.typographicBounds;
+
+        CGPoint startLocation = [lineFragment locationForCharacterAtIndex:range.location];
+        CGPoint endLocation = [lineFragment locationForCharacterAtIndex:range.location + range.length];
+        startLocation.y = idx*lineBounds.size.height;
+        CGRect paddedRect = CGRect(startLocation, CGSize(endLocation.x-startLocation.x, lineBounds.size.height));
+
+        UIRectCorner cornersToRound = UIRectCornerAllCorners;
 
         UIBezierPath *linePath = [UIBezierPath bezierPathWithRoundedRect:paddedRect
                                                        byRoundingCorners:cornersToRound
                                                              cornerRadii:CGSizeMake(kCornerRadius, kCornerRadius)];
         [fullPath appendPath:linePath];
+      }
     }];
 
     [fullPath fill];

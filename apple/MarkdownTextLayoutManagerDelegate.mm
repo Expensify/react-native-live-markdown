@@ -17,12 +17,9 @@ API_AVAILABLE(ios(15.0)){
       return textLayoutFragment;
     }
 
-    NSNumber *isMentionUser = [self.textStorage attribute:RCTLiveMarkdownMentionUserAttributeName atIndex:index effectiveRange:nil];
-    if (isMentionUser) {
-      MentionBorderLayoutFragment *textLayoutFragment = [[MentionBorderLayoutFragment alloc] initWithTextElement:textElement range:textElement.elementRange];
-      textLayoutFragment.markdownUtils = _markdownUtils;
-      return textLayoutFragment;
-    }
+    MentionBorderLayoutFragment *textLayoutFragment = [[MentionBorderLayoutFragment alloc] initWithTextElement:textElement range:textElement.elementRange];
+    textLayoutFragment.markdownUtils = _markdownUtils;
+    return textLayoutFragment;
   }
   return [[NSTextLayoutFragment alloc] initWithTextElement:textElement range:textElement.elementRange];
 }
