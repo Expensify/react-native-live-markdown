@@ -40,15 +40,15 @@ test.describe('markdown content styling', () => {
   });
 
   test('mention-here', async ({page}) => {
-    await testMarkdownContentStyle({testContent: 'here', style: 'color: green; background-color: lime;', page});
+    await testMarkdownContentStyle({testContent: 'here', style: 'color: green; background-color: lime; border-radius: 5px;', page});
   });
 
   test('mention-user', async ({page}) => {
-    await testMarkdownContentStyle({testContent: 'someone@swmansion.com', style: 'color: blue; background-color: cyan;', page});
+    await testMarkdownContentStyle({testContent: 'someone@swmansion.com', style: 'color: blue; background-color: cyan; border-radius: 5px;', page});
   });
 
   test('mention-report', async ({page}) => {
-    await testMarkdownContentStyle({testContent: 'mention-report', style: 'color: red; background-color: pink;', page});
+    await testMarkdownContentStyle({testContent: 'mention-report', style: 'color: red; background-color: pink; border-radius: 5px;', page});
   });
 
   test('blockquote', async ({page, browserName}) => {

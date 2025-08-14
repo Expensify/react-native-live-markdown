@@ -4,11 +4,10 @@
 NS_ASSUME_NONNULL_BEGIN
 
 API_AVAILABLE(ios(15.0))
-@interface BlockquoteTextLayoutFragment : NSTextLayoutFragment
+@interface MarkdownTextLayoutFragment : NSTextLayoutFragment
 
 @property (nonnull, atomic) RCTMarkdownUtils *markdownUtils;
-
-@property NSUInteger depth;
+@property (nonnull, atomic) NSNumber* depth;
 
 @end
 

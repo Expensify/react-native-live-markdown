@@ -8,6 +8,8 @@ const NSAttributedStringKey RCTLiveMarkdownTextAttributeName = @"RCTLiveMarkdown
 
 const NSAttributedStringKey RCTLiveMarkdownBlockquoteDepthAttributeName = @"RCTLiveMarkdownBlockquoteDepth";
 
+const NSAttributedStringKey RCTLiveMarkdownMentionAttributeName = @"RCTLiveMarkdownMention";
+
 @interface MarkdownFormatter : NSObject
 
 - (void)formatAttributedString:(nonnull NSMutableAttributedString *)attributedString
