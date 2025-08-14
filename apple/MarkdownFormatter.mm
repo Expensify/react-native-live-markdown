@@ -91,14 +91,35 @@
     [attributedString addAttribute:NSBackgroundColorAttributeName value:markdownStyle.codeBackgroundColor range:range];
   } else if (type == "mention-here") {
     [attributedString addAttribute:NSForegroundColorAttributeName value:markdownStyle.mentionHereColor range:range];
-    [attributedString addAttribute:NSBackgroundColorAttributeName value:markdownStyle.mentionHereBackgroundColor range:range];
+    if (@available(iOS 16.0, *)) {
+      [attributedString addAttribute:RCTLiveMarkdownMentionAttributeName
+                               value:@{@"backgroundColor": markdownStyle.mentionHereBackgroundColor,
+                                       @"cornerRadius": @(markdownStyle.mentionHereBorderRadius)}
+                               range:range];
+    } else {
+      [attributedString addAttribute:NSBackgroundColorAttributeName value:markdownStyle.mentionHereBackgroundColor range:range];
+    }
   } else if (type == "mention-user") {
     // TODO: change mention color when it mentions current user
     [attributedString addAttribute:NSForegroundColorAttributeName value:markdownStyle.mentionUserColor range:range];
-    [attributedString addAttribute:RCTLiveMarkdownMentionUserAttributeName value:@(YES) range:range];
+    if (@available(iOS 16.0, *)) {
+      [attributedString addAttribute:RCTLiveMarkdownMentionAttributeName
+                               value:@{@"backgroundColor": markdownStyle.mentionUserBackgroundColor,
+                                       @"cornerRadius": @(markdownStyle.mentionUserBorderRadius)}
+                               range:range];
+    } else {
+      [attributedString addAttribute:NSBackgroundColorAttributeName value:markdownStyle.mentionUserBackgroundColor range:range];
+    }
   } else if (type == "mention-report") {
     [attributedString addAttribute:NSForegroundColorAttributeName value:markdownStyle.mentionReportColor range:range];
-    [attributedString addAttribute:NSBackgroundColorAttributeName value:markdownStyle.mentionReportBackgroundColor range:range];
+    if (@available(iOS 16.0, *)) {
+      [attributedString addAttribute:RCTLiveMarkdownMentionAttributeName
+                               value:@{@"backgroundColor": markdownStyle.mentionReportBackgroundColor,
+                                       @"cornerRadius": @(markdownStyle.mentionReportBorderRadius)}
+                               range:range];
+    } else {
+      [attributedString addAttribute:NSBackgroundColorAttributeName value:markdownStyle.mentionReportBackgroundColor range:range];
+    }
   } else if (type == "link") {
     [attributedString addAttribute:NSUnderlineStyleAttributeName value:[NSNumber numberWithInteger:NSUnderlineStyleSingle] range:range];
     [attributedString addAttribute:NSForegroundColorAttributeName value:markdownStyle.linkColor range:range];
