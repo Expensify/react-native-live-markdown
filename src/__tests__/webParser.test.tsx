@@ -296,3 +296,41 @@ describe('trailing whitespace', () => {
     });
   });
 });
+
+describe('strikethrough with blockquote combinations', () => {
+  test('strikethrough spanning over blockquote text', () => {
+    expect('~test\n> test\ntest~').toBeParsedAsHTML(
+      '<p data-type="line" data-id="0"><span data-type="syntax" data-id="0,0"><span data-type="text" data-id="0,0,0">~</span></span><span data-type="strikethrough" data-id="0,1"><span data-type="text" data-id="0,1,0">test</span></span></p><p data-type="line" data-id="1"><span data-type="strikethrough" data-id="1,0"><span data-type="blockquote" style="text-decoration: line-through;" data-id="1,0,0"><span data-type="syntax" data-id="1,0,0,0"><span data-type="text" data-id="1,0,0,0,0">&gt;</span></span><span data-type="text" data-id="1,0,0,1"> test</span></span></span></p><p data-type="line" data-id="2"><span data-type="strikethrough" data-id="2,0"><span data-type="text" data-id="2,0,0">test</span><span data-type="syntax" data-id="2,0,1"><span data-type="text" data-id="2,0,1,0">~</span></span></span></p>',
+    );
+  });
+
+  test('single line strikethrough with blockquote inside', () => {
+    expect('~> test content~').toBeParsedAsHTML(
+      '<p data-type="line" data-id="0"><span data-type="syntax" data-id="0,0"><span data-type="text" data-id="0,0,0">~</span></span><span data-type="strikethrough" data-id="0,1"><span data-type="text" data-id="0,1,0">&gt; test content</span></span><span data-type="syntax" data-id="0,2"><span data-type="text" data-id="0,2,0">~</span></span></p>',
+    );
+  });
+
+  test('multiple blockquotes within strikethrough - not valid strikethrough', () => {
+    expect('~> first quote\n> second quote~').toBeParsedAsHTML(
+      '<p data-type="line" data-id="0"><span data-type="text" data-id="0,0">~&gt; first quote</span></p><p data-type="line" data-id="1"><span data-type="blockquote" data-id="1,0"><span data-type="syntax" data-id="1,0,0"><span data-type="text" data-id="1,0,0,0">&gt;</span></span><span data-type="text" data-id="1,0,1"> second quote~</span></span></p>',
+    );
+  });
+
+  test('strikethrough not fully encompassing blockquote - not valid strikethrough', () => {
+    expect('~test\n> not struck~ more').toBeParsedAsHTML(
+      '<p data-type="line" data-id="0"><span data-type="text" data-id="0,0">~test</span></p><p data-type="line" data-id="1"><span data-type="blockquote" data-id="1,0"><span data-type="syntax" data-id="1,0,0"><span data-type="text" data-id="1,0,0,0">&gt;</span></span><span data-type="text" data-id="1,0,1"> not struck~ more</span></span></p>',
+    );
+  });
+
+  test('nested blockquotes within strikethrough', () => {
+    expect('~>> nested quote~').toBeParsedAsHTML(
+      '<p data-type="line" data-id="0"><span data-type="syntax" data-id="0,0"><span data-type="text" data-id="0,0,0">~</span></span><span data-type="strikethrough" data-id="0,1"><span data-type="text" data-id="0,1,0">&gt;&gt; nested quote</span></span><span data-type="syntax" data-id="0,2"><span data-type="text" data-id="0,2,0">~</span></span></p>',
+    );
+  });
+
+  test('blockquote with other formatting inside strikethrough', () => {
+    expect('~> *bold* and _italic_~').toBeParsedAsHTML(
+      '<p data-type="line" data-id="0"><span data-type="syntax" data-id="0,0"><span data-type="text" data-id="0,0,0">~</span></span><span data-type="strikethrough" data-id="0,1"><span data-type="text" data-id="0,1,0">&gt; </span><span data-type="syntax" data-id="0,1,1"><span data-type="text" data-id="0,1,1,0">*</span></span><span data-type="bold" data-id="0,1,2"><span data-type="text" data-id="0,1,2,0">bold</span></span><span data-type="syntax" data-id="0,1,3"><span data-type="text" data-id="0,1,3,0">*</span></span><span data-type="text" data-id="0,1,4"> and </span><span data-type="syntax" data-id="0,1,5"><span data-type="text" data-id="0,1,5,0">_</span></span><span data-type="italic" data-id="0,1,6"><span data-type="text" data-id="0,1,6,0">italic</span></span><span data-type="syntax" data-id="0,1,7"><span data-type="text" data-id="0,1,7,0">_</span></span></span><span data-type="syntax" data-id="0,2"><span data-type="text" data-id="0,2,0">~</span></span></p>',
+    );
+  });
+});
