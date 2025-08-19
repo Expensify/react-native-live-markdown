@@ -236,7 +236,6 @@ function parseRangesToHTMLNodes(
 
     lastRangeEndIndex = line.start;
     const lineMarkdownRanges = line.markdownRanges;
-    const parsedLineMarkdownRanges = [] as MarkdownRange[];
     // go through all markdown ranges in the line
     while (lineMarkdownRanges.length > 0) {
       const range = lineMarkdownRanges.shift();
@@ -265,12 +264,6 @@ function parseRangesToHTMLNodes(
 
       if (!disableInlineStyles) {
         addStyleToBlock(span, range.type, markdownStyle, isMultiline);
-      }
-      if (
-        range.type === 'blockquote' &&
-        parsedLineMarkdownRanges.some((prevLine) => prevLine.type === 'strikethrough' && prevLine.start <= range.start && prevLine.length + prevLine.start >= range.start + range.length)
-      ) {
-        addStyleToBlock(span, 'strikethrough', markdownStyle, isMultiline);
       }
 
       const spanNode = appendNode(span, currentParentNode, range.type, range.length);
@@ -304,7 +297,6 @@ function parseRangesToHTMLNodes(
           currentParentNode = currentParentNode.parentNode || rootNode;
         }
       }
-      parsedLineMarkdownRanges.push(range);
     }
   }
 
