@@ -62,17 +62,17 @@ function makeDefaultMarkdownStyle(): MarkdownStyle {
     mentionHere: {
       color: 'green',
       backgroundColor: 'lime',
-      borderRadius: 5.0,
+      borderRadius: 5,
     },
     mentionUser: {
       color: 'blue',
       backgroundColor: 'cyan',
-      borderRadius: 5.0,
+      borderRadius: 5,
     },
     mentionReport: {
       color: 'red',
       backgroundColor: 'pink',
-      borderRadius: 5.0,
+      borderRadius: 5,
     },
     inlineImage: {
       minWidth: 50,

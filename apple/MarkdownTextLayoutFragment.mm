@@ -1,11 +1,14 @@
 #import <RNLiveMarkdown/MarkdownTextLayoutFragment.h>
 
+@implementation RCTMarkdownTextBackgroundWithRange
+@end
+
 @implementation MarkdownTextLayoutFragment
 
 #pragma mark - overriding class methods
 
 - (CGRect)renderingSurfaceBounds {
-  if (self.depth == nil) {
+  if (self.depth == 0) {
     return [super renderingSurfaceBounds];
   }
   return CGRectUnion(self.boundingRect, [super renderingSurfaceBounds]);
@@ -17,7 +20,7 @@
     return;
   }
   
-  [self drawRibbon];
+  [self drawBlockquoteRibbons];
   [self drawMentions];
   
   [super drawAtPoint:point inContext:ctx];
@@ -25,8 +28,8 @@
 
 #pragma mark - drawing custom elements
 
-- (void)drawRibbon {
-  if (self.depth == nil) {
+- (void)drawBlockquoteRibbons {
+  if (self.depth == 0) {
     return;
   }
   
@@ -38,14 +41,17 @@
   [_markdownUtils.markdownStyle.blockquoteBorderColor setFill];
   
   CGRect boundingRect = self.boundingRect;
-  for (NSUInteger i = 0; i < [_depth unsignedIntValue]; ++i) {
-    CGRect ribbonRect = CGRectMake(boundingRect.origin.x + i * shift, boundingRect.origin.y, borderWidth, boundingRect.size.height);
+  for (NSUInteger level = 0; level < _depth; ++level) {
+    CGFloat x = boundingRect.origin.x + level * shift;
+    CGRect ribbonRect = CGRectMake(x, boundingRect.origin.y, borderWidth, boundingRect.size.height);
     UIRectFill(ribbonRect);
   }
 }
 
 - (void)drawMentions {
-  NSMutableArray<RCTMarkdownTextBackgroundWithRange *> *mentions = [self getMentions];
+  if (self.mentions.count == 0) {
+    return;
+  }
   
   [self.textLineFragments enumerateObjectsUsingBlock:^(NSTextLineFragment * _Nonnull lineFragment, NSUInteger idx, BOOL * _Nonnull stop) {
     if (lineFragment.characterRange.length == 0) {
@@ -53,36 +59,37 @@
     }
     
     CGRect lineBounds = lineFragment.typographicBounds;
-    for (RCTMarkdownTextBackgroundWithRange *mention in mentions) {
+    for (RCTMarkdownTextBackgroundWithRange *mention in self.mentions) {
       NSRange intersection = NSIntersectionRange(lineFragment.characterRange, mention.range);
       if (intersection.length == 0) {
         continue;
       }
       
-      BOOL isStart = (intersection.location == mention.range.location);
-      BOOL isEnd = (NSMaxRange(intersection) == NSMaxRange(mention.range));
-      
       CGPoint startLocation = [lineFragment locationForCharacterAtIndex:intersection.location];
       CGPoint endLocation = [lineFragment locationForCharacterAtIndex:intersection.location + intersection.length];
+      CGFloat width = endLocation.x - startLocation.x;
       
-      CGRect paddedRect = CGRectMake(startLocation.x,
-                                     lineBounds.origin.y,
-                                     endLocation.x - startLocation.x,
-                                     lineBounds.size.height);
+      CGRect backgroundRect = CGRectMake(startLocation.x,
+                                         lineBounds.origin.y,
+                                         width,
+                                         lineBounds.size.height);
       
+      BOOL isStart = (intersection.location == mention.range.location);
+      BOOL isEnd = (NSMaxRange(intersection) == NSMaxRange(mention.range));
       UIRectCorner cornersToRound = 0;
-      if (isStart && isEnd) {
-        cornersToRound = UIRectCornerAllCorners;
-      } else if (isStart) {
-        cornersToRound = (UIRectCornerTopLeft | UIRectCornerBottomLeft);
-      } else if (isEnd) {
-        cornersToRound = (UIRectCornerTopRight | UIRectCornerBottomRight);
+      if (isStart) {
+        cornersToRound |= UIRectCornerTopLeft | UIRectCornerBottomLeft;
+      }
+      if (isEnd) {
+        cornersToRound |= UIRectCornerTopRight | UIRectCornerBottomRight;
       }
       
-      UIBezierPath *linePath;
-      linePath = [UIBezierPath bezierPathWithRoundedRect:paddedRect
-                                       byRoundingCorners:cornersToRound
-                                             cornerRadii:CGSizeMake(mention.textBackground.cornerRadius, mention.textBackground.cornerRadius)];
+      UIBezierPath *linePath = (cornersToRound == 0)
+      ? [UIBezierPath bezierPathWithRect:backgroundRect]
+      : [UIBezierPath bezierPathWithRoundedRect:backgroundRect
+                              byRoundingCorners:cornersToRound
+                                    cornerRadii:CGSizeMake(mention.textBackground.cornerRadius,
+                                                           mention.textBackground.cornerRadius)];
       
       [mention.textBackground.color setFill];
       [linePath fill];
@@ -111,31 +118,10 @@
   CGFloat paddingLeft = _markdownUtils.markdownStyle.blockquotePaddingLeft;
   CGFloat shift = marginLeft + borderWidth + paddingLeft;
   
-  fragmentTextBounds.origin.x -= (paddingLeft + borderWidth) + shift * ([_depth unsignedIntValue] - 1);
-  fragmentTextBounds.size.width = borderWidth + shift * ([_depth unsignedIntValue] - 1);
+  fragmentTextBounds.origin.x -= (paddingLeft + borderWidth) + shift * (_depth - 1);
+  fragmentTextBounds.size.width = borderWidth + shift * (_depth - 1);
   
   return fragmentTextBounds;
-}
-
-- (NSMutableArray<RCTMarkdownTextBackgroundWithRange *>*)getMentions {
-  NSTextParagraph *paragraph = (NSTextParagraph *)self.textElement;
-  NSAttributedString *attributedString = [paragraph attributedString];
-  
-  NSMutableArray<RCTMarkdownTextBackgroundWithRange *> *mentions = [NSMutableArray array];
-  [attributedString enumerateAttribute:RCTLiveMarkdownTextBackgroundAttributeName
-                               inRange:NSMakeRange(0, attributedString.length)
-                               options:0
-                            usingBlock:^(id value, NSRange range, BOOL *stop) {
-    if (value) {
-      RCTMarkdownTextBackgroundWithRange *textBackgroundWithRange = [[RCTMarkdownTextBackgroundWithRange alloc] init];
-      textBackgroundWithRange.textBackground = value;
-      textBackgroundWithRange.range = range;
-      
-      [mentions addObject:textBackgroundWithRange];
-    }
-  }];
-  
-  return mentions;
 }
 
 @end
