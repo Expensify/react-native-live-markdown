@@ -26,7 +26,7 @@ API_AVAILABLE(ios(15.0)){
   NSAttributedString *attributedString = [paragraph attributedString];
   
   __block BOOL hasMention = NO;
-  [attributedString enumerateAttribute:RCTLiveMarkdownMentionAttributeName
+  [attributedString enumerateAttribute:RCTLiveMarkdownTextBackgroundAttributeName
                                inRange:NSMakeRange(0, attributedString.length)
                                options:0
                             usingBlock:^(id value, NSRange range, BOOL *stop) {
