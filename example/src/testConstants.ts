@@ -6,6 +6,7 @@ const EXAMPLE_CONTENT = [
   'https://expensify.com',
   '# header1',
   '> blockquote',
+  '~sb\n*sbb\n_sbi\n> strikethrough_blockquote\nsbi_\nsbb*\nsb~',
   '`inline code`',
   '```\ncodeblock\n```',
   '@here',

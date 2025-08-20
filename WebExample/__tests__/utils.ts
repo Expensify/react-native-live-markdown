@@ -103,4 +103,29 @@ const testMarkdownContentStyle = async ({testContent, style, page, dimmensions}:
   }
 };
 
-export {setupInput, getCursorPosition, setCursorPosition, getElementStyle, pressCmd, getElementValue, changeMarkdownStyle, setSelection, testMarkdownContentStyle};
+const testMarkdownElementHasComputedStyle = async ({testContent, propertyName, style, page}: {testContent: string; propertyName: string; style: string; page: Page}) => {
+  const inputLocator = await setupInput(page);
+
+  const elementHandle = inputLocator.locator('span', {hasText: testContent}).last();
+
+  let elementStyle;
+  if (elementHandle) {
+    await elementHandle.waitFor({state: 'attached'});
+    elementStyle = await elementHandle.evaluate((el, property) => window.getComputedStyle(el).getPropertyValue(property), propertyName);
+  }
+
+  expect(elementStyle).toEqual(style);
+};
+
+export {
+  setupInput,
+  getCursorPosition,
+  setCursorPosition,
+  getElementStyle,
+  pressCmd,
+  getElementValue,
+  changeMarkdownStyle,
+  setSelection,
+  testMarkdownContentStyle,
+  testMarkdownElementHasComputedStyle,
+};

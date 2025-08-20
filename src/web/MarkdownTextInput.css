@@ -76,3 +76,7 @@
   -ms-user-select: none;
   user-select: none;
 }
+
+[class^='react-native-live-markdown-input'] [data-type='strikethrough'] * {
+  text-decoration: inherit;
+}
