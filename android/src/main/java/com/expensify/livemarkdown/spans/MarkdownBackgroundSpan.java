@@ -16,11 +16,11 @@ public class MarkdownBackgroundSpan implements MarkdownSpan, LineBackgroundSpan 
   private final int backgroundColor;
   private final int mentionStart;
   private final int mentionEnd;
-  private final float cornerRadius;
+  private final float borderRadius;
 
   public MarkdownBackgroundSpan(@ColorInt int backgroundColor, float borderRadius, int mentionStart, int mentionEnd) {
     this.backgroundColor = backgroundColor;
-    this.cornerRadius = borderRadius;
+    this.borderRadius = borderRadius;
     this.mentionStart = mentionStart;
     this.mentionEnd = mentionEnd;
   }
@@ -73,13 +73,13 @@ public class MarkdownBackgroundSpan implements MarkdownSpan, LineBackgroundSpan 
     float[] radii = new float[8];
 
     if (roundedLeft) {
-      radii[0] = radii[1] = cornerRadius; // top-left
-      radii[6] = radii[7] = cornerRadius; // bottom-left
+      radii[0] = radii[1] = borderRadius; // top-left
+      radii[6] = radii[7] = borderRadius; // bottom-left
     }
 
     if (roundedRight) {
-      radii[2] = radii[3] = cornerRadius; // top-right
-      radii[4] = radii[5] = cornerRadius; // bottom-right
+      radii[2] = radii[3] = borderRadius; // top-right
+      radii[4] = radii[5] = borderRadius; // bottom-right
     }
 
     return radii;
