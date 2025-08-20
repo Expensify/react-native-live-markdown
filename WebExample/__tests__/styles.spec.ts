@@ -1,7 +1,7 @@
 import {test} from '@playwright/test';
 // eslint-disable-next-line import/no-relative-packages
 import * as TEST_CONST from '../../example/src/testConstants';
-import {testMarkdownContentStyle} from './utils';
+import {testMarkdownContentStyle, testMarkdownElementHasComputedStyle} from './utils';
 
 test.beforeEach(async ({page}) => {
   await page.goto(TEST_CONST.LOCAL_URL, {waitUntil: 'load'});
@@ -59,5 +59,16 @@ test.describe('markdown content styling', () => {
     const browserStyle = browserName === 'firefox' ? blockquoteStyle.replace('border-left-style: solid', 'border-left: 6px solid gray') : blockquoteStyle;
 
     await testMarkdownContentStyle({testContent: 'blockquote', style: browserStyle, page});
+  });
+
+  test('blockquote with strikethrough', async ({page, browserName}) => {
+    let blockquoteStyle = 'line-through';
+    if (browserName === 'firefox') {
+      blockquoteStyle = 'line-through rgb(0, 0, 0)';
+    } else if (browserName === 'chromium') {
+      blockquoteStyle = 'line-through solid rgb(0, 0, 0)';
+    }
+
+    await testMarkdownElementHasComputedStyle({testContent: 'strikethrough_blockquote', propertyName: 'text-decoration', style: blockquoteStyle, page});
   });
 });
