@@ -1,13 +1,8 @@
 #import <RNLiveMarkdown/RCTMarkdownUtils.h>
-#import <RNLiveMarkdown/MarkdownFormatter.h>
+#import <RNLiveMarkdown/RCTMarkdownTextBackgroundUtils.h>
 #import <UIKit/UIKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
-
-@interface RCTMarkdownTextBackgroundWithRange : NSObject
-@property (nonnull, atomic) RCTMarkdownTextBackground *textBackground;
-@property NSRange range;
-@end
 
 API_AVAILABLE(ios(15.0))
 @interface MarkdownTextLayoutFragment : NSTextLayoutFragment

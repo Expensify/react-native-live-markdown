@@ -1,7 +1,5 @@
 #import <RNLiveMarkdown/MarkdownTextLayoutFragment.h>
-
-@implementation RCTMarkdownTextBackgroundWithRange
-@end
+#import <RNLiveMarkdown/RCTMarkdownTextBackgroundUtils.h>
 
 @implementation MarkdownTextLayoutFragment
 

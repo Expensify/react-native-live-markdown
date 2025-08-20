@@ -1,6 +1,7 @@
 #import <RNLiveMarkdown/MarkdownTextLayoutManagerDelegate.h>
 #import <RNLiveMarkdown/MarkdownTextLayoutFragment.h>
 #import <RNLiveMarkdown/MarkdownFormatter.h>
+#import <RNLiveMarkdown/RCTMarkdownTextBackgroundUtils.h>
 
 @implementation MarkdownTextLayoutManagerDelegate
 

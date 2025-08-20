@@ -7,10 +7,6 @@ NS_ASSUME_NONNULL_BEGIN
 const NSAttributedStringKey RCTLiveMarkdownTextAttributeName = @"RCTLiveMarkdownText";
 
 const NSAttributedStringKey RCTLiveMarkdownTextBackgroundAttributeName = @"RCTLiveMarkdownTextBackground";
-@interface RCTMarkdownTextBackground : NSObject
-  @property (nonatomic, strong) UIColor *color;
-  @property (nonatomic, assign) CGFloat cornerRadius;
-@end
 
 const NSAttributedStringKey RCTLiveMarkdownBlockquoteDepthAttributeName = @"RCTLiveMarkdownBlockquoteDepth";
 

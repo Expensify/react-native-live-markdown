@@ -1,8 +1,6 @@
 #import "MarkdownFormatter.h"
 #import <React/RCTFont.h>
-
-@implementation RCTMarkdownTextBackground
-@end
+#import <RNLiveMarkdown/RCTMarkdownTextBackgroundUtils.h>
 
 @implementation MarkdownFormatter
 
