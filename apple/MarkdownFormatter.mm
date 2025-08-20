@@ -95,7 +95,7 @@
     if (@available(iOS 16.0, *)) {
       RCTMarkdownTextBackground *textBackground = [[RCTMarkdownTextBackground alloc] init];
       textBackground.color = markdownStyle.mentionHereBackgroundColor;
-      textBackground.cornerRadius = markdownStyle.mentionHereBorderRadius;
+      textBackground.borderRadius = markdownStyle.mentionHereBorderRadius;
       
       [attributedString addAttribute:RCTLiveMarkdownTextBackgroundAttributeName
                                value:textBackground
@@ -109,7 +109,7 @@
     if (@available(iOS 16.0, *)) {
       RCTMarkdownTextBackground *textBackground = [[RCTMarkdownTextBackground alloc] init];
       textBackground.color = markdownStyle.mentionUserBackgroundColor;
-      textBackground.cornerRadius = markdownStyle.mentionUserBorderRadius;
+      textBackground.borderRadius = markdownStyle.mentionUserBorderRadius;
       
       [attributedString addAttribute:RCTLiveMarkdownTextBackgroundAttributeName
                                value:textBackground
@@ -122,7 +122,7 @@
     if (@available(iOS 16.0, *)) {
       RCTMarkdownTextBackground *textBackground = [[RCTMarkdownTextBackground alloc] init];
       textBackground.color = markdownStyle.mentionReportBackgroundColor;
-      textBackground.cornerRadius = markdownStyle.mentionReportBorderRadius;
+      textBackground.borderRadius = markdownStyle.mentionReportBorderRadius;
       
       [attributedString addAttribute:RCTLiveMarkdownTextBackgroundAttributeName
                                value:textBackground

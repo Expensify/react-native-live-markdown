@@ -4,7 +4,7 @@
 
 @property (nonatomic, strong) UIColor *color;
 
-@property (nonatomic, assign) CGFloat cornerRadius;
+@property (nonatomic, assign) CGFloat borderRadius;
 
 @end
 

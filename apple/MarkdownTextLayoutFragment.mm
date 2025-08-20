@@ -86,8 +86,8 @@
       ? [UIBezierPath bezierPathWithRect:backgroundRect]
       : [UIBezierPath bezierPathWithRoundedRect:backgroundRect
                               byRoundingCorners:cornersToRound
-                                    cornerRadii:CGSizeMake(mention.textBackground.cornerRadius,
-                                                           mention.textBackground.cornerRadius)];
+                                    cornerRadii:CGSizeMake(mention.textBackground.borderRadius,
+                                                           mention.textBackground.borderRadius)];
       
       [mention.textBackground.color setFill];
       [linePath fill];
