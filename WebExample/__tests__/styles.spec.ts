@@ -78,9 +78,12 @@ test.describe('empty input styling', () => {
     await page.click('[data-testid="clear"]');
   });
 
-  test('empty input should have a placeholder', async ({page}) => {
+  test('placeholder should have correct text', async ({page}) => {
     const placeholder = await page.$eval(`div#${TEST_CONST.INPUT_ID}`, (el) => el.getAttribute('placeholder'));
     expect(placeholder).toBe('Type here...');
+  });
+
+  test('empty input should have visible placeholder', async ({page}) => {
     const inputLocator = await setupInput(page);
 
     const beforeContent = await inputLocator.evaluate((el) => {
