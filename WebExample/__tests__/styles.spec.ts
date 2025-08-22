@@ -1,4 +1,4 @@
-import {test} from '@playwright/test';
+import {test, expect} from '@playwright/test';
 // eslint-disable-next-line import/no-relative-packages
 import * as TEST_CONST from '../../example/src/testConstants';
 import {testMarkdownContentStyle, testMarkdownElementHasComputedStyle} from './utils';
@@ -70,5 +70,16 @@ test.describe('markdown content styling', () => {
     }
 
     await testMarkdownElementHasComputedStyle({testContent: 'strikethrough_blockquote', propertyName: 'text-decoration', style: blockquoteStyle, page});
+  });
+});
+
+test.describe('empty input styling', () => {
+  test.beforeEach(async ({page}) => {
+    await page.click('[data-testid="clear"]');
+  });
+
+  test('empty input should have a placeholder', async ({page}) => {
+    const placeholder = await page.$eval(`div#${TEST_CONST.INPUT_ID}`, (el) => el.getAttribute('placeholder'));
+    expect(placeholder).toBe('Type here...');
   });
 });
