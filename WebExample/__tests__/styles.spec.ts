@@ -1,7 +1,7 @@
 import {test, expect} from '@playwright/test';
 // eslint-disable-next-line import/no-relative-packages
 import * as TEST_CONST from '../../example/src/testConstants';
-import {testMarkdownContentStyle, testMarkdownElementHasComputedStyle} from './utils';
+import {setupInput, testMarkdownContentStyle, testMarkdownElementHasComputedStyle} from './utils';
 
 test.beforeEach(async ({page}) => {
   await page.goto(TEST_CONST.LOCAL_URL, {waitUntil: 'load'});
@@ -81,5 +81,15 @@ test.describe('empty input styling', () => {
   test('empty input should have a placeholder', async ({page}) => {
     const placeholder = await page.$eval(`div#${TEST_CONST.INPUT_ID}`, (el) => el.getAttribute('placeholder'));
     expect(placeholder).toBe('Type here...');
+    const inputLocator = await setupInput(page);
+
+    const beforeContent = await inputLocator.evaluate((el) => {
+      return window.getComputedStyle(el, '::before').getPropertyValue('content');
+    });
+
+    expect([
+      '"Type here..."', // Chromium/WebKit, resolves attr()
+      'attr(placeholder)', // Firefox, literal
+    ]).toContain(beforeContent);
   });
 });
