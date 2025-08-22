@@ -66,8 +66,9 @@
       CGPoint startLocation = [lineFragment locationForCharacterAtIndex:intersection.location];
       CGPoint endLocation = [lineFragment locationForCharacterAtIndex:intersection.location + intersection.length];
       CGFloat width = endLocation.x - startLocation.x;
+      CGFloat x = lineBounds.origin.x + startLocation.x;
       
-      CGRect backgroundRect = CGRectMake(startLocation.x,
+      CGRect backgroundRect = CGRectMake(x,
                                          lineBounds.origin.y,
                                          width,
                                          lineBounds.size.height);
