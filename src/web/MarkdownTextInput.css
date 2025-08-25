@@ -30,6 +30,13 @@
   padding-right: 1px !important;
 }
 
+.react-native-live-markdown-input-singleline:empty::before,
+.react-native-live-markdown-input-multiline:empty::before {
+  pointer-events: none;
+  display: block; /* For Firefox */
+  content: attr(placeholder);
+}
+
 .react-native-live-markdown-input-multiline *[data-type='pre'] {
   line-height: 1.3;
   display: block;

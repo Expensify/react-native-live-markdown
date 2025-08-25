@@ -1,7 +1,7 @@
-import {test} from '@playwright/test';
+import {test, expect} from '@playwright/test';
 // eslint-disable-next-line import/no-relative-packages
 import * as TEST_CONST from '../../example/src/testConstants';
-import {testMarkdownContentStyle, testMarkdownElementHasComputedStyle} from './utils';
+import {setupInput, testMarkdownContentStyle, testMarkdownElementHasComputedStyle} from './utils';
 
 test.beforeEach(async ({page}) => {
   await page.goto(TEST_CONST.LOCAL_URL, {waitUntil: 'load'});
@@ -70,5 +70,29 @@ test.describe('markdown content styling', () => {
     }
 
     await testMarkdownElementHasComputedStyle({testContent: 'strikethrough_blockquote', propertyName: 'text-decoration', style: blockquoteStyle, page});
+  });
+});
+
+test.describe('empty input styling', () => {
+  test.beforeEach(async ({page}) => {
+    await page.click('[data-testid="clear"]');
+  });
+
+  test('placeholder should have correct text', async ({page}) => {
+    const placeholder = await page.$eval(`div#${TEST_CONST.INPUT_ID}`, (el) => el.getAttribute('placeholder'));
+    expect(placeholder).toBe('Type here...');
+  });
+
+  test('empty input should have visible placeholder', async ({page}) => {
+    const inputLocator = await setupInput(page);
+
+    const beforeContent = await inputLocator.evaluate((el) => {
+      return window.getComputedStyle(el, '::before').getPropertyValue('content');
+    });
+
+    expect([
+      '"Type here..."', // Chromium/WebKit, resolves attr()
+      'attr(placeholder)', // Firefox, literal
+    ]).toContain(beforeContent);
   });
 });
