@@ -43,14 +43,21 @@ public class MarkdownBackgroundSpan implements MarkdownSpan, LineBackgroundSpan 
     int end,
     int lnum
   ) {
-    if (layout == null || layout.getText() != text || layout.getWidth() != right || layout.getLineEnd(0) != end) {
-      layout = StaticLayout.Builder.obtain(text, start, end, (TextPaint) paint, right).build();
+    int lineStart = 0;
+    int lineEnd = end - start;
+    CharSequence lineText = text.subSequence(start, end);
+    if (layout == null || layout.getText() != lineText || layout.getWidth() != right || layout.getLineEnd(0) != lineEnd) {
+      // Create layout for the current line only
+      layout = StaticLayout.Builder.obtain(lineText, lineStart, lineEnd, (TextPaint) paint, right).build();
 
-      boolean mentionStarts = start <= mentionStart;
-      boolean mentionEnds = end >= mentionEnd;
+      int relativeMentionStart = mentionStart - start;
+      int relativeMentionEnd = mentionEnd - start;
 
-      float startX = layout.getPrimaryHorizontal(mentionStarts ? mentionStart : start);
-      float endX = layout.getPrimaryHorizontal(mentionEnds ? mentionEnd : end);
+      boolean mentionStarts = lineStart <= relativeMentionStart;
+      boolean mentionEnds = lineEnd >= relativeMentionEnd;
+
+      float startX = layout.getPrimaryHorizontal(mentionStarts ? relativeMentionStart: lineStart);
+      float endX = layout.getPrimaryHorizontal(mentionEnds ? relativeMentionEnd : lineEnd);
 
       RectF lineRect = new RectF(startX, top, endX, bottom);
       backgroundPath.reset();
