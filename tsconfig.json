@@ -27,5 +27,5 @@
     "typeRoots": ["node_modules/@types"]
   },
   "include": ["src/**/*", "mock/**/*"],
-  "exclude": ["**/node_modules/**/*", "**/lib/**/*", "example/src/**/*", "WebExample/**/*"]
+  "exclude": ["**/node_modules/**/*", "**/lib/**/*", "example/src/**/*", "WebExample/**/*", "**/Pods"]
 }
