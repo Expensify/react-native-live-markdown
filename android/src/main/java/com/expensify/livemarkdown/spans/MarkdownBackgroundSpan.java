@@ -4,8 +4,8 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
-import android.text.Spanned;
-import android.text.style.LeadingMarginSpan;
+import android.text.StaticLayout;
+import android.text.TextPaint;
 import android.text.style.LineBackgroundSpan;
 
 import androidx.annotation.ColorInt;
@@ -18,11 +18,15 @@ public class MarkdownBackgroundSpan implements MarkdownSpan, LineBackgroundSpan 
   private final int mentionEnd;
   private final float borderRadius;
 
+  private StaticLayout layout;
+  private Path backgroundPath;
+
   public MarkdownBackgroundSpan(@ColorInt int backgroundColor, float borderRadius, int mentionStart, int mentionEnd) {
     this.backgroundColor = backgroundColor;
     this.borderRadius = borderRadius;
     this.mentionStart = mentionStart;
     this.mentionEnd = mentionEnd;
+    this.backgroundPath = new Path();
   }
 
   @Override
@@ -39,34 +43,26 @@ public class MarkdownBackgroundSpan implements MarkdownSpan, LineBackgroundSpan 
     int end,
     int lnum
   ) {
-    int leadingMargin = getLeadingMargin(text, start, end);
+    if (layout == null || layout.getText() != text || layout.getWidth() != right || layout.getLineEnd(0) != end) {
+      layout = StaticLayout.Builder.obtain(text, start, end, (TextPaint) paint, right).build();
 
-    boolean mentionStarts = start <= mentionStart;
-    boolean mentionEnds = end >= mentionEnd;
+      boolean mentionStarts = start <= mentionStart;
+      boolean mentionEnds = end >= mentionEnd;
 
-    float startX = leadingMargin + (mentionStarts ? paint.measureText(text, start, mentionStart) : 0);
-    float endX = leadingMargin + paint.measureText(text, start, mentionEnds ? mentionEnd : end);
+      float startX = layout.getPrimaryHorizontal(mentionStarts ? mentionStart : start);
+      float endX = layout.getPrimaryHorizontal(mentionEnds ? mentionEnd : end);
+
+      RectF lineRect = new RectF(startX, top, endX, bottom);
+      backgroundPath.reset();
+      backgroundPath.addRoundRect(lineRect, createRadii(mentionStarts, mentionEnds), Path.Direction.CW);
+    }
 
     int originalColor = paint.getColor();
     paint.setColor(backgroundColor);
 
-    RectF lineRect = new RectF(startX, top, endX, bottom);
-    Path backgroundPath = new Path();
-    backgroundPath.addRoundRect(lineRect, createRadii(mentionStarts, mentionEnds), Path.Direction.CW);
     canvas.drawPath(backgroundPath, paint);
 
     paint.setColor(originalColor);
-  }
-
-  private int getLeadingMargin(@NonNull CharSequence text, int start, int end) {
-    int leadingMargin = 0;
-    if (text instanceof Spanned spanned) {
-      LeadingMarginSpan[] marginSpans = spanned.getSpans(start, end, LeadingMarginSpan.class);
-      for (LeadingMarginSpan marginSpan : marginSpans) {
-        leadingMargin += marginSpan.getLeadingMargin(true);
-      }
-    }
-    return leadingMargin;
   }
 
   private float[] createRadii(boolean roundedLeft, boolean roundedRight) {
