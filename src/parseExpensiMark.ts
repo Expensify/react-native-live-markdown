@@ -28,10 +28,11 @@ const MAX_PARSABLE_LENGTH = 4000;
 type Token = ['TEXT' | 'HTML', string];
 type StackItem = {tag: string; children: Array<StackItem | string>};
 
-function parseMarkdownToHTML(markdown: string): string {
+function parseMarkdownToHTML(markdown: string, filterRules: string[] | undefined): string {
   const parser = new ExpensiMark();
   const html = parser.replace(markdown, {
     shouldKeepRawInput: true,
+    filterRules,
   });
   return html as string;
 }
@@ -240,11 +241,11 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, MarkdownRange[]] {
 
 const isNative = Platform.OS === 'android' || Platform.OS === 'ios';
 
-function parseExpensiMark(markdown: string): MarkdownRange[] {
+function parseExpensiMark(markdown: string, filterRules?: string[]): MarkdownRange[] {
   if (markdown.length > MAX_PARSABLE_LENGTH) {
     return [];
   }
-  const html = parseMarkdownToHTML(markdown);
+  const html = parseMarkdownToHTML(markdown, filterRules);
   const tokens = parseHTMLToTokens(html);
   const tree = parseTokensToTree(tokens);
   const [text, ranges] = parseTreeToTextAndRanges(tree);
