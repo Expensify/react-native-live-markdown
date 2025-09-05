@@ -63,17 +63,23 @@ public class MarkdownStyle {
   @ColorInt
   private final int mMentionHereBackgroundColor;
 
+  private final float mMentionHereBorderRadius;
+
   @ColorInt
   private final int mMentionUserColor;
 
   @ColorInt
   private final int mMentionUserBackgroundColor;
 
+  private final float mMentionUserBorderRadius;
+
   @ColorInt
   private final int mMentionReportColor;
 
   @ColorInt
   private final int mMentionReportBackgroundColor;
+
+  private final float mMentionReportBorderRadius;
 
   public MarkdownStyle(@NonNull ReadableMap map, @NonNull Context context) {
     mSyntaxColor = parseColor(map, "syntax", "color", context);
@@ -95,10 +101,13 @@ public class MarkdownStyle {
     mPreBackgroundColor = parseColor(map, "pre", "backgroundColor", context);
     mMentionHereColor = parseColor(map, "mentionHere", "color", context);
     mMentionHereBackgroundColor = parseColor(map, "mentionHere", "backgroundColor", context);
+    mMentionHereBorderRadius = parseFloat(map, "mentionHere", "borderRadius");
     mMentionUserColor = parseColor(map, "mentionUser", "color", context);
     mMentionUserBackgroundColor = parseColor(map, "mentionUser", "backgroundColor", context);
+    mMentionUserBorderRadius = parseFloat(map, "mentionUser", "borderRadius");
     mMentionReportColor = parseColor(map, "mentionReport", "color", context);
     mMentionReportBackgroundColor = parseColor(map, "mentionReport", "backgroundColor", context);
+    mMentionReportBorderRadius = parseFloat(map, "mentionReport", "borderRadius");
   }
 
   private static int parseColor(@NonNull ReadableMap map, @NonNull String key, @NonNull String prop, @NonNull Context context) {
@@ -213,6 +222,10 @@ public class MarkdownStyle {
     return mMentionHereBackgroundColor;
   }
 
+  public float getMentionHereBorderRadius() {
+    return mMentionHereBorderRadius;
+  }
+
   @ColorInt
   public int getMentionUserColor() {
     return mMentionUserColor;
@@ -223,6 +236,10 @@ public class MarkdownStyle {
     return mMentionUserBackgroundColor;
   }
 
+  public float getMentionUserBorderRadius() {
+    return mMentionUserBorderRadius;
+  }
+
   @ColorInt
   public int getMentionReportColor() {
     return mMentionReportColor;
@@ -231,5 +248,9 @@ public class MarkdownStyle {
   @ColorInt
   public int getMentionReportBackgroundColor() {
     return mMentionReportBackgroundColor;
+  }
+
+  public float getMentionReportBorderRadius() {
+    return mMentionReportBorderRadius;
   }
 }

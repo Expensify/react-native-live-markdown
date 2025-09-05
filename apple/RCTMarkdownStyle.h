@@ -25,10 +25,13 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) UIColor *preBackgroundColor;
 @property (nonatomic) UIColor *mentionHereColor;
 @property (nonatomic) UIColor *mentionHereBackgroundColor;
+@property (nonatomic) CGFloat mentionHereBorderRadius;
 @property (nonatomic) UIColor *mentionUserColor;
 @property (nonatomic) UIColor *mentionUserBackgroundColor;
+@property (nonatomic) CGFloat mentionUserBorderRadius;
 @property (nonatomic) UIColor *mentionReportColor;
 @property (nonatomic) UIColor *mentionReportBackgroundColor;
+@property (nonatomic) CGFloat mentionReportBorderRadius;
 
 - (instancetype)initWithStruct:(const facebook::react::MarkdownTextInputDecoratorViewMarkdownStyleStruct &)style;
 

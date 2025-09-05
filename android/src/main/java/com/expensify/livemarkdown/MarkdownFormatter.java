@@ -75,16 +75,16 @@ public class MarkdownFormatter {
         break;
       case "mention-here":
         setSpan(ssb, new MarkdownForegroundColorSpan(markdownStyle.getMentionHereColor()), start, end);
-        setSpan(ssb, new MarkdownBackgroundColorSpan(markdownStyle.getMentionHereBackgroundColor()), start, end);
+        setSpan(ssb, new MarkdownBackgroundSpan(markdownStyle.getMentionHereBackgroundColor(), markdownStyle.getMentionHereBorderRadius(), start, end), start, end);
         break;
       case "mention-user":
         // TODO: change mention color when it mentions current user
         setSpan(ssb, new MarkdownForegroundColorSpan(markdownStyle.getMentionUserColor()), start, end);
-        setSpan(ssb, new MarkdownBackgroundColorSpan(markdownStyle.getMentionUserBackgroundColor()), start, end);
+        setSpan(ssb, new MarkdownBackgroundSpan(markdownStyle.getMentionUserBackgroundColor(), markdownStyle.getMentionUserBorderRadius(), start, end), start, end);
         break;
       case "mention-report":
         setSpan(ssb, new MarkdownForegroundColorSpan(markdownStyle.getMentionReportColor()), start, end);
-        setSpan(ssb, new MarkdownBackgroundColorSpan(markdownStyle.getMentionReportBackgroundColor()), start, end);
+        setSpan(ssb, new MarkdownBackgroundSpan(markdownStyle.getMentionReportBackgroundColor(), markdownStyle.getMentionReportBorderRadius(), start, end), start, end);
         break;
       case "syntax":
         setSpan(ssb, new MarkdownForegroundColorSpan(markdownStyle.getSyntaxColor()), start, end);
