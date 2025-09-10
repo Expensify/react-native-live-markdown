@@ -128,8 +128,10 @@ android {
       ]
 
       // TextLayoutManager
-      if (REACT_NATIVE_MINOR_VERSION <= 79 ) {
+      if (REACT_NATIVE_MINOR_VERSION <= 79) {
           java.srcDirs += "src/reactNativeVersionPatch/CustomMountingManager/79"
+      } else if (REACT_NATIVE_MINOR_VERSION == 80) {
+          java.srcDirs += "src/reactNativeVersionPatch/CustomMountingManager/80"
       } else {
           java.srcDirs += "src/reactNativeVersionPatch/CustomMountingManager/latest"
       }
