@@ -52,17 +52,16 @@ if (ReactAndroid_VERSION_MINOR LESS_EQUAL 80)
                 -frtti
                 -Wall
                 -std=c++20
-                -DREACT_NATIVE_MINOR_VERSION=${ReactAndroid_VERSION_MINOR}
         )
 else()
         target_compile_reactnative_options(${LIB_TARGET_NAME} PRIVATE)
-
-        target_compile_options(
-                ${LIB_TARGET_NAME}
-                PRIVATE
-                -DREACT_NATIVE_MINOR_VERSION=${ReactAndroid_VERSION_MINOR}
-        )
 endif()
+
+target_compile_options(
+        ${LIB_TARGET_NAME}
+        PRIVATE
+        -DREACT_NATIVE_MINOR_VERSION=${ReactAndroid_VERSION_MINOR}
+)
 
 target_include_directories(
         ${CMAKE_PROJECT_NAME}
