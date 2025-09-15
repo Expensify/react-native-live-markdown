@@ -120,7 +120,7 @@
     "./WebExample"
   ],
   "engines": {
-    "node": ">= 22.14.0"
+    "node": ">= 20.19.4"
   },
   "jest": {
     "preset": "react-native",
