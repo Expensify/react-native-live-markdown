@@ -80,7 +80,7 @@ jobs:
           restore-keys: build-ios-derived-data-
 
       - name: Build app
-        working-directory: example
+        working-directory: example/ios
         run: |
           xcrun simctl list devices
 
