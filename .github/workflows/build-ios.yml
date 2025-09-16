@@ -81,4 +81,13 @@ jobs:
 
       - name: Build app
         working-directory: example
-        run: npx react-native run-ios --no-packager
+        run: |
+          xcrun simctl list devices
+
+          xcodebuild \
+            -workspace LiveMarkdownExample.xcworkspace \
+            -scheme LiveMarkdownExample \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=18.4' \
+            build
