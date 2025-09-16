@@ -89,5 +89,5 @@ jobs:
             -scheme LiveMarkdownExample \
             -configuration Debug \
             -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=18.4' \
+            -destination 'platform=iOS Simulator,name=iPhone 16 Pro' \
             build
