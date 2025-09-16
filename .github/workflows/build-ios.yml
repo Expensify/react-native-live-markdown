@@ -32,7 +32,7 @@ jobs:
     steps:
       - uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: 16.1
+          xcode-version: 16.4
       - name: Check out Git repository
         # v4
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
