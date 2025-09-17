@@ -43,14 +43,23 @@ target_link_libraries(
         ReactAndroid::reactnative
 )
 
+if (ReactAndroid_VERSION_MINOR LESS_EQUAL 80)
+        target_compile_options(
+                ${LIB_TARGET_NAME}
+                PRIVATE
+                -DLOG_TAG=\"ReactNative\"
+                -fexceptions
+                -frtti
+                -Wall
+                -std=c++20
+        )
+else()
+        target_compile_reactnative_options(${LIB_TARGET_NAME} PRIVATE)
+endif()
+
 target_compile_options(
         ${LIB_TARGET_NAME}
         PRIVATE
-        -DLOG_TAG=\"ReactNative\"
-        -fexceptions
-        -frtti
-        -Wall
-        -std=c++20
         -DREACT_NATIVE_MINOR_VERSION=${ReactAndroid_VERSION_MINOR}
 )
 
