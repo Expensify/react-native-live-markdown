@@ -58,6 +58,24 @@ function ungroupRanges(ranges: MarkdownRange[]): MarkdownRange[] {
 }
 
 /**
+ * Creates a list of ranges that should not be formatted by certain markdown types (italic, strikethrough).
+ * This includes emojis and syntaxes of inline code blocks.
+ */
+function getRangesToExcludeFormatting(ranges: MarkdownRange[]) {
+  let closingSyntaxPosition: number | null = null;
+  return ranges.filter((range, index) => {
+    const nextRange = ranges[index + 1];
+    if (nextRange && nextRange.type === 'code' && range.type === 'syntax') {
+      closingSyntaxPosition = nextRange.start + nextRange.length;
+    } else if (closingSyntaxPosition !== null && range.type === 'syntax' && range.start <= closingSyntaxPosition) {
+      closingSyntaxPosition = null;
+      return true;
+    }
+    return range.type === 'emoji' || (ranges[index + 1]?.type === 'code' && range.type === 'syntax');
+  });
+}
+
+/**
  * Splits ranges of a specific type from being formatted by specified markdown types (e.g., 'emoji', 'syntax').
  * @param ranges - The array of MarkdownRange objects to process.
  * @param baseMarkdownType - The base markdown type to exclude formatting from (e.g., 'italic').
@@ -118,4 +136,4 @@ function excludeRangeTypesFromFormatting(ranges: MarkdownRange[], baseMarkdownTy
   return newRanges;
 }
 
-export {sortRanges, groupRanges, ungroupRanges, excludeRangeTypesFromFormatting};
+export {sortRanges, groupRanges, ungroupRanges, excludeRangeTypesFromFormatting, getRangesToExcludeFormatting};

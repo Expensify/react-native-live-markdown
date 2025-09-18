@@ -6,7 +6,7 @@ import {unescapeText} from 'expensify-common/dist/utils';
 import {decode} from 'html-entities';
 import type {WorkletFunction} from 'react-native-reanimated/lib/typescript/commonTypes';
 import type {MarkdownType, MarkdownRange} from './commonTypes';
-import {groupRanges, sortRanges, excludeRangeTypesFromFormatting} from './rangeUtils';
+import {groupRanges, sortRanges, excludeRangeTypesFromFormatting, getRangesToExcludeFormatting} from './rangeUtils';
 
 function isWeb() {
   return Platform.OS === 'web';
@@ -236,24 +236,6 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, MarkdownRange[]] {
   }
   dfs(tree);
   return [text, ranges];
-}
-
-/**
- * Creates a list of ranges that should not be formatted by certain markdown types (italic, strikethrough).
- * This includes emojis and syntaxes of inline code blocks.
- */
-function getRangesToExcludeFormatting(ranges: MarkdownRange[]) {
-  let closingSyntaxPosition: number | null = null;
-  return ranges.filter((range, index) => {
-    const nextRange = ranges[index + 1];
-    if (nextRange && nextRange.type === 'code' && range.type === 'syntax') {
-      closingSyntaxPosition = nextRange.start + nextRange?.length;
-    } else if (closingSyntaxPosition !== null && range.type === 'syntax' && range.start <= closingSyntaxPosition) {
-      closingSyntaxPosition = null;
-      return true;
-    }
-    return range.type === 'emoji' || (ranges[index + 1]?.type === 'code' && range.type === 'syntax');
-  });
 }
 
 function parseExpensiMark(markdown: string): MarkdownRange[] {

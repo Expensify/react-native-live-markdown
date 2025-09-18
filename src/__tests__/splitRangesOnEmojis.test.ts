@@ -1,5 +1,5 @@
 import type {MarkdownRange} from '../commonTypes';
-import {splitRangesOnEmojis} from '../rangeUtils';
+import {excludeRangeTypesFromFormatting, getRangesToExcludeFormatting} from '../rangeUtils';
 
 const sortRanges = (ranges: MarkdownRange[]) => {
   return ranges.sort((a, b) => a.start - b.start);
@@ -11,7 +11,7 @@ test('no overlap', () => {
     {type: 'emoji', start: 12, length: 2},
   ];
 
-  const splittedRanges = splitRangesOnEmojis(markdownRanges, 'strikethrough');
+  const splittedRanges = excludeRangeTypesFromFormatting(markdownRanges, 'strikethrough', getRangesToExcludeFormatting(markdownRanges));
   expect(splittedRanges).toEqual([
     {type: 'strikethrough', start: 0, length: 10},
     {type: 'emoji', start: 12, length: 2},
@@ -24,7 +24,7 @@ test('overlap different type', () => {
     {type: 'emoji', start: 3, length: 4},
   ];
 
-  const splittedRanges = splitRangesOnEmojis(markdownRanges, 'italic');
+  const splittedRanges = excludeRangeTypesFromFormatting(markdownRanges, 'italic', getRangesToExcludeFormatting(markdownRanges));
   expect(splittedRanges).toEqual(markdownRanges);
 });
 
@@ -35,7 +35,7 @@ describe('single overlap', () => {
       {type: 'emoji', start: 0, length: 2},
     ];
 
-    markdownRanges = splitRangesOnEmojis(markdownRanges, 'strikethrough');
+    markdownRanges = excludeRangeTypesFromFormatting(markdownRanges, 'strikethrough', getRangesToExcludeFormatting(markdownRanges));
     sortRanges(markdownRanges);
 
     expect(markdownRanges).toEqual([
@@ -50,7 +50,7 @@ describe('single overlap', () => {
       {type: 'emoji', start: 3, length: 4},
     ];
 
-    markdownRanges = splitRangesOnEmojis(markdownRanges, 'strikethrough');
+    markdownRanges = excludeRangeTypesFromFormatting(markdownRanges, 'strikethrough', getRangesToExcludeFormatting(markdownRanges));
     sortRanges(markdownRanges);
 
     expect(markdownRanges).toEqual([
@@ -66,7 +66,7 @@ describe('single overlap', () => {
       {type: 'emoji', start: 8, length: 2},
     ];
 
-    markdownRanges = splitRangesOnEmojis(markdownRanges, 'strikethrough');
+    markdownRanges = excludeRangeTypesFromFormatting(markdownRanges, 'strikethrough', getRangesToExcludeFormatting(markdownRanges));
     sortRanges(markdownRanges);
 
     expect(markdownRanges).toEqual([
@@ -82,7 +82,7 @@ describe('single overlap', () => {
       {type: 'emoji', start: 5, length: 2},
     ];
 
-    markdownRanges = splitRangesOnEmojis(markdownRanges, 'strikethrough');
+    markdownRanges = excludeRangeTypesFromFormatting(markdownRanges, 'strikethrough', getRangesToExcludeFormatting(markdownRanges));
     sortRanges(markdownRanges);
 
     expect(markdownRanges).toEqual([
@@ -101,7 +101,7 @@ describe('single overlap', () => {
       {type: 'emoji', start: 4, length: 2},
     ];
 
-    markdownRanges = splitRangesOnEmojis(markdownRanges, 'strikethrough');
+    markdownRanges = excludeRangeTypesFromFormatting(markdownRanges, 'strikethrough', getRangesToExcludeFormatting(markdownRanges));
 
     expect(markdownRanges).toEqual([
       {type: 'emoji', start: 0, length: 2},
@@ -121,7 +121,7 @@ describe('multiple overlaps', () => {
       {type: 'strikethrough', start: 22, length: 5},
     ];
 
-    markdownRanges = splitRangesOnEmojis(markdownRanges, 'strikethrough');
+    markdownRanges = excludeRangeTypesFromFormatting(markdownRanges, 'strikethrough', getRangesToExcludeFormatting(markdownRanges));
     sortRanges(markdownRanges);
 
     expect(markdownRanges).toEqual([
@@ -144,8 +144,8 @@ describe('multiple overlaps', () => {
       {type: 'strikethrough', start: 22, length: 5},
     ];
 
-    markdownRanges = splitRangesOnEmojis(markdownRanges, 'strikethrough');
-    markdownRanges = splitRangesOnEmojis(markdownRanges, 'italic');
+    markdownRanges = excludeRangeTypesFromFormatting(markdownRanges, 'strikethrough', getRangesToExcludeFormatting(markdownRanges));
+    markdownRanges = excludeRangeTypesFromFormatting(markdownRanges, 'italic', getRangesToExcludeFormatting(markdownRanges));
     sortRanges(markdownRanges);
 
     expect(markdownRanges).toEqual([
