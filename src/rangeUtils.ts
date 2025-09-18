@@ -57,8 +57,13 @@ function ungroupRanges(ranges: MarkdownRange[]): MarkdownRange[] {
   return ungroupedRanges;
 }
 
-function splitRangesOnEmojis(ranges: MarkdownRange[], type: MarkdownType): MarkdownRange[] {
-  const emojiRanges: MarkdownRange[] = ranges.filter((range) => range.type === 'emoji');
+/**
+ * Splits ranges of a specific type from being formatted by specified markdown types (e.g., 'emoji', 'syntax').
+ * @param ranges - The array of MarkdownRange objects to process.
+ * @param baseMarkdownType - The base markdown type to exclude formatting from (e.g., 'italic').
+ * @param rangesToExclude - The array of MarkdownRange objects representing the ranges to exclude from formatting.
+ */
+function excludeRangeTypesFromFormatting(ranges: MarkdownRange[], baseMarkdownType: MarkdownType, rangesToExclude: MarkdownRange[]): MarkdownRange[] {
   const newRanges: MarkdownRange[] = [];
 
   let i = 0;
@@ -69,33 +74,33 @@ function splitRangesOnEmojis(ranges: MarkdownRange[], type: MarkdownType): Markd
       break;
     }
 
-    if (currentRange.type !== type) {
+    if (currentRange.type !== baseMarkdownType) {
       newRanges.push(currentRange);
       i++;
     } else {
       // Iterate through all emoji ranges before the end of the current range, splitting the current range at each intersection.
-      while (j < emojiRanges.length) {
-        const emojiRange = emojiRanges[j];
-        if (!emojiRange || emojiRange.start > currentRange.start + currentRange.length) {
+      while (j < rangesToExclude.length) {
+        const excludeRange = rangesToExclude[j];
+        if (!excludeRange || excludeRange.start > currentRange.start + currentRange.length) {
           break;
         }
 
         const currentStart: number = currentRange.start;
         const currentEnd: number = currentRange.start + currentRange.length;
-        const emojiStart: number = emojiRange.start;
-        const emojiEnd: number = emojiRange.start + emojiRange.length;
+        const excludeRangeStart: number = excludeRange.start;
+        const excludeRangeEnd: number = excludeRange.start + excludeRange.length;
 
-        if (emojiStart >= currentStart && emojiEnd <= currentEnd) {
+        if (excludeRangeStart >= currentStart && excludeRangeEnd <= currentEnd) {
           // Intersection
           const newRange: MarkdownRange = {
             type: currentRange.type,
             start: currentStart,
-            length: emojiStart - currentStart,
+            length: excludeRangeStart - currentStart,
             ...(currentRange?.depth && {depth: currentRange?.depth}),
           };
 
-          currentRange.start = emojiEnd;
-          currentRange.length = currentEnd - emojiEnd;
+          currentRange.start = excludeRangeEnd;
+          currentRange.length = currentEnd - excludeRangeEnd;
 
           if (newRange.length > 0) {
             newRanges.push(newRange);
@@ -113,4 +118,4 @@ function splitRangesOnEmojis(ranges: MarkdownRange[], type: MarkdownType): Markd
   return newRanges;
 }
 
-export {sortRanges, groupRanges, ungroupRanges, splitRangesOnEmojis};
+export {sortRanges, groupRanges, ungroupRanges, excludeRangeTypesFromFormatting};

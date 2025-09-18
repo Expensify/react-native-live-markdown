@@ -6,7 +6,7 @@ import {unescapeText} from 'expensify-common/dist/utils';
 import {decode} from 'html-entities';
 import type {WorkletFunction} from 'react-native-reanimated/lib/typescript/commonTypes';
 import type {MarkdownType, MarkdownRange} from './commonTypes';
-import {groupRanges, sortRanges, splitRangesOnEmojis} from './rangeUtils';
+import {groupRanges, sortRanges, excludeRangeTypesFromFormatting} from './rangeUtils';
 
 function isWeb() {
   return Platform.OS === 'web';
@@ -238,7 +238,23 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, MarkdownRange[]] {
   return [text, ranges];
 }
 
-const isNative = Platform.OS === 'android' || Platform.OS === 'ios';
+/**
+ * Creates a list of ranges that should not be formatted by certain markdown types (italic, strikethrough).
+ * This includes emojis and syntaxes of inline code blocks.
+ */
+function getRangesToExcludeFormatting(ranges: MarkdownRange[]) {
+  let closingSyntaxPosition: number | null = null;
+  return ranges.filter((range, index) => {
+    const nextRange = ranges[index + 1];
+    if (nextRange && nextRange.type === 'code' && range.type === 'syntax') {
+      closingSyntaxPosition = nextRange.start + nextRange?.length;
+    } else if (closingSyntaxPosition !== null && range.type === 'syntax' && range.start <= closingSyntaxPosition) {
+      closingSyntaxPosition = null;
+      return true;
+    }
+    return range.type === 'emoji' || (ranges[index + 1]?.type === 'code' && range.type === 'syntax');
+  });
+}
 
 function parseExpensiMark(markdown: string): MarkdownRange[] {
   if (markdown.length > MAX_PARSABLE_LENGTH) {
@@ -257,12 +273,11 @@ function parseExpensiMark(markdown: string): MarkdownRange[] {
     return [];
   }
   let markdownRanges = sortRanges(ranges);
-  if (isNative) {
-    // Blocks applying italic and strikethrough styles to emojis on Android and iOS
-    // TODO: Remove this condition when splitting emojis inside the inline code block will be fixed on the web
-    markdownRanges = splitRangesOnEmojis(markdownRanges, 'italic');
-    markdownRanges = splitRangesOnEmojis(markdownRanges, 'strikethrough');
-  }
+
+  // Prevent italic and strikethrough formatting inside emojis and inline code blocks
+  const rangesToExclude = getRangesToExcludeFormatting(markdownRanges);
+  markdownRanges = excludeRangeTypesFromFormatting(markdownRanges, 'italic', rangesToExclude);
+  markdownRanges = excludeRangeTypesFromFormatting(markdownRanges, 'strikethrough', rangesToExclude);
 
   const groupedRanges = groupRanges(markdownRanges);
   return groupedRanges;
