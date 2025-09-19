@@ -67,11 +67,13 @@ function getRangesToExcludeFormatting(ranges: MarkdownRange[]) {
     const nextRange = ranges[index + 1];
     if (nextRange && nextRange.type === 'code' && range.type === 'syntax') {
       closingSyntaxPosition = nextRange.start + nextRange.length;
-    } else if (closingSyntaxPosition !== null && range.type === 'syntax' && range.start <= closingSyntaxPosition) {
+      return true;
+    }
+    if (closingSyntaxPosition !== null && range.type === 'syntax' && range.start <= closingSyntaxPosition) {
       closingSyntaxPosition = null;
       return true;
     }
-    return range.type === 'emoji' || (ranges[index + 1]?.type === 'code' && range.type === 'syntax');
+    return range.type === 'emoji';
   });
 }
 
@@ -116,7 +118,6 @@ function excludeRangeTypesFromFormatting(ranges: MarkdownRange[], baseMarkdownTy
             length: excludeRangeStart - currentStart,
             ...(currentRange?.depth && {depth: currentRange?.depth}),
           };
-
           currentRange.start = excludeRangeEnd;
           currentRange.length = currentEnd - excludeRangeEnd;
 
