@@ -31,9 +31,6 @@ function addStyleToBlock(targetElement: HTMLElement, type: NodeType, markdownSty
       Object.assign(node.style, {
         ...markdownStyle.emoji,
         verticalAlign: 'middle',
-        fontStyle: 'normal', // remove italic
-        textDecoration: 'none', // remove strikethrough
-        display: 'inline-block',
       });
       break;
     case 'mention-here':
