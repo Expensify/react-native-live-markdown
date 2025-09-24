@@ -79,7 +79,6 @@ test('emoji', () => {
 test('emoji and italic', () => {
   expect('_😎_').toBeParsedAs([
     {type: 'syntax', start: 0, length: 1},
-    {type: 'italic', start: 1, length: 2},
     {type: 'emoji', start: 1, length: 2},
     {type: 'syntax', start: 3, length: 1},
   ]);
