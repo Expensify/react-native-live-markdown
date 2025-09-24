@@ -1,5 +1,6 @@
 #import "MarkdownFormatter.h"
 #import <React/RCTFont.h>
+#import <RNLiveMarkdown/RCTMarkdownTextBackgroundUtils.h>
 
 @implementation MarkdownFormatter
 
@@ -91,14 +92,44 @@
     [attributedString addAttribute:NSBackgroundColorAttributeName value:markdownStyle.codeBackgroundColor range:range];
   } else if (type == "mention-here") {
     [attributedString addAttribute:NSForegroundColorAttributeName value:markdownStyle.mentionHereColor range:range];
-    [attributedString addAttribute:NSBackgroundColorAttributeName value:markdownStyle.mentionHereBackgroundColor range:range];
+    if (@available(iOS 16.0, *)) {
+      RCTMarkdownTextBackground *textBackground = [[RCTMarkdownTextBackground alloc] init];
+      textBackground.color = markdownStyle.mentionHereBackgroundColor;
+      textBackground.borderRadius = markdownStyle.mentionHereBorderRadius;
+      
+      [attributedString addAttribute:RCTLiveMarkdownTextBackgroundAttributeName
+                               value:textBackground
+                               range:range];
+    } else {
+      [attributedString addAttribute:NSBackgroundColorAttributeName value:markdownStyle.mentionHereBackgroundColor range:range];
+    }
   } else if (type == "mention-user") {
     // TODO: change mention color when it mentions current user
     [attributedString addAttribute:NSForegroundColorAttributeName value:markdownStyle.mentionUserColor range:range];
-    [attributedString addAttribute:NSBackgroundColorAttributeName value:markdownStyle.mentionUserBackgroundColor range:range];
+    if (@available(iOS 16.0, *)) {
+      RCTMarkdownTextBackground *textBackground = [[RCTMarkdownTextBackground alloc] init];
+      textBackground.color = markdownStyle.mentionUserBackgroundColor;
+      textBackground.borderRadius = markdownStyle.mentionUserBorderRadius;
+      
+      [attributedString addAttribute:RCTLiveMarkdownTextBackgroundAttributeName
+                               value:textBackground
+                               range:range];
+    } else {
+      [attributedString addAttribute:NSBackgroundColorAttributeName value:markdownStyle.mentionUserBackgroundColor range:range];
+    }
   } else if (type == "mention-report") {
     [attributedString addAttribute:NSForegroundColorAttributeName value:markdownStyle.mentionReportColor range:range];
-    [attributedString addAttribute:NSBackgroundColorAttributeName value:markdownStyle.mentionReportBackgroundColor range:range];
+    if (@available(iOS 16.0, *)) {
+      RCTMarkdownTextBackground *textBackground = [[RCTMarkdownTextBackground alloc] init];
+      textBackground.color = markdownStyle.mentionReportBackgroundColor;
+      textBackground.borderRadius = markdownStyle.mentionReportBorderRadius;
+      
+      [attributedString addAttribute:RCTLiveMarkdownTextBackgroundAttributeName
+                               value:textBackground
+                               range:range];
+    } else {
+      [attributedString addAttribute:NSBackgroundColorAttributeName value:markdownStyle.mentionReportBackgroundColor range:range];
+    }
   } else if (type == "link") {
     [attributedString addAttribute:NSUnderlineStyleAttributeName value:[NSNumber numberWithInteger:NSUnderlineStyleSingle] range:range];
     [attributedString addAttribute:NSForegroundColorAttributeName value:markdownStyle.linkColor range:range];
