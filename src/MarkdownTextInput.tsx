@@ -1,16 +1,21 @@
 import {StyleSheet, TextInput, processColor} from 'react-native';
 import React from 'react';
 import type {TextInputProps} from 'react-native';
-import {createWorkletRuntime, makeShareableCloneRecursive} from 'react-native-reanimated';
-import type {WorkletRuntime} from 'react-native-reanimated';
-import type {ShareableRef, WorkletFunction} from 'react-native-reanimated/lib/typescript/commonTypes';
-
+// import {createWorkletRuntime, makeShareableCloneRecursive} from 'react-native-reanimated';
+// import type {WorkletRuntime} from 'react-native-reanimated';
+// import type {ShareableRef, WorkletFunction} from 'react-native-reanimated/lib/typescript/commonTypes';
+// import {createWorkletRuntime, makeShareableCloneRecursive } from 'react-native-worklets';
+// import type {ShareableRef, WorkletFunction} from 'react-native-reanimated/lib/typescript/commonTypes';
+// import type {WorkletRuntime as WorkletRuntimeReanimated} from 'react-native-reanimated';
+import type {WorkletRuntime as WorkletRuntimeWorklets} from 'react-native-worklets';
 import MarkdownTextInputDecoratorViewNativeComponent from './MarkdownTextInputDecoratorViewNativeComponent';
 import type {MarkdownStyle} from './MarkdownTextInputDecoratorViewNativeComponent';
 import NativeLiveMarkdownModule from './NativeLiveMarkdownModule';
 import {mergeMarkdownStyleWithDefault} from './styleUtils';
 import type {PartialMarkdownStyle} from './styleUtils';
 import type {InlineImagesInputProps, MarkdownRange} from './commonTypes';
+
+type WorkletRuntime = WorkletRuntimeReanimated | WorkletRuntimeWorklets;
 
 declare global {
   // eslint-disable-next-line no-var
@@ -43,13 +48,45 @@ function initializeLiveMarkdownIfNeeded() {
   if (!global.jsi_setMarkdownRuntime) {
     throw new Error('[react-native-live-markdown] global.jsi_setMarkdownRuntime is not available');
   }
+
+  let createWorkletRuntime;
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires,import/no-unresolved
+    createWorkletRuntime = require('react-native-worklets').createWorkletRuntime;
+  } catch {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires,import/no-unresolved
+      createWorkletRuntime = require('react-native-reanimated').createWorkletRuntime;
+    } catch {
+      /* empty */
+    }
+  }
+
   workletRuntime = createWorkletRuntime('LiveMarkdownRuntime');
+  if (!workletRuntime) {
+    return;
+  }
+
   global.jsi_setMarkdownRuntime(workletRuntime);
   initialized = true;
 }
 
 function registerParser(parser: (input: string) => MarkdownRange[]): number {
   initializeLiveMarkdownIfNeeded();
+
+  let makeShareableCloneRecursive;
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires,import/no-unresolved
+    makeShareableCloneRecursive = require('react-native-worklets').makeShareableCloneRecursive;
+  } catch {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires,import/no-unresolved
+      makeShareableCloneRecursive = require('react-native-reanimated').makeShareableCloneRecursive;
+    } catch {
+      /* empty */
+    }
+  }
+
   const shareableWorklet = makeShareableCloneRecursive(parser) as ShareableRef<WorkletFunction<[string], MarkdownRange[]>>;
   const parserId = global.jsi_registerMarkdownWorklet(shareableWorklet);
   return parserId;

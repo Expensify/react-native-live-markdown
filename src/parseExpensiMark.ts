@@ -4,7 +4,7 @@ import {Platform} from 'react-native';
 import {ExpensiMark} from 'expensify-common';
 import {unescapeText} from 'expensify-common/dist/utils';
 import {decode} from 'html-entities';
-import type {WorkletFunction} from 'react-native-reanimated/lib/typescript/commonTypes';
+// import type {WorkletFunction} from 'react-native-reanimated/lib/typescript/commonTypes';
 import type {MarkdownType, MarkdownRange} from './commonTypes';
 import {groupRanges, sortRanges, excludeRangeTypesFromFormatting, getRangesToExcludeFormatting} from './rangeUtils';
 

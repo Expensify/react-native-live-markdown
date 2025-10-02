@@ -1,5 +1,6 @@
 #include "RuntimeDecorator.h"
 #include "MarkdownGlobal.h"
+#include <stdexcept>
 
 using namespace facebook;
 using namespace worklets;
@@ -23,7 +24,13 @@ void injectJSIBindings(jsi::Runtime &rt) {
       jsi::PropNameID::forAscii(rt, "jsi_registerMarkdownWorklet"),
       1,
       [](jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) -> jsi::Value {
+        #ifdef IS_WORKLETS
+        auto parserId = registerMarkdownWorklet(
+                extractSerializableOrThrow<SerializableWorklet>(rt, args[0])
+        );
+        #else
         auto parserId = registerMarkdownWorklet(extractShareableOrThrow<ShareableWorklet>(rt, args[0]));
+        #endif
         return jsi::Value(parserId);
       }));
 

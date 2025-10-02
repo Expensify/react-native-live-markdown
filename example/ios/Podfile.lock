@@ -2253,7 +2253,7 @@ PODS:
     - React-perflogger (= 0.81.4)
     - React-utils (= 0.81.4)
     - SocketRocket
-  - RNLiveMarkdown (0.1.303):
+  - RNLiveMarkdown (0.1.305):
     - boost
     - DoubleConversion
     - fast_float
@@ -2735,10 +2735,10 @@ SPEC CHECKSUMS:
   ReactAppDependencyProvider: 433ddfb4536948630aadd5bd925aff8a632d2fe3
   ReactCodegen: adf5027f30e34c68b5a09f0b68acb3e5ef9e1a5d
   ReactCommon: 394c6b92765cf6d211c2c3f7f6bc601dffb316a6
-  RNLiveMarkdown: 0a98549fd315dc5fdc8b7ed937fdd6414d47565f
+  RNLiveMarkdown: e441098898bcfb03fe2edc4bd56a1efe987a09e6
   RNReanimated: 08fa7bb56d5f6d47c32245cf9cf53efb19befa0c
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
-  Yoga: 922d794dce2af9c437f864bf4093abfa7a131adb
+  Yoga: a3ed390a19db0459bd6839823a6ac6d9c6db198d
 
 PODFILE CHECKSUM: 3f53660915b3f926239de7f89ab29581306a2614
 

@@ -58,6 +58,16 @@ def resolveReactNativeDirectory() {
   throw new GradleException("[react-native-live-markdown] Unable to resolve react-native location in node_modules. Your app should define `REACT_NATIVE_NODE_MODULES_DIR` extension property in `app/build.gradle` with a path to react-native in node_modules.")
 }
 
+println resolveReactNativeDirectory().parent
+
+def findInstalledPackage = { name ->
+  def reactNativeLocation = resolveReactNativeDirectory().parent
+  println reactNativeLocation
+  if (!reactNativeLocation) return false
+    def packagePath = new File(reactNativeLocation, name)
+  return packagePath.isDirectory()
+}
+
 def getReactNativeMinorVersion() {
   def reactNativeRootDir = resolveReactNativeDirectory()
   def reactNativeProperties = new Properties()
@@ -67,6 +77,8 @@ def getReactNativeMinorVersion() {
 }
 
 def REACT_NATIVE_MINOR_VERSION = getReactNativeMinorVersion()
+def isReanimated = findInstalledPackage('react-native-reanimated')
+def isWorklets   = findInstalledPackage('react-native-worklets')
 
 android {
   if (supportsNamespace()) {
@@ -94,7 +106,8 @@ android {
         arguments "-DANDROID_STL=c++_shared",
           "-DANDROID_TOOLCHAIN=clang",
           "-DREACT_NATIVE_MINOR_VERSION=${REACT_NATIVE_MINOR_VERSION}",
-          "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"
+          "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON",
+          "-DREACT_NATIVE_ROOT_DIR=${resolveReactNativeDirectory()}"
         abiFilters (*reactNativeArchitectures())
       }
     }
@@ -173,11 +186,15 @@ repositories {
   google()
 }
 
-
 dependencies {
   implementation "com.facebook.react:react-android" // version substituted by RNGP
   implementation "com.facebook.react:hermes-android" // version substituted by RNGP
-  implementation project(":react-native-reanimated")
+
+  if (isReanimated) {
+    implementation project(":react-native-reanimated")
+  } else if (isWorklets) {
+    implementation project(":react-native-worklets")
+  }
 }
 
 // This fixes linking errors due to undefined symbols from libworklets.so.
@@ -185,6 +202,11 @@ dependencies {
 // like a header-only library. During build, config files are not regenerated
 // because the cache key does not change and AGP thinks that they are up-to-date.
 afterEvaluate {
-  prepareKotlinBuildScriptModel.dependsOn(":react-native-reanimated:prefabDebugPackage")
-  prepareKotlinBuildScriptModel.dependsOn(":react-native-reanimated:prefabReleasePackage")
+  if (isReanimated) {
+    prepareKotlinBuildScriptModel.dependsOn(":react-native-reanimated:prefabDebugPackage")
+    prepareKotlinBuildScriptModel.dependsOn(":react-native-reanimated:prefabReleasePackage")
+  } else if (isWorklets) {
+    prepareKotlinBuildScriptModel.dependsOn(":react-native-worklets:prefabDebugPackage")
+    prepareKotlinBuildScriptModel.dependsOn(":react-native-worklets:prefabReleasePackage")
+  }
 }
