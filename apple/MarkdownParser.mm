@@ -19,7 +19,11 @@
     const auto &markdownRuntime = expensify::livemarkdown::getMarkdownRuntime();
     jsi::Runtime &rt = markdownRuntime->getJSIRuntime();
 
+#ifdef IS_WORKLETS
+    std::shared_ptr<SerializableWorklet> markdownWorklet;
+#else
     std::shared_ptr<ShareableWorklet> markdownWorklet;
+#endif
     try {
       markdownWorklet = expensify::livemarkdown::getMarkdownWorklet([parserId intValue]);
     } catch (const std::out_of_range &error) {
