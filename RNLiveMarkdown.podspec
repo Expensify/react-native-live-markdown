@@ -45,7 +45,7 @@ Pod::Spec.new do |s|
     s.dependency "RNReanimated/worklets"
   end
 
-  s.xcconfig = {
+  xcconfig = {
     "OTHER_CFLAGS" => "$(inherited) -DREACT_NATIVE_MINOR_VERSION=#{react_native_minor_version}",
     "HEADER_SEARCH_PATHS" => [
       "\"$(PODS_ROOT)/#{react_native_worklets_node_modules_dir_from_pods_root}/apple\"",
@@ -53,8 +53,9 @@ Pod::Spec.new do |s|
     ].join(' '),
   }
   if worklets_installed
-    s.xcconfig["OTHER_CFLAGS"] << " -DWORKLETS_INSTALLED=1"
+    xcconfig["OTHER_CFLAGS"] << " -DWORKLETS_INSTALLED=1"
   end
+  s.xcconfig = xcconfig
 
   s.pod_target_xcconfig = { "HEADER_SEARCH_PATHS" => "\"$(PODS_TARGET_SRCROOT)/cpp\"" }
 

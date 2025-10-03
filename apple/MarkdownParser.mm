@@ -19,7 +19,7 @@
     const auto &markdownRuntime = expensify::livemarkdown::getMarkdownRuntime();
     jsi::Runtime &rt = markdownRuntime->getJSIRuntime();
 
-#ifdef IS_WORKLETS
+#ifdef WORKLETS_INSTALLED
     std::shared_ptr<SerializableWorklet> markdownWorklet;
 #else
     std::shared_ptr<ShareableWorklet> markdownWorklet;

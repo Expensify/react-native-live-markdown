@@ -29,7 +29,7 @@ add_library(${CMAKE_PROJECT_NAME} SHARED ${ANDROID_SRC} ${CPP_SRC})
 
 if(WORKLETS_INSTALLED)
   target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CPP_DIR} "${REACT_NATIVE_ROOT_DIR}/ReactCommon/jsiexecutor")
-else
+else()
   target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CPP_DIR})
 endif()
 
@@ -39,7 +39,7 @@ find_package(ReactAndroid REQUIRED CONFIG)
 if(WORKLETS_INSTALLED)
   find_package(react-native-worklets REQUIRED CONFIG)
   add_definitions(-DWORKLETS_INSTALLED)
-else
+else()
   find_package(react-native-reanimated REQUIRED CONFIG)
 endif()
 
@@ -53,6 +53,6 @@ target_link_libraries(
 
 if(WORKLETS_INSTALLED)
   target_link_libraries(${CMAKE_PROJECT_NAME} react-native-worklets::worklets)
-else
+else()
   target_link_libraries(${CMAKE_PROJECT_NAME} react-native-reanimated::worklets)
 endif()
