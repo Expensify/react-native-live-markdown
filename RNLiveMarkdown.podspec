@@ -56,6 +56,9 @@ Pod::Spec.new do |s|
       "\"$(PODS_ROOT)/#{react_native_worklets_node_modules_dir_from_pods_root}/Common/cpp\"",
     ].join(' '),
   }
+  if is_worklets
+    s.xcconfig["OTHER_CFLAGS"] << " -DIS_WORKLETS=1"
+  end
 
   s.pod_target_xcconfig = { "HEADER_SEARCH_PATHS" => "\"$(PODS_TARGET_SRCROOT)/cpp\"" }
 
