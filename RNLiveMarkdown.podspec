@@ -41,9 +41,9 @@ Pod::Spec.new do |s|
 
   s.source_files = "apple/**/*.{h,m,mm}", "cpp/**/*.{h,cpp}"
 
-  if reanimated
+  if is_reanimated
     s.dependency "RNReanimated/worklets"
-  elsif worklets
+  elsif is_worklets
     s.dependency "RNWorklets"
   else
     raise "Error!"
