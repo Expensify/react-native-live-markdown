@@ -1,13 +1,6 @@
 import {StyleSheet, TextInput, processColor} from 'react-native';
 import React from 'react';
 import type {TextInputProps} from 'react-native';
-// import {createWorkletRuntime, makeShareableCloneRecursive} from 'react-native-reanimated';
-// import type {WorkletRuntime} from 'react-native-reanimated';
-// import type {ShareableRef, WorkletFunction} from 'react-native-reanimated/lib/typescript/commonTypes';
-// import {createWorkletRuntime, makeShareableCloneRecursive } from 'react-native-worklets';
-// import type {ShareableRef, WorkletFunction} from 'react-native-reanimated/lib/typescript/commonTypes';
-// import type {WorkletRuntime as WorkletRuntimeReanimated} from 'react-native-reanimated';
-import type {WorkletRuntime as WorkletRuntimeWorklets} from 'react-native-worklets';
 import MarkdownTextInputDecoratorViewNativeComponent from './MarkdownTextInputDecoratorViewNativeComponent';
 import type {MarkdownStyle} from './MarkdownTextInputDecoratorViewNativeComponent';
 import NativeLiveMarkdownModule from './NativeLiveMarkdownModule';
@@ -15,7 +8,11 @@ import {mergeMarkdownStyleWithDefault} from './styleUtils';
 import type {PartialMarkdownStyle} from './styleUtils';
 import type {InlineImagesInputProps, MarkdownRange} from './commonTypes';
 
-type WorkletRuntime = WorkletRuntimeReanimated | WorkletRuntimeWorklets;
+type WorkletRuntime = any;
+type WorkletFunction<Args extends unknown[] = unknown[], ReturnValue = unknown> = Args | ReturnValue | any;
+type ShareableRef<T = unknown> = {
+  __hostObjectShareableJSRef: T;
+};
 
 declare global {
   // eslint-disable-next-line no-var

@@ -16,6 +16,8 @@ function isJest() {
   return !!global.process.env.JEST_WORKER_ID;
 }
 
+type WorkletFunction = any;
+
 // eslint-disable-next-line no-underscore-dangle
 if (__DEV__ && !isWeb() && !isJest() && (decode as WorkletFunction).__workletHash === undefined) {
   throw new Error(

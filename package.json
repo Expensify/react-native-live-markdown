@@ -101,7 +101,8 @@
     "react-native-web": "^0.20.0",
     "release-it": "^15.0.0",
     "turbo": "^1.10.7",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "react-native-reanimated": "3.19.0"
   },
   "peerDependencies": {
     "expensify-common": ">=2.0.148",
