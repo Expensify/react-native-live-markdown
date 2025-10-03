@@ -14,10 +14,10 @@ end
 is_reanimated = find_installed_package.call('react-native-reanimated')
 is_worklets   = find_installed_package.call('react-native-worklets')
 
-package_name = if is_reanimated
-                 'react-native-reanimated/package.json'
-               elsif is_worklets
+package_name = if is_worklets
                  'react-native-worklets/package.json'
+               elsif is_reanimated
+                 'react-native-reanimated/package.json'
                else
                  raise "Error!"
                end
@@ -41,10 +41,10 @@ Pod::Spec.new do |s|
 
   s.source_files = "apple/**/*.{h,m,mm}", "cpp/**/*.{h,cpp}"
 
-  if is_reanimated
-    s.dependency "RNReanimated/worklets"
-  elsif is_worklets
+  if is_worklets
     s.dependency "RNWorklets"
+  elsif is_reanimated
+    s.dependency "RNReanimated/worklets"
   else
     raise "Error!"
   end
