@@ -58,11 +58,8 @@ def resolveReactNativeDirectory() {
   throw new GradleException("[react-native-live-markdown] Unable to resolve react-native location in node_modules. Your app should define `REACT_NATIVE_NODE_MODULES_DIR` extension property in `app/build.gradle` with a path to react-native in node_modules.")
 }
 
-println resolveReactNativeDirectory().parent
-
-def findInstalledPackage = { name ->
+def isPackageInstalled = { name ->
   def reactNativeLocation = resolveReactNativeDirectory().parent
-  println reactNativeLocation
   if (!reactNativeLocation) return false
     def packagePath = new File(reactNativeLocation, name)
   return packagePath.isDirectory()
@@ -77,8 +74,7 @@ def getReactNativeMinorVersion() {
 }
 
 def REACT_NATIVE_MINOR_VERSION = getReactNativeMinorVersion()
-def isReanimated = findInstalledPackage('react-native-reanimated')
-def isWorklets   = findInstalledPackage('react-native-worklets')
+def workletsInstalled = isPackageInstalled('react-native-worklets')
 
 android {
   if (supportsNamespace()) {
@@ -186,13 +182,14 @@ repositories {
   google()
 }
 
+
 dependencies {
   implementation "com.facebook.react:react-android" // version substituted by RNGP
   implementation "com.facebook.react:hermes-android" // version substituted by RNGP
 
-  if (isWorklets) {
+  if (workletsInstalled) {
     implementation project(":react-native-worklets")
-  } else if (isReanimated) {
+  } else {
     implementation project(":react-native-reanimated")
   }
 }
@@ -202,10 +199,10 @@ dependencies {
 // like a header-only library. During build, config files are not regenerated
 // because the cache key does not change and AGP thinks that they are up-to-date.
 afterEvaluate {
-  if (isWorklets) {
+  if (workletsInstalled) {
     prepareKotlinBuildScriptModel.dependsOn(":react-native-worklets:prefabDebugPackage")
     prepareKotlinBuildScriptModel.dependsOn(":react-native-worklets:prefabReleasePackage")
-  } else if (isReanimated) {
+  } else {
     prepareKotlinBuildScriptModel.dependsOn(":react-native-reanimated:prefabDebugPackage")
     prepareKotlinBuildScriptModel.dependsOn(":react-native-reanimated:prefabReleasePackage")
   }

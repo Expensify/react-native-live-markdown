@@ -14,7 +14,7 @@ void setMarkdownRuntime(const std::shared_ptr<WorkletRuntime> &markdownWorkletRu
 
 std::shared_ptr<WorkletRuntime> getMarkdownRuntime();
 
-#ifdef IS_WORKLETS
+#ifdef WORKLETS_INSTALLED
 const int registerMarkdownWorklet(const std::shared_ptr<SerializableWorklet> &markdownWorklet);
 #else
 const int registerMarkdownWorklet(const std::shared_ptr<ShareableWorklet> &markdownWorklet);
@@ -22,7 +22,7 @@ const int registerMarkdownWorklet(const std::shared_ptr<ShareableWorklet> &markd
 
 void unregisterMarkdownWorklet(const int parserId);
 
-#ifdef IS_WORKLETS
+#ifdef WORKLETS_INSTALLED
 std::shared_ptr<SerializableWorklet> getMarkdownWorklet(const int parserId);
 #else
 std::shared_ptr<ShareableWorklet> getMarkdownWorklet(const int parserId);

@@ -6,22 +6,20 @@ react_native_minor_version = react_native_json['version'].split('.')[1].to_i
 
 pods_root = Pod::Config.instance.project_pods_root
 
-find_installed_package = ->(name) do
+is_package_installed = ->(name) do
   package_path = File.join(react_native_node_modules_dir, name)
   File.directory?(package_path)
 end
 
-is_reanimated = find_installed_package.call('react-native-reanimated')
-is_worklets   = find_installed_package.call('react-native-worklets')
+worklets_installed = is_package_installed.call('react-native-worklets')
 
-package_name = if is_worklets
+package_name = if worklets_installed
                  'react-native-worklets/package.json'
-               elsif is_reanimated
-                 'react-native-reanimated/package.json'
                else
-                 raise "Error!"
+                 'react-native-reanimated/package.json'
                end
 
+# TODO: is REACT_NATIVE_REANIMATED_NODE_MODULES_DIR needed, should we rename it or add new variable?
 react_native_worklets_node_modules_dir = ENV['REACT_NATIVE_REANIMATED_NODE_MODULES_DIR'] || File.dirname(`cd "#{Pod::Config.instance.installation_root.to_s}" && node --print "require.resolve('#{package_name}')"`)
 react_native_worklets_node_modules_dir_from_pods_root = Pathname.new(react_native_worklets_node_modules_dir).relative_path_from(pods_root).to_s
 
@@ -41,12 +39,10 @@ Pod::Spec.new do |s|
 
   s.source_files = "apple/**/*.{h,m,mm}", "cpp/**/*.{h,cpp}"
 
-  if is_worklets
+  if worklets_installed
     s.dependency "RNWorklets"
-  elsif is_reanimated
-    s.dependency "RNReanimated/worklets"
   else
-    raise "Error!"
+    s.dependency "RNReanimated/worklets"
   end
 
   s.xcconfig = {
@@ -56,8 +52,8 @@ Pod::Spec.new do |s|
       "\"$(PODS_ROOT)/#{react_native_worklets_node_modules_dir_from_pods_root}/Common/cpp\"",
     ].join(' '),
   }
-  if is_worklets
-    s.xcconfig["OTHER_CFLAGS"] << " -DIS_WORKLETS=1"
+  if worklets_installed
+    s.xcconfig["OTHER_CFLAGS"] << " -DWORKLETS_INSTALLED=1"
   end
 
   s.pod_target_xcconfig = { "HEADER_SEARCH_PATHS" => "\"$(PODS_TARGET_SRCROOT)/cpp\"" }

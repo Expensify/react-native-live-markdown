@@ -6,17 +6,12 @@ set(CMAKE_VERBOSE_MAKEFILE on)
 
 set(NODE_MODULES_DIR "${REACT_NATIVE_ROOT_DIR}/..")
 set(REACT_NATIVE_WORKLETS_DIR "${NODE_MODULES_DIR}/react-native-worklets")
-set(REACT_NATIVE_REANIMATED_DIR "${NODE_MODULES_DIR}/react-native-reanimated")
 
 if(EXISTS "${REACT_NATIVE_WORKLETS_DIR}")
-  set(IS_WORKLETS TRUE)
+  set(WORKLETS_INSTALLED TRUE)
 endif()
 
-if(EXISTS "${REACT_NATIVE_REANIMATED_DIR}")
-  set(IS_REANIMATED TRUE)
-endif()
-
-if(IS_WORKLETS)
+if(WORKLETS_INSTALLED)
   include("${REACT_NATIVE_ROOT_DIR}/ReactAndroid/cmake-utils/folly-flags.cmake")
   add_compile_options(${folly_FLAGS})
 endif()
@@ -32,19 +27,19 @@ file(GLOB CPP_SRC CONFIGURE_DEPENDS "${CPP_DIR}/*.cpp")
 
 add_library(${CMAKE_PROJECT_NAME} SHARED ${ANDROID_SRC} ${CPP_SRC})
 
-if(IS_WORKLETS)
+if(WORKLETS_INSTALLED)
   target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CPP_DIR} "${REACT_NATIVE_ROOT_DIR}/ReactCommon/jsiexecutor")
-elseif(IS_REANIMATED)
+else
   target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CPP_DIR})
 endif()
 
 find_package(fbjni REQUIRED CONFIG)
 find_package(ReactAndroid REQUIRED CONFIG)
 
-if(IS_WORKLETS)
+if(WORKLETS_INSTALLED)
   find_package(react-native-worklets REQUIRED CONFIG)
-  add_definitions(-DIS_WORKLETS)
-elseif(IS_REANIMATED)
+  add_definitions(-DWORKLETS_INSTALLED)
+else
   find_package(react-native-reanimated REQUIRED CONFIG)
 endif()
 
@@ -56,8 +51,8 @@ target_link_libraries(
         ReactAndroid::reactnative
 )
 
-if(IS_WORKLETS)
+if(WORKLETS_INSTALLED)
   target_link_libraries(${CMAKE_PROJECT_NAME} react-native-worklets::worklets)
-elseif(IS_REANIMATED)
+else
   target_link_libraries(${CMAKE_PROJECT_NAME} react-native-reanimated::worklets)
 endif()

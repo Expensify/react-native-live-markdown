@@ -17,7 +17,7 @@ std::shared_ptr<WorkletRuntime> getMarkdownRuntime() {
   return globalMarkdownWorkletRuntime;
 }
 
-#ifdef IS_WORKLETS
+#ifdef WORKLETS_INSTALLED
 std::unordered_map<int, std::shared_ptr<SerializableWorklet>> globalMarkdownShareableWorklets;
 #else
 std::unordered_map<int, std::shared_ptr<ShareableWorklet>> globalMarkdownShareableWorklets;
@@ -25,7 +25,7 @@ std::unordered_map<int, std::shared_ptr<ShareableWorklet>> globalMarkdownShareab
 std::mutex globalMarkdownShareableWorkletsMutex;
 int nextParserId = 1;
 
-#ifdef IS_WORKLETS
+#ifdef WORKLETS_INSTALLED
 const int registerMarkdownWorklet(const std::shared_ptr<SerializableWorklet> &markdownWorklet) {
 #else
 const int registerMarkdownWorklet(const std::shared_ptr<ShareableWorklet> &markdownWorklet) {
@@ -42,7 +42,7 @@ void unregisterMarkdownWorklet(const int parserId) {
   globalMarkdownShareableWorklets.erase(parserId);
 }
 
-#ifdef IS_WORKLETS
+#ifdef WORKLETS_INSTALLED
 std::shared_ptr<SerializableWorklet> getMarkdownWorklet(const int parserId) {
 #else
 std::shared_ptr<ShareableWorklet> getMarkdownWorklet(const int parserId) {
