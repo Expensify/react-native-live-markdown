@@ -25,7 +25,7 @@ void unregisterMarkdownWorklet(const int parserId);
 #ifdef IS_WORKLETS
 std::shared_ptr<SerializableWorklet> getMarkdownWorklet(const int parserId);
 #else
-const int registerMarkdownWorklet(const std::shared_ptr<ShareableWorklet> &markdownWorklet);
+std::shared_ptr<ShareableWorklet> getMarkdownWorklet(const int parserId);
 #endif
 
 } // namespace livemarkdown

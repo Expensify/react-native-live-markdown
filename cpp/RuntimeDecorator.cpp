@@ -25,9 +25,7 @@ void injectJSIBindings(jsi::Runtime &rt) {
       1,
       [](jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) -> jsi::Value {
         #ifdef IS_WORKLETS
-        auto parserId = registerMarkdownWorklet(
-                extractSerializableOrThrow<SerializableWorklet>(rt, args[0])
-        );
+        auto parserId = registerMarkdownWorklet(extractSerializableOrThrow<SerializableWorklet>(rt, args[0]));
         #else
         auto parserId = registerMarkdownWorklet(extractShareableOrThrow<ShareableWorklet>(rt, args[0]));
         #endif

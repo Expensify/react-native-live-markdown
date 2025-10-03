@@ -50,7 +50,6 @@ target_link_libraries(
         fbjni::fbjni
         ReactAndroid::jsi
         ReactAndroid::reactnative
-        react-native-worklets::worklets
 )
 
 if(IS_REANIMATED)
