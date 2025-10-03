@@ -107,7 +107,7 @@ android {
           "-DANDROID_TOOLCHAIN=clang",
           "-DREACT_NATIVE_MINOR_VERSION=${REACT_NATIVE_MINOR_VERSION}",
           "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON",
-          "-DREACT_NATIVE_ROOT_DIR=${resolveReactNativeDirectory()}"
+          "-DREACT_NATIVE_ROOT_DIR=${resolveReactNativeDirectory().path}"
         abiFilters (*reactNativeArchitectures())
       }
     }
@@ -190,10 +190,10 @@ dependencies {
   implementation "com.facebook.react:react-android" // version substituted by RNGP
   implementation "com.facebook.react:hermes-android" // version substituted by RNGP
 
-  if (isReanimated) {
-    implementation project(":react-native-reanimated")
-  } else if (isWorklets) {
+  if (isWorklets) {
     implementation project(":react-native-worklets")
+  } else if (isReanimated) {
+    implementation project(":react-native-reanimated")
   }
 }
 
@@ -202,11 +202,11 @@ dependencies {
 // like a header-only library. During build, config files are not regenerated
 // because the cache key does not change and AGP thinks that they are up-to-date.
 afterEvaluate {
-  if (isReanimated) {
-    prepareKotlinBuildScriptModel.dependsOn(":react-native-reanimated:prefabDebugPackage")
-    prepareKotlinBuildScriptModel.dependsOn(":react-native-reanimated:prefabReleasePackage")
-  } else if (isWorklets) {
+  if (isWorklets) {
     prepareKotlinBuildScriptModel.dependsOn(":react-native-worklets:prefabDebugPackage")
     prepareKotlinBuildScriptModel.dependsOn(":react-native-worklets:prefabReleasePackage")
+  } else if (isReanimated) {
+    prepareKotlinBuildScriptModel.dependsOn(":react-native-reanimated:prefabDebugPackage")
+    prepareKotlinBuildScriptModel.dependsOn(":react-native-reanimated:prefabReleasePackage")
   }
 }

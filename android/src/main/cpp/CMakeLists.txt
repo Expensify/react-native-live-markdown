@@ -32,18 +32,22 @@ file(GLOB CPP_SRC CONFIGURE_DEPENDS "${CPP_DIR}/*.cpp")
 
 add_library(${CMAKE_PROJECT_NAME} SHARED ${ANDROID_SRC} ${CPP_SRC})
 
-target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CPP_DIR} "${REACT_NATIVE_ROOT_DIR}/ReactCommon/jsiexecutor")
+if(IS_WORKLETS)
+  target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CPP_DIR} "${REACT_NATIVE_ROOT_DIR}/ReactCommon/jsiexecutor")
+elseif(IS_REANIMATED)
+  target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CPP_DIR})
+endif()
 
 find_package(fbjni REQUIRED CONFIG)
 find_package(ReactAndroid REQUIRED CONFIG)
 
-if(IS_REANIMATED)
-  find_package(react-native-reanimated CONFIG QUIET)
-endif()
 if(IS_WORKLETS)
   find_package(react-native-worklets REQUIRED CONFIG)
   add_definitions(-DIS_WORKLETS)
+elseif(IS_REANIMATED)
+  find_package(react-native-reanimated REQUIRED CONFIG)
 endif()
+
 
 target_link_libraries(
         ${CMAKE_PROJECT_NAME}
@@ -52,8 +56,8 @@ target_link_libraries(
         ReactAndroid::reactnative
 )
 
-if(IS_REANIMATED)
-  target_link_libraries(${CMAKE_PROJECT_NAME} react-native-reanimated::worklets)
-elseif(IS_WORKLETS)
+if(IS_WORKLETS)
   target_link_libraries(${CMAKE_PROJECT_NAME} react-native-worklets::worklets)
+elseif(IS_REANIMATED)
+  target_link_libraries(${CMAKE_PROJECT_NAME} react-native-reanimated::worklets)
 endif()
