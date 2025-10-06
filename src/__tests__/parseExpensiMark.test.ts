@@ -1,10 +1,11 @@
 import {expect} from '@jest/globals';
 import type {MarkdownRange} from '../commonTypes';
 import parseExpensiMark from '../parseExpensiMark';
+import type {ExtendedMarkdownRange} from '../rangeUtils';
 
 declare module 'expect' {
   interface Matchers<R> {
-    toBeParsedAs(expectedRanges: MarkdownRange[]): R;
+    toBeParsedAs(expectedRanges: ExtendedMarkdownRange[]): R;
   }
 }
 
@@ -222,9 +223,9 @@ test('email with multiline hyperlinks', () => {
 
 test('inline code', () => {
   expect('Hello `world`!').toBeParsedAs([
-    {type: 'syntax', start: 6, length: 1},
+    {type: 'syntax', start: 6, length: 1, syntaxType: 'opening'},
     {type: 'code', start: 7, length: 5},
-    {type: 'syntax', start: 12, length: 1},
+    {type: 'syntax', start: 12, length: 1, syntaxType: 'closing'},
   ]);
 });
 
@@ -585,9 +586,9 @@ describe('report mentions', () => {
 
   test('report mention with markdown', () => {
     expect('reported #`report-name` should be highlighted').toBeParsedAs([
-      {type: 'syntax', start: 10, length: 1},
+      {type: 'syntax', start: 10, length: 1, syntaxType: 'opening'},
       {type: 'code', start: 11, length: 11},
-      {type: 'syntax', start: 22, length: 1},
+      {type: 'syntax', start: 22, length: 1, syntaxType: 'closing'},
     ]);
   });
 
@@ -675,6 +676,94 @@ describe('inline video', () => {
       {type: 'syntax', start: 13, length: 1},
       {type: 'link', start: 14, length: 29},
       {type: 'syntax', start: 43, length: 1},
+    ]);
+  });
+});
+
+describe('nested inline code', () => {
+  test('starting with emoji', () => {
+    expect('_~`🚀test`~_').toBeParsedAs([
+      {type: 'syntax', start: 0, length: 1},
+      {type: 'italic', start: 1, length: 2},
+      {type: 'italic', start: 5, length: 4},
+      {type: 'italic', start: 9, length: 2},
+      {type: 'syntax', start: 1, length: 1},
+      {type: 'strikethrough', start: 2, length: 1},
+      {type: 'strikethrough', start: 5, length: 4},
+      {type: 'strikethrough', start: 9, length: 1},
+      {type: 'syntax', start: 2, length: 1, syntaxType: 'opening'},
+      {type: 'code', start: 3, length: 6},
+      {type: 'emoji', start: 3, length: 2},
+      {type: 'syntax', start: 9, length: 1, syntaxType: 'closing'},
+      {type: 'syntax', start: 10, length: 1},
+      {type: 'syntax', start: 11, length: 1},
+    ]);
+  });
+
+  test('emoji in the middle', () => {
+    expect('_~`te🚀st`~_').toBeParsedAs([
+      {type: 'syntax', start: 0, length: 1},
+      {type: 'italic', start: 1, length: 2},
+      {type: 'italic', start: 3, length: 2},
+      {type: 'italic', start: 7, length: 2},
+      {type: 'italic', start: 9, length: 2},
+      {type: 'syntax', start: 1, length: 1},
+      {type: 'strikethrough', start: 2, length: 1},
+      {type: 'strikethrough', start: 3, length: 2},
+      {type: 'strikethrough', start: 7, length: 2},
+      {type: 'strikethrough', start: 9, length: 1},
+      {type: 'syntax', start: 2, length: 1, syntaxType: 'opening'},
+      {type: 'code', start: 3, length: 6},
+      {type: 'emoji', start: 5, length: 2},
+      {type: 'syntax', start: 9, length: 1, syntaxType: 'closing'},
+      {type: 'syntax', start: 10, length: 1},
+      {type: 'syntax', start: 11, length: 1},
+    ]);
+  });
+
+  test('ending with emoji', () => {
+    expect('_~`test🚀`~_').toBeParsedAs([
+      {type: 'syntax', start: 0, length: 1},
+      {type: 'italic', start: 1, length: 2},
+      {type: 'italic', start: 3, length: 4},
+      {type: 'italic', start: 9, length: 2},
+      {type: 'syntax', start: 1, length: 1},
+      {type: 'strikethrough', start: 2, length: 1},
+      {type: 'strikethrough', start: 3, length: 4},
+      {type: 'strikethrough', start: 9, length: 1},
+      {type: 'syntax', start: 2, length: 1, syntaxType: 'opening'},
+      {type: 'code', start: 3, length: 6},
+      {type: 'emoji', start: 7, length: 2},
+      {type: 'syntax', start: 9, length: 1, syntaxType: 'closing'},
+      {type: 'syntax', start: 10, length: 1},
+      {type: 'syntax', start: 11, length: 1},
+    ]);
+  });
+
+  test('emoji inside and outside inline code', () => {
+    expect('_~🚀`🚀te🚀st🚀`🚀~_').toBeParsedAs([
+      {type: 'syntax', start: 0, length: 1},
+      {type: 'italic', start: 1, length: 1},
+      {type: 'italic', start: 4, length: 1},
+      {type: 'italic', start: 7, length: 2},
+      {type: 'italic', start: 11, length: 2},
+      {type: 'italic', start: 15, length: 1},
+      {type: 'italic', start: 18, length: 1},
+      {type: 'syntax', start: 1, length: 1},
+      {type: 'strikethrough', start: 4, length: 1},
+      {type: 'strikethrough', start: 7, length: 2},
+      {type: 'strikethrough', start: 11, length: 2},
+      {type: 'strikethrough', start: 15, length: 1},
+      {type: 'emoji', start: 2, length: 2},
+      {type: 'syntax', start: 4, length: 1, syntaxType: 'opening'},
+      {type: 'code', start: 5, length: 10},
+      {type: 'emoji', start: 5, length: 2},
+      {type: 'emoji', start: 9, length: 2},
+      {type: 'emoji', start: 13, length: 2},
+      {type: 'syntax', start: 15, length: 1, syntaxType: 'closing'},
+      {type: 'emoji', start: 16, length: 2},
+      {type: 'syntax', start: 18, length: 1},
+      {type: 'syntax', start: 19, length: 1},
     ]);
   });
 });
