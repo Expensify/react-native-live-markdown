@@ -2,6 +2,10 @@
 
 import type {MarkdownRange, MarkdownType} from './commonTypes';
 
+type ExtendedMarkdownRange = MarkdownRange & {
+  syntaxType?: 'opening' | 'closing';
+};
+
 // getTagPriority returns a priority for a tag, higher priority means the tag should be processed first
 function getTagPriority(tag: string) {
   switch (tag) {
@@ -56,20 +60,22 @@ function ungroupRanges(ranges: MarkdownRange[]): MarkdownRange[] {
   });
   return ungroupedRanges;
 }
-
 /**
  * Creates a list of ranges that should not be formatted by certain markdown types (italic, strikethrough).
  * This includes emojis and syntaxes of inline code blocks.
  */
-function getRangesToExcludeFormatting(ranges: MarkdownRange[]) {
+function getRangesToExcludeFormatting(ranges: MarkdownRange[]): ExtendedMarkdownRange[] {
   let closingSyntaxPosition: number | null = null;
   return ranges.filter((range, index) => {
     const nextRange = ranges[index + 1];
+    const currentRange = range as ExtendedMarkdownRange;
     if (nextRange && nextRange.type === 'code' && range.type === 'syntax') {
+      currentRange.syntaxType = 'opening';
       closingSyntaxPosition = nextRange.start + nextRange.length;
       return true;
     }
     if (closingSyntaxPosition !== null && range.type === 'syntax' && range.start <= closingSyntaxPosition) {
+      currentRange.syntaxType = 'closing';
       closingSyntaxPosition = null;
       return true;
     }
@@ -83,7 +89,7 @@ function getRangesToExcludeFormatting(ranges: MarkdownRange[]) {
  * @param baseMarkdownType - The base markdown type to exclude formatting from (e.g., 'italic').
  * @param rangesToExclude - The array of MarkdownRange objects representing the ranges to exclude from formatting.
  */
-function excludeRangeTypesFromFormatting(ranges: MarkdownRange[], baseMarkdownType: MarkdownType, rangesToExclude: MarkdownRange[]): MarkdownRange[] {
+function excludeRangeTypesFromFormatting(ranges: MarkdownRange[], baseMarkdownType: MarkdownType, rangesToExclude: ExtendedMarkdownRange[]): MarkdownRange[] {
   const newRanges: MarkdownRange[] = [];
 
   let i = 0;
@@ -115,11 +121,11 @@ function excludeRangeTypesFromFormatting(ranges: MarkdownRange[], baseMarkdownTy
           const newRange: MarkdownRange = {
             type: currentRange.type,
             start: currentStart,
-            length: excludeRangeStart - currentStart,
+            length: excludeRangeStart - currentStart + (excludeRange.syntaxType === 'opening' ? 1 : 0), // Adjust length so opening syntax ends after the opening syntax
             ...(currentRange?.depth && {depth: currentRange?.depth}),
           };
-          currentRange.start = excludeRangeEnd;
-          currentRange.length = currentEnd - excludeRangeEnd;
+          currentRange.start = excludeRangeEnd + (excludeRange.syntaxType === 'closing' ? -1 : 0); // Adjust current range to start before closing syntax
+          currentRange.length = currentEnd - excludeRangeEnd + (excludeRange.syntaxType === 'closing' ? 1 : 0);
 
           if (newRange.length > 0) {
             newRanges.push(newRange);
@@ -138,3 +144,4 @@ function excludeRangeTypesFromFormatting(ranges: MarkdownRange[], baseMarkdownTy
 }
 
 export {sortRanges, groupRanges, ungroupRanges, excludeRangeTypesFromFormatting, getRangesToExcludeFormatting};
+export type {ExtendedMarkdownRange};
