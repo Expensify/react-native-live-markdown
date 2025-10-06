@@ -4,13 +4,6 @@ cmake_minimum_required(VERSION 3.13)
 
 set(CMAKE_VERBOSE_MAKEFILE on)
 
-set(NODE_MODULES_DIR "${REACT_NATIVE_ROOT_DIR}/..")
-set(REACT_NATIVE_WORKLETS_DIR "${NODE_MODULES_DIR}/react-native-worklets")
-
-if(EXISTS "${REACT_NATIVE_WORKLETS_DIR}")
-  set(WORKLETS_INSTALLED TRUE)
-endif()
-
 if(WORKLETS_INSTALLED)
   include("${REACT_NATIVE_ROOT_DIR}/ReactAndroid/cmake-utils/folly-flags.cmake")
   add_compile_options(${folly_FLAGS})

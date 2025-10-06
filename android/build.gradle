@@ -96,7 +96,8 @@ android {
           "-DANDROID_TOOLCHAIN=clang",
           "-DREACT_NATIVE_MINOR_VERSION=${REACT_NATIVE_MINOR_VERSION}",
           "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON",
-          "-DREACT_NATIVE_ROOT_DIR=${resolveReactNativeDirectory().path}"
+          "-DREACT_NATIVE_ROOT_DIR=${resolveReactNativeDirectory().path}",
+          "-DWORKLETS_INSTALLED=${workletsInstalled}"
         abiFilters (*reactNativeArchitectures())
       }
     }
