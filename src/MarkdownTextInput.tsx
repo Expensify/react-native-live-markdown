@@ -40,23 +40,15 @@ function initializeLiveMarkdownIfNeeded() {
     throw new Error('[react-native-live-markdown] global.jsi_setMarkdownRuntime is not available');
   }
 
-  let createWorkletRuntime;
+  let createWorkletRuntime: (name: string) => WorkletRuntime;
   try {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     createWorkletRuntime = require('react-native-worklets').createWorkletRuntime;
   } catch {
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      createWorkletRuntime = require('react-native-reanimated').createWorkletRuntime;
-    } catch {
-      /* empty */
-    }
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    createWorkletRuntime = require('react-native-reanimated').createWorkletRuntime;
   }
-
   workletRuntime = createWorkletRuntime('LiveMarkdownRuntime');
-  if (!workletRuntime) {
-    return;
-  }
 
   global.jsi_setMarkdownRuntime(workletRuntime);
   initialized = true;
@@ -70,12 +62,8 @@ function registerParser(parser: (input: string) => MarkdownRange[]): number {
     // eslint-disable-next-line @typescript-eslint/no-var-requires,import/no-unresolved
     makeShareableCloneRecursive = require('react-native-worklets').makeShareableCloneRecursive;
   } catch {
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires,import/no-unresolved
-      makeShareableCloneRecursive = require('react-native-reanimated').makeShareableCloneRecursive;
-    } catch {
-      /* empty */
-    }
+    // eslint-disable-next-line @typescript-eslint/no-var-requires,import/no-unresolved
+    makeShareableCloneRecursive = require('react-native-reanimated').makeShareableCloneRecursive;
   }
 
   const shareableWorklet = makeShareableCloneRecursive(parser) as ShareableRef<WorkletFunction<[string], MarkdownRange[]>>;
