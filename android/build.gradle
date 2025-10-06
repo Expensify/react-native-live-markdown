@@ -58,13 +58,6 @@ def resolveReactNativeDirectory() {
   throw new GradleException("[react-native-live-markdown] Unable to resolve react-native location in node_modules. Your app should define `REACT_NATIVE_NODE_MODULES_DIR` extension property in `app/build.gradle` with a path to react-native in node_modules.")
 }
 
-def isPackageInstalled = { name ->
-  def reactNativeLocation = resolveReactNativeDirectory().parent
-  if (!reactNativeLocation) return false
-    def packagePath = new File(reactNativeLocation, name)
-  return packagePath.isDirectory()
-}
-
 def getReactNativeMinorVersion() {
   def reactNativeRootDir = resolveReactNativeDirectory()
   def reactNativeProperties = new Properties()
@@ -74,7 +67,7 @@ def getReactNativeMinorVersion() {
 }
 
 def REACT_NATIVE_MINOR_VERSION = getReactNativeMinorVersion()
-def workletsInstalled = isPackageInstalled('react-native-worklets')
+def workletsInstalled = rootProject.findProject(':react-native-worklets') != null
 
 android {
   if (supportsNamespace()) {

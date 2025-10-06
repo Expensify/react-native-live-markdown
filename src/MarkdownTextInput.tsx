@@ -1,19 +1,12 @@
 import {StyleSheet, TextInput, processColor} from 'react-native';
 import React from 'react';
 import type {TextInputProps} from 'react-native';
-import type {WorkletRuntime as WorkletRuntimeWorklets, WorkletFunction as WorkletFunctionWorklets, SerializableRef as SerializableRefWorklets} from 'react-native-worklets';
-import type {WorkletRuntime as WorkletRuntimeReanimated} from 'react-native-reanimated';
-import type {ShareableRef as ShereableRefReanimated, WorkletFunction as WorkletFunctionReanimated} from 'react-native-reanimated/lib/typescript/commonTypes';
 import MarkdownTextInputDecoratorViewNativeComponent from './MarkdownTextInputDecoratorViewNativeComponent';
 import type {MarkdownStyle} from './MarkdownTextInputDecoratorViewNativeComponent';
 import NativeLiveMarkdownModule from './NativeLiveMarkdownModule';
 import {mergeMarkdownStyleWithDefault} from './styleUtils';
 import type {PartialMarkdownStyle} from './styleUtils';
-import type {InlineImagesInputProps, MarkdownRange} from './commonTypes';
-
-type WorkletRuntime = WorkletRuntimeWorklets | WorkletRuntimeReanimated;
-type WorkletFunction<T extends unknown[], U> = WorkletFunctionWorklets<T, U> | WorkletFunctionReanimated<T, U>;
-type ShareableRef<T> = SerializableRefWorklets<T> | ShereableRefReanimated<T>;
+import type {InlineImagesInputProps, MarkdownRange, ShareableRef, WorkletFunction, WorkletRuntime} from './commonTypes';
 
 declare global {
   // eslint-disable-next-line no-var
@@ -49,11 +42,11 @@ function initializeLiveMarkdownIfNeeded() {
 
   let createWorkletRuntime;
   try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires,import/no-unresolved
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     createWorkletRuntime = require('react-native-worklets').createWorkletRuntime;
   } catch {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires,import/no-unresolved
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
       createWorkletRuntime = require('react-native-reanimated').createWorkletRuntime;
     } catch {
       /* empty */
