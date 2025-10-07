@@ -6,7 +6,10 @@ react_native_minor_version = react_native_json['version'].split('.')[1].to_i
 
 pods_root = Pod::Config.instance.project_pods_root
 
-worklets_installed = system(`cd "#{Pod::Config.instance.installation_root.to_s}" && node -e "require.resolve(\'react-native-worklets/package.json\')" 2>/dev/null`)
+worklets_installed = system(%Q[
+  cd "#{Pod::Config.instance.installation_root}" &&
+  node -e "require.resolve('react-native-worklets/package.json')" > /dev/null 2>&1
+])
 package_name = worklets_installed ? 'react-native-worklets/package.json' : 'react-native-reanimated/package.json'
 
 react_native_worklets_node_modules_dir = ENV['REACT_NATIVE_REANIMATED_NODE_MODULES_DIR'] ||
