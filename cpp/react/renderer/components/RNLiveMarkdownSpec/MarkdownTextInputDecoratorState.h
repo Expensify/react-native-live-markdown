@@ -12,17 +12,19 @@ public:
 
   MarkdownTextInputDecoratorState(){};
 
-#ifdef ANDROID
+// TODO: Simplify once RN 0.81 is the lowest supported version
+#if (defined(ANDROID) && REACT_NATIVE_MINOR_VERSION < 81) || (defined(RN_SERIALIZABLE_STATE) && REACT_NATIVE_MINOR_VERSION >= 81)
   MarkdownTextInputDecoratorState(
       MarkdownTextInputDecoratorState const &previousState, folly::dynamic data){};
-#endif
 
-#ifdef ANDROID
   folly::dynamic getDynamic() const {
     return {};
   }
+#if REACT_NATIVE_MINOR_VERSION < 81
   MapBuffer getMapBuffer() const { return MapBufferBuilder::EMPTY(); };
-#endif
+#endif // REACT_NATIVE_MINOR_VERSION < 81
+#endif // (defined(ANDROID) && REACT_NATIVE_MINOR_VERSION < 81) || (defined(RN_SERIALIZABLE_STATE) && REACT_NATIVE_MINOR_VERSION >= 81)
+
 };
 
 } // namespace react

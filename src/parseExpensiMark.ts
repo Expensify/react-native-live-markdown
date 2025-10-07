@@ -6,7 +6,7 @@ import {unescapeText} from 'expensify-common/dist/utils';
 import {decode} from 'html-entities';
 import type {WorkletFunction} from 'react-native-reanimated/lib/typescript/commonTypes';
 import type {MarkdownType, MarkdownRange} from './commonTypes';
-import {groupRanges, sortRanges, splitRangesOnEmojis} from './rangeUtils';
+import {groupRanges, sortRanges, excludeRangeTypesFromFormatting, getRangesToExcludeFormatting} from './rangeUtils';
 
 function isWeb() {
   return Platform.OS === 'web';
@@ -238,8 +238,6 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, MarkdownRange[]] {
   return [text, ranges];
 }
 
-const isNative = Platform.OS === 'android' || Platform.OS === 'ios';
-
 function parseExpensiMark(markdown: string): MarkdownRange[] {
   if (markdown.length > MAX_PARSABLE_LENGTH) {
     return [];
@@ -257,12 +255,11 @@ function parseExpensiMark(markdown: string): MarkdownRange[] {
     return [];
   }
   let markdownRanges = sortRanges(ranges);
-  if (isNative) {
-    // Blocks applying italic and strikethrough styles to emojis on Android and iOS
-    // TODO: Remove this condition when splitting emojis inside the inline code block will be fixed on the web
-    markdownRanges = splitRangesOnEmojis(markdownRanges, 'italic');
-    markdownRanges = splitRangesOnEmojis(markdownRanges, 'strikethrough');
-  }
+
+  // Prevent italic and strikethrough formatting inside emojis and inline code blocks
+  const rangesToExclude = getRangesToExcludeFormatting(markdownRanges);
+  markdownRanges = excludeRangeTypesFromFormatting(markdownRanges, 'italic', rangesToExclude);
+  markdownRanges = excludeRangeTypesFromFormatting(markdownRanges, 'strikethrough', rangesToExclude);
 
   const groupedRanges = groupRanges(markdownRanges);
   return groupedRanges;

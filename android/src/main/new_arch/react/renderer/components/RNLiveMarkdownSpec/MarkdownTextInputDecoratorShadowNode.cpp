@@ -144,14 +144,14 @@ void MarkdownTextInputDecoratorShadowNode::overwriteTextLayoutManager() {
 }
 
 void MarkdownTextInputDecoratorShadowNode::appendChild(
-    const ShadowNode::Shared &child) {
+    const std::shared_ptr<const ShadowNode> &child) {
   YogaLayoutableShadowNode::appendChild(child);
 
   overwriteTextLayoutManager();
 }
 
 void MarkdownTextInputDecoratorShadowNode::replaceChild(
-    const ShadowNode &oldChild, const ShadowNode::Shared &newChild,
+    const ShadowNode &oldChild, const std::shared_ptr<const ShadowNode> &newChild,
     size_t suggestedIndex) {
   YogaLayoutableShadowNode::replaceChild(oldChild, newChild, suggestedIndex);
 
@@ -166,7 +166,7 @@ void MarkdownTextInputDecoratorShadowNode::layout(LayoutContext layoutContext) {
       children.size() == 1 &&
       "MarkdownTextInputDecoratorView didn't receive exactly one child");
 
-  auto child = std::static_pointer_cast<const YogaLayoutableShadowNode>(getChildren()[0]);
+  auto child = std::static_pointer_cast<const YogaLayoutableShadowNode>(children[0]);
   child->ensureUnsealed();
   auto mutableChild = std::const_pointer_cast<YogaLayoutableShadowNode>(child);
 

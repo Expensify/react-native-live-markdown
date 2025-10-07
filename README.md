@@ -173,7 +173,7 @@ function parser(input: string) {
 
 ## Markdown flavors support
 
-Currently, `react-native-live-markdown` supports only [ExpensiMark](https://github.com/Expensify/expensify-common/blob/main/lib/ExpensiMark.ts) flavor. We are working on CommonMark support as well as possibility to use other Markdown parsers.
+Currently, `react-native-live-markdown` supports only [ExpensiMark](https://github.com/Expensify/expensify-common/blob/main/lib/ExpensiMark.ts) flavor out-of-the-box. You can customize the behavior by passing a custom parser worklet function via the `parser` prop, as detailed in the [Parsing logic](#parsing-logic) section.
 
 ## API reference
 
