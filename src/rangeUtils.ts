@@ -56,20 +56,22 @@ function ungroupRanges(ranges: MarkdownRange[]): MarkdownRange[] {
   });
   return ungroupedRanges;
 }
-
 /**
  * Creates a list of ranges that should not be formatted by certain markdown types (italic, strikethrough).
  * This includes emojis and syntaxes of inline code blocks.
  */
-function getRangesToExcludeFormatting(ranges: MarkdownRange[]) {
+function getRangesToExcludeFormatting(ranges: MarkdownRange[]): MarkdownRange[] {
   let closingSyntaxPosition: number | null = null;
   return ranges.filter((range, index) => {
     const nextRange = ranges[index + 1];
+    const currentRange = range;
     if (nextRange && nextRange.type === 'code' && range.type === 'syntax') {
+      currentRange.syntaxType = 'opening';
       closingSyntaxPosition = nextRange.start + nextRange.length;
       return true;
     }
     if (closingSyntaxPosition !== null && range.type === 'syntax' && range.start <= closingSyntaxPosition) {
+      currentRange.syntaxType = 'closing';
       closingSyntaxPosition = null;
       return true;
     }
@@ -115,11 +117,11 @@ function excludeRangeTypesFromFormatting(ranges: MarkdownRange[], baseMarkdownTy
           const newRange: MarkdownRange = {
             type: currentRange.type,
             start: currentStart,
-            length: excludeRangeStart - currentStart,
+            length: excludeRangeStart - currentStart + (excludeRange.syntaxType === 'opening' ? 1 : 0), // Adjust the length so the new range from the split ends after the opening syntax
             ...(currentRange?.depth && {depth: currentRange?.depth}),
           };
-          currentRange.start = excludeRangeEnd;
-          currentRange.length = currentEnd - excludeRangeEnd;
+          currentRange.start = excludeRangeEnd + (excludeRange.syntaxType === 'closing' ? -1 : 0); // Adjust the current range to start before the closing syntax
+          currentRange.length = currentEnd - excludeRangeEnd + (excludeRange.syntaxType === 'closing' ? 1 : 0);
 
           if (newRange.length > 0) {
             newRanges.push(newRange);

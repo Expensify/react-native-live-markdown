@@ -21,6 +21,7 @@ interface MarkdownRange {
   start: number;
   length: number;
   depth?: number;
+  syntaxType?: 'opening' | 'closing';
 }
 
 type InlineImagesInputProps = {
