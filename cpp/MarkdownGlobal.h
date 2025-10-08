@@ -10,23 +10,19 @@ using namespace worklets;
 namespace expensify {
 namespace livemarkdown {
 
+#ifndef WORKLETS_INSTALLED
+using SerializableWorklet = ShareableWorklet; // ShareableWorklet was renamed to SerializableWorklet
+#endif
+
 void setMarkdownRuntime(const std::shared_ptr<WorkletRuntime> &markdownWorkletRuntime);
 
 std::shared_ptr<WorkletRuntime> getMarkdownRuntime();
 
-#ifdef WORKLETS_INSTALLED
 const int registerMarkdownWorklet(const std::shared_ptr<SerializableWorklet> &markdownWorklet);
-#else
-const int registerMarkdownWorklet(const std::shared_ptr<ShareableWorklet> &markdownWorklet);
-#endif
 
 void unregisterMarkdownWorklet(const int parserId);
 
-#ifdef WORKLETS_INSTALLED
 std::shared_ptr<SerializableWorklet> getMarkdownWorklet(const int parserId);
-#else
-std::shared_ptr<ShareableWorklet> getMarkdownWorklet(const int parserId);
-#endif
 
 } // namespace livemarkdown
 } // namespace expensify

@@ -29,7 +29,7 @@ function getWorkletRuntime(): WorkletRuntime {
   return workletRuntime;
 }
 
-function initializeLiveMarkdownIfNeeded(workletsPackageName = 'react-native-worklets') {
+function initializeLiveMarkdownIfNeeded() {
   if (initialized) {
     return;
   }
@@ -43,7 +43,7 @@ function initializeLiveMarkdownIfNeeded(workletsPackageName = 'react-native-work
   let createWorkletRuntime: (name: string) => WorkletRuntime;
   try {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    createWorkletRuntime = require(workletsPackageName).createWorkletRuntime;
+    createWorkletRuntime = require('react-native-worklets').createWorkletRuntime;
   } catch {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     createWorkletRuntime = require('react-native-reanimated').createWorkletRuntime;
@@ -54,13 +54,13 @@ function initializeLiveMarkdownIfNeeded(workletsPackageName = 'react-native-work
   initialized = true;
 }
 
-function registerParser(parser: (input: string) => MarkdownRange[], workletsPackageName = 'react-native-worklets'): number {
+function registerParser(parser: (input: string) => MarkdownRange[]): number {
   initializeLiveMarkdownIfNeeded();
 
   let makeShareableCloneRecursive;
   try {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    makeShareableCloneRecursive = require(workletsPackageName).makeShareableCloneRecursive;
+    makeShareableCloneRecursive = require('react-native-worklets').makeShareableCloneRecursive;
   } catch {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     makeShareableCloneRecursive = require('react-native-reanimated').makeShareableCloneRecursive;
