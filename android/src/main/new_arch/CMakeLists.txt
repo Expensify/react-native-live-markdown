@@ -11,11 +11,9 @@ set(LIB_CUSTOM_SOURCES_DIR ${LIB_CPP_DIR}/react/renderer/components/${LIB_LITERA
 set(LIB_ANDROID_GENERATED_JNI_DIR ${LIB_ANDROID_DIR}/build/generated/source/codegen/jni)
 set(LIB_ANDROID_GENERATED_COMPONENTS_DIR ${LIB_ANDROID_GENERATED_JNI_DIR}/react/renderer/components/${LIB_LITERAL})
 
-file(GLOB LIB_MODULE_SRCS CONFIGURE_DEPENDS *.cpp)
+file(GLOB LIB_MODULE_SRCS CONFIGURE_DEPENDS *.cpp react/renderer/components/RNLiveMarkdownSpec/*.cpp)
 file(GLOB LIB_CUSTOM_SRCS CONFIGURE_DEPENDS ${LIB_CUSTOM_SOURCES_DIR}/*.cpp)
 file(GLOB LIB_CODEGEN_SRCS CONFIGURE_DEPENDS ${LIB_ANDROID_GENERATED_COMPONENTS_DIR}/*.cpp)
-
-set(RN_DIR ${LIB_ANDROID_DIR}/../example/node_modules/react-native)
 
 add_library(
         ${LIB_TARGET_NAME}
@@ -29,6 +27,7 @@ target_include_directories(
         ${LIB_TARGET_NAME}
         PUBLIC
         .
+        ./react/renderer/components/RNLiveMarkdownSpec
         ${LIB_ANDROID_GENERATED_JNI_DIR}
         ${LIB_ANDROID_GENERATED_COMPONENTS_DIR}
         ${LIB_CPP_DIR}
@@ -41,49 +40,27 @@ target_link_libraries(
         ${LIB_TARGET_NAME}
         fbjni::fbjni
         ReactAndroid::jsi
+        ReactAndroid::reactnative
 )
 
-if (ReactAndroid_VERSION_MINOR GREATER_EQUAL 76)
-  target_link_libraries(
-          ${LIB_TARGET_NAME}
-          ReactAndroid::reactnative
-  )
-elseif (ReactAndroid_VERSION_MINOR GREATER_EQUAL 75)
-  target_link_libraries(
-          ${LIB_TARGET_NAME}
-          ReactAndroid::fabricjni
-          ReactAndroid::folly_runtime
-          ReactAndroid::glog
-          ReactAndroid::react_debug
-          ReactAndroid::react_nativemodule_core
-          ReactAndroid::react_performance_timeline
-          ReactAndroid::react_render_consistency
-          ReactAndroid::react_render_core
-          ReactAndroid::react_render_debug
-          ReactAndroid::react_render_graphics
-          ReactAndroid::react_render_imagemanager
-          ReactAndroid::react_render_mapbuffer
-          ReactAndroid::react_render_observers_events
-          ReactAndroid::react_render_textlayoutmanager
-          ReactAndroid::reactnativejni
-          ReactAndroid::rrc_text
-          ReactAndroid::rrc_textinput
-          ReactAndroid::rrc_view
-          ReactAndroid::runtimeexecutor
-          ReactAndroid::yoga
-  )
-else ()
-  message(FATAL_ERROR "react-native-live-markdown requires react-native 0.75 or newer.")
-endif ()
+if (ReactAndroid_VERSION_MINOR LESS_EQUAL 80)
+        target_compile_options(
+                ${LIB_TARGET_NAME}
+                PRIVATE
+                -DLOG_TAG=\"ReactNative\"
+                -fexceptions
+                -frtti
+                -Wall
+                -std=c++20
+        )
+else()
+        target_compile_reactnative_options(${LIB_TARGET_NAME} PRIVATE)
+endif()
 
 target_compile_options(
         ${LIB_TARGET_NAME}
         PRIVATE
-        -DLOG_TAG=\"ReactNative\"
-        -fexceptions
-        -frtti
-        -Wall
-        -std=c++20
+        -DREACT_NATIVE_MINOR_VERSION=${ReactAndroid_VERSION_MINOR}
 )
 
 target_include_directories(

@@ -1,7 +1,21 @@
 import type {ColorValue, ViewProps} from 'react-native';
 
-import type {Float} from 'react-native/Libraries/Types/CodegenTypes';
+import type {Float, Int32} from 'react-native/Libraries/Types/CodegenTypes';
 import codegenNativeComponent from 'react-native/Libraries/Utilities/codegenNativeComponent';
+
+interface CodeBlockStyle {
+  fontFamily: string;
+  fontSize: Float;
+  color: ColorValue;
+  backgroundColor: ColorValue;
+  borderColor?: ColorValue;
+  borderWidth?: Float;
+  borderRadius?: Float;
+  borderStyle?: string;
+  padding?: Float;
+  paddingVertical?: Float;
+  paddingHorizontal?: Float;
+}
 
 interface MarkdownStyle {
   syntax: {
@@ -9,6 +23,7 @@ interface MarkdownStyle {
   };
   emoji: {
     fontSize: Float;
+    fontFamily: string;
   };
   link: {
     color: ColorValue;
@@ -22,29 +37,24 @@ interface MarkdownStyle {
     marginLeft: Float;
     paddingLeft: Float;
   };
-  code: {
-    fontFamily: string;
-    fontSize: Float;
-    color: ColorValue;
-    backgroundColor: ColorValue;
+  code: CodeBlockStyle & {
+    h1NestedFontSize?: Float;
   };
-  pre: {
-    fontFamily: string;
-    fontSize: Float;
-    color: ColorValue;
-    backgroundColor: ColorValue;
-  };
+  pre: CodeBlockStyle;
   mentionHere: {
     color: ColorValue;
     backgroundColor: ColorValue;
+    borderRadius?: Float;
   };
   mentionUser: {
     color: ColorValue;
     backgroundColor: ColorValue;
+    borderRadius?: Float;
   };
   mentionReport: {
     color: ColorValue;
     backgroundColor: ColorValue;
+    borderRadius?: Float;
   };
   inlineImage: {
     minWidth: Float;
@@ -74,6 +84,7 @@ interface MarkdownStyle {
 
 interface NativeProps extends ViewProps {
   markdownStyle: MarkdownStyle;
+  parserId: Int32;
 }
 
 export default codegenNativeComponent<NativeProps>('MarkdownTextInputDecoratorView', {

@@ -1,6 +1,6 @@
 #pragma once
-#if defined(RCT_NEW_ARCH_ENABLED) || defined(ANDROID)
 
+#include <memory>
 #include <react/renderer/core/ShadowNodeFamily.h>
 
 namespace facebook {
@@ -10,28 +10,22 @@ class JSI_EXPORT MarkdownTextInputDecoratorState final {
 public:
   using Shared = std::shared_ptr<const MarkdownTextInputDecoratorState>;
 
-  MarkdownTextInputDecoratorState() : decoratorFamily(nullptr){};
+  MarkdownTextInputDecoratorState(){};
+
+// TODO: Simplify once RN 0.81 is the lowest supported version
+#if (defined(ANDROID) && REACT_NATIVE_MINOR_VERSION < 81) || (defined(RN_SERIALIZABLE_STATE) && REACT_NATIVE_MINOR_VERSION >= 81)
   MarkdownTextInputDecoratorState(
-      const ShadowNodeFamily::Shared textInputFamily_)
-      : decoratorFamily(textInputFamily_){};
+      MarkdownTextInputDecoratorState const &previousState, folly::dynamic data){};
 
-#ifdef ANDROID
-  MarkdownTextInputDecoratorState(
-      MarkdownTextInputDecoratorState const &previousState, folly::dynamic data)
-      : decoratorFamily(previousState.decoratorFamily){};
-#endif
-
-  const ShadowNodeFamily::Shared decoratorFamily;
-
-#ifdef ANDROID
   folly::dynamic getDynamic() const {
-    return folly::dynamic::object("decoratorFamily", "pointer should be here?");
+    return {};
   }
+#if REACT_NATIVE_MINOR_VERSION < 81
   MapBuffer getMapBuffer() const { return MapBufferBuilder::EMPTY(); };
-#endif
+#endif // REACT_NATIVE_MINOR_VERSION < 81
+#endif // (defined(ANDROID) && REACT_NATIVE_MINOR_VERSION < 81) || (defined(RN_SERIALIZABLE_STATE) && REACT_NATIVE_MINOR_VERSION >= 81)
+
 };
 
 } // namespace react
 } // namespace facebook
-
-#endif

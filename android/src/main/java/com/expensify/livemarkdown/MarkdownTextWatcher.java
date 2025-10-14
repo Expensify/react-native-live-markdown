@@ -7,7 +7,7 @@ import android.text.TextWatcher;
 import androidx.annotation.NonNull;
 
 public class MarkdownTextWatcher implements TextWatcher {
-  private final MarkdownUtils mMarkdownUtils;
+  private final @NonNull MarkdownUtils mMarkdownUtils;
 
   public MarkdownTextWatcher(@NonNull MarkdownUtils markdownUtils) {
     mMarkdownUtils = markdownUtils;
@@ -25,8 +25,8 @@ public class MarkdownTextWatcher implements TextWatcher {
 
   @Override
   public void afterTextChanged(Editable editable) {
-    if (editable instanceof SpannableStringBuilder) {
-      mMarkdownUtils.applyMarkdownFormatting((SpannableStringBuilder) editable);
+    if (editable instanceof SpannableStringBuilder ssb) {
+      mMarkdownUtils.applyMarkdownFormatting(ssb);
     }
   }
 }

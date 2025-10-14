@@ -29,7 +29,7 @@ jobs:
         uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493
 
       - name: Install node_modules
-        run: yarn install --immutable
+        run: npm ci
 
       - name: Build app
         working-directory: WebExample

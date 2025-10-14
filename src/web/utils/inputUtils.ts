@@ -1,11 +1,13 @@
 import type {CSSProperties} from 'react';
-import type {MarkdownTextInputElement} from '../../MarkdownTextInput.web';
+import type {MarkdownNativeEvent, MarkdownTextInputElement} from '../../MarkdownTextInput.web';
+import {isChildOfMarkdownElement, isChildOfMultilineMarkdownElement} from './blockUtils';
+import BrowserUtils from './browserUtils';
 
 const ZERO_WIDTH_SPACE = '\u200B';
 
 // If an Input Method Editor is processing key input, the 'keyCode' is 229.
 // https://www.w3.org/TR/uievents/#determine-keydown-keyup-keyCode
-function isEventComposing(nativeEvent: globalThis.KeyboardEvent) {
+function isEventComposing(nativeEvent: globalThis.KeyboardEvent | MarkdownNativeEvent) {
   return nativeEvent.isComposing || nativeEvent.keyCode === 229;
 }
 
@@ -36,17 +38,33 @@ function normalizeValue(value: string) {
   return value.replaceAll('\r\n', '\n');
 }
 
-// Parses the HTML structure of a MarkdownTextInputElement to a plain text string. Used for getting the correct value of the input element.
-function parseInnerHTMLToText(target: MarkdownTextInputElement, inputType: string, cursorPosition: number): string {
-  // Returns the parent of a given node that is higher in the hierarchy and is of a different type than 'text', 'br' or 'line'
-  function getTopParentNode(node: ChildNode) {
-    let currentParentNode = node.parentNode;
-    while (currentParentNode && ['text', 'br', 'line'].includes(currentParentNode.parentElement?.getAttribute('data-type') || '')) {
-      currentParentNode = currentParentNode?.parentNode || null;
-    }
-    return currentParentNode;
+/**
+ * Returns the parent of a given node that is higher in the hierarchy and is of a different type than 'text', 'br' or 'line'
+ */
+function getTopParentNode(node: ChildNode) {
+  let currentParentNode = node.parentNode;
+  while (currentParentNode && ['text', 'br', 'line'].includes(currentParentNode.parentElement?.getAttribute('data-type') || '')) {
+    currentParentNode = currentParentNode?.parentNode || null;
   }
+  return currentParentNode;
+}
 
+/**
+ * On Firefox, when breaking one codeblock, its syntax and the <br> after it can be merged into the closing syntax of the previous codeblock.
+ */
+function didTwoCodeblocksMerge(node: ChildNode | null) {
+  if (!node || !BrowserUtils.isFirefox) {
+    return;
+  }
+  // To identify that two codeblock has merged, we check if current line ends with <br> tag, that previously was second codeblock's opening syntax line break
+  const hasPartOfBrokenCodeblock = node.lastChild?.lastChild?.lastChild?.lastChild?.nodeName === 'BR';
+  return BrowserUtils.isFirefox && (node.lastChild as HTMLElement)?.getAttribute('data-type') === 'codeblock' && hasPartOfBrokenCodeblock;
+}
+
+/**
+ * Parses the HTML structure of a MarkdownTextInputElement to a plain text string. Used for getting the correct value of the input element.
+ */
+function parseInnerHTMLToText(target: MarkdownTextInputElement, cursorPosition: number, inputType?: string, isMultiline = true): string {
   const stack: ChildNode[] = [target];
   let text = '';
   let shouldAddNewline = false;
@@ -57,7 +75,7 @@ function parseInnerHTMLToText(target: MarkdownTextInputElement, inputType: strin
   }
 
   while (stack.length > 0) {
-    const node = stack.pop();
+    const node = stack.pop() as HTMLElement;
     if (!node) {
       break;
     }
@@ -65,13 +83,14 @@ function parseInnerHTMLToText(target: MarkdownTextInputElement, inputType: strin
     // If we are operating on the nodes that are children of the MarkdownTextInputElement, we need to add a newline after each
     const isTopComponent = node.parentElement?.contentEditable === 'true';
     if (isTopComponent) {
-      // Replaced text is beeing added as text node, so we need to not add the newline before and after it
-      if (node.nodeType === Node.TEXT_NODE) {
+      // When inputType is undefined, the first part of the replaced text is added as a text node.
+      // Because of it, we need to prevent adding new lines in this case
+      if (!isMultiline || (!inputType && node.nodeType === Node.TEXT_NODE)) {
         shouldAddNewline = false;
       } else {
         const firstChild = node.firstChild as HTMLElement;
         const containsEmptyBlockElement = firstChild?.getAttribute?.('data-type') === 'block' && firstChild.textContent === '';
-        if (shouldAddNewline && !containsEmptyBlockElement) {
+        if (firstChild && shouldAddNewline && !containsEmptyBlockElement && !didTwoCodeblocksMerge(node.previousSibling)) {
           text += '\n';
           shouldAddNewline = false;
         }
@@ -80,13 +99,44 @@ function parseInnerHTMLToText(target: MarkdownTextInputElement, inputType: strin
     }
 
     if (node.nodeType === Node.TEXT_NODE) {
+      let hasAddedNewline = false;
+      // Fix for codeblocks: Removing last codeblock newline, moves codeblock syntax too far into the codeblock content
+      // skipping one <br> after the codeblock syntax. We need to force parsing it before the text node is added.
+      if (node.parentElement && !node.parentElement.getAttribute?.('data-type') && isChildOfMarkdownElement(node, 'pre')) {
+        text += '\n';
+        const nextBR = node.parentElement?.nextElementSibling?.firstElementChild ?? node.parentElement?.nextElementSibling;
+        if (nextBR && nextBR.tagName === 'BR') {
+          nextBR.remove();
+        }
+        hasAddedNewline = true;
+      }
+
       // Parse text nodes into text
       text += node.textContent;
+
+      // Fix for codeblocks: If we are adding text at the end of a multiline markdown type element, we need to add a newline
+      // because the new text can replace the last <br> element and it will not be added to the text.
+      if (
+        node.parentElement &&
+        node.parentNode?.parentElement?.nextSibling &&
+        !node.parentNode?.nextSibling &&
+        isChildOfMultilineMarkdownElement(node) &&
+        ((!hasAddedNewline && isChildOfMarkdownElement(node, 'br')) || (!node.parentElement.getAttribute?.('data-type') && isChildOfMarkdownElement(node, 'syntax')))
+      ) {
+        text += '\n';
+      }
     } else if (node.nodeName === 'BR') {
       const parentNode = getTopParentNode(node);
-      if (parentNode && parentNode.parentElement?.contentEditable !== 'true' && !!(node as HTMLElement).getAttribute('data-id')) {
+
+      if (
+        (isMultiline &&
+          parentNode &&
+          parentNode.parentElement?.contentEditable !== 'true' &&
+          !!((node as HTMLElement).getAttribute('data-id') || (node.parentElement as HTMLElement).getAttribute('data-type') === 'br')) ||
+        (node.parentElement?.getAttribute('data-type') === 'text' && isChildOfMultilineMarkdownElement(node))
+      ) {
         // Parse br elements into newlines only if their parent is not a child of the MarkdownTextInputElement (a paragraph when writing or a div when pasting).
-        // It prevents adding extra newlines when entering text
+        // It prevents adding extra newlines when entering text - and now only for multiline inputs
         text += '\n';
       }
     } else {
@@ -104,7 +154,7 @@ function parseInnerHTMLToText(target: MarkdownTextInputElement, inputType: strin
   text = text.replaceAll('\r\n', '\n');
 
   // Force letter removal if the input value haven't changed but input type is 'delete'
-  if (text === target.value && inputType.includes('delete')) {
+  if (text === target.value && inputType?.includes('delete')) {
     text = text.slice(0, cursorPosition - 1) + text.slice(cursorPosition);
   }
   return text;

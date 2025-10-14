@@ -5,24 +5,27 @@
 - ⚛️ Drop-in replacement for `<TextInput>` component
 - ⌨️ Live synchronous formatting on every keystroke
 - ⚡ Fully native experience (selection, spellcheck, autocomplete)
+- 🔧 Customizable logic
 - 🎨 Customizable styles
 - 🌐 Universal support (Android, iOS, web)
-- 🏗️ Supports New Architecture
+- 🏗️ Supports only the New Architecture
 
 ## Installation
 
 First, install the library from npm with the package manager of your choice:
 
 ```sh
-yarn add @expensify/react-native-live-markdown
-npm install @expensify/react-native-live-markdown --save
-npx expo install @expensify/react-native-live-markdown
+yarn add @expensify/react-native-live-markdown react-native-reanimated expensify-common html-entities@2.5.3
+npm install @expensify/react-native-live-markdown react-native-reanimated expensify-common html-entities@2.5.3 --save
+npx expo install @expensify/react-native-live-markdown react-native-reanimated expensify-common html-entities@2.5.3
 ```
+
+React Native Live Markdown requires [react-native-reanimated](https://github.com/software-mansion/react-native-reanimated) 3.17.0 or newer as well as [expensify-common](https://github.com/Expensify/expensify-common) 2.0.115 and [html-entities](https://github.com/mdevils/html-entities) 2.5.3 exactly if using the default built-in ExpensiMark parser.
 
 Then, install the iOS dependencies with CocoaPods:
 
 ```sh
-cd ios && pod install
+cd ios && bundler install && bundler exec pod install
 ```
 
 The library includes native code so you will need to re-build the native app.
@@ -33,7 +36,7 @@ The library includes native code so you will need to re-build the native app.
 ## Usage
 
 ```tsx
-import {MarkdownTextInput} from '@expensify/react-native-live-markdown';
+import {MarkdownTextInput, parseExpensiMark} from '@expensify/react-native-live-markdown';
 import React from 'react';
 
 export default function App() {
@@ -43,6 +46,7 @@ export default function App() {
     <MarkdownTextInput
       value={text}
       onChangeText={setText}
+      parser={parseExpensiMark}
     />
   );
 }
@@ -62,6 +66,12 @@ const FONT_FAMILY_MONOSPACE = Platform.select({
   default: 'monospace',
 });
 
+const FONT_FAMILY_EMOJI = Platform.select({
+  ios: 'System',
+  android: 'Noto Color Emoji',
+  default: 'System, Apple Color Emoji, Segoe UI Emoji, Noto Color Emoji',
+});
+
 const markdownStyle: MarkdownStyle = {
   syntax: {
     color: 'gray',
@@ -74,6 +84,7 @@ const markdownStyle: MarkdownStyle = {
   },
   emoji: {
     fontSize: 20,
+    fontFamily: FONT_FAMILY_EMOJI,
   },
   blockquote: {
     borderColor: 'gray',
@@ -118,21 +129,76 @@ The style object can be passed to multiple `MarkdownTextInput` components using 
 > [!TIP]
 > We recommend to store the style object outside of a component body or memoize the style object with `React.useMemo`.
 
+## Parsing logic
+
+`MarkdownTextInput` behavior can be customized via `parser` property. Parser is a function that accepts a plaintext string and returns an array of `MarkdownRange` objects:
+
+```ts
+interface MarkdownRange {
+  type: MarkdownType;
+  start: number;
+  length: number;
+  depth?: number;
+}
+```
+
+Currently, only the following types are supported:
+
+```ts
+type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'emoji' | 'mention-here' | 'mention-user' | 'mention-report' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax';
+```
+
+Parser needs to be marked as a [worklet](https://docs.swmansion.com/react-native-reanimated/docs/guides/worklets/) because it's executed on the UI thread as the user types.
+
+Here's a sample function that parses all substrings located between two asterisks as bold text:
+
+```ts
+function parser(input: string) {
+  'worklet';
+
+  const ranges = [];
+  const regexp = /\*(.*?)\*/g;
+  let match;
+  while ((match = regexp.exec(input)) !== null) {
+    ranges.push({start: match.index, length: 1, type: 'syntax'});
+    ranges.push({start: match.index + 1, length: match[1]!.length, type: 'bold'});
+    ranges.push({start: match.index + 1 + match[1]!.length, length: 1, type: 'syntax'});
+  }
+  return ranges;
+}
+```
+
+> [!TIP]
+> We recommend to store the parser function outside of a component body or memoize the parser function with `React.useMemo`.
+
 ## Markdown flavors support
 
-Currently, `react-native-live-markdown` supports only [ExpensiMark](https://github.com/Expensify/expensify-common/blob/main/lib/ExpensiMark.ts) flavor. We are working on CommonMark support as well as possibility to use other Markdown parsers.
+Currently, `react-native-live-markdown` supports only [ExpensiMark](https://github.com/Expensify/expensify-common/blob/main/lib/ExpensiMark.ts) flavor out-of-the-box. You can customize the behavior by passing a custom parser worklet function via the `parser` prop, as detailed in the [Parsing logic](#parsing-logic) section.
 
 ## API reference
 
 `MarkdownTextInput` inherits all props of React Native's `TextInput` component as well as introduces the following properties:
 
-| Prop            | Type            | Default     | Note                                                                                                                                                                                                                   |
-| --------------- | --------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `markdownStyle` | `MarkdownStyle` | `undefined` | Adds custom styling to Markdown text. The provided value is merged with default style object. See [Styling](https://github.com/expensify/react-native-live-markdown/blob/main/README.md#styling) for more information. |
+| Prop            | Type                                 | Default     | Note                                                                                                                                                                                                                   |
+| --------------- | ------------------------------------ | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `parser`        | `(value: string) => MarkdownRange[]` | `undefined` | A function that parses the current value and returns an array of ranges.                                                                                                                                               |
+| `markdownStyle` | `MarkdownStyle`                      | `undefined` | Adds custom styling to Markdown text. The provided value is merged with default style object. See [Styling](https://github.com/expensify/react-native-live-markdown/blob/main/README.md#styling) for more information. |
 
 ## Compatibility
 
-`react-native-live-markdown` requires React Native 0.74 or newer.
+`react-native-live-markdown` supports only latest React Native minor releases with the New Architecture enabled.
+
+| @expensify/react-native-live-markdown | 0.73 | 0.74 | 0.75 | 0.76 | 0.77 | 0.78 | 0.79 | 0.80 |
+| :-----------------------------------: | :--: | :--: | :--: | :--: | :--: | :--: | :--: | :--: |
+|               0.1.297+                |  ❌  |  ❌  |  ❌  |  ❌  |  ✅  |  ✅  |  ✅  |  ✅  |
+|           0.1.260 – 0.1.296           |  ❌  |  ❌  |  ❌  |  ❌  |  ✅  |  ✅  |  ✅  |  ❌  |
+|           0.1.256 – 0.1.259           |  ❌  |  ❌  |  ❌  |  ❌  |  ✅  |  ❌  |  ❌  |  ❌  |
+|           0.1.248 – 0.1.255           |  ❌  |  ❌  |  ❌  |  ✅  |  ✅  |  ❌  |  ❌  |  ❌  |
+|           0.1.235 – 0.1.247           |  ❌  |  ❌  |  ✅  |  ✅  |  ✅  |  ❌  |  ❌  |  ❌  |
+|           0.1.141 – 0.1.234           |  ❌  |  ❌  |  ✅  |  ✅  |  ❌  |  ❌  |  ❌  |  ❌  |
+|           0.1.129 – 0.1.140           |  ❌  |  ❌  |  ✅  |  ❌  |  ❌  |  ❌  |  ❌  |  ❌  |
+|           0.1.122 – 0.1.128           |  ❌  |  ✅  |  ❌  |  ❌  |  ❌  |  ❌  |  ❌  |  ❌  |
+|           0.1.15 – 0.1.121            |  ✅  |  ❌  |  ❌  |  ❌  |  ❌  |  ❌  |  ❌  |  ❌  |
 
 ## License
 

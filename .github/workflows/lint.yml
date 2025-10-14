@@ -1,8 +1,8 @@
 name: Lint JavaScript
 
 on:
-    pull_request:
-        types: [opened, synchronize]
+  pull_request:
+    types: [opened, synchronize]
 
 jobs:
     lint:
@@ -27,13 +27,13 @@ jobs:
                 node-version-file: '.nvmrc'
 
             - name: Install node_modules
-              run: yarn install --immutable
+              run: npm ci
 
             - name: Verify there's no Prettier diff
               run: |
-                yarn lint --fix --quiet
+                npm run lint -- --fix --quiet
                 if ! git diff --name-only --exit-code; then
                     # shellcheck disable=SC2016
-                    echo 'Error: Prettier diff detected! Please run `yarn lint --fix` and commit the changes.'
+                    echo 'Error: Prettier diff detected! Please run `npm run lint -- --fix` and commit the changes.'
                     exit 1
                 fi
