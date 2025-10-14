@@ -55,7 +55,7 @@ jobs:
         run: yarn version patch
 
       - name: Set new version in GitHub ENV
-        run: echo "NEW_VERSION=$(jq '.version' package.json)" >> $GITHUB_ENV
+        run: echo "NEW_VERSION=$(jq '.version' package.json)" >> "$GITHUB_ENV"
 
       - name: Commit version bump
         run: git commit -am "Bump version to ${{ env.NEW_VERSION }}"
