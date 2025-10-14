@@ -2,15 +2,12 @@ import {StyleSheet, TextInput, processColor} from 'react-native';
 import React from 'react';
 import type {TextInputProps} from 'react-native';
 import {createWorkletRuntime, makeShareableCloneRecursive} from 'react-native-reanimated';
-import type {WorkletRuntime} from 'react-native-reanimated';
-import type {ShareableRef, WorkletFunction} from 'react-native-reanimated/lib/typescript/commonTypes';
-
 import MarkdownTextInputDecoratorViewNativeComponent from './MarkdownTextInputDecoratorViewNativeComponent';
 import type {MarkdownStyle} from './MarkdownTextInputDecoratorViewNativeComponent';
 import NativeLiveMarkdownModule from './NativeLiveMarkdownModule';
 import {mergeMarkdownStyleWithDefault} from './styleUtils';
 import type {PartialMarkdownStyle} from './styleUtils';
-import type {InlineImagesInputProps, MarkdownRange} from './commonTypes';
+import type {InlineImagesInputProps, MarkdownRange, ShareableRef, WorkletFunction, WorkletRuntime} from './commonTypes';
 
 declare global {
   // eslint-disable-next-line no-var
@@ -50,7 +47,7 @@ function initializeLiveMarkdownIfNeeded() {
 
 function registerParser(parser: (input: string) => MarkdownRange[]): number {
   initializeLiveMarkdownIfNeeded();
-  const shareableWorklet = makeShareableCloneRecursive(parser) as ShareableRef<WorkletFunction<[string], MarkdownRange[]>>;
+  const shareableWorklet = makeShareableCloneRecursive(parser) as unknown as ShareableRef<WorkletFunction<[string], MarkdownRange[]>>;
   const parserId = global.jsi_registerMarkdownWorklet(shareableWorklet);
   return parserId;
 }

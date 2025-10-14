@@ -4,6 +4,11 @@ cmake_minimum_required(VERSION 3.13)
 
 set(CMAKE_VERBOSE_MAKEFILE on)
 
+if(WORKLETS_INSTALLED)
+  include("${REACT_NATIVE_ROOT_DIR}/ReactAndroid/cmake-utils/folly-flags.cmake")
+  add_compile_options(${folly_FLAGS})
+endif()
+
 add_compile_options(-fvisibility=hidden -fexceptions -frtti)
 
 string(APPEND CMAKE_CXX_FLAGS " -DREACT_NATIVE_MINOR_VERSION=${REACT_NATIVE_MINOR_VERSION}")
@@ -15,16 +20,32 @@ file(GLOB CPP_SRC CONFIGURE_DEPENDS "${CPP_DIR}/*.cpp")
 
 add_library(${CMAKE_PROJECT_NAME} SHARED ${ANDROID_SRC} ${CPP_SRC})
 
-target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CPP_DIR})
+if(WORKLETS_INSTALLED)
+  target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CPP_DIR} "${REACT_NATIVE_ROOT_DIR}/ReactCommon/jsiexecutor")
+else()
+  target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CPP_DIR})
+endif()
 
 find_package(fbjni REQUIRED CONFIG)
 find_package(ReactAndroid REQUIRED CONFIG)
-find_package(react-native-reanimated REQUIRED CONFIG)
+
+if(WORKLETS_INSTALLED)
+  find_package(react-native-worklets REQUIRED CONFIG)
+  add_definitions(-DWORKLETS_INSTALLED)
+else()
+  find_package(react-native-reanimated REQUIRED CONFIG)
+endif()
+
 
 target_link_libraries(
         ${CMAKE_PROJECT_NAME}
         fbjni::fbjni
         ReactAndroid::jsi
         ReactAndroid::reactnative
-        react-native-reanimated::worklets
 )
+
+if(WORKLETS_INSTALLED)
+  target_link_libraries(${CMAKE_PROJECT_NAME} react-native-worklets::worklets)
+else()
+  target_link_libraries(${CMAKE_PROJECT_NAME} react-native-reanimated::worklets)
+endif()
