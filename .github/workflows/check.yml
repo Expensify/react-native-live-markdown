@@ -16,13 +16,15 @@ jobs:
       group: check-root-${{ github.ref }}
       cancel-in-progress: true
     steps:
+      # v5.0.0
       - name: Check out Git repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493
 
-      - name: Use Node.js 18
-        uses: actions/setup-node@v4
+      # v6.0.0
+      - name: Setup Node.js
+        uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903
         with:
-          node-version: 18
+          node-version-file: '.nvmrc'
 
       - name: Install node_modules
         run: yarn install --immutable

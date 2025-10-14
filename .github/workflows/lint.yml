@@ -8,19 +8,23 @@ jobs:
     lint:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v2
+            # v5.0.0
+            - name: Check out Git repository
+              uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493
 
-            - uses: actions/cache@v2
+            # v4.3.0
+            - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
               with:
                   path: ~/.yarn
                   key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
                   restore-keys: |
                       ${{ runner.os }}-yarn-
 
-            - name: Setup Node
-              uses: actions/setup-node@v1
+            # v6.0.0
+            - name: Setup Node.js
+              uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903
               with:
-                  node-version: "16.x"
+                node-version-file: '.nvmrc'
 
             - name: Install node_modules
               run: yarn install --immutable
