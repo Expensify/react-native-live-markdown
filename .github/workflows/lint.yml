@@ -15,10 +15,10 @@ jobs:
       # v4.3.0
       - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
         with:
-          path: ~/.yarn
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
-              ${{ runner.os }}-yarn-
+              ${{ runner.os }}-npm-
 
       # v6.0.0
       - name: Setup Node.js
