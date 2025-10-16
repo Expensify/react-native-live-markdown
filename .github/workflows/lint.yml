@@ -18,7 +18,7 @@ jobs:
           path: ~/.npm
           key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
-              ${{ runner.os }}-npm-
+            ${{ runner.os }}-npm-
 
       # v6.0.0
       - name: Setup Node.js
