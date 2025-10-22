@@ -77,7 +77,7 @@ using namespace facebook::react;
   react_native_assert([childView isKindOfClass:[RCTTextInputComponentView class]] && "Child component of MarkdownTextInputDecoratorComponentView is not an instance of RCTTextInputComponentView.");
   RCTTextInputComponentView *textInputComponentView = (RCTTextInputComponentView *)childView;
   UIView<RCTBackedTextInputViewProtocol> *backedTextInputView = [textInputComponentView valueForKey:@"_backedTextInputView"];
- 
+
   _observersAdded = true;
 
   if ([backedTextInputView isKindOfClass:[RCTUITextField class]]) {
@@ -99,6 +99,17 @@ using namespace facebook::react;
 
     // format initial value
     [_markdownTextFieldObserver textFieldDidChange:_textField];
+
+    if (@available(iOS 16.0, *)) {
+      NSTextStorage *textStorage = [_textField valueForKey:@"_textStorage"];
+      NSTextContainer *textContainer = [_textField valueForKey:@"_textContainer"];
+      NSTextLayoutManager *textLayoutManager = [textContainer valueForKey:@"_textLayoutManager"];
+
+      _markdownTextLayoutManagerDelegate = [[MarkdownTextLayoutManagerDelegate alloc] init];
+      _markdownTextLayoutManagerDelegate.textStorage = textStorage;
+      _markdownTextLayoutManagerDelegate.markdownUtils = _markdownUtils;
+      textLayoutManager.delegate = _markdownTextLayoutManagerDelegate;
+    }
 
     // TODO: register blockquotes layout manager
     // https://github.com/Expensify/react-native-live-markdown/issues/87
@@ -229,7 +240,7 @@ using namespace facebook::react;
 {
   react_native_assert(!_observersAdded && "MarkdownTextInputDecoratorComponentView was being recycled with TextInput observers still attached");
   [super prepareForRecycle];
-  
+
   static const auto defaultProps = std::make_shared<const MarkdownTextInputDecoratorViewProps>();
   _props = defaultProps;
   _markdownUtils = [[RCTMarkdownUtils alloc] init];
