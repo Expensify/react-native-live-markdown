@@ -24,9 +24,9 @@ jobs:
       group: build-web-${{ github.ref }}
       cancel-in-progress: true
     steps:
+      # v5.0.0
       - name: Check out Git repository
-        # v4
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493
 
       - name: Install node_modules
         run: npm ci

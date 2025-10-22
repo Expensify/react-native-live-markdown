@@ -67,6 +67,7 @@ def getReactNativeMinorVersion() {
 }
 
 def REACT_NATIVE_MINOR_VERSION = getReactNativeMinorVersion()
+def workletsInstalled = rootProject.findProject(':react-native-worklets') != null
 
 android {
   if (supportsNamespace()) {
@@ -94,7 +95,9 @@ android {
         arguments "-DANDROID_STL=c++_shared",
           "-DANDROID_TOOLCHAIN=clang",
           "-DREACT_NATIVE_MINOR_VERSION=${REACT_NATIVE_MINOR_VERSION}",
-          "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"
+          "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON",
+          "-DREACT_NATIVE_ROOT_DIR=${resolveReactNativeDirectory().path}",
+          "-DWORKLETS_INSTALLED=${workletsInstalled}"
         abiFilters (*reactNativeArchitectures())
       }
     }
@@ -177,7 +180,12 @@ repositories {
 dependencies {
   implementation "com.facebook.react:react-android" // version substituted by RNGP
   implementation "com.facebook.react:hermes-android" // version substituted by RNGP
-  implementation project(":react-native-reanimated")
+
+  if (workletsInstalled) {
+    implementation project(":react-native-worklets")
+  } else {
+    implementation project(":react-native-reanimated")
+  }
 }
 
 // This fixes linking errors due to undefined symbols from libworklets.so.
@@ -185,6 +193,11 @@ dependencies {
 // like a header-only library. During build, config files are not regenerated
 // because the cache key does not change and AGP thinks that they are up-to-date.
 afterEvaluate {
-  prepareKotlinBuildScriptModel.dependsOn(":react-native-reanimated:prefabDebugPackage")
-  prepareKotlinBuildScriptModel.dependsOn(":react-native-reanimated:prefabReleasePackage")
+  if (workletsInstalled) {
+    prepareKotlinBuildScriptModel.dependsOn(":react-native-worklets:prefabDebugPackage")
+    prepareKotlinBuildScriptModel.dependsOn(":react-native-worklets:prefabReleasePackage")
+  } else {
+    prepareKotlinBuildScriptModel.dependsOn(":react-native-reanimated:prefabDebugPackage")
+    prepareKotlinBuildScriptModel.dependsOn(":react-native-reanimated:prefabReleasePackage")
+  }
 }
