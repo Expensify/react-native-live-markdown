@@ -7,7 +7,7 @@
 - ⚡ Fully native experience (selection, spellcheck, autocomplete)
 - 🔧 Customizable logic
 - 🎨 Customizable styles
-- 🌐 Universal support (Android, iOS, web)
+- 🌐 Universal support (Android, iOS, macOS, web)
 - 🏗️ Supports only the New Architecture
 
 ## Installation
