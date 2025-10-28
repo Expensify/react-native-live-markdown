@@ -59,7 +59,11 @@ public class MarkdownBackgroundSpan implements MarkdownSpan, LineBackgroundSpan 
       float startX = layout.getPrimaryHorizontal(mentionStarts ? relativeMentionStart: lineStart);
       float endX = layout.getPrimaryHorizontal(mentionEnds ? relativeMentionEnd : lineEnd);
 
-      RectF lineRect = new RectF(startX, top, endX, bottom);
+      Paint.FontMetrics fm = paint.getFontMetrics();
+      float startY = baseline + fm.ascent;
+      float endY = baseline + fm.descent;
+
+      RectF lineRect = new RectF(startX, startY, endX, endY);
       backgroundPath.reset();
       backgroundPath.addRoundRect(lineRect, createRadii(mentionStarts, mentionEnds), Path.Direction.CW);
     }
