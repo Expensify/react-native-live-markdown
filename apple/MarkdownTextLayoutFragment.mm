@@ -82,10 +82,20 @@
       CGFloat width = endLocation.x - startLocation.x;
       CGFloat x = lineBounds.origin.x + startLocation.x;
 
+      NSUInteger lineRelativeLocation = intersection.location - lineFragment.characterRange.location;
+      UIFont *font = [lineFragment.attributedString attribute:NSFontAttributeName
+                                                      atIndex:lineRelativeLocation
+                                               effectiveRange:NULL];
+      CGFloat ascent = font.ascender;
+      CGFloat descent = font.descender;
+      CGFloat textHeight = ascent - descent;
+      CGFloat y = (startLocation.y - ascent) / 2;
+
+
       CGRect backgroundRect = CGRectMake(x,
-                                         lineBounds.origin.y,
+                                         y,
                                          width,
-                                         lineBounds.size.height);
+                                         textHeight);
 
       BOOL isStart = (intersection.location == mention.range.location);
       BOOL isEnd = (NSMaxRange(intersection) == NSMaxRange(mention.range));
