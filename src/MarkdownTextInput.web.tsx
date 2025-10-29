@@ -656,7 +656,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
         }
         e.preventDefault();
         const clipboardData = e.clipboardData;
-        const text = clipboardData.getData('text/plain');
+        const text = clipboardData.getData('text/plain').trim() || clipboardData.getData('text/uri-list').trim();
         insertText(e, text);
       },
       [insertText],
