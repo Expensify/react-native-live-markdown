@@ -52,19 +52,30 @@
   }
 
   bool isSingleline = [self.textLineFragments count] == 1;
+  __block NSUInteger mentionIndex = 0;
   [self.textLineFragments enumerateObjectsUsingBlock:^(NSTextLineFragment * _Nonnull lineFragment, NSUInteger idx, BOOL * _Nonnull stop) {
     if (lineFragment.characterRange.length == 0) {
       return;
     }
 
     CGRect lineBounds = lineFragment.typographicBounds;
+    NSRange lineRange = lineFragment.characterRange;
     CGPoint lineEndLocation = [lineFragment locationForCharacterAtIndex: lineFragment.characterRange.length];
-    for (RCTMarkdownTextBackgroundWithRange *mention in self.mentions) {
-      NSRange intersection = NSIntersectionRange(lineFragment.characterRange, mention.range);
-      if (intersection.length == 0) {
-        continue;
+    
+    while (mentionIndex < self.mentions.count &&
+           NSMaxRange(self.mentions[mentionIndex].range) <= lineRange.location) {
+        mentionIndex++;
+    }
+    
+    for (NSUInteger i = mentionIndex; i < self.mentions.count; i++) {
+      RCTMarkdownTextBackgroundWithRange *mention = self.mentions[i];
+      NSRange mentionRange = mention.range;
+      
+      if (mentionRange.location >= NSMaxRange(lineRange)) {
+          break;
       }
-
+      
+      NSRange intersection = NSIntersectionRange(lineRange, mentionRange);
       CGPoint startLocation = [lineFragment locationForCharacterAtIndex:intersection.location];
       if (isSingleline && startLocation.x == 0 && intersection.location > 0) {
         // singleline: mention starts off screen, no need to draw background
@@ -86,9 +97,8 @@
                                                       atIndex:intersection.location
                                                effectiveRange:NULL];
       CGFloat ascent = font.ascender;
-      CGFloat descent = font.descender;
-      CGFloat textHeight = ascent - descent;
-      CGFloat y = lineBounds.size.height * idx + (startLocation.y - ascent) / 2;
+      CGFloat textHeight = font.lineHeight;
+      CGFloat y = lineBounds.origin.y + startLocation.y - ascent;
 
 
       CGRect backgroundRect = CGRectMake(x,

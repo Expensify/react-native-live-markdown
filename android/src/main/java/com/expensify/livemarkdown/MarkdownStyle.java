@@ -83,7 +83,7 @@ public class MarkdownStyle {
 
   public MarkdownStyle(@NonNull ReadableMap map, @NonNull Context context) {
     float screenDensity = context.getResources().getDisplayMetrics().density;
-    
+
     mSyntaxColor = parseColor(map, "syntax", "color", context);
     mLinkColor = parseColor(map, "link", "color", context);
     mH1FontSize = parseFloat(map, "h1", "fontSize");
