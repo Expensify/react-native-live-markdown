@@ -82,6 +82,8 @@ public class MarkdownStyle {
   private final float mMentionReportBorderRadius;
 
   public MarkdownStyle(@NonNull ReadableMap map, @NonNull Context context) {
+    float screenDensity = context.getResources().getDisplayMetrics().density;
+    
     mSyntaxColor = parseColor(map, "syntax", "color", context);
     mLinkColor = parseColor(map, "link", "color", context);
     mH1FontSize = parseFloat(map, "h1", "fontSize");
@@ -101,13 +103,13 @@ public class MarkdownStyle {
     mPreBackgroundColor = parseColor(map, "pre", "backgroundColor", context);
     mMentionHereColor = parseColor(map, "mentionHere", "color", context);
     mMentionHereBackgroundColor = parseColor(map, "mentionHere", "backgroundColor", context);
-    mMentionHereBorderRadius = parseFloat(map, "mentionHere", "borderRadius");
+    mMentionHereBorderRadius = parseFloat(map, "mentionHere", "borderRadius") * screenDensity;
     mMentionUserColor = parseColor(map, "mentionUser", "color", context);
     mMentionUserBackgroundColor = parseColor(map, "mentionUser", "backgroundColor", context);
-    mMentionUserBorderRadius = parseFloat(map, "mentionUser", "borderRadius");
+    mMentionUserBorderRadius = parseFloat(map, "mentionUser", "borderRadius") * screenDensity;
     mMentionReportColor = parseColor(map, "mentionReport", "color", context);
     mMentionReportBackgroundColor = parseColor(map, "mentionReport", "backgroundColor", context);
-    mMentionReportBorderRadius = parseFloat(map, "mentionReport", "borderRadius");
+    mMentionReportBorderRadius = parseFloat(map, "mentionReport", "borderRadius") * screenDensity;
   }
 
   private static int parseColor(@NonNull ReadableMap map, @NonNull String key, @NonNull String prop, @NonNull Context context) {
