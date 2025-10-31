@@ -6,6 +6,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 const NSAttributedStringKey RCTLiveMarkdownTextAttributeName = @"RCTLiveMarkdownText";
 
+const NSAttributedStringKey RCTLiveMarkdownTextBackgroundAttributeName = @"RCTLiveMarkdownTextBackground";
+
 const NSAttributedStringKey RCTLiveMarkdownBlockquoteDepthAttributeName = @"RCTLiveMarkdownBlockquoteDepth";
 
 @interface MarkdownFormatter : NSObject
