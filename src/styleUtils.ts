@@ -7,6 +7,7 @@ type PartialMarkdownStyle = Partial<{
 
 const FONT_FAMILY_MONOSPACE = Platform.select({
   ios: 'Courier',
+  macos: 'Menlo',
   default: 'monospace',
 });
 

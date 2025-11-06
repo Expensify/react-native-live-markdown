@@ -1,4 +1,5 @@
 #import <RNLiveMarkdown/MarkdownLayoutManager.h>
+#import <objc/runtime.h>
 
 @implementation MarkdownLayoutManager
 
