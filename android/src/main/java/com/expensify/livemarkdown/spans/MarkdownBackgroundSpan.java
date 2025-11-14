@@ -43,21 +43,21 @@ public class MarkdownBackgroundSpan implements MarkdownSpan, LineBackgroundSpan 
     int end,
     int lnum
   ) {
-    int lineStart = 0;
-    int lineEnd = end - start;
     CharSequence lineText = text.subSequence(start, end);
-    if (layout == null || layout.getText() != lineText || layout.getWidth() != right || layout.getLineEnd(0) != lineEnd) {
+    if (layout == null || layout.getText() != lineText || layout.getWidth() != right || layout.getLineEnd(0) != lineText.length()) {
+      int currentLineStart = 0;
+      int currentLineEnd = lineText.length();
       // Create layout for the current line only
-      layout = StaticLayout.Builder.obtain(lineText, lineStart, lineEnd, (TextPaint) paint, right).build();
+      layout = StaticLayout.Builder.obtain(lineText, currentLineStart, currentLineEnd, (TextPaint) paint, right).build();
 
       int relativeMentionStart = mentionStart - start;
       int relativeMentionEnd = mentionEnd - start;
 
-      boolean mentionStarts = lineStart <= relativeMentionStart;
-      boolean mentionEnds = lineEnd >= relativeMentionEnd;
+      boolean mentionStartsInCurrentLine = currentLineStart <= relativeMentionStart;
+      boolean mentionEndsInCurrentLine = currentLineEnd >= relativeMentionEnd;
 
-      float startX = layout.getPrimaryHorizontal(mentionStarts ? relativeMentionStart: lineStart);
-      float endX = layout.getPrimaryHorizontal(mentionEnds ? relativeMentionEnd : lineEnd);
+      float startX = layout.getPrimaryHorizontal(mentionStartsInCurrentLine ? relativeMentionStart: currentLineStart);
+      float endX = layout.getPrimaryHorizontal(mentionEndsInCurrentLine ? relativeMentionEnd : currentLineEnd);
 
       Paint.FontMetrics fm = paint.getFontMetrics();
       float startY = baseline + fm.ascent;
@@ -65,7 +65,7 @@ public class MarkdownBackgroundSpan implements MarkdownSpan, LineBackgroundSpan 
 
       RectF lineRect = new RectF(startX, startY, endX, endY);
       backgroundPath.reset();
-      backgroundPath.addRoundRect(lineRect, createRadii(mentionStarts, mentionEnds), Path.Direction.CW);
+      backgroundPath.addRoundRect(lineRect, createRadii(mentionStartsInCurrentLine, mentionEndsInCurrentLine), Path.Direction.CW);
     }
 
     int originalColor = paint.getColor();
