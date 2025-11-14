@@ -1,5 +1,5 @@
 #import <RNLiveMarkdown/MarkdownTextLayoutFragment.h>
-#import <RNLiveMarkdown/RCTMarkdownTextBackgroundUtils.h>
+#import <RNLiveMarkdown/RCTMarkdownTextBackgroundWithRange.h>
 
 @implementation MarkdownTextLayoutFragment
 
@@ -79,6 +79,7 @@
       CGPoint startLocation = [lineFragment locationForCharacterAtIndex:intersection.location];
       if (isSingleline && startLocation.x == 0 && intersection.location > 0) {
         // singleline: mention starts off screen, no need to draw background
+        // it only happens when the text input isn't focused
         continue;
       }
 

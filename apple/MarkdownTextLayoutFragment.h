@@ -1,5 +1,5 @@
 #import <RNLiveMarkdown/RCTMarkdownUtils.h>
-#import <RNLiveMarkdown/RCTMarkdownTextBackgroundUtils.h>
+#import <RNLiveMarkdown/RCTMarkdownTextBackgroundWithRange.h>
 #import <UIKit/UIKit.h>
 
 NS_ASSUME_NONNULL_BEGIN

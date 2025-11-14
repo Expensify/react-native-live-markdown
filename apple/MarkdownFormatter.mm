@@ -1,6 +1,6 @@
 #import "MarkdownFormatter.h"
 #import <React/RCTFont.h>
-#import <RNLiveMarkdown/RCTMarkdownTextBackgroundUtils.h>
+#import <RNLiveMarkdown/RCTMarkdownTextBackgroundWithRange.h>
 
 @implementation MarkdownFormatter
 
@@ -91,45 +91,24 @@
     [attributedString addAttribute:NSForegroundColorAttributeName value:markdownStyle.codeColor range:range];
     [attributedString addAttribute:NSBackgroundColorAttributeName value:markdownStyle.codeBackgroundColor range:range];
   } else if (type == "mention-here") {
-    [attributedString addAttribute:NSForegroundColorAttributeName value:markdownStyle.mentionHereColor range:range];
-    if (@available(iOS 16.0, *)) {
-      RCTMarkdownTextBackground *textBackground = [[RCTMarkdownTextBackground alloc] init];
-      textBackground.color = markdownStyle.mentionHereBackgroundColor;
-      textBackground.borderRadius = markdownStyle.mentionHereBorderRadius;
-      
-      [attributedString addAttribute:RCTLiveMarkdownTextBackgroundAttributeName
-                               value:textBackground
-                               range:range];
-    } else {
-      [attributedString addAttribute:NSBackgroundColorAttributeName value:markdownStyle.mentionHereBackgroundColor range:range];
-    }
+    [self applyMentionFormatting:attributedString
+                           range:range
+                 mentionColor:markdownStyle.mentionHereColor
+                 backgroundColor:markdownStyle.mentionHereBackgroundColor
+                    borderRadius:markdownStyle.mentionHereBorderRadius];
   } else if (type == "mention-user") {
     // TODO: change mention color when it mentions current user
-    [attributedString addAttribute:NSForegroundColorAttributeName value:markdownStyle.mentionUserColor range:range];
-    if (@available(iOS 16.0, *)) {
-      RCTMarkdownTextBackground *textBackground = [[RCTMarkdownTextBackground alloc] init];
-      textBackground.color = markdownStyle.mentionUserBackgroundColor;
-      textBackground.borderRadius = markdownStyle.mentionUserBorderRadius;
-      
-      [attributedString addAttribute:RCTLiveMarkdownTextBackgroundAttributeName
-                               value:textBackground
-                               range:range];
-    } else {
-      [attributedString addAttribute:NSBackgroundColorAttributeName value:markdownStyle.mentionUserBackgroundColor range:range];
-    }
+    [self applyMentionFormatting:attributedString
+                           range:range
+                 mentionColor:markdownStyle.mentionUserColor
+                 backgroundColor:markdownStyle.mentionUserBackgroundColor
+                    borderRadius:markdownStyle.mentionUserBorderRadius];
   } else if (type == "mention-report") {
-    [attributedString addAttribute:NSForegroundColorAttributeName value:markdownStyle.mentionReportColor range:range];
-    if (@available(iOS 16.0, *)) {
-      RCTMarkdownTextBackground *textBackground = [[RCTMarkdownTextBackground alloc] init];
-      textBackground.color = markdownStyle.mentionReportBackgroundColor;
-      textBackground.borderRadius = markdownStyle.mentionReportBorderRadius;
-      
-      [attributedString addAttribute:RCTLiveMarkdownTextBackgroundAttributeName
-                               value:textBackground
-                               range:range];
-    } else {
-      [attributedString addAttribute:NSBackgroundColorAttributeName value:markdownStyle.mentionReportBackgroundColor range:range];
-    }
+    [self applyMentionFormatting:attributedString
+                           range:range
+                 mentionColor:markdownStyle.mentionReportColor
+                 backgroundColor:markdownStyle.mentionReportBackgroundColor
+                    borderRadius:markdownStyle.mentionReportBorderRadius];
   } else if (type == "link") {
     [attributedString addAttribute:NSUnderlineStyleAttributeName value:[NSNumber numberWithInteger:NSUnderlineStyleSingle] range:range];
     [attributedString addAttribute:NSForegroundColorAttributeName value:markdownStyle.linkColor range:range];
@@ -146,6 +125,26 @@
     NSRange rangeForBackground = [[attributedString string] characterAtIndex:range.location] == '\n' ? NSMakeRange(range.location + 1, range.length - 1) : range;
     [attributedString addAttribute:NSBackgroundColorAttributeName value:markdownStyle.preBackgroundColor range:rangeForBackground];
     // TODO: pass background color and ranges to layout manager
+  }
+}
+
+- (void)applyMentionFormatting:(NSMutableAttributedString *)attributedString
+                         range:(const NSRange)range
+               mentionColor:(UIColor *)mentionColor
+               backgroundColor:(UIColor *)backgroundColor
+                  borderRadius:(CGFloat)borderRadius
+{
+  [attributedString addAttribute:NSForegroundColorAttributeName value:mentionColor range:range];
+  if (@available(iOS 16.0, *)) {
+    RCTMarkdownTextBackground *textBackground = [[RCTMarkdownTextBackground alloc] init];
+    textBackground.color = backgroundColor;
+    textBackground.borderRadius = borderRadius;
+    
+    [attributedString addAttribute:RCTLiveMarkdownTextBackgroundAttributeName
+                             value:textBackground
+                             range:range];
+  } else {
+    [attributedString addAttribute:NSBackgroundColorAttributeName value:backgroundColor range:range];
   }
 }
 
