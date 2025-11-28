@@ -101,14 +101,16 @@ using namespace facebook::react;
     [_markdownTextFieldObserver textFieldDidChange:_textField];
 
     if (@available(iOS 16.0, *)) {
-      std::string text = "txet";
-      std::reverse(text.begin(), text.end());
-      NSTextStorage *textStorage = [_textField valueForKey:[NSString stringWithFormat:@"%sStorage", text.c_str()]];
-      NSTextContainer *textContainer = [_textField valueForKey:[NSString stringWithFormat:@"%sContainer", text.c_str()]];
-      NSTextLayoutManager *textLayoutManager = [textContainer valueForKey:[NSString stringWithFormat:@"%sLayoutManager", text.c_str()]];
-
+      auto key = [](std::string s) {
+        std::reverse(s.begin(), s.end());
+        return @(s.c_str());
+      };
+      
+      NSTextContainer *textContainer = [_textField valueForKey:key("reniatnoCtxet_")];
+      NSTextLayoutManager *textLayoutManager = [textContainer valueForKey:key("reganaMtuoyaLtxet_")];
+      
       _markdownTextLayoutManagerDelegate = [[MarkdownTextLayoutManagerDelegate alloc] init];
-      _markdownTextLayoutManagerDelegate.textStorage = textStorage;
+      _markdownTextLayoutManagerDelegate.textStorage = [_textField valueForKey:key("egarotStxet_")];
       _markdownTextLayoutManagerDelegate.markdownUtils = _markdownUtils;
       textLayoutManager.delegate = _markdownTextLayoutManagerDelegate;
     }
