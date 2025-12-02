@@ -4,8 +4,9 @@ import {Platform} from 'react-native';
 import {ExpensiMark} from 'expensify-common';
 import {unescapeText} from 'expensify-common/dist/utils';
 import {decode} from 'html-entities';
-import type {MarkdownType, MarkdownRange, WorkletFunction} from './commonTypes';
+import type {WorkletFunction} from 'react-native-worklets';
 import {groupRanges, sortRanges, excludeRangeTypesFromFormatting, getRangesToExcludeFormatting} from './rangeUtils';
+import type {MarkdownRange, MarkdownType} from './commonTypes';
 
 function isWeb() {
   return Platform.OS === 'web';
