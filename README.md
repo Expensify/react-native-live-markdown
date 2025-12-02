@@ -148,7 +148,7 @@ Currently, only the following types are supported:
 type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'emoji' | 'mention-here' | 'mention-user' | 'mention-report' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax';
 ```
 
-Parser needs to be marked as a [worklet](https://docs.swmansion.com/react-native-worklets) because it's executed on the UI thread as the user types.
+Parser needs to be marked as a [worklet](https://docs.swmansion.com/react-native-worklets/docs/fundamentals/glossary#worklet) because it's executed on the UI thread as the user types.
 
 Here's a sample function that parses all substrings located between two asterisks as bold text:
 
