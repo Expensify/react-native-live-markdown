@@ -48,7 +48,7 @@ function initializeLiveMarkdownIfNeeded() {
 
 function registerParser(parser: (input: string) => MarkdownRange[]): number {
   initializeLiveMarkdownIfNeeded();
-  const serializableWorklet = createSerializable(parser) as SerializableRef<WorkletFunction<[string], MarkdownRange[]>>;
+  const serializableWorklet = createSerializable(parser as WorkletFunction<[string], MarkdownRange[]>);
   const parserId = global.jsi_registerMarkdownWorklet(serializableWorklet);
   return parserId;
 }
