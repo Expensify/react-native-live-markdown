@@ -1,19 +1,20 @@
 import {StyleSheet, TextInput, processColor} from 'react-native';
 import React from 'react';
 import type {TextInputProps} from 'react-native';
-import {createWorkletRuntime, makeShareableCloneRecursive} from 'react-native-reanimated';
+import {createSerializable, createWorkletRuntime} from 'react-native-worklets';
+import type {SerializableRef, WorkletFunction, WorkletRuntime} from 'react-native-worklets';
 import MarkdownTextInputDecoratorViewNativeComponent from './MarkdownTextInputDecoratorViewNativeComponent';
 import type {MarkdownStyle} from './MarkdownTextInputDecoratorViewNativeComponent';
 import NativeLiveMarkdownModule from './NativeLiveMarkdownModule';
 import {mergeMarkdownStyleWithDefault} from './styleUtils';
 import type {PartialMarkdownStyle} from './styleUtils';
-import type {InlineImagesInputProps, MarkdownRange, ShareableRef, WorkletFunction, WorkletRuntime} from './commonTypes';
+import type {InlineImagesInputProps, MarkdownRange} from './commonTypes';
 
 declare global {
   // eslint-disable-next-line no-var
   var jsi_setMarkdownRuntime: (runtime: WorkletRuntime) => void;
   // eslint-disable-next-line no-var
-  var jsi_registerMarkdownWorklet: (shareableWorklet: ShareableRef<WorkletFunction<[string], MarkdownRange[]>>) => number;
+  var jsi_registerMarkdownWorklet: (shareableWorklet: SerializableRef<WorkletFunction<[string], MarkdownRange[]>>) => number;
   // eslint-disable-next-line no-var
   var jsi_unregisterMarkdownWorklet: (parserId: number) => void;
 }
@@ -40,15 +41,15 @@ function initializeLiveMarkdownIfNeeded() {
   if (!global.jsi_setMarkdownRuntime) {
     throw new Error('[react-native-live-markdown] global.jsi_setMarkdownRuntime is not available');
   }
-  workletRuntime = createWorkletRuntime('LiveMarkdownRuntime');
+  workletRuntime = createWorkletRuntime({name: 'LiveMarkdownRuntime'});
   global.jsi_setMarkdownRuntime(workletRuntime);
   initialized = true;
 }
 
 function registerParser(parser: (input: string) => MarkdownRange[]): number {
   initializeLiveMarkdownIfNeeded();
-  const shareableWorklet = makeShareableCloneRecursive(parser) as unknown as ShareableRef<WorkletFunction<[string], MarkdownRange[]>>;
-  const parserId = global.jsi_registerMarkdownWorklet(shareableWorklet);
+  const serializableWorklet = createSerializable(parser as WorkletFunction<[string], MarkdownRange[]>);
+  const parserId = global.jsi_registerMarkdownWorklet(serializableWorklet);
   return parserId;
 }
 

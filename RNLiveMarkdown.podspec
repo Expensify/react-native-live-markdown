@@ -5,14 +5,9 @@ react_native_json = JSON.parse(File.read(File.join(react_native_node_modules_dir
 react_native_minor_version = react_native_json['version'].split('.')[1].to_i
 
 pods_root = Pod::Config.instance.project_pods_root
-
-react_native_worklets_path = `cd "#{Pod::Config.instance.installation_root.to_s}" && node --print "require.resolve('react-native-worklets/package.json')"`
-worklets_installed = react_native_worklets_path != ""
-worklets_package_name = worklets_installed ? 'react-native-worklets' : 'react-native-reanimated'
-
-react_native_worklets_or_reanimated_node_modules_dir = ENV['REACT_NATIVE_WORKLETS_NODE_MODULES_DIR'] || ENV['REACT_NATIVE_REANIMATED_NODE_MODULES_DIR'] ||
- File.dirname(`cd "#{Pod::Config.instance.installation_root.to_s}" && node --print "require.resolve('#{worklets_package_name}/package.json')"`)
-react_native_worklets_or_reanimated_node_modules_dir_from_pods_root = Pathname.new(react_native_worklets_or_reanimated_node_modules_dir).relative_path_from(pods_root).to_s
+react_native_worklets_node_modules_dir = ENV['REACT_NATIVE_WORKLETS_NODE_MODULES_DIR'] ||
+ File.dirname(`cd "#{Pod::Config.instance.installation_root.to_s}" && node --print "require.resolve('react-native-worklets/package.json')"`)
+react_native_worklets_node_modules_dir_from_pods_root = Pathname.new(react_native_worklets_node_modules_dir).relative_path_from(pods_root).to_s
 
 react_native_react_common_dir = File.join(react_native_node_modules_dir, 'react-native/ReactCommon')
 react_native_react_common_dir_from_pods_root = Pathname.new(react_native_react_common_dir).relative_path_from(pods_root).to_s
@@ -33,24 +28,16 @@ Pod::Spec.new do |s|
 
   s.source_files = "apple/**/*.{h,m,mm}", "cpp/**/*.{h,cpp}"
 
-  if worklets_installed
-    s.dependency "RNWorklets"
-  else
-    s.dependency "RNReanimated/worklets"
-  end
+  s.dependency "RNWorklets"
 
-  xcconfig = {
+  s.xcconfig = {
     "OTHER_CFLAGS" => "$(inherited) -DREACT_NATIVE_MINOR_VERSION=#{react_native_minor_version}",
     "HEADER_SEARCH_PATHS" => [
-      "\"$(PODS_ROOT)/#{react_native_worklets_or_reanimated_node_modules_dir_from_pods_root}/apple\"",
-      "\"$(PODS_ROOT)/#{react_native_worklets_or_reanimated_node_modules_dir_from_pods_root}/Common/cpp\"",
+      "\"$(PODS_ROOT)/#{react_native_worklets_node_modules_dir_from_pods_root}/apple\"",
+      "\"$(PODS_ROOT)/#{react_native_worklets_node_modules_dir_from_pods_root}/Common/cpp\"",
       "\"$(PODS_ROOT)/#{react_native_react_common_dir_from_pods_root}\"",
     ].join(' '),
   }
-  if worklets_installed
-    xcconfig["OTHER_CFLAGS"] << " -DWORKLETS_INSTALLED=1"
-  end
-  s.xcconfig = xcconfig
 
   s.pod_target_xcconfig = { "HEADER_SEARCH_PATHS" => "\"$(PODS_TARGET_SRCROOT)/cpp\"" }
 

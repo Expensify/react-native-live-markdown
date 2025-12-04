@@ -15,12 +15,12 @@
 First, install the library from npm with the package manager of your choice:
 
 ```sh
-yarn add @expensify/react-native-live-markdown react-native-reanimated expensify-common html-entities@2.5.3
-npm install @expensify/react-native-live-markdown react-native-reanimated expensify-common html-entities@2.5.3 --save
-npx expo install @expensify/react-native-live-markdown react-native-reanimated expensify-common html-entities@2.5.3
+yarn add @expensify/react-native-live-markdown react-native-worklets expensify-common html-entities@2.5.3
+npm install @expensify/react-native-live-markdown react-native-worklets expensify-common html-entities@2.5.3 --save
+npx expo install @expensify/react-native-live-markdown react-native-worklets expensify-common html-entities@2.5.3
 ```
 
-React Native Live Markdown requires [react-native-reanimated](https://github.com/software-mansion/react-native-reanimated) 3.17.0 or newer as well as [expensify-common](https://github.com/Expensify/expensify-common) 2.0.115 and [html-entities](https://github.com/mdevils/html-entities) 2.5.3 exactly if using the default built-in ExpensiMark parser.
+React Native Live Markdown requires [react-native-worklets](https://github.com/software-mansion/react-native-reanimated/tree/main/packages/react-native-worklets) 0.6.0 or newer as well as [expensify-common](https://github.com/Expensify/expensify-common) 2.0.115 and [html-entities](https://github.com/mdevils/html-entities) 2.5.3 exactly if using the default built-in ExpensiMark parser.
 
 Then, install the iOS dependencies with CocoaPods:
 
@@ -148,7 +148,7 @@ Currently, only the following types are supported:
 type MarkdownType = 'bold' | 'italic' | 'strikethrough' | 'emoji' | 'mention-here' | 'mention-user' | 'mention-report' | 'link' | 'code' | 'pre' | 'blockquote' | 'h1' | 'syntax';
 ```
 
-Parser needs to be marked as a [worklet](https://docs.swmansion.com/react-native-reanimated/docs/guides/worklets/) because it's executed on the UI thread as the user types.
+Parser needs to be marked as a [worklet](https://docs.swmansion.com/react-native-worklets/docs/fundamentals/glossary#worklet) because it's executed on the UI thread as the user types.
 
 Here's a sample function that parses all substrings located between two asterisks as bold text:
 
