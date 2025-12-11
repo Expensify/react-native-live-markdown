@@ -3,6 +3,7 @@ project("livemarkdown")
 cmake_minimum_required(VERSION 3.13)
 
 set(CMAKE_VERBOSE_MAKEFILE on)
+set(CMAKE_CXX_STANDARD 20)
 
 include("${REACT_NATIVE_ROOT_DIR}/ReactAndroid/cmake-utils/folly-flags.cmake")
 add_compile_options(${folly_FLAGS})
