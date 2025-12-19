@@ -87,6 +87,7 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
       autoCapitalize = 'sentences',
       autoCorrect = true,
       blurOnSubmit = false,
+      submitBehavior,
       caretHidden,
       clearTextOnFocus,
       dir = 'auto',
@@ -518,9 +519,19 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
           return;
         }
 
-        const blurOnSubmitDefault = !multiline;
-        const shouldBlurOnSubmit = blurOnSubmit === null ? blurOnSubmitDefault : blurOnSubmit;
-
+        // Support submitBehavior prop (React Native 0.73+), fallback to blurOnSubmit for backwards compatibility
+        let shouldBlurOnSubmit;
+        let shouldSubmit;
+        if (submitBehavior != null) {
+          // submitBehavior takes precedence over blurOnSubmit
+          shouldSubmit = submitBehavior === 'submit' || submitBehavior === 'blurAndSubmit';
+          shouldBlurOnSubmit = submitBehavior === 'blurAndSubmit';
+        } else {
+          // Fallback to blurOnSubmit logic for backwards compatibility
+          const blurOnSubmitDefault = !multiline;
+          shouldBlurOnSubmit = blurOnSubmit === null ? blurOnSubmitDefault : blurOnSubmit;
+          shouldSubmit = blurOnSubmit || !multiline;
+        }
         const nativeEvent = e.nativeEvent;
         const isComposing = isEventComposing(nativeEvent);
 
@@ -538,19 +549,20 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
         ) {
           // prevent "Enter" from inserting a newline or submitting a form
           e.preventDefault();
-          if (!e.shiftKey && (blurOnSubmit || !multiline) && onSubmitEditing) {
+          // submitBehavior === 'newline' means don't submit, just insert newline (default behavior)
+          if (!e.shiftKey && shouldSubmit && onSubmitEditing) {
             onSubmitEditing(event as unknown as NativeSyntheticEvent<TextInputSubmitEditingEventData>);
-          } else if (multiline) {
+          } else if (multiline && (!shouldSubmit || e.shiftKey)) {
             //   We need to change normal behavior of "Enter" key to insert a line breaks, to prevent wrapping contentEditable text in <div> tags.
             //  Thanks to that in every situation we have proper amount of new lines in our parsed text. Without it pressing enter in empty lines will add 2 more new lines.
             insertText(e, '\n');
           }
-          if (!e.shiftKey && ((shouldBlurOnSubmit && hostNode !== null) || !multiline)) {
+          if (!e.shiftKey && shouldBlurOnSubmit && hostNode !== null) {
             setTimeout(() => divRef.current && divRef.current.blur(), 0);
           }
         }
       },
-      [multiline, blurOnSubmit, setEventProps, onKeyPress, handleOnChangeText, onSubmitEditing, insertText],
+      [multiline, blurOnSubmit, submitBehavior, setEventProps, onKeyPress, handleOnChangeText, onSubmitEditing, insertText],
     );
 
     const handleFocus: FocusEventHandler<HTMLDivElement> = useCallback(
