@@ -256,9 +256,10 @@ function parseExpensiMark(markdown: string): MarkdownRange[] {
   }
   let markdownRanges = sortRanges(ranges);
 
-  // Prevent italic and strikethrough formatting inside emojis and inline code blocks
+  // Prevent italic, bold and strikethrough formatting inside emojis and inline code blocks
   const rangesToExclude = getRangesToExcludeFormatting(markdownRanges);
   markdownRanges = excludeRangeTypesFromFormatting(markdownRanges, 'italic', rangesToExclude);
+  markdownRanges = excludeRangeTypesFromFormatting(markdownRanges, 'bold', rangesToExclude);
   markdownRanges = excludeRangeTypesFromFormatting(markdownRanges, 'strikethrough', rangesToExclude);
 
   const groupedRanges = groupRanges(markdownRanges);
