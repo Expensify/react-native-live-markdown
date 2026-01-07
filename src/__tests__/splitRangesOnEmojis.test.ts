@@ -109,6 +109,41 @@ describe('single overlap', () => {
       {type: 'emoji', start: 4, length: 2},
     ]);
   });
+
+  test('bold with emoji in the middle', () => {
+    let markdownRanges: MarkdownRange[] = [
+      {type: 'bold', start: 0, length: 10},
+      {type: 'emoji', start: 3, length: 2},
+    ];
+
+    markdownRanges = excludeRangeTypesFromFormatting(markdownRanges, 'bold', getRangesToExcludeFormatting(markdownRanges));
+    sortRanges(markdownRanges);
+
+    expect(markdownRanges).toEqual([
+      {type: 'bold', start: 0, length: 3},
+      {type: 'emoji', start: 3, length: 2},
+      {type: 'bold', start: 5, length: 5},
+    ]);
+  });
+
+  test('bold with multiple emojis', () => {
+    let markdownRanges: MarkdownRange[] = [
+      {type: 'bold', start: 0, length: 10},
+      {type: 'emoji', start: 2, length: 2},
+      {type: 'emoji', start: 6, length: 2},
+    ];
+
+    markdownRanges = excludeRangeTypesFromFormatting(markdownRanges, 'bold', getRangesToExcludeFormatting(markdownRanges));
+    sortRanges(markdownRanges);
+
+    expect(markdownRanges).toEqual([
+      {type: 'bold', start: 0, length: 2},
+      {type: 'emoji', start: 2, length: 2},
+      {type: 'bold', start: 4, length: 2},
+      {type: 'emoji', start: 6, length: 2},
+      {type: 'bold', start: 8, length: 2},
+    ]);
+  });
 });
 
 describe('multiple overlaps', () => {
@@ -158,6 +193,49 @@ describe('multiple overlaps', () => {
       {type: 'italic', start: 10, length: 10},
       {type: 'strikethrough', start: 10, length: 4},
       {type: 'strikethrough', start: 22, length: 5},
+    ]);
+  });
+
+  test('splitting on three types', () => {
+    let markdownRanges: MarkdownRange[] = [
+      {type: 'italic', start: 0, length: 20},
+      {type: 'bold', start: 2, length: 12},
+      {type: 'strikethrough', start: 4, length: 8},
+      {type: 'emoji', start: 6, length: 2},
+    ];
+
+    markdownRanges = excludeRangeTypesFromFormatting(markdownRanges, 'italic', getRangesToExcludeFormatting(markdownRanges));
+    markdownRanges = excludeRangeTypesFromFormatting(markdownRanges, 'bold', getRangesToExcludeFormatting(markdownRanges));
+    markdownRanges = excludeRangeTypesFromFormatting(markdownRanges, 'strikethrough', getRangesToExcludeFormatting(markdownRanges));
+    sortRanges(markdownRanges);
+
+    expect(markdownRanges).toEqual([
+      {type: 'italic', start: 0, length: 6},
+      {type: 'bold', start: 2, length: 4},
+      {type: 'strikethrough', start: 4, length: 2},
+      {type: 'emoji', start: 6, length: 2},
+      {type: 'italic', start: 8, length: 12},
+      {type: 'bold', start: 8, length: 6},
+      {type: 'strikethrough', start: 8, length: 4},
+    ]);
+  });
+
+  test('nested ranges with emoji', () => {
+    let markdownRanges: MarkdownRange[] = [
+      {type: 'italic', start: 1, length: 15},
+      {type: 'bold', start: 5, length: 7},
+      {type: 'emoji', start: 10, length: 2},
+    ];
+
+    markdownRanges = excludeRangeTypesFromFormatting(markdownRanges, 'italic', getRangesToExcludeFormatting(markdownRanges));
+    markdownRanges = excludeRangeTypesFromFormatting(markdownRanges, 'bold', getRangesToExcludeFormatting(markdownRanges));
+    sortRanges(markdownRanges);
+
+    expect(markdownRanges).toEqual([
+      {type: 'italic', start: 1, length: 9},
+      {type: 'bold', start: 5, length: 5},
+      {type: 'emoji', start: 10, length: 2},
+      {type: 'italic', start: 12, length: 4},
     ]);
   });
 });
