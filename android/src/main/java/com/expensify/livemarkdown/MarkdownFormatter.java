@@ -10,11 +10,13 @@ import com.expensify.livemarkdown.spans.*;
 import com.facebook.react.views.text.internal.span.CustomLineHeightSpan;
 import com.facebook.systrace.Systrace;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class MarkdownFormatter {
   private final @NonNull AssetManager mAssetManager;
+  private final List<MarkdownSpan> mMarkdownSpans = new ArrayList<>();
 
   public MarkdownFormatter(@NonNull AssetManager assetManager) {
     mAssetManager = assetManager;
@@ -34,11 +36,11 @@ public class MarkdownFormatter {
   private void removeSpans(@NonNull SpannableStringBuilder ssb) {
     try {
       Systrace.beginSection(0, "removeSpans");
-      // We shouldn't use `removeSpans()` because it also removes SpellcheckSpan, SuggestionSpan etc.
-      MarkdownSpan[] spans = ssb.getSpans(0, ssb.length(), MarkdownSpan.class);
-      for (MarkdownSpan span : spans) {
+      // We shouldn't use `ssb.removeSpans()` because it also removes SpellcheckSpan, SuggestionSpan etc.
+      for (MarkdownSpan span : mMarkdownSpans) {
         ssb.removeSpan(span);
       }
+      mMarkdownSpans.clear();
     } finally {
       Systrace.endSection(0);
     }
@@ -129,5 +131,6 @@ public class MarkdownFormatter {
 
   private void setSpan(@NonNull SpannableStringBuilder ssb, @NonNull MarkdownSpan span, int start, int end) {
     ssb.setSpan(span, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+    mMarkdownSpans.add(span);
   }
 }
