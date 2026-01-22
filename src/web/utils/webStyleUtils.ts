@@ -6,27 +6,27 @@ import {mergeMarkdownStyleWithDefault} from '../../styleUtils';
 let createReactDOMStyle: (style: any) => any;
 try {
   createReactDOMStyle =
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
     require('react-native-web/dist/exports/StyleSheet/compiler/createReactDOMStyle').default;
-} catch (e) {
+} catch {
   throw new Error('[react-native-live-markdown] Function `createReactDOMStyle` from react-native-web not found. Please make sure that you are using React Native Web 0.18 or newer.');
 }
 
 let preprocessStyle: (style: any) => any;
 try {
   preprocessStyle =
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
     require('react-native-web/dist/exports/StyleSheet/preprocess').default;
-} catch (e) {
+} catch {
   throw new Error('[react-native-live-markdown] Function `preprocessStyle` from react-native-web not found.');
 }
 
 let dangerousStyleValue: (name: string, value: any, isCustomProperty: boolean) => any;
 try {
   dangerousStyleValue =
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
     require('react-native-web/dist/modules/setValueForStyles/dangerousStyleValue').default;
-} catch (e) {
+} catch {
   throw new Error('[react-native-live-markdown] Function `dangerousStyleValue` from react-native-web not found.');
 }
 
