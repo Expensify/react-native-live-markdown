@@ -4,17 +4,13 @@ const ANIMATED_ELEMENT_TYPES = ['spinner'] as const;
 
 type AnimatedElementType = (typeof ANIMATED_ELEMENT_TYPES)[number];
 
-type AnimationTimes = {
-  [key in AnimatedElementType]?: CSSNumberish[];
-};
+type AnimationTimes = Partial<Record<AnimatedElementType, CSSNumberish[]>>;
 
-const KEYFRAMES: {
-  [key in AnimatedElementType]?: Keyframe[];
-} = {
+const KEYFRAMES: Partial<Record<AnimatedElementType, Keyframe[]>> = {
   spinner: [{transform: 'rotate(0deg)'}, {transform: 'rotate(360deg)'}],
 };
 
-const OPTIONS: {[key in AnimatedElementType]?: KeyframeAnimationOptions} = {
+const OPTIONS: Partial<Record<AnimatedElementType, KeyframeAnimationOptions>> = {
   spinner: {
     duration: 1000,
     iterations: Infinity,

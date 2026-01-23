@@ -19,7 +19,7 @@ file(GLOB CPP_SRC CONFIGURE_DEPENDS "${CPP_DIR}/*.cpp")
 
 add_library(${CMAKE_PROJECT_NAME} SHARED ${ANDROID_SRC} ${CPP_SRC})
 
-target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CPP_DIR} "${REACT_NATIVE_ROOT_DIR}/ReactCommon/jsiexecutor")
+target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CPP_DIR} "${REACT_NATIVE_ROOT_DIR}/ReactCommon/jsiexecutor" "${REACT_NATIVE_ROOT_DIR}/ReactCommon")
 
 find_package(fbjni REQUIRED CONFIG)
 find_package(ReactAndroid REQUIRED CONFIG)

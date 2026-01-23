@@ -22,7 +22,7 @@ function sortRanges(ranges: MarkdownRange[]) {
 }
 
 function groupRanges(ranges: MarkdownRange[]) {
-  const lastVisibleRangeIndex: {[key in MarkdownType]?: number} = {};
+  const lastVisibleRangeIndex: Partial<Record<MarkdownType, number>> = {};
 
   return ranges.reduce((acc, range) => {
     const start = range.start;

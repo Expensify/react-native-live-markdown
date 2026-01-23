@@ -35,7 +35,7 @@ public:
   void layout(LayoutContext layoutContext) override;
 
 private:
-  ContextContainer::Shared customContextContainer_;
+  std::shared_ptr<const ContextContainer> customContextContainer_;
   folly::dynamic previousMarkdownStyle_;
   int previousParserId_;
 

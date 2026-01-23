@@ -1,7 +1,7 @@
+import {codegenNativeComponent} from 'react-native';
 import type {ColorValue, ViewProps} from 'react-native';
 
 import type {Float, Int32} from 'react-native/Libraries/Types/CodegenTypes';
-import codegenNativeComponent from 'react-native/Libraries/Utilities/codegenNativeComponent';
 
 interface CodeBlockStyle {
   fontFamily: string;
