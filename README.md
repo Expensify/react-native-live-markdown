@@ -20,7 +20,10 @@ npm install @expensify/react-native-live-markdown react-native-worklets expensif
 npx expo install @expensify/react-native-live-markdown react-native-worklets expensify-common html-entities@2.5.3
 ```
 
-React Native Live Markdown requires [react-native-worklets](https://github.com/software-mansion/react-native-reanimated/tree/main/packages/react-native-worklets) 0.6.0 or newer as well as [expensify-common](https://github.com/Expensify/expensify-common) 2.0.115 and [html-entities](https://github.com/mdevils/html-entities) 2.5.3 exactly if using the default built-in ExpensiMark parser.
+React Native Live Markdown requires [react-native-worklets](https://github.com/software-mansion/react-native-reanimated/tree/main/packages/react-native-worklets) 0.7.0 or newer as well as [expensify-common](https://github.com/Expensify/expensify-common) 2.0.115 and [html-entities](https://github.com/mdevils/html-entities) 2.5.3 exactly if using the default built-in ExpensiMark parser.
+
+> [!IMPORTANT]
+> Please follow the `react-native-worklets` [Getting Started](https://docs.swmansion.com/react-native-worklets/docs/#react-native-community-cli) guide to avoid issues.
 
 Then, install the iOS dependencies with CocoaPods:
 
@@ -180,7 +183,7 @@ Currently, `react-native-live-markdown` supports only [ExpensiMark](https://gith
 `MarkdownTextInput` inherits all props of React Native's `TextInput` component as well as introduces the following properties:
 
 | Prop            | Type                                 | Default     | Note                                                                                                                                                                                                                   |
-| --------------- | ------------------------------------ | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|-----------------|--------------------------------------|-------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `parser`        | `(value: string) => MarkdownRange[]` | `undefined` | A function that parses the current value and returns an array of ranges.                                                                                                                                               |
 | `markdownStyle` | `MarkdownStyle`                      | `undefined` | Adds custom styling to Markdown text. The provided value is merged with default style object. See [Styling](https://github.com/expensify/react-native-live-markdown/blob/main/README.md#styling) for more information. |
 
@@ -188,18 +191,30 @@ Currently, `react-native-live-markdown` supports only [ExpensiMark](https://gith
 
 `react-native-live-markdown` supports only latest React Native minor releases with the New Architecture enabled.
 
-| @expensify/react-native-live-markdown | 0.73 | 0.74 | 0.75 | 0.76 | 0.77 | 0.78 | 0.79 | 0.80 | 0.81 |
-| :-----------------------------------: | :--: | :--: | :--: | :--: | :--: | :--: | :--: | :--: | :--: |
-|               0.1.304+                |  ❌  |  ❌  |  ❌  |  ❌  |  ✅  |  ✅  |  ✅  |  ✅  |  ✅  |
-|           0.1.297 – 0.1.303           |  ❌  |  ❌  |  ❌  |  ❌  |  ✅  |  ✅  |  ✅  |  ✅  |  ❌  |
-|           0.1.260 – 0.1.296           |  ❌  |  ❌  |  ❌  |  ❌  |  ✅  |  ✅  |  ✅  |  ❌  |  ❌  |
-|           0.1.256 – 0.1.259           |  ❌  |  ❌  |  ❌  |  ❌  |  ✅  |  ❌  |  ❌  |  ❌  |  ❌  |
-|           0.1.248 – 0.1.255           |  ❌  |  ❌  |  ❌  |  ✅  |  ✅  |  ❌  |  ❌  |  ❌  |  ❌  |
-|           0.1.235 – 0.1.247           |  ❌  |  ❌  |  ✅  |  ✅  |  ✅  |  ❌  |  ❌  |  ❌  |  ❌  |
-|           0.1.141 – 0.1.234           |  ❌  |  ❌  |  ✅  |  ✅  |  ❌  |  ❌  |  ❌  |  ❌  |  ❌  |
-|           0.1.129 – 0.1.140           |  ❌  |  ❌  |  ✅  |  ❌  |  ❌  |  ❌  |  ❌  |  ❌  |  ❌  |
-|           0.1.122 – 0.1.128           |  ❌  |  ✅  |  ❌  |  ❌  |  ❌  |  ❌  |  ❌  |  ❌  |  ❌  |
-|           0.1.15 – 0.1.121            |  ✅  |  ❌  |  ❌  |  ❌  |  ❌  |  ❌  |  ❌  |  ❌  |  ❌  |
+### React Native compatibility
+
+|                   | 0.73 | 0.74 | 0.75 | 0.76 | 0.77 | 0.78 | 0.79 | 0.80 | 0.81 | 0.82 | 0.83 |
+|:-----------------:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|
+|     0.1.321+      |  ❌   |  ❌   |  ❌   |  ❌   |  ❌   |  ❌   |  ✅   |  ✅   |  ✅   |  ✅   |  ✅   |
+| 0.1.304 - 0.1.320 |  ❌   |  ❌   |  ❌   |  ❌   |  ✅   |  ✅   |  ✅   |  ✅   |  ✅   |  ❌   |  ❌   |
+| 0.1.297 – 0.1.303 |  ❌   |  ❌   |  ❌   |  ❌   |  ✅   |  ✅   |  ✅   |  ✅   |  ❌   |  ❌   |  ❌   |
+| 0.1.260 – 0.1.296 |  ❌   |  ❌   |  ❌   |  ❌   |  ✅   |  ✅   |  ✅   |  ❌   |  ❌   |  ❌   |  ❌   |
+| 0.1.256 – 0.1.259 |  ❌   |  ❌   |  ❌   |  ❌   |  ✅   |  ❌   |  ❌   |  ❌   |  ❌   |  ❌   |  ❌   |
+| 0.1.248 – 0.1.255 |  ❌   |  ❌   |  ❌   |  ✅   |  ✅   |  ❌   |  ❌   |  ❌   |  ❌   |  ❌   |  ❌   |
+| 0.1.235 – 0.1.247 |  ❌   |  ❌   |  ✅   |  ✅   |  ✅   |  ❌   |  ❌   |  ❌   |  ❌   |  ❌   |  ❌   |
+| 0.1.141 – 0.1.234 |  ❌   |  ❌   |  ✅   |  ✅   |  ❌   |  ❌   |  ❌   |  ❌   |  ❌   |  ❌   |  ❌   |
+| 0.1.129 – 0.1.140 |  ❌   |  ❌   |  ✅   |  ❌   |  ❌   |  ❌   |  ❌   |  ❌   |  ❌   |  ❌   |  ❌   |
+| 0.1.122 – 0.1.128 |  ❌   |  ✅   |  ❌   |  ❌   |  ❌   |  ❌   |  ❌   |  ❌   |  ❌   |  ❌   |  ❌   |
+| 0.1.15 – 0.1.121  |  ✅   |  ❌   |  ❌   |  ❌   |  ❌   |  ❌   |  ❌   |  ❌   |  ❌   |  ❌   |  ❌   |
+
+
+### `react-native-worklets` compatibility
+
+|                   | 0.6.x | 0.7.x |
+|:-----------------:|:-----:|:-----:|
+|     0.1.321+      |   ❌   |   ✅   |
+| 0.1.308 – 0.1.320 |   ✅   |   ❌   |
+
 
 ## License
 
