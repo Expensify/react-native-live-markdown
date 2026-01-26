@@ -9,10 +9,6 @@ buildscript {
   }
 }
 
-task prepareKotlinBuildScriptModel {
-  // This task is run during Gradle Sync in Android Studio.
-}
-
 def reactNativeArchitectures() {
   def value = project.getProperties().get("reactNativeArchitectures")
   return value ? value.split(",") : ["armeabi-v7a", "x86", "x86_64", "arm64-v8a"]
@@ -179,13 +175,4 @@ dependencies {
   implementation "com.facebook.react:react-android" // version substituted by RNGP
   implementation "com.facebook.react:hermes-android" // version substituted by RNGP
   implementation project(":react-native-worklets")
-}
-
-// This fixes linking errors due to undefined symbols from libworklets.so.
-// During Gradle Sync, Android Gradle Plugin runs Prefab and treats worklets
-// like a header-only library. During build, config files are not regenerated
-// because the cache key does not change and AGP thinks that they are up-to-date.
-afterEvaluate {
-  prepareKotlinBuildScriptModel.dependsOn(":react-native-worklets:prefabDebugPackage")
-  prepareKotlinBuildScriptModel.dependsOn(":react-native-worklets:prefabReleasePackage")
 }
