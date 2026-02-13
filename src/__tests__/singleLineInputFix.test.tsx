@@ -34,7 +34,7 @@ describe('Single-line input fix validation', () => {
     });
 
     it('should not generate BR elements for single-line markdown (isMultiline=false)', () => {
-      const text = 'hello *world* test';
+      const text = 'hello **world** test';
       const ranges = parseExpensiMark(text);
 
       const result = parseRangesToHTMLNodes(text, ranges, false, {}, true);
@@ -100,7 +100,7 @@ describe('Single-line input fix validation', () => {
 
     it('should work correctly with markdown in single-line context', () => {
       // Test that our fix doesn't break markdown functionality
-      const markdownText = '*bold* normal `code`';
+      const markdownText = '**bold** normal `code`';
       const ranges = parseExpensiMark(markdownText);
 
       const result = parseRangesToHTMLNodes(markdownText, ranges, false, {}, true);

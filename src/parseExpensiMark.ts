@@ -134,9 +134,9 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, MarkdownRange[]] {
       if (node.tag === '<>') {
         processChildren(node);
       } else if (node.tag === '<strong>') {
-        appendSyntax('*');
+        appendSyntax('**');
         addChildrenWithStyle(node, 'bold');
-        appendSyntax('*');
+        appendSyntax('**');
       } else if (node.tag === '<em>') {
         appendSyntax('_');
         addChildrenWithStyle(node, 'italic');

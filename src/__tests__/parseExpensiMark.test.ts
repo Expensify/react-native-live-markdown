@@ -49,10 +49,10 @@ describe('parsing error', () => {
 });
 
 test('bold', () => {
-  expect('Hello, *world*!').toBeParsedAs([
-    {type: 'syntax', start: 7, length: 1},
-    {type: 'bold', start: 8, length: 5},
-    {type: 'syntax', start: 13, length: 1},
+  expect('Hello, **world**!').toBeParsedAs([
+    {type: 'syntax', start: 7, length: 2},
+    {type: 'bold', start: 9, length: 5},
+    {type: 'syntax', start: 14, length: 2},
   ]);
 });
 
@@ -281,19 +281,19 @@ test('h1', () => {
 });
 
 test('nested bold and italic', () => {
-  expect('*_Hello_*, _*world*_!').toBeParsedAs([
-    {type: 'syntax', start: 0, length: 1},
-    {type: 'bold', start: 1, length: 7},
-    {type: 'syntax', start: 1, length: 1},
-    {type: 'italic', start: 2, length: 5},
-    {type: 'syntax', start: 7, length: 1},
+  expect('**_Hello_**, _**world**_!').toBeParsedAs([
+    {type: 'syntax', start: 0, length: 2},
+    {type: 'bold', start: 2, length: 7},
+    {type: 'syntax', start: 2, length: 1},
+    {type: 'italic', start: 3, length: 5},
     {type: 'syntax', start: 8, length: 1},
-    {type: 'syntax', start: 11, length: 1},
-    {type: 'italic', start: 12, length: 7},
-    {type: 'syntax', start: 12, length: 1},
-    {type: 'bold', start: 13, length: 5},
-    {type: 'syntax', start: 18, length: 1},
-    {type: 'syntax', start: 19, length: 1},
+    {type: 'syntax', start: 9, length: 2},
+    {type: 'syntax', start: 13, length: 1},
+    {type: 'italic', start: 14, length: 9},
+    {type: 'syntax', start: 14, length: 2},
+    {type: 'bold', start: 16, length: 5},
+    {type: 'syntax', start: 21, length: 2},
+    {type: 'syntax', start: 23, length: 1},
   ]);
 });
 
@@ -412,13 +412,13 @@ describe('trailing whitespace', () => {
     });
 
     test('with another style inside', () => {
-      expect('>> Hello *world*').toBeParsedAs([
-        {type: 'blockquote', start: 0, length: 16, depth: 2},
+      expect('>> Hello **world**').toBeParsedAs([
+        {type: 'blockquote', start: 0, length: 18, depth: 2},
         {type: 'syntax', start: 0, length: 1},
         {type: 'syntax', start: 1, length: 1},
-        {type: 'syntax', start: 9, length: 1},
-        {type: 'bold', start: 10, length: 5},
-        {type: 'syntax', start: 15, length: 1},
+        {type: 'syntax', start: 9, length: 2},
+        {type: 'bold', start: 11, length: 5},
+        {type: 'syntax', start: 16, length: 2},
       ]);
     });
   });

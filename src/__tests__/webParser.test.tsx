@@ -44,8 +44,8 @@ test('no formatting', () => {
 });
 
 test('bold', () => {
-  expect('Hello, *world*!').toBeParsedAsHTML(
-    '<p data-type="line" data-id="0"><span data-type="text" data-id="0,0">Hello, </span><span data-type="syntax" data-id="0,1"><span data-type="text" data-id="0,1,0">*</span></span><span data-type="bold" data-id="0,2"><span data-type="text" data-id="0,2,0">world</span></span><span data-type="syntax" data-id="0,3"><span data-type="text" data-id="0,3,0">*</span></span><span data-type="text" data-id="0,4">!</span></p>',
+  expect('Hello, **world**!').toBeParsedAsHTML(
+    '<p data-type="line" data-id="0"><span data-type="text" data-id="0,0">Hello, </span><span data-type="syntax" data-id="0,1"><span data-type="text" data-id="0,1,0">**</span></span><span data-type="bold" data-id="0,2"><span data-type="text" data-id="0,2,0">world</span></span><span data-type="syntax" data-id="0,3"><span data-type="text" data-id="0,3,0">**</span></span><span data-type="text" data-id="0,4">!</span></p>',
   );
 });
 
@@ -224,8 +224,8 @@ test('heading', () => {
 });
 
 test('nested bold and italic', () => {
-  expect('*_Hello_*, _*world*_!').toBeParsedAsHTML(
-    '<p data-type="line" data-id="0"><span data-type="syntax" data-id="0,0"><span data-type="text" data-id="0,0,0">*</span></span><span data-type="bold" data-id="0,1"><span data-type="syntax" data-id="0,1,0"><span data-type="text" data-id="0,1,0,0">_</span></span><span data-type="italic" data-id="0,1,1"><span data-type="text" data-id="0,1,1,0">Hello</span></span><span data-type="syntax" data-id="0,1,2"><span data-type="text" data-id="0,1,2,0">_</span></span></span><span data-type="syntax" data-id="0,2"><span data-type="text" data-id="0,2,0">*</span></span><span data-type="text" data-id="0,3">, </span><span data-type="syntax" data-id="0,4"><span data-type="text" data-id="0,4,0">_</span></span><span data-type="italic" data-id="0,5"><span data-type="syntax" data-id="0,5,0"><span data-type="text" data-id="0,5,0,0">*</span></span><span data-type="bold" data-id="0,5,1"><span data-type="text" data-id="0,5,1,0">world</span></span><span data-type="syntax" data-id="0,5,2"><span data-type="text" data-id="0,5,2,0">*</span></span></span><span data-type="syntax" data-id="0,6"><span data-type="text" data-id="0,6,0">_</span></span><span data-type="text" data-id="0,7">!</span></p>',
+  expect('**_Hello_**, _**world**_!').toBeParsedAsHTML(
+    '<p data-type="line" data-id="0"><span data-type="syntax" data-id="0,0"><span data-type="text" data-id="0,0,0">**</span></span><span data-type="bold" data-id="0,1"><span data-type="syntax" data-id="0,1,0"><span data-type="text" data-id="0,1,0,0">_</span></span><span data-type="italic" data-id="0,1,1"><span data-type="text" data-id="0,1,1,0">Hello</span></span><span data-type="syntax" data-id="0,1,2"><span data-type="text" data-id="0,1,2,0">_</span></span></span><span data-type="syntax" data-id="0,2"><span data-type="text" data-id="0,2,0">**</span></span><span data-type="text" data-id="0,3">, </span><span data-type="syntax" data-id="0,4"><span data-type="text" data-id="0,4,0">_</span></span><span data-type="italic" data-id="0,5"><span data-type="syntax" data-id="0,5,0"><span data-type="text" data-id="0,5,0,0">**</span></span><span data-type="bold" data-id="0,5,1"><span data-type="text" data-id="0,5,1,0">world</span></span><span data-type="syntax" data-id="0,5,2"><span data-type="text" data-id="0,5,2,0">**</span></span></span><span data-type="syntax" data-id="0,6"><span data-type="text" data-id="0,6,0">_</span></span><span data-type="text" data-id="0,7">!</span></p>',
   );
 });
 

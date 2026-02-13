@@ -6,9 +6,9 @@ describe('normalizeLines', () => {
   it('should handle single line markdown with no multi-line ranges', () => {
     const lines: Paragraph[] = [
       {
-        text: '*Hello, world!*',
+        text: '**Hello, world!**',
         start: 0,
-        length: 13,
+        length: 15,
         markdownRanges: [],
       },
     ];
@@ -17,42 +17,42 @@ describe('normalizeLines', () => {
       {
         type: 'syntax',
         start: 0,
-        length: 1,
+        length: 2,
       },
       {
         type: 'bold',
-        start: 1,
+        start: 2,
         length: 11,
       },
       {
         type: 'syntax',
-        start: 12,
-        length: 1,
+        start: 13,
+        length: 2,
       },
     ];
 
     const result = normalizeLines(lines, ranges);
     const paragraph = result[0] as Paragraph;
     expect(paragraph.markdownRanges).toEqual([
-      {length: 1, start: 0, type: 'syntax'},
-      {length: 11, start: 1, type: 'bold'},
-      {length: 1, start: 12, type: 'syntax'},
+      {length: 2, start: 0, type: 'syntax'},
+      {length: 11, start: 2, type: 'bold'},
+      {length: 2, start: 13, type: 'syntax'},
     ]);
-    expect(paragraph.text).toEqual('*Hello, world!*');
+    expect(paragraph.text).toEqual('**Hello, world!**');
   });
 
   it('should handle multiline line markdown with no multi-line ranges', () => {
     const lines: Paragraph[] = [
       {
-        text: '*Hello',
+        text: '**Hello',
         start: 0,
-        length: 6,
+        length: 7,
         markdownRanges: [],
       },
       {
-        text: 'world!*',
-        start: 7,
-        length: 7,
+        text: 'world!**',
+        start: 8,
+        length: 8,
         markdownRanges: [],
       },
     ];
@@ -61,17 +61,17 @@ describe('normalizeLines', () => {
       {
         type: 'syntax',
         start: 0,
-        length: 1,
+        length: 2,
       },
       {
         type: 'bold',
         start: 0,
-        length: 13,
+        length: 14,
       },
       {
         type: 'syntax',
-        start: 13,
-        length: 1,
+        start: 14,
+        length: 2,
       },
     ];
 
@@ -79,10 +79,10 @@ describe('normalizeLines', () => {
     expect(result.length).toBe(2);
     const firstParagraph = result[0] as Paragraph;
     const secondParagraph = result[1] as Paragraph;
-    expect(firstParagraph.text).toEqual('*Hello');
-    expect(secondParagraph.text).toEqual('world!*');
-    expect(firstParagraph.markdownRanges).toContainEqual({type: 'bold', start: 0, length: 6});
-    expect(secondParagraph.markdownRanges).toContainEqual({type: 'bold', start: 7, length: 6});
+    expect(firstParagraph.text).toEqual('**Hello');
+    expect(secondParagraph.text).toEqual('world!**');
+    expect(firstParagraph.markdownRanges).toContainEqual({type: 'bold', start: 0, length: 7});
+    expect(secondParagraph.markdownRanges).toContainEqual({type: 'bold', start: 8, length: 6});
   });
 
   it('should merge lines when handling multi-line markdown ranges', () => {
