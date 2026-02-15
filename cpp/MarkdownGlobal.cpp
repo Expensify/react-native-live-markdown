@@ -1,5 +1,6 @@
 #include "MarkdownGlobal.h"
 
+#include <react/debug/react_native_assert.h>
 #include <unordered_map>
 
 using namespace facebook;
@@ -8,12 +9,16 @@ namespace expensify {
 namespace livemarkdown {
 
 std::shared_ptr<WorkletRuntime> globalMarkdownWorkletRuntime;
+std::mutex globalMarkdownRuntimeMutex;
 
 void setMarkdownRuntime(const std::shared_ptr<WorkletRuntime> &markdownWorkletRuntime) {
+  std::lock_guard<std::mutex> lock(globalMarkdownRuntimeMutex);
   globalMarkdownWorkletRuntime = markdownWorkletRuntime;
 }
 
 std::shared_ptr<WorkletRuntime> getMarkdownRuntime() {
+  std::lock_guard<std::mutex> lock(globalMarkdownRuntimeMutex);
+  react_native_assert(globalMarkdownWorkletRuntime != nullptr && "Markdown worklet runtime is not initialized yet");
   return globalMarkdownWorkletRuntime;
 }
 
