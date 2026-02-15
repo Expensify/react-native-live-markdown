@@ -8,12 +8,15 @@ namespace expensify {
 namespace livemarkdown {
 
 std::shared_ptr<WorkletRuntime> globalMarkdownWorkletRuntime;
+std::mutex globalMarkdownRuntimeMutex;
 
 void setMarkdownRuntime(const std::shared_ptr<WorkletRuntime> &markdownWorkletRuntime) {
+  std::lock_guard<std::mutex> lock(globalMarkdownRuntimeMutex);
   globalMarkdownWorkletRuntime = markdownWorkletRuntime;
 }
 
 std::shared_ptr<WorkletRuntime> getMarkdownRuntime() {
+  std::lock_guard<std::mutex> lock(globalMarkdownRuntimeMutex);
   return globalMarkdownWorkletRuntime;
 }
 
