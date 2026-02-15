@@ -1,5 +1,6 @@
 #include "MarkdownGlobal.h"
 
+#include <react/debug/react_native_assert.h>
 #include <unordered_map>
 
 using namespace facebook;
@@ -17,6 +18,7 @@ void setMarkdownRuntime(const std::shared_ptr<WorkletRuntime> &markdownWorkletRu
 
 std::shared_ptr<WorkletRuntime> getMarkdownRuntime() {
   std::lock_guard<std::mutex> lock(globalMarkdownRuntimeMutex);
+  react_native_assert(globalMarkdownWorkletRuntime != nullptr && "Markdown worklet runtime is not initialized yet");
   return globalMarkdownWorkletRuntime;
 }
 
