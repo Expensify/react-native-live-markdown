@@ -93,10 +93,10 @@
 
 // This method is added as a patch in the New Expensify app.
 // See https://github.com/Expensify/App/blob/fd4b9adc22144cb99db1a5634f8828a13fa8c374/patches/react-native%2B0.77.1%2B011%2BAdd-onPaste-to-TextInput.patch#L239
-- (void)textInputDidPaste:(NSString *)type withData:(NSString *)data
+- (void)textInputDidPaste:(NSArray<NSDictionary<NSString *, NSString *> *> *)items
 {
-  void (*func)(id, SEL, NSString*, NSString*) = (void (*)(id, SEL, NSString*, NSString*))objc_msgSend;
-  func(_originalTextInputDelegate, @selector(textInputDidPaste:withData:), type, data);
+  void (*func)(id, SEL, NSArray<NSDictionary<NSString *, NSString *> *> *) = (void (*)(id, SEL, NSArray<NSDictionary<NSString *, NSString *> *> *))objc_msgSend;
+  func(_originalTextInputDelegate, @selector(textInputDidPaste:), items);
 }
 
 @end
