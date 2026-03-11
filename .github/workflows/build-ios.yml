@@ -66,6 +66,8 @@ jobs:
         run: |
           bundler install
           bundler exec pod install
+        env:
+          USE_FRAMEWORKS: static
 
       - name: Remove .xcode.env.local
         working-directory: example/ios
