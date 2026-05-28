@@ -33,4 +33,4 @@ jobs:
 
       - name: Build app
         working-directory: WebExample
-        run: npx expo export:web
+        run: npx expo export --platform web
