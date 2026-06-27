@@ -202,8 +202,7 @@ void MarkdownTextInputDecoratorShadowNode::applyMarkdownFormattingToTextInputSta
 
   RCTMarkdownStyle *markdownStyle =
       [[RCTMarkdownStyle alloc] initWithStruct:decoratorProps.markdownStyle];
-  [utils setMarkdownStyle:markdownStyle];
-  [utils setParserId:[NSNumber numberWithInt:decoratorProps.parserId]];
+  NSNumber *parserId = [NSNumber numberWithInt:decoratorProps.parserId];
 
   // convert the attibuted string stored in state to
   // NSAttributedString
@@ -244,7 +243,10 @@ void MarkdownTextInputDecoratorShadowNode::applyMarkdownFormattingToTextInputSta
 
     // apply markdown
     NSMutableAttributedString *newString = [nsAttributedString mutableCopy];
-    [utils applyMarkdownFormatting:newString withDefaultTextAttributes:defaultNSTextAttributes];
+    [utils applyMarkdownFormatting:newString
+        withDefaultTextAttributes:defaultNSTextAttributes
+                    markdownStyle:markdownStyle
+                         parserId:parserId];
 
     // create a clone of the old TextInputState and update the
     // attributed string box to point to the string with markdown
@@ -256,7 +258,10 @@ void MarkdownTextInputDecoratorShadowNode::applyMarkdownFormattingToTextInputSta
 
     // apply markdown
     NSMutableAttributedString *newString = [nsAttributedString mutableCopy];
-    [utils applyMarkdownFormatting:newString withDefaultTextAttributes:defaultNSTextAttributes];
+    [utils applyMarkdownFormatting:newString
+        withDefaultTextAttributes:defaultNSTextAttributes
+                    markdownStyle:markdownStyle
+                         parserId:parserId];
 
     // create a clone of the old TextInputState and update the
     // attributed string box to point to the string with markdown
