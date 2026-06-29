@@ -48,6 +48,12 @@ private:
                                                  YGMeasureMode heightMode);
   static YogaLayoutableShadowNode &
   shadowNodeFromContext(YGNodeConstRef yogaNode);
+
+  // Persisted RCTMarkdownUtils instance shared across shadow node clones so
+  // that MarkdownParser's one-entry memo cache (keyed on text + parserId)
+  // survives repeated Yoga measure callbacks instead of being discarded on
+  // every call to applyMarkdownFormattingToTextInputState.
+  mutable std::shared_ptr<void> markdownUtils_;
 };
 
 } // namespace react

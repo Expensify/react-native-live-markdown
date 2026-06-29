@@ -34,4 +34,22 @@
                            withMarkdownStyle:_markdownStyle];
 }
 
+- (void)applyMarkdownFormatting:(nonnull NSMutableAttributedString *)attributedString
+      withDefaultTextAttributes:(nonnull NSDictionary<NSAttributedStringKey, id> *)defaultTextAttributes
+                  markdownStyle:(nonnull RCTMarkdownStyle *)markdownStyle
+                       parserId:(nonnull NSNumber *)parserId
+{
+  // Keep the style/parserId assignment and the parse+format together under a
+  // single lock. The shadow node shares one instance across clones, and Fabric
+  // runs commits/layout optimistically on multiple threads, so without this the
+  // setters could interleave with another thread's parse/format and apply the
+  // wrong parserId/style for a frame. `@synchronized` is recursive, so nesting
+  // with `MarkdownParser`'s own `@synchronized(self)` in `parse:` is safe.
+  @synchronized (self) {
+    _markdownStyle = markdownStyle;
+    _parserId = parserId;
+    [self applyMarkdownFormatting:attributedString withDefaultTextAttributes:defaultTextAttributes];
+  }
+}
+
 @end

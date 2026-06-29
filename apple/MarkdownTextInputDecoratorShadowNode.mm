@@ -32,6 +32,13 @@ MarkdownTextInputDecoratorShadowNode::MarkdownTextInputDecoratorShadowNode(
     ShadowNode const &sourceShadowNode,
     ShadowNodeFragment const &fragment)
     : ConcreteViewShadowNode(sourceShadowNode, fragment) {
+  // Carry the persisted RCTMarkdownUtils over from the source node so the
+  // MarkdownParser memo cache survives the frequent cloning that happens
+  // during layout and re-render cycles.
+  const auto &source =
+      static_cast<const MarkdownTextInputDecoratorShadowNode &>(sourceShadowNode);
+  markdownUtils_ = source.markdownUtils_;
+
   initialize();
   makeChildNodeMutable();
   
@@ -182,12 +189,20 @@ void MarkdownTextInputDecoratorShadowNode::applyMarkdownFormattingToTextInputSta
   const auto defaultNSTextAttributes =
       RCTNSTextAttributesFromTextAttributes(defaultTextAttributes);
 
-  // this can possibly be optimized
+  // Lazily create and persist the RCTMarkdownUtils instance so the MarkdownParser
+  // one-entry memo cache (keyed on text + parserId) survives repeated Yoga measure
+  // callbacks. Previously a fresh utils/parser was allocated on every call,
+  // discarding the cache and forcing a full JSI re-parse each time.
+  if (!markdownUtils_) {
+    RCTMarkdownUtils *freshUtils = [[RCTMarkdownUtils alloc] init];
+    markdownUtils_ = std::shared_ptr<void>(
+        (__bridge_retained void *)freshUtils, [](void *p) { CFRelease(p); });
+  }
+  RCTMarkdownUtils *utils = (__bridge RCTMarkdownUtils *)markdownUtils_.get();
+
   RCTMarkdownStyle *markdownStyle =
       [[RCTMarkdownStyle alloc] initWithStruct:decoratorProps.markdownStyle];
-  RCTMarkdownUtils *utils = [[RCTMarkdownUtils alloc] init];
-  [utils setMarkdownStyle:markdownStyle];
-  [utils setParserId:[NSNumber numberWithInt:decoratorProps.parserId]];
+  NSNumber *parserId = [NSNumber numberWithInt:decoratorProps.parserId];
 
   // convert the attibuted string stored in state to
   // NSAttributedString
@@ -228,7 +243,10 @@ void MarkdownTextInputDecoratorShadowNode::applyMarkdownFormattingToTextInputSta
 
     // apply markdown
     NSMutableAttributedString *newString = [nsAttributedString mutableCopy];
-    [utils applyMarkdownFormatting:newString withDefaultTextAttributes:defaultNSTextAttributes];
+    [utils applyMarkdownFormatting:newString
+        withDefaultTextAttributes:defaultNSTextAttributes
+                    markdownStyle:markdownStyle
+                         parserId:parserId];
 
     // create a clone of the old TextInputState and update the
     // attributed string box to point to the string with markdown
@@ -240,7 +258,10 @@ void MarkdownTextInputDecoratorShadowNode::applyMarkdownFormattingToTextInputSta
 
     // apply markdown
     NSMutableAttributedString *newString = [nsAttributedString mutableCopy];
-    [utils applyMarkdownFormatting:newString withDefaultTextAttributes:defaultNSTextAttributes];
+    [utils applyMarkdownFormatting:newString
+        withDefaultTextAttributes:defaultNSTextAttributes
+                    markdownStyle:markdownStyle
+                         parserId:parserId];
 
     // create a clone of the old TextInputState and update the
     // attributed string box to point to the string with markdown
