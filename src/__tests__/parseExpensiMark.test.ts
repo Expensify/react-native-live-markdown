@@ -39,12 +39,10 @@ test('no formatting', () => {
 
 describe('parsing error', () => {
   expect(`> [exa\nmple.com](https://example.com)`).toBeParsedAs([
-    {type: 'blockquote', start: 0, length: 37},
+    {type: 'blockquote', start: 0, length: 6},
     {type: 'syntax', start: 0, length: 1},
-    {type: 'syntax', start: 2, length: 1},
-    {type: 'syntax', start: 15, length: 2},
+    {type: 'link', start: 7, length: 8},
     {type: 'link', start: 17, length: 19},
-    {type: 'syntax', start: 36, length: 1},
   ]);
 });
 
