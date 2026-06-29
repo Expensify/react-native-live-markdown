@@ -23,7 +23,7 @@ npx expo install @expensify/react-native-live-markdown react-native-worklets exp
 React Native Live Markdown requires [react-native-worklets](https://github.com/software-mansion/react-native-reanimated/tree/main/packages/react-native-worklets) 0.7.0 or newer as well as [expensify-common](https://github.com/Expensify/expensify-common) 2.0.115 and [html-entities](https://github.com/mdevils/html-entities) 2.5.3 exactly if using the default built-in ExpensiMark parser.
 
 > [!IMPORTANT]
-> Please follow the `react-native-worklets` [Getting Started](https://docs.swmansion.com/react-native-worklets/docs/#react-native-community-cli) guide to avoid issues.
+> Please follow the `react-native-worklets` [Getting Started](https://docs.swmansion.com/react-native-worklets/docs/fundamentals/getting-started/#react-native-community-cli) guide to avoid issues.
 
 Then, install the iOS dependencies with CocoaPods:
 
