@@ -1,7 +1,7 @@
 import {StyleSheet, TextInput, processColor} from 'react-native';
 import React from 'react';
 import type {TextInputProps} from 'react-native';
-import {createSerializable, createWorkletRuntime} from 'react-native-worklets';
+import {createSerializable, createWorkletRuntime, registerCustomSerializable} from 'react-native-worklets';
 import type {SerializableRef, WorkletFunction, WorkletRuntime} from 'react-native-worklets';
 import MarkdownTextInputDecoratorViewNativeComponent from './MarkdownTextInputDecoratorViewNativeComponent';
 import type {MarkdownStyle} from './MarkdownTextInputDecoratorViewNativeComponent';
@@ -22,6 +22,34 @@ declare global {
 let initialized = false;
 let workletRuntime: WorkletRuntime | undefined;
 
+// The worklet closure of the built-in `parseExpensiMark` parser captures the `Log` singleton from
+// `expensify-common`, and serializing the parser worklet fails because `react-native-worklets` 0.10
+// can't copy `Logger` class instances. The logger is unused on the worklet runtime, so serialize it as a no-op.
+// `registerCustomSerializable` has been available since react-native-worklets 0.7.0, so this stays
+// compatible with every supported version (on 0.9.x and older it's a harmless no-op — they don't throw).
+function registerLoggerSerializableOnceIfNeeded() {
+  type NoopLogger = Record<string, (...args: unknown[]) => void>;
+  registerCustomSerializable<NoopLogger, Record<string, never>>({
+    name: 'react-native-live-markdown/Logger',
+    determine: (value): value is NoopLogger => {
+      'worklet';
+
+      return value !== null && typeof value === 'object' && (value as {constructor?: {name?: string}}).constructor?.name === 'Logger';
+    },
+    pack: () => {
+      'worklet';
+
+      return {};
+    },
+    unpack: () => {
+      'worklet';
+
+      const noop = () => undefined;
+      return {logToServer: noop, add: noop, info: noop, alert: noop, warn: noop, hmmm: noop, client: noop};
+    },
+  });
+}
+
 function getWorkletRuntime(): WorkletRuntime {
   if (workletRuntime === undefined) {
     throw new Error(
@@ -41,6 +69,7 @@ function initializeLiveMarkdownIfNeeded() {
   if (!global.jsi_setMarkdownRuntime) {
     throw new Error('[react-native-live-markdown] global.jsi_setMarkdownRuntime is not available');
   }
+  registerLoggerSerializableOnceIfNeeded();
   workletRuntime = createWorkletRuntime({name: 'LiveMarkdownRuntime'});
   global.jsi_setMarkdownRuntime(workletRuntime);
   initialized = true;
