@@ -78,7 +78,7 @@ public class CustomFabricUIManager extends FabricUIManager {
         parserId
       );
     } catch (NoSuchFieldException | IllegalAccessException e) {
-      throw new RuntimeException("[LiveMarkdown] Cannot read data from FabricUIManager");
+      throw new RuntimeException("[LiveMarkdown] Cannot read data from FabricUIManager", e);
     }
   }
 

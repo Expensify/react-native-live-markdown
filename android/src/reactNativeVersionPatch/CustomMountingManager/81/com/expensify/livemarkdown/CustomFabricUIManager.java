@@ -47,6 +47,7 @@ public class CustomFabricUIManager extends FabricUIManager {
     this.mMarkdownUtils.setParserId(parserId);
   }
 
+  @Override
   public long measureText(
     int surfaceId,
     ReadableMapBuffer attributedString,
@@ -86,12 +87,7 @@ public class CustomFabricUIManager extends FabricUIManager {
   }
 
   public static FabricUIManager create(FabricUIManager source, ReadableMap markdownProps, int parserId) {
-    Class<? extends FabricUIManager> uiManagerClass = source.getClass();
-
     try {
-      Field mountingManagerField = uiManagerClass.getDeclaredField("mMountingManager");
-      mountingManagerField.setAccessible(true);
-
       MountingManager sourceMountingManager = readPrivateField(source, "mMountingManager");
       ReactApplicationContext reactContext = readPrivateField(source, "mReactApplicationContext");
       ViewManagerRegistry viewManagerRegistry = readPrivateField(source, "mViewManagerRegistry");
@@ -108,7 +104,7 @@ public class CustomFabricUIManager extends FabricUIManager {
 
       return customFabricUIManager;
     } catch (NoSuchFieldException | IllegalAccessException e) {
-      throw new RuntimeException("[LiveMarkdown] Cannot read data from FabricUIManager");
+      throw new RuntimeException("[LiveMarkdown] Cannot read data from FabricUIManager", e);
     }
   }
 
