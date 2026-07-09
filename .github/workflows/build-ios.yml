@@ -48,7 +48,7 @@ jobs:
           restore-keys: build-ios-node-modules-
 
       - name: Install node_modules
-        run: npm ci
+        run: npm ci --legacy-peer-deps
 
       # v4.3.0
       - name: Restore Pods from cache

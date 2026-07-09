@@ -36,7 +36,7 @@ jobs:
           node-version-file: '.nvmrc'
 
       - name: Install node_modules
-        run: npm ci
+        run: npm ci --legacy-peer-deps
 
       - name: Install browsers
         run: npx playwright install --with-deps

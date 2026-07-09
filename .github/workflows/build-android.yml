@@ -42,7 +42,7 @@ jobs:
           java-version: 17
 
       - name: Install node_modules
-        run: npm ci
+        run: npm ci --legacy-peer-deps
 
       - name: Build app
         working-directory: example/android

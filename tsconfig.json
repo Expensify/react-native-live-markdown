@@ -23,7 +23,7 @@
     "target": "esnext",
     "verbatimModuleSyntax": true,
     "typeRoots": ["node_modules/@types"],
-    "types": ["jest", "node"]
+    "types": ["*"]
   },
   "include": ["src/**/*", "mock/**/*"],
   "exclude": ["**/node_modules/**/*", "**/lib/**/*", "example/src/**/*", "WebExample/**/*", "**/Pods"]

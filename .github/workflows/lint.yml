@@ -27,7 +27,7 @@ jobs:
           node-version-file: '.nvmrc'
 
       - name: Install node_modules
-        run: npm ci
+        run: npm ci --legacy-peer-deps
 
       - name: Verify there's no Prettier diff
         run: |
