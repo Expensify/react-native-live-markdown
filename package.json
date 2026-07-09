@@ -106,7 +106,7 @@
     "react-native-worklets": "0.9.1",
     "release-it": "^15.0.0",
     "turbo": "^1.10.7",
-    "typescript": "^5.8.3"
+    "typescript": "^7.0.2"
   },
   "peerDependencies": {
     "expensify-common": ">=2.0.189",

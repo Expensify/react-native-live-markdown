@@ -14,8 +14,6 @@
     "moduleResolution": "bundler",
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
-    "noImplicitUseStrict": false,
-    "noStrictGenericChecks": false,
     "noUncheckedIndexedAccess": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
@@ -24,7 +22,8 @@
     "strict": true,
     "target": "esnext",
     "verbatimModuleSyntax": true,
-    "typeRoots": ["node_modules/@types"]
+    "typeRoots": ["node_modules/@types"],
+    "types": ["jest", "node"]
   },
   "include": ["src/**/*", "mock/**/*"],
   "exclude": ["**/node_modules/**/*", "**/lib/**/*", "example/src/**/*", "WebExample/**/*", "**/Pods"]
