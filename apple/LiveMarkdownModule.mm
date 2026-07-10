@@ -11,12 +11,10 @@ using namespace expensify::livemarkdown;
 
 RCT_EXPORT_MODULE()
 
-RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install)
+- (void)installJSIBindingsWithRuntime:(facebook::jsi::Runtime &)runtime
+                          callInvoker:(const std::shared_ptr<facebook::react::CallInvoker> &)callinvoker
 {
-  RCTCxxBridge *cxxBridge = (RCTCxxBridge *)self.bridge;
-  jsi::Runtime &rt = *(jsi::Runtime *)cxxBridge.runtime;
-  expensify::livemarkdown::injectJSIBindings(rt);
-  return @(1);
+  expensify::livemarkdown::injectJSIBindings(runtime);
 }
 
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
