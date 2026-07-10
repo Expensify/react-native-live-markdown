@@ -1,29 +1,6 @@
-'worklet';
-
-import {Platform} from 'react-native';
 import {ExpensiMark} from 'expensify-common';
 import {unescapeText} from 'expensify-common/utils';
-import {decode} from 'html-entities';
-import type {WorkletFunction} from 'react-native-worklets';
-import {groupRanges, sortRanges, excludeRangeTypesFromFormatting, getRangesToExcludeFormatting} from './rangeUtils';
 import type {MarkdownRange, MarkdownType} from './commonTypes';
-
-function isWeb() {
-  return Platform.OS === 'web';
-}
-
-function isJest() {
-  return !!global.process.env.JEST_WORKER_ID;
-}
-
-// eslint-disable-next-line no-underscore-dangle
-if (__DEV__ && !isWeb() && !isJest() && (decode as WorkletFunction<unknown[], unknown>).__workletHash === undefined) {
-  throw new Error(
-    "[react-native-live-markdown] `parseExpensiMark` requires `html-entities` package to be workletized. Please add `'worklet';` directive at the top of `node_modules/html-entities/lib/index.js` using patch-package. Make sure you've installed `html-entities` version 2.5.3 exactly as otherwise there is no `lib/` directory.",
-  );
-}
-
-const MAX_PARSABLE_LENGTH = 4000;
 
 type Token = ['TEXT' | 'HTML', string];
 type StackItem = {tag: string; children: Array<StackItem | string>};
@@ -238,32 +215,4 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, MarkdownRange[]] {
   return [text, ranges];
 }
 
-function parseExpensiMark(markdown: string): MarkdownRange[] {
-  if (markdown.length > MAX_PARSABLE_LENGTH) {
-    return [];
-  }
-  const html = parseMarkdownToHTML(markdown);
-  const tokens = parseHTMLToTokens(html);
-  const tree = parseTokensToTree(tokens);
-  const [text, ranges] = parseTreeToTextAndRanges(tree);
-  if (text !== markdown) {
-    console.error(
-      `[react-native-live-markdown] Parsing error: the processed text does not match the original Markdown input. This may be caused by incorrect parsing functions or invalid input Markdown.\nProcessed input: '${JSON.stringify(
-        text,
-      )}'\nOriginal input: '${JSON.stringify(markdown)}'`,
-    );
-    return [];
-  }
-  let markdownRanges = sortRanges(ranges);
-
-  // Prevent italic, bold and strikethrough formatting inside emojis and inline code blocks
-  const rangesToExclude = getRangesToExcludeFormatting(markdownRanges);
-  markdownRanges = excludeRangeTypesFromFormatting(markdownRanges, 'italic', rangesToExclude);
-  markdownRanges = excludeRangeTypesFromFormatting(markdownRanges, 'bold', rangesToExclude);
-  markdownRanges = excludeRangeTypesFromFormatting(markdownRanges, 'strikethrough', rangesToExclude);
-
-  const groupedRanges = groupRanges(markdownRanges);
-  return groupedRanges;
-}
-
-export default parseExpensiMark;
+export {parseMarkdownToHTML, parseHTMLToTokens, parseTokensToTree, parseTreeToTextAndRanges};

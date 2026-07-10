@@ -1,6 +1,6 @@
 import {expect} from '@jest/globals';
 import {parseRangesToHTMLNodes} from '../web/utils/parserUtils';
-import parseExpensiMark from '../parseExpensiMark';
+import parseExpensiMark from '../parse';
 
 /**
  * Focused tests for the single-line input fix
