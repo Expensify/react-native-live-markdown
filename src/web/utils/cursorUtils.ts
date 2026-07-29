@@ -3,6 +3,19 @@ import {isChildOfMultilineMarkdownElement} from './blockUtils';
 import {findHTMLElementInTree, getTreeNodeByIndex} from './treeUtils';
 import type {TreeNode} from './treeUtils';
 
+function getMaxRangeOffset(node: ChildNode): number {
+  return node.nodeType === Node.TEXT_NODE ? (node.textContent ?? '').length : node.childNodes.length;
+}
+
+/**
+ * Range offsets are applied to the real DOM node, not the parsed markdown tree.
+ * When the tree is temporarily stale, clamp to the DOM node's bounds so cursor
+ * restoration lands at the nearest valid position instead of throwing.
+ */
+function getClampedRangeOffset(node: ChildNode, offset: number): number {
+  return Math.max(0, Math.min(offset, getMaxRangeOffset(node)));
+}
+
 function setCursorPosition(target: MarkdownTextInputElement, startIndex: number, endIndex: number | null = null, shouldScrollIntoView = false) {
   // We don't want to move the cursor if the target is not focused
   if (!target.tree || target !== document.activeElement) {
@@ -29,14 +42,16 @@ function setCursorPosition(target: MarkdownTextInputElement, startIndex: number,
     range.setStartBefore(startTreeNode.element);
   } else {
     const startElement = startTreeNode.element;
-    range.setStart((startElement.childNodes[0] || startElement) as ChildNode, start - startTreeNode.start);
+    const startNode = (startElement.childNodes[0] || startElement) as ChildNode;
+    range.setStart(startNode, getClampedRangeOffset(startNode, start - startTreeNode.start));
   }
 
   if (endTreeNode.type === 'br') {
     range.setEndBefore(endTreeNode.element);
   } else {
     const endElement = endTreeNode.element;
-    range.setEnd((endElement.childNodes[0] || endElement) as ChildNode, (end || start) - endTreeNode.start);
+    const endNode = (endElement.childNodes[0] || endElement) as ChildNode;
+    range.setEnd(endNode, getClampedRangeOffset(endNode, (end || start) - endTreeNode.start));
   }
 
   if (!end) {
