@@ -7,6 +7,11 @@ function getMaxRangeOffset(node: ChildNode): number {
   return node.nodeType === Node.TEXT_NODE ? (node.textContent ?? '').length : node.childNodes.length;
 }
 
+/**
+ * Range offsets are applied to the real DOM node, not the parsed markdown tree.
+ * When the tree is temporarily stale, clamp to the DOM node's bounds so cursor
+ * restoration lands at the nearest valid position instead of throwing.
+ */
 function getClampedRangeOffset(node: ChildNode, offset: number): number {
   return Math.max(0, Math.min(offset, getMaxRangeOffset(node)));
 }
