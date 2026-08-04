@@ -1,5 +1,5 @@
-import {MarkdownTextInput} from '../src';
-import type {parseExpensiMark} from '../src';
+import {MarkdownTextInput} from '..';
+import type {parseExpensiMark} from '..';
 
 global.jsi_setMarkdownRuntime = jest.fn();
 global.jsi_registerMarkdownWorklet = jest.fn();

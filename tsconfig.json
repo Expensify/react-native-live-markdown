@@ -26,6 +26,6 @@
     "verbatimModuleSyntax": true,
     "typeRoots": ["node_modules/@types"]
   },
-  "include": ["src/**/*", "mock/**/*"],
+  "include": ["src/**/*"],
   "exclude": ["**/node_modules/**/*", "**/lib/**/*", "example/src/**/*", "WebExample/**/*", "**/Pods"]
 }

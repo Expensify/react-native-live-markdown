@@ -8,6 +8,9 @@
 lib/**/*
 scripts/**/*
 
+# Shim entry points that re-export from the build output
+mock/**/*
+
 babel.config.js
 metro.config.js
 react-native.config.js
