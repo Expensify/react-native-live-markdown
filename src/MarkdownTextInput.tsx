@@ -98,12 +98,6 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
     throw new Error('[react-native-live-markdown] `parser` is undefined');
   }
 
-  // eslint-disable-next-line no-underscore-dangle
-  const workletHash = (props.parser as {__workletHash?: number}).__workletHash;
-  if (workletHash === undefined) {
-    throw new Error('[react-native-live-markdown] `parser` is not a worklet');
-  }
-
   const parserId = React.useMemo(() => {
     return registerParser(props.parser);
   }, [props.parser]);

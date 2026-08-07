@@ -1,5 +1,3 @@
-'worklet';
-
 import type {MarkdownRange, MarkdownType} from './commonTypes';
 
 // getTagPriority returns a priority for a tag, higher priority means the tag should be processed first
