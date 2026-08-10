@@ -15,6 +15,9 @@ import java.util.Objects;
 
 public class MarkdownFormatter {
   private final @NonNull AssetManager mAssetManager;
+  private String mPrevText;
+  private List<MarkdownRange> mPrevMarkdownRanges;
+  private MarkdownStyle mPrevMarkdownStyle;
 
   public MarkdownFormatter(@NonNull AssetManager assetManager) {
     mAssetManager = assetManager;
@@ -24,8 +27,19 @@ public class MarkdownFormatter {
     try {
       Systrace.beginSection(0, "format");
       Objects.requireNonNull(markdownStyle, "mMarkdownStyle is null");
+
+      String text = ssb.toString();
+      if (text.equals(mPrevText) && markdownRanges == mPrevMarkdownRanges && markdownStyle == mPrevMarkdownStyle) {
+        // Use shallow comparison of markdown ranges and markdown style
+        // to optimistically skip removing and applying the same spans
+        return;
+      }
+
       removeSpans(ssb);
       applyRanges(ssb, markdownRanges, markdownStyle);
+      mPrevText = text;
+      mPrevMarkdownRanges = markdownRanges;
+      mPrevMarkdownStyle = markdownStyle;
     } finally {
       Systrace.endSection(0);
     }
