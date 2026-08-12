@@ -8,6 +8,9 @@
 #include <react/renderer/components/view/ConcreteViewShadowNode.h>
 #include <react/renderer/core/LayoutContext.h>
 
+#include <atomic>
+#include <memory>
+
 namespace facebook {
 namespace react {
 
@@ -50,10 +53,17 @@ private:
   shadowNodeFromContext(YGNodeConstRef yogaNode);
 
   // Persisted RCTMarkdownUtils instance shared across shadow node clones so
-  // that MarkdownParser's one-entry memo cache (keyed on text + parserId)
-  // survives repeated Yoga measure callbacks instead of being discarded on
-  // every call to applyMarkdownFormattingToTextInputState.
+  // that MarkdownParser's cache (keyed on text + parserId) survives repeated
+  // Yoga measure callbacks instead of being discarded on every call to
+  // applyMarkdownFormattingToTextInputState.
   mutable std::shared_ptr<void> markdownUtils_;
+
+  // Set from an arbitrary thread when an async markdown parse (scheduled by a
+  // main-thread measure that could not enter the worklet runtime) has finished.
+  // Shared across clones alongside markdownUtils_ and consumed by
+  // overwriteMeasureCallbackConnector, which dirties the child's Yoga node so
+  // the measure function runs again with markdown applied.
+  mutable std::shared_ptr<std::atomic_bool> needsRemeasure_;
 };
 
 } // namespace react

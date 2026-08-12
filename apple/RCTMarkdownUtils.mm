@@ -52,8 +52,8 @@
     _parserId = parserId;
   }
 
-  NSArray<MarkdownRange *> *markdownRanges = [_markdownParser cachedRangesForText:attributedString.string
-                                                                      withParserId:parserId];
+  NSString *text = attributedString.string;
+  NSArray<MarkdownRange *> *markdownRanges = [_markdownParser cachedRangesForText:text withParserId:parserId];
 
   if (markdownRanges == nil) {
     if ([NSThread isMainThread]) {
@@ -61,17 +61,31 @@
       // measure. If the runtime is busy (e.g. a background Fabric layout is
       // parsing, or a worklet is blocked on another runtime), the wait can
       // exceed the ~2s watchdog limit and iOS kills the app (Sentry APP-EF1).
-      // Warm the cache asynchronously and measure with unformatted text for
-      // this pass; a subsequent measure/commit picks up the cached ranges.
-      // In practice the main thread almost always hits the cache here: text
-      // changes are committed (and parsed) on background threads first.
-      [_markdownParser warmCacheAsyncForText:attributedString.string withParserId:parserId];
+      // Parse asynchronously and measure with unformatted text for this pass;
+      // `onAsyncFormattingReady` then triggers a re-measure once the ranges are
+      // cached, so the temporarily wrong metrics (h1 font size, code/pre font,
+      // blockquote indent, emoji size) cannot persist.
+      // In practice the main thread usually hits the cache here: text changes
+      // are committed (and parsed) on background threads first.
+      __weak RCTMarkdownUtils *weakSelf = self;
+      [_markdownParser warmCacheAsyncForText:text
+                                withParserId:parserId
+                                  completion:^{
+        // Runs on the parser's warm-up queue, only for the newest requested
+        // text. Cannot spin: the re-measure it asks for hits the cache and stops
+        // scheduling warm-ups (or the text changed again, in which case the new
+        // text needs a re-measure anyway).
+        void (^handler)(void) = weakSelf.onAsyncFormattingReady;
+        if (handler != nil) {
+          handler();
+        }
+      }];
       return;
     }
     // Background Fabric layout threads may parse synchronously: the watchdog
     // only monitors the main thread, and parse no longer holds any lock the
     // main-thread measure path can block on.
-    markdownRanges = [_markdownParser parse:attributedString.string withParserId:parserId];
+    markdownRanges = [_markdownParser parse:text withParserId:parserId];
   }
 
   [_markdownFormatter formatAttributedString:attributedString

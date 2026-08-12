@@ -2,16 +2,79 @@
 #import <RNLiveMarkdown/MarkdownGlobal.h>
 #import <React/RCTLog.h>
 
-@implementation MarkdownParser {
-  NSString *_prevText;
-  NSNumber *_prevParserId;
-  NSArray<MarkdownRange *> *_prevMarkdownRanges;
-  BOOL _asyncParseInFlight;
+// Number of (text, parserId) results kept in the cache.
+//
+// The main-thread measure path can only format from this cache, because it must
+// never enter the worklet runtime (see RCTMarkdownUtils). With a single entry
+// that fast path was unreliable: two alternating text values thrashed the entry
+// and every main-thread measure missed, falling back to measuring unformatted
+// text. A handful of entries absorbs alternating values (e.g. typing then
+// undoing, or a controlled input echoing back an older value) and is still
+// cheap to scan linearly.
+static const NSUInteger kMarkdownParserCacheCapacity = 4;
+
+@interface MarkdownParserCacheEntry : NSObject
+
+@property (nonatomic, readonly, nonnull) NSString *text;
+@property (nonatomic, readonly, nonnull) NSNumber *parserId;
+@property (nonatomic, readonly, nonnull) NSArray<MarkdownRange *> *markdownRanges;
+
+- (instancetype)initWithText:(nonnull NSString *)text
+                    parserId:(nonnull NSNumber *)parserId
+              markdownRanges:(nonnull NSArray<MarkdownRange *> *)markdownRanges;
+
+- (BOOL)matchesText:(nonnull NSString *)text parserId:(nonnull NSNumber *)parserId;
+
+@end
+
+@implementation MarkdownParserCacheEntry
+
+- (instancetype)initWithText:(nonnull NSString *)text
+                    parserId:(nonnull NSNumber *)parserId
+              markdownRanges:(nonnull NSArray<MarkdownRange *> *)markdownRanges
+{
+  if (self = [super init]) {
+    _text = [text copy];
+    _parserId = parserId;
+    _markdownRanges = markdownRanges;
+  }
+
+  return self;
 }
 
-// Shared serial queue used to warm the memo cache off the main thread. A
-// single queue is enough: parses are serialized by the markdown worklet
-// runtime's own mutex anyway, and keeping it serial bounds duplicate work.
+- (BOOL)matchesText:(nonnull NSString *)text parserId:(nonnull NSNumber *)parserId
+{
+  // Compare the parser id first, it is much cheaper than a string comparison.
+  return [_parserId isEqualToNumber:parserId] && [_text isEqualToString:text];
+}
+
+@end
+
+@implementation MarkdownParser {
+  // Most-recently-used first; index 0 is the newest entry. Guarded by
+  // `@synchronized (self)`.
+  NSMutableArray<MarkdownParserCacheEntry *> *_cache;
+
+  // Latest-wins coalescing state for background warm-ups. Guarded by
+  // `@synchronized (self)`.
+  NSString *_pendingText;
+  NSNumber *_pendingParserId;
+  void (^_pendingCompletion)(void);
+  BOOL _warmupScheduled;
+}
+
+- (instancetype)init
+{
+  if (self = [super init]) {
+    _cache = [[NSMutableArray alloc] initWithCapacity:kMarkdownParserCacheCapacity];
+  }
+
+  return self;
+}
+
+// Shared serial queue used to warm the cache off the main thread. A single queue
+// is enough: parses are serialized by the markdown worklet runtime's own mutex
+// anyway, and keeping it serial bounds duplicate work.
 + (dispatch_queue_t)cacheWarmupQueue
 {
   static dispatch_queue_t queue;
@@ -28,37 +91,102 @@
                                               withParserId:(nonnull NSNumber *)parserId
 {
   @synchronized (self) {
-    if (_prevText != nil && _prevParserId != nil && [text isEqualToString:_prevText] &&
-        [parserId isEqualToNumber:_prevParserId]) {
-      return _prevMarkdownRanges;
+    for (NSUInteger i = 0, n = _cache.count; i < n; i++) {
+      MarkdownParserCacheEntry *entry = _cache[i];
+      if (![entry matchesText:text parserId:parserId]) {
+        continue;
+      }
+      if (i != 0) {
+        // Refresh recency so the entry the measure path keeps asking for is not
+        // the one that gets evicted.
+        [_cache removeObjectAtIndex:i];
+        [_cache insertObject:entry atIndex:0];
+      }
+      return entry.markdownRanges;
     }
   }
+
   return nil;
 }
 
-- (void)warmCacheAsyncForText:(nonnull NSString *)text withParserId:(nonnull NSNumber *)parserId
+- (void)cacheMarkdownRanges:(nonnull NSArray<MarkdownRange *> *)markdownRanges
+                    forText:(nonnull NSString *)text
+               withParserId:(nonnull NSNumber *)parserId
+{
+  MarkdownParserCacheEntry *entry = [[MarkdownParserCacheEntry alloc] initWithText:text
+                                                                         parserId:parserId
+                                                                   markdownRanges:markdownRanges];
+
+  @synchronized (self) {
+    for (NSUInteger i = 0, n = _cache.count; i < n; i++) {
+      if ([_cache[i] matchesText:text parserId:parserId]) {
+        [_cache removeObjectAtIndex:i];
+        break;
+      }
+    }
+    [_cache insertObject:entry atIndex:0];
+    while (_cache.count > kMarkdownParserCacheCapacity) {
+      [_cache removeLastObject];
+    }
+  }
+}
+
+- (void)warmCacheAsyncForText:(nonnull NSString *)text
+                 withParserId:(nonnull NSNumber *)parserId
+                   completion:(nullable void (^)(void))completion
 {
   @synchronized (self) {
-    if (_asyncParseInFlight) {
-      // A warm-up is already queued. If it races with newer text, a later
-      // measure pass will observe the miss and schedule again.
+    // Latest-wins: overwrite whatever was queued but has not started yet, so a
+    // stale request can never win over newer text. The completion of the
+    // superseded request is dropped together with it; its result would be stale
+    // and the newer request reports for itself.
+    _pendingText = [text copy];
+    _pendingParserId = parserId;
+    _pendingCompletion = completion;
+
+    if (_warmupScheduled) {
+      // A drain loop is already running (or queued) and will pick this up.
       return;
     }
-    _asyncParseInFlight = YES;
+    _warmupScheduled = YES;
   }
 
-  NSString *textCopy = [text copy];
   __weak MarkdownParser *weakSelf = self;
   dispatch_async([MarkdownParser cacheWarmupQueue], ^{
-    MarkdownParser *strongSelf = weakSelf;
-    if (strongSelf == nil) {
-      return;
-    }
-    [strongSelf parse:textCopy withParserId:parserId];
-    @synchronized (strongSelf) {
-      strongSelf->_asyncParseInFlight = NO;
-    }
+    [weakSelf drainPendingWarmups];
   });
+}
+
+- (void)drainPendingWarmups
+{
+  while (true) {
+    NSString *text;
+    NSNumber *parserId;
+    void (^completion)(void);
+
+    @synchronized (self) {
+      if (_pendingText == nil) {
+        _warmupScheduled = NO;
+        return;
+      }
+      text = _pendingText;
+      parserId = _pendingParserId;
+      completion = _pendingCompletion;
+      _pendingText = nil;
+      _pendingParserId = nil;
+      _pendingCompletion = nil;
+    }
+
+    [self parse:text withParserId:parserId];
+
+    BOOL superseded;
+    @synchronized (self) {
+      superseded = _pendingText != nil;
+    }
+    if (completion != nil && !superseded) {
+      completion();
+    }
+  }
 }
 
 - (NSArray<MarkdownRange *> *)parse:(nonnull NSString *)text
@@ -79,11 +207,7 @@
   // the results are identical, and last-writer-wins on the cache is safe.
   NSArray<MarkdownRange *> *markdownRanges = [self parseUncached:text withParserId:parserId];
 
-  @synchronized (self) {
-    _prevText = [text copy];
-    _prevParserId = parserId;
-    _prevMarkdownRanges = markdownRanges;
-  }
+  [self cacheMarkdownRanges:markdownRanges forText:text withParserId:parserId];
 
   return markdownRanges;
 }
