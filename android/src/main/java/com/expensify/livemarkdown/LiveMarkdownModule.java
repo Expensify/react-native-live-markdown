@@ -1,11 +1,14 @@
 package com.expensify.livemarkdown;
 
+import androidx.annotation.NonNull;
+
+import com.facebook.proguard.annotations.DoNotStrip;
 import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.turbomodule.core.interfaces.BindingsInstallerHolder;
+import com.facebook.react.turbomodule.core.interfaces.TurboModuleWithJSIBindings;
 import com.facebook.soloader.SoLoader;
 
-import java.util.Objects;
-
-public class LiveMarkdownModule extends NativeLiveMarkdownModuleSpec {
+public class LiveMarkdownModule extends NativeLiveMarkdownModuleSpec implements TurboModuleWithJSIBindings {
   static {
     SoLoader.loadLibrary("livemarkdown");
   }
@@ -14,13 +17,8 @@ public class LiveMarkdownModule extends NativeLiveMarkdownModuleSpec {
     super(reactContext);
   }
 
+  @DoNotStrip
+  @NonNull
   @Override
-  public boolean install() {
-    long jsiRuntime = Objects.requireNonNull(getReactApplicationContext().getJavaScriptContextHolder(), "[react-native-live-markdown] JavaScriptContextHolder is null").get();
-    injectJSIBindings(jsiRuntime);
-
-    return true;
-  }
-
-  private native void injectJSIBindings(long jsiRuntime);
+  public native BindingsInstallerHolder getBindingsInstaller();
 }
