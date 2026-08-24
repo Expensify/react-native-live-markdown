@@ -3,8 +3,12 @@
 #include <React/RCTUtils.h>
 #include <react/renderer/components/view/conversions.h>
 #include <react/renderer/core/ComponentDescriptor.h>
+#include <react/renderer/core/ConcreteState.h>
 #include <react/renderer/textlayoutmanager/RCTAttributedTextUtils.h>
 #include <yoga/Yoga.h>
+
+#include <atomic>
+#include <memory>
 
 #include "RCTMarkdownStyle.h"
 #include "RCTMarkdownUtils.h"
@@ -32,12 +36,13 @@ MarkdownTextInputDecoratorShadowNode::MarkdownTextInputDecoratorShadowNode(
     ShadowNode const &sourceShadowNode,
     ShadowNodeFragment const &fragment)
     : ConcreteViewShadowNode(sourceShadowNode, fragment) {
-  // Carry the persisted RCTMarkdownUtils over from the source node so the
-  // MarkdownParser memo cache survives the frequent cloning that happens
-  // during layout and re-render cycles.
+  // Copy the utils (and its parser cache) and the re-measure flag from the node
+  // we are cloning. Both have to be set before makeChildNodeMutable() below,
+  // which is what reads the flag.
   const auto &source =
       static_cast<const MarkdownTextInputDecoratorShadowNode &>(sourceShadowNode);
   markdownUtils_ = source.markdownUtils_;
+  needsRemeasure_ = source.needsRemeasure_;
 
   initialize();
   makeChildNodeMutable();
@@ -97,6 +102,20 @@ void MarkdownTextInputDecoratorShadowNode::overwriteMeasureCallbackConnector() {
   // on the decorator
   const auto &yogaNode = &nodeWithAccessibleYogaNode->yogaNode_;
   YGNodeSetMeasureFunc(yogaNode, yogaNodeMeasureCallbackConnector);
+
+  // If a background parse finished since the last layout, the size Yoga saved
+  // for the child was measured from plain text, and nothing marks this part of
+  // the tree dirty on its own (Yoga does not measure the decorator), so the
+  // wrong height would stay until something else changed the layout.
+  //
+  // Mark both nodes dirty by hand instead of using YGNodeMarkDirty(): the child
+  // is usually dirty already from completeClone(), which stops the flag from
+  // travelling up and would leave the decorator clean. Parents pick it up on
+  // their own when updateYogaChildren() runs.
+  if (needsRemeasure_ != nullptr && needsRemeasure_->exchange(false)) {
+    yogaNode->setDirty(true);
+    yogaNode_.setDirty(true);
+  }
 }
 
 void MarkdownTextInputDecoratorShadowNode::appendChild(
@@ -189,14 +208,35 @@ void MarkdownTextInputDecoratorShadowNode::applyMarkdownFormattingToTextInputSta
   const auto defaultNSTextAttributes =
       RCTNSTextAttributesFromTextAttributes(defaultTextAttributes);
 
-  // Lazily create and persist the RCTMarkdownUtils instance so the MarkdownParser
-  // one-entry memo cache (keyed on text + parserId) survives repeated Yoga measure
-  // callbacks. Previously a fresh utils/parser was allocated on every call,
-  // discarding the cache and forcing a full JSI re-parse each time.
+  // Create the utils once and keep it, so the parser cache survives repeated
+  // measure calls. It used to be created fresh every time, which threw the
+  // cache away and forced a full re-parse.
   if (!markdownUtils_) {
     RCTMarkdownUtils *freshUtils = [[RCTMarkdownUtils alloc] init];
     markdownUtils_ = std::shared_ptr<void>(
         (__bridge_retained void *)freshUtils, [](void *p) { CFRelease(p); });
+    needsRemeasure_ = std::make_shared<std::atomic_bool>(false);
+
+    // When the main thread does not find the ranges in the cache, it measures
+    // plain text and parses in the background instead (see RCTMarkdownUtils).
+    // That size is wrong for any style that changes how big the text is, so
+    // once the ranges arrive we force another measure rather than hope
+    // something else does. Both steps are needed: the state update schedules a
+    // new commit, and the flag makes Yoga measure again instead of reusing the
+    // old size. updateState() can be called from any thread - it only queues
+    // work on the family.
+    const auto state =
+        std::static_pointer_cast<const ::facebook::react::ConcreteState<
+            MarkdownTextInputDecoratorState>>(getState());
+    if (state != nullptr) {
+      const auto needsRemeasure = needsRemeasure_;
+      freshUtils.onAsyncFormattingReady = ^{
+        needsRemeasure->store(true);
+        // This update changes nothing; it is here only to schedule a new
+        // commit. If the family is already gone, updateState() handles that.
+        state->updateState(MarkdownTextInputDecoratorState{});
+      };
+    }
   }
   RCTMarkdownUtils *utils = (__bridge RCTMarkdownUtils *)markdownUtils_.get();
 

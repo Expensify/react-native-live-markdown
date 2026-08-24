@@ -39,17 +39,54 @@
                   markdownStyle:(nonnull RCTMarkdownStyle *)markdownStyle
                        parserId:(nonnull NSNumber *)parserId
 {
-  // Keep the style/parserId assignment and the parse+format together under a
-  // single lock. The shadow node shares one instance across clones, and Fabric
-  // runs commits/layout optimistically on multiple threads, so without this the
-  // setters could interleave with another thread's parse/format and apply the
-  // wrong parserId/style for a frame. `@synchronized` is recursive, so nesting
-  // with `MarkdownParser`'s own `@synchronized(self)` in `parse:` is safe.
+  // The lock only covers the two shared fields. Holding it while parsing and
+  // formatting froze the app (Sentry APP-EF1): parsing waits for the worklet
+  // runtime, so a background thread could hold this lock while waiting, leaving
+  // the main thread stuck on the lock while measuring. The formatting below
+  // uses the arguments instead of the fields, so every call still gets a
+  // matching style and parserId.
   @synchronized (self) {
     _markdownStyle = markdownStyle;
     _parserId = parserId;
-    [self applyMarkdownFormatting:attributedString withDefaultTextAttributes:defaultTextAttributes];
   }
+
+  NSString *text = attributedString.string;
+  NSArray<MarkdownRange *> *markdownRanges = [_markdownParser cachedRangesForText:text withParserId:parserId];
+
+  if (markdownRanges == nil) {
+    if ([NSThread isMainThread]) {
+      // Never run the parser from the main thread while measuring. If the
+      // worklet runtime is busy, the wait can pass the ~2s limit and iOS kills
+      // the app (Sentry APP-EF1). Parse in the background instead and measure
+      // plain text for now; `onAsyncFormattingReady` asks for a new measure
+      // once the ranges are ready, so the wrong sizes (h1 font, code font,
+      // blockquote indent, emoji) do not stay. This rarely happens - text
+      // changes are usually parsed on a background thread first, so the main
+      // thread finds the ranges in the cache.
+      __weak RCTMarkdownUtils *weakSelf = self;
+      [_markdownParser warmCacheAsyncForText:text
+                                withParserId:parserId
+                                  completion:^{
+        // This only runs for the newest text, so it can't loop forever: the new
+        // measure finds the ranges in the cache (or the text changed again, and
+        // then a new measure was needed anyway).
+        void (^handler)(void) = weakSelf.onAsyncFormattingReady;
+        if (handler != nil) {
+          handler();
+        }
+      }];
+      return;
+    }
+    // Background threads can parse right here: the ~2s limit only applies to
+    // the main thread, and parsing no longer holds a lock the main thread
+    // waits on.
+    markdownRanges = [_markdownParser parse:text withParserId:parserId];
+  }
+
+  [_markdownFormatter formatAttributedString:attributedString
+                   withDefaultTextAttributes:defaultTextAttributes
+                          withMarkdownRanges:markdownRanges
+                           withMarkdownStyle:markdownStyle];
 }
 
 @end
