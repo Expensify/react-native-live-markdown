@@ -52,17 +52,14 @@ private:
   static YogaLayoutableShadowNode &
   shadowNodeFromContext(YGNodeConstRef yogaNode);
 
-  // Persisted RCTMarkdownUtils instance shared across shadow node clones so
-  // that MarkdownParser's cache (keyed on text + parserId) survives repeated
-  // Yoga measure callbacks instead of being discarded on every call to
-  // applyMarkdownFormattingToTextInputState.
+  // Shared between shadow node clones, so the parser cache survives all the
+  // cloning that happens during layout instead of being thrown away on every
+  // call to applyMarkdownFormattingToTextInputState.
   mutable std::shared_ptr<void> markdownUtils_;
 
-  // Set from an arbitrary thread when an async markdown parse (scheduled by a
-  // main-thread measure that could not enter the worklet runtime) has finished.
-  // Shared across clones alongside markdownUtils_ and consumed by
-  // overwriteMeasureCallbackConnector, which dirties the child's Yoga node so
-  // the measure function runs again with markdown applied.
+  // Set from any thread when a background parse finishes.
+  // overwriteMeasureCallbackConnector then marks the child's Yoga node dirty so
+  // it gets measured again with markdown. Passed along with markdownUtils_.
   mutable std::shared_ptr<std::atomic_bool> needsRemeasure_;
 };
 

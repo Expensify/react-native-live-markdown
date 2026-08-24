@@ -2,15 +2,11 @@
 #import <RNLiveMarkdown/MarkdownGlobal.h>
 #import <React/RCTLog.h>
 
-// Number of (text, parserId) results kept in the cache.
-//
-// The main-thread measure path can only format from this cache, because it must
-// never enter the worklet runtime (see RCTMarkdownUtils). With a single entry
-// that fast path was unreliable: two alternating text values thrashed the entry
-// and every main-thread measure missed, falling back to measuring unformatted
-// text. A handful of entries absorbs alternating values (e.g. typing then
-// undoing, or a controlled input echoing back an older value) and is still
-// cheap to scan linearly.
+// The main thread can only use ranges that are already cached (see
+// RCTMarkdownUtils), and one entry was not enough: two texts taking turns kept
+// overwriting each other, so the main thread never found what it needed. A few
+// entries cover that case (typing then undoing, or an input echoing back older
+// text), and the list is still small enough to scan one by one.
 static const NSUInteger kMarkdownParserCacheCapacity = 4;
 
 @interface MarkdownParserCacheEntry : NSObject
@@ -44,19 +40,18 @@ static const NSUInteger kMarkdownParserCacheCapacity = 4;
 
 - (BOOL)matchesText:(nonnull NSString *)text parserId:(nonnull NSNumber *)parserId
 {
-  // Compare the parser id first, it is much cheaper than a string comparison.
+  // Check the parser id first - comparing numbers is cheaper than strings.
   return [_parserId isEqualToNumber:parserId] && [_text isEqualToString:text];
 }
 
 @end
 
+// Everything below is only read and written inside `@synchronized (self)`.
 @implementation MarkdownParser {
-  // Most-recently-used first; index 0 is the newest entry. Guarded by
-  // `@synchronized (self)`.
+  // Newest entry first, at index 0.
   NSMutableArray<MarkdownParserCacheEntry *> *_cache;
 
-  // Latest-wins coalescing state for background warm-ups. Guarded by
-  // `@synchronized (self)`.
+  // The next text to parse in the background, if there is one.
   NSString *_pendingText;
   NSNumber *_pendingParserId;
   void (^_pendingCompletion)(void);
@@ -72,9 +67,9 @@ static const NSUInteger kMarkdownParserCacheCapacity = 4;
   return self;
 }
 
-// Shared serial queue used to warm the cache off the main thread. A single queue
-// is enough: parses are serialized by the markdown worklet runtime's own mutex
-// anyway, and keeping it serial bounds duplicate work.
+// One background queue for parsing off the main thread. A serial queue is
+// enough: the worklet runtime only runs one parse at a time anyway, and this
+// keeps us from doing the same work twice.
 + (dispatch_queue_t)cacheWarmupQueue
 {
   static dispatch_queue_t queue;
@@ -97,8 +92,8 @@ static const NSUInteger kMarkdownParserCacheCapacity = 4;
         continue;
       }
       if (i != 0) {
-        // Refresh recency so the entry the measure path keeps asking for is not
-        // the one that gets evicted.
+        // Move it to the front, so the text we keep asking for is not the one
+        // we throw away next.
         [_cache removeObjectAtIndex:i];
         [_cache insertObject:entry atIndex:0];
       }
@@ -136,16 +131,15 @@ static const NSUInteger kMarkdownParserCacheCapacity = 4;
                    completion:(nullable void (^)(void))completion
 {
   @synchronized (self) {
-    // Latest-wins: overwrite whatever was queued but has not started yet, so a
-    // stale request can never win over newer text. The completion of the
-    // superseded request is dropped together with it; its result would be stale
-    // and the newer request reports for itself.
+    // Keep only the newest request: replace anything that is waiting but
+    // hasn't started, so old text can never win over newer text. The replaced
+    // completion goes with it, since the new request will report instead.
     _pendingText = [text copy];
     _pendingParserId = parserId;
     _pendingCompletion = completion;
 
     if (_warmupScheduled) {
-      // A drain loop is already running (or queued) and will pick this up.
+      // A background loop is already running and will pick this up.
       return;
     }
     _warmupScheduled = YES;
@@ -197,14 +191,14 @@ static const NSUInteger kMarkdownParserCacheCapacity = 4;
     return cached;
   }
 
-  // Run the worklet parse WITHOUT holding any Objective-C lock. Entering the
-  // shared worklet runtime acquires its recursive_mutex, and holding an ObjC
-  // lock across that boundary is what created the APP-EF1 lock-order
-  // inversion: the main thread got stuck in objc_sync_enter during Yoga
-  // measure while a background Fabric layout thread held the lock and waited
-  // on the runtime mutex, until the iOS watchdog killed the app. Concurrent
-  // cache misses may parse the same text twice; the runtime serializes them,
-  // the results are identical, and last-writer-wins on the cache is safe.
+  // Parse WITHOUT holding an Objective-C lock. Running the parser waits for the
+  // worklet runtime, and holding a lock while waiting is what froze the app
+  // (Sentry APP-EF1): a background thread held this lock and waited on the
+  // runtime, so the main thread was stuck waiting for the lock while measuring,
+  // until iOS killed the app.
+  //
+  // Two threads may end up parsing the same text at the same time. That is
+  // fine: they run one after the other and produce the same result.
   NSArray<MarkdownRange *> *markdownRanges = [self parseUncached:text withParserId:parserId];
 
   [self cacheMarkdownRanges:markdownRanges forText:text withParserId:parserId];

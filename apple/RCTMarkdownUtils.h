@@ -8,27 +8,23 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) RCTMarkdownStyle *markdownStyle;
 @property (nonatomic) NSNumber *parserId;
 
-// Invoked from a background queue after an async parse scheduled by a
-// main-thread measure pass has landed in the parser cache. The owner is expected
-// to invalidate layout for the affected node so the text gets measured again,
-// this time with markdown applied. Without it, the unformatted measurement taken
-// during the cache miss could stick until something else dirtied layout.
-// Thread-safe to set and read (atomic).
+// Called on a background queue once a background parse has finished and the
+// ranges are cached. The owner should mark the layout as out of date so the
+// text is measured again, this time with markdown. Otherwise the size measured
+// from plain text stays until something else triggers a new layout.
 @property (atomic, copy, nullable) void (^onAsyncFormattingReady)(void);
 
 - (void)applyMarkdownFormatting:(nonnull NSMutableAttributedString *)attributedString
       withDefaultTextAttributes:(nonnull NSDictionary<NSAttributedStringKey, id> *)defaultTextAttributes;
 
-// Sets the style/parser and applies formatting using the given values.
-// Use this from the shadow node measure path, where one RCTMarkdownUtils
-// instance is shared across shadow node clones and may be accessed from
-// concurrent Fabric commits/layout passes.
-// NOTE: on the main thread this formats only from the parser's cache and never
-// enters the worklet runtime; on a cache miss it schedules an async parse and
-// leaves the string unformatted for that measure pass, then calls
-// `onAsyncFormattingReady` once the ranges are available so the node can be
-// measured again. This keeps the main thread from blocking on runtime-bound
-// locks during Yoga measure (Sentry APP-EF1 watchdog kills).
+// Sets the style/parser and formats using the values passed in. Use this from
+// the shadow node measure path, where one instance is shared between clones and
+// several Fabric threads can call it at the same time.
+//
+// On the main thread this only uses ranges that are already cached and never
+// runs the parser. If they are not there, the text is left unformatted for this
+// pass and parsed in the background, then `onAsyncFormattingReady` is called so
+// the node can be measured again (see Sentry APP-EF1).
 - (void)applyMarkdownFormatting:(nonnull NSMutableAttributedString *)attributedString
       withDefaultTextAttributes:(nonnull NSDictionary<NSAttributedStringKey, id> *)defaultTextAttributes
                   markdownStyle:(nonnull RCTMarkdownStyle *)markdownStyle

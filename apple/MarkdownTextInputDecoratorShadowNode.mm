@@ -36,11 +36,9 @@ MarkdownTextInputDecoratorShadowNode::MarkdownTextInputDecoratorShadowNode(
     ShadowNode const &sourceShadowNode,
     ShadowNodeFragment const &fragment)
     : ConcreteViewShadowNode(sourceShadowNode, fragment) {
-  // Carry the persisted RCTMarkdownUtils over from the source node so the
-  // MarkdownParser cache survives the frequent cloning that happens during
-  // layout and re-render cycles. The re-measure flag has to travel with it,
-  // and both must be in place before makeChildNodeMutable() below, which is
-  // what consumes the flag.
+  // Copy the utils (and its parser cache) and the re-measure flag from the node
+  // we are cloning. Both have to be set before makeChildNodeMutable() below,
+  // which is what reads the flag.
   const auto &source =
       static_cast<const MarkdownTextInputDecoratorShadowNode &>(sourceShadowNode);
   markdownUtils_ = source.markdownUtils_;
@@ -105,21 +103,15 @@ void MarkdownTextInputDecoratorShadowNode::overwriteMeasureCallbackConnector() {
   const auto &yogaNode = &nodeWithAccessibleYogaNode->yogaNode_;
   YGNodeSetMeasureFunc(yogaNode, yogaNodeMeasureCallbackConnector);
 
-  // An async markdown parse may have completed since the last layout, meaning
-  // the measurement Yoga has cached for the child was taken from unformatted
-  // text (see the onAsyncFormattingReady handler in
-  // applyMarkdownFormattingToTextInputState). The state update that brought us
-  // here does not dirty this subtree on its own - the decorator is not a
-  // measurable Yoga node - so without this Yoga would reuse that stale
-  // measurement and the wrong height would stick until something else
-  // invalidated layout.
+  // If a background parse finished since the last layout, the size Yoga saved
+  // for the child was measured from plain text, and nothing marks this part of
+  // the tree dirty on its own (Yoga does not measure the decorator), so the
+  // wrong height would stay until something else changed the layout.
   //
-  // Dirty both nodes explicitly instead of relying on
-  // YGNodeMarkDirty()'s upward propagation: the child is usually already dirty
-  // from completeClone(), in which case propagation short-circuits and the
-  // decorator would stay clean. Ancestors then pick the dirty flag up on their
-  // own, because they are cloned with new children and updateYogaChildren()
-  // propagates child dirtiness upwards.
+  // Mark both nodes dirty by hand instead of using YGNodeMarkDirty(): the child
+  // is usually dirty already from completeClone(), which stops the flag from
+  // travelling up and would leave the decorator clean. Parents pick it up on
+  // their own when updateYogaChildren() runs.
   if (needsRemeasure_ != nullptr && needsRemeasure_->exchange(false)) {
     yogaNode->setDirty(true);
     yogaNode_.setDirty(true);
@@ -216,29 +208,23 @@ void MarkdownTextInputDecoratorShadowNode::applyMarkdownFormattingToTextInputSta
   const auto defaultNSTextAttributes =
       RCTNSTextAttributesFromTextAttributes(defaultTextAttributes);
 
-  // Lazily create and persist the RCTMarkdownUtils instance so the MarkdownParser
-  // cache (keyed on text + parserId) survives repeated Yoga measure callbacks.
-  // Previously a fresh utils/parser was allocated on every call, discarding the
-  // cache and forcing a full JSI re-parse each time.
+  // Create the utils once and keep it, so the parser cache survives repeated
+  // measure calls. It used to be created fresh every time, which threw the
+  // cache away and forced a full re-parse.
   if (!markdownUtils_) {
     RCTMarkdownUtils *freshUtils = [[RCTMarkdownUtils alloc] init];
     markdownUtils_ = std::shared_ptr<void>(
         (__bridge_retained void *)freshUtils, [](void *p) { CFRelease(p); });
     needsRemeasure_ = std::make_shared<std::atomic_bool>(false);
 
-    // When measure runs on the main thread it must not enter the worklet
-    // runtime, so on a cache miss it measures unformatted text and asks the
-    // parser to fill the cache in the background. That measurement is wrong for
-    // any style that changes text metrics, so once the ranges are ready we have
-    // to force another measure pass rather than hope something else dirties
-    // layout:
-    //   1. raise the flag, which makes the next clone dirty the child's Yoga
-    //      node (see overwriteMeasureCallbackConnector), and
-    //   2. dispatch a state update on this family to produce that commit.
-    // Both are needed: the state update schedules the commit, the flag makes
-    // Yoga actually re-run the measure function instead of reusing its cache.
-    // updateState() is safe to call from any thread - it only enqueues work on
-    // the family's event dispatcher.
+    // When the main thread does not find the ranges in the cache, it measures
+    // plain text and parses in the background instead (see RCTMarkdownUtils).
+    // That size is wrong for any style that changes how big the text is, so
+    // once the ranges arrive we force another measure rather than hope
+    // something else does. Both steps are needed: the state update schedules a
+    // new commit, and the flag makes Yoga measure again instead of reusing the
+    // old size. updateState() can be called from any thread - it only queues
+    // work on the family.
     const auto state =
         std::static_pointer_cast<const ::facebook::react::ConcreteState<
             MarkdownTextInputDecoratorState>>(getState());
@@ -246,8 +232,8 @@ void MarkdownTextInputDecoratorShadowNode::applyMarkdownFormattingToTextInputSta
       const auto needsRemeasure = needsRemeasure_;
       freshUtils.onAsyncFormattingReady = ^{
         needsRemeasure->store(true);
-        // Cheap no-op state update; it exists only to schedule a commit. If the
-        // family is already gone updateState() bails out on its own.
+        // This update changes nothing; it is here only to schedule a new
+        // commit. If the family is already gone, updateState() handles that.
         state->updateState(MarkdownTextInputDecoratorState{});
       };
     }

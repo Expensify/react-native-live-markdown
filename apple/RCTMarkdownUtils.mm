@@ -39,14 +39,12 @@
                   markdownStyle:(nonnull RCTMarkdownStyle *)markdownStyle
                        parserId:(nonnull NSNumber *)parserId
 {
-  // Only protect the shared ivar updates with the lock. Holding
-  // `@synchronized(self)` across parse+format caused a lock-order inversion:
-  // `MarkdownParser parse:` synchronously enters the shared worklet runtime
-  // (recursive_mutex), so a background Fabric layout thread could hold this
-  // lock while blocked on the runtime mutex, leaving the main thread stuck in
-  // objc_sync_enter during Yoga measure until the watchdog killed the app
-  // (Sentry APP-EF1). Per-call consistency of style/parserId is preserved by
-  // formatting with the local parameters instead of re-reading the ivars.
+  // The lock only covers the two shared fields. Holding it while parsing and
+  // formatting froze the app (Sentry APP-EF1): parsing waits for the worklet
+  // runtime, so a background thread could hold this lock while waiting, leaving
+  // the main thread stuck on the lock while measuring. The formatting below
+  // uses the arguments instead of the fields, so every call still gets a
+  // matching style and parserId.
   @synchronized (self) {
     _markdownStyle = markdownStyle;
     _parserId = parserId;
@@ -57,24 +55,21 @@
 
   if (markdownRanges == nil) {
     if ([NSThread isMainThread]) {
-      // Never enter the worklet runtime from the main thread during Yoga
-      // measure. If the runtime is busy (e.g. a background Fabric layout is
-      // parsing, or a worklet is blocked on another runtime), the wait can
-      // exceed the ~2s watchdog limit and iOS kills the app (Sentry APP-EF1).
-      // Parse asynchronously and measure with unformatted text for this pass;
-      // `onAsyncFormattingReady` then triggers a re-measure once the ranges are
-      // cached, so the temporarily wrong metrics (h1 font size, code/pre font,
-      // blockquote indent, emoji size) cannot persist.
-      // In practice the main thread usually hits the cache here: text changes
-      // are committed (and parsed) on background threads first.
+      // Never run the parser from the main thread while measuring. If the
+      // worklet runtime is busy, the wait can pass the ~2s limit and iOS kills
+      // the app (Sentry APP-EF1). Parse in the background instead and measure
+      // plain text for now; `onAsyncFormattingReady` asks for a new measure
+      // once the ranges are ready, so the wrong sizes (h1 font, code font,
+      // blockquote indent, emoji) do not stay. This rarely happens - text
+      // changes are usually parsed on a background thread first, so the main
+      // thread finds the ranges in the cache.
       __weak RCTMarkdownUtils *weakSelf = self;
       [_markdownParser warmCacheAsyncForText:text
                                 withParserId:parserId
                                   completion:^{
-        // Runs on the parser's warm-up queue, only for the newest requested
-        // text. Cannot spin: the re-measure it asks for hits the cache and stops
-        // scheduling warm-ups (or the text changed again, in which case the new
-        // text needs a re-measure anyway).
+        // This only runs for the newest text, so it can't loop forever: the new
+        // measure finds the ranges in the cache (or the text changed again, and
+        // then a new measure was needed anyway).
         void (^handler)(void) = weakSelf.onAsyncFormattingReady;
         if (handler != nil) {
           handler();
@@ -82,9 +77,9 @@
       }];
       return;
     }
-    // Background Fabric layout threads may parse synchronously: the watchdog
-    // only monitors the main thread, and parse no longer holds any lock the
-    // main-thread measure path can block on.
+    // Background threads can parse right here: the ~2s limit only applies to
+    // the main thread, and parsing no longer holds a lock the main thread
+    // waits on.
     markdownRanges = [_markdownParser parse:text withParserId:parserId];
   }
 

@@ -8,26 +8,22 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSArray<MarkdownRange *> *)parse:(nonnull NSString *)text
                        withParserId:(nonnull NSNumber *)parserId;
 
-// Returns the memoized ranges for (text, parserId) if they are still in the
-// cache, otherwise nil. Never enters the worklet runtime and only takes a brief
-// internal lock, so it is safe to call from the Yoga measure path on the main
-// thread.
+// Returns the ranges for (text, parserId) if they are already in the cache, or
+// nil if they aren't. This never runs the parser, so it is safe to call from
+// the main thread while Yoga is measuring.
 - (nullable NSArray<MarkdownRange *> *)cachedRangesForText:(nonnull NSString *)text
                                               withParserId:(nonnull NSNumber *)parserId;
 
-// Requests a parse on a background queue to populate the cache without blocking
-// the calling thread. Used when the main thread needs ranges during layout but
-// must not wait on the worklet runtime (see Sentry APP-EF1).
+// Parses in the background and puts the result in the cache, so the caller
+// doesn't have to wait for the parser. Used by the main thread, which must
+// never wait for it (see Sentry APP-EF1).
 //
-// Requests are coalesced latest-wins: the most recent (text, parserId) always
-// wins, and any earlier request that has not started executing yet is dropped.
-// A parse that is already inside the worklet runtime cannot be cancelled, but
-// the newest request is picked up as soon as it returns, so the newest text is
-// always parsed.
+// Only the newest request matters: a new call replaces one that is still
+// waiting. A parse that already started can't be stopped, but the newest text
+// is parsed as soon as it finishes.
 //
-// `completion` runs on the warm-up queue once `text` has been parsed and
-// cached. It is skipped when the request was superseded by a newer one, since
-// the newer request invokes its own completion.
+// `completion` runs on the background queue once the text is cached. It is
+// skipped if a newer call replaced this one, since that call reports instead.
 - (void)warmCacheAsyncForText:(nonnull NSString *)text
                  withParserId:(nonnull NSNumber *)parserId
                    completion:(nullable void (^)(void))completion;
