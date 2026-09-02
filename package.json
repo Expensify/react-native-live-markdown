@@ -121,6 +121,18 @@
   "engines": {
     "node": ">= 18.0.0"
   },
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": ">=24.19.0",
+      "onFail": "error"
+    },
+    "packageManager": {
+      "name": "npm",
+      "version": ">=11.10.0",
+      "onFail": "error"
+    }
+  },
   "jest": {
     "preset": "react-native",
     "modulePathIgnorePatterns": [

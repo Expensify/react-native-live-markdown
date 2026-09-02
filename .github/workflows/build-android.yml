@@ -41,6 +41,12 @@ jobs:
           distribution: 'zulu'
           java-version: 17
 
+      # v6.0.0
+      - name: Setup Node.js
+        uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903
+        with:
+          node-version-file: '.nvmrc'
+
       - name: Install node_modules
         run: npm ci
 
