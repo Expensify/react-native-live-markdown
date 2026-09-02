@@ -82,3 +82,6 @@ lib/
 
 # jest
 coverage/
+
+# Claude
+.claude/
