@@ -238,8 +238,8 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, MarkdownRange[]] {
   return [text, ranges];
 }
 
-function parseExpensiMark(markdown: string): MarkdownRange[] {
-  if (markdown.length > MAX_PARSABLE_LENGTH) {
+function parseExpensiMark(markdown: string, maxLength = MAX_PARSABLE_LENGTH): MarkdownRange[] {
+  if (markdown.length > maxLength) {
     return [];
   }
   const html = parseMarkdownToHTML(markdown);
