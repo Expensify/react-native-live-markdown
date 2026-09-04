@@ -28,6 +28,12 @@ jobs:
       - name: Check out Git repository
         uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493
 
+      # v6.0.0
+      - name: Setup Node.js
+        uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903
+        with:
+          node-version-file: '.nvmrc'
+
       - name: Install node_modules
         run: npm ci
 
