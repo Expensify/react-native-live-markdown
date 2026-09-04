@@ -238,6 +238,13 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, MarkdownRange[]] {
   return [text, ranges];
 }
 
+/**
+ * Parses Markdown text into formatting ranges using ExpensiMark.
+ *
+ * @param markdown - The raw Markdown string to parse.
+ * @param maxLength - Maximum input length to parse; longer input returns `[]` without parsing. Defaults to 4000.
+ * @returns The list of formatting ranges, or `[]` if input exceeds `maxLength` or fails to parse.
+ */
 function parseExpensiMark(markdown: string, maxLength = MAX_PARSABLE_LENGTH): MarkdownRange[] {
   if (markdown.length > maxLength) {
     return [];
