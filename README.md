@@ -20,7 +20,7 @@ npm install @expensify/react-native-live-markdown react-native-worklets expensif
 npx expo install @expensify/react-native-live-markdown react-native-worklets expensify-common html-entities@2.5.3
 ```
 
-React Native Live Markdown requires [react-native-worklets](https://github.com/software-mansion/react-native-reanimated/tree/main/packages/react-native-worklets) 0.7.0 or newer as well as [expensify-common](https://github.com/Expensify/expensify-common) 2.0.115 and [html-entities](https://github.com/mdevils/html-entities) 2.5.3 exactly if using the default built-in ExpensiMark parser.
+React Native Live Markdown requires [react-native-worklets](https://github.com/software-mansion/react-native-reanimated/tree/main/packages/react-native-worklets) 0.7.0 or newer as well as [expensify-common](https://github.com/Expensify/expensify-common) 2.0.201 or newer and [html-entities](https://github.com/mdevils/html-entities) 2.5.3 exactly if using the default built-in ExpensiMark parser.
 
 > [!IMPORTANT]
 > Please follow the `react-native-worklets` [Getting Started](https://docs.swmansion.com/react-native-worklets/docs/fundamentals/getting-started/#react-native-community-cli) guide to avoid issues.
@@ -52,6 +52,16 @@ export default function App() {
       parser={parseExpensiMark}
     />
   );
+}
+```
+
+The built-in `parseExpensiMark` parser accepts an optional maximum input length. It defaults to 4,000 characters and returns no formatting ranges when the input is longer than the configured limit. To use a different limit, wrap the parser in a worklet function:
+
+```ts
+function parser(input: string) {
+  'worklet';
+
+  return parseExpensiMark(input, 5000);
 }
 ```
 
