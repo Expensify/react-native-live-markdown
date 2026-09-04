@@ -37,6 +37,28 @@ test('no formatting', () => {
   expect('Hello, world!').toBeParsedAs([]);
 });
 
+describe('maximum parsable length', () => {
+  const createBoldMarkdown = (length: number) => `*${'a'.repeat(length - 2)}*`;
+  const getBoldRanges = (length: number): MarkdownRange[] => [
+    {type: 'syntax', start: 0, length: 1},
+    {type: 'bold', start: 1, length: length - 2},
+    {type: 'syntax', start: length - 1, length: 1},
+  ];
+
+  test('keeps the default 4000-character limit', () => {
+    expect(parseExpensiMark(createBoldMarkdown(4000))).toEqual(getBoldRanges(4000));
+    expect(parseExpensiMark(createBoldMarkdown(4001))).toEqual([]);
+  });
+
+  test('uses the caller-provided maximum length', () => {
+    const markdown = createBoldMarkdown(5000);
+
+    expect(parseExpensiMark(markdown)).toEqual([]);
+    expect(parseExpensiMark(markdown, 5000)).toEqual(getBoldRanges(5000));
+    expect(parseExpensiMark(`${markdown}a`, 5000)).toEqual([]);
+  });
+});
+
 describe('parsing error', () => {
   expect(`> [exa\nmple.com](https://example.com)`).toBeParsedAs([
     {type: 'blockquote', start: 0, length: 6},
