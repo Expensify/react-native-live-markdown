@@ -847,7 +847,7 @@ const styles = StyleSheet.create({
 
 export default MarkdownTextInput;
 
-export type {MarkdownNativeEvent, MarkdownTextInputProps, MarkdownTextInputElement, HTMLMarkdownElement};
+export type {MarkdownNativeEvent, MarkdownTextInputProps, MarkdownTextInputElement, HTMLMarkdownElement, MarkdownStyle};
 
 function getWorkletRuntime() {
   throw new Error('[react-native-live-markdown] `getWorkletRuntime` is not available on web. Please make sure to use it only on native Android or iOS.');
