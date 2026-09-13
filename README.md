@@ -33,6 +33,23 @@ cd ios && bundler install && bundler exec pod install
 
 The library includes native code so you will need to re-build the native app.
 
+### Worklets Bundle Mode
+
+If you're using [Worklets Bundle Mode](https://docs.swmansion.com/react-native-worklets/docs/bundleMode) you will have to
+configure your [import forwarding](https://docs.swmansion.com/react-native-worklets/docs/worklets-babel-plugin/plugin-options#importforwarding) as follows in your `babel.config.js` file:
+
+```js
+importForwarding: {
+  moduleNames: [
+    // your existing module names here...
+    // the order of the modules does not matter
+    'expensify-common',
+    'html-entities',
+    'react-native-live-markdown',
+  ],
+},
+```
+
 > [!NOTE]
 > The library does not support Expo Go, you will need to setup Expo Dev Client (see [here](https://docs.expo.dev/workflow/prebuild/)).
 
