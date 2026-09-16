@@ -5,12 +5,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MarkdownParser : NSObject
 
-// Looks up the worklet registered under `parserId` and keeps it alive until
-// another registered id is set or this parser is released. JS unregisters the
-// id when React cleans up effects, which also happens for an input that is
-// hidden but still mounted, so the registry can't be asked again at parse time.
-- (void)setParserId:(nonnull NSNumber *)parserId;
-
 - (NSArray<MarkdownRange *> *)parse:(nonnull NSString *)text
                        withParserId:(nonnull NSNumber *)parserId;
 

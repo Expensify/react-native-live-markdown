@@ -7,45 +7,16 @@ using namespace facebook;
 
 namespace expensify {
 namespace livemarkdown {
-  jni::local_ref<MarkdownParser::jhybriddata> MarkdownParser::initHybrid(jni::alias_ref<jclass>) {
-    return makeCxxInstance();
-  }
-
-  void MarkdownParser::nativeSetParserId(const int parserId) {
-    std::unique_lock<std::mutex> lock(mutex_);
-    if (parserId_ == parserId) {
-      return;
-    }
-    const auto markdownWorklet = findMarkdownWorklet(parserId);
-    if (markdownWorklet == nullptr) {
-      return;
-    }
-    parserId_ = parserId;
-    markdownWorklet_ = markdownWorklet;
-  }
-
-  // A parse for the current id uses the worklet kept alive by `nativeSetParserId`.
-  // Any other id is looked up in the registry the way it always was.
-  std::shared_ptr<SerializableWorklet> MarkdownParser::workletForParserId(const int parserId) {
-    {
-      std::unique_lock<std::mutex> lock(mutex_);
-      if (parserId_ == parserId) {
-        return markdownWorklet_;
-      }
-    }
-
-    return findMarkdownWorklet(parserId);
-  }
-
   jni::local_ref<jni::JString> MarkdownParser::nativeParse(
+      jni::alias_ref<jhybridobject> jThis,
       jni::alias_ref<jni::JString> text,
       const int parserId) {
-    const auto markdownWorklet = workletForParserId(parserId);
+    const auto markdownWorklet = expensify::livemarkdown::findMarkdownWorklet(parserId);
     if (markdownWorklet == nullptr) {
       return jni::make_jstring("[]");
     }
 
-    const auto markdownRuntime = getMarkdownRuntime();
+    const auto markdownRuntime = expensify::livemarkdown::getMarkdownRuntime();
     jsi::Runtime &rt = markdownRuntime->getJSIRuntime();
 
     const auto input = jsi::String::createFromUtf8(rt, text->toStdString());
@@ -57,8 +28,6 @@ namespace livemarkdown {
 
   void MarkdownParser::registerNatives() {
     registerHybrid({
-        makeNativeMethod("initHybrid", MarkdownParser::initHybrid),
-        makeNativeMethod("nativeSetParserId", MarkdownParser::nativeSetParserId),
         makeNativeMethod("nativeParse", MarkdownParser::nativeParse)});
   }
 

@@ -2,8 +2,6 @@ package com.expensify.livemarkdown;
 
 import androidx.annotation.NonNull;
 
-import com.facebook.jni.HybridData;
-import com.facebook.jni.annotations.DoNotStrip;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.util.RNLog;
 import com.facebook.soloader.SoLoader;
@@ -22,10 +20,6 @@ public class MarkdownParser {
     SoLoader.loadLibrary("livemarkdown");
   }
 
-  @DoNotStrip
-  @SuppressWarnings("unused")
-  private final HybridData mHybridData;
-
   private final @NonNull ReactContext mReactContext;
   private String mPrevText;
   private int mPrevParserId;
@@ -33,22 +27,9 @@ public class MarkdownParser {
 
   public MarkdownParser(@NonNull ReactContext reactContext) {
     mReactContext = reactContext;
-    mHybridData = initHybrid();
   }
-
-  private static native HybridData initHybrid();
-
-  private native void nativeSetParserId(int parserId);
 
   private native String nativeParse(@NonNull String text, int parserId);
-
-  /**
-   * Keeps the worklet registered under {@code parserId} alive in native code for as long as this parser lives, so a
-   * later parse still works after JS has unregistered the id. See {@code MarkdownParser.h} for why that happens.
-   */
-  public synchronized void setParserId(int parserId) {
-    nativeSetParserId(parserId);
-  }
 
   public synchronized List<MarkdownRange> parse(@NonNull String text, int parserId) {
     try {

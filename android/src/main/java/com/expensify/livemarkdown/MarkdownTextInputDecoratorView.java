@@ -15,17 +15,11 @@ public class MarkdownTextInputDecoratorView extends ReactViewGroup {
 
   public MarkdownTextInputDecoratorView(Context context) {
     super(context);
-    mMarkdownParser = new MarkdownParser((ReactContext) context);
   }
 
   private MarkdownStyle mMarkdownStyle;
 
   private int mParserId;
-
-  // Owned by the view rather than by `mMarkdownUtils`, which is recreated every
-  // time the view is attached, so the parser worklet stays alive for as long as
-  // the view is mounted.
-  private final MarkdownParser mMarkdownParser;
 
   private MarkdownUtils mMarkdownUtils;
 
@@ -39,7 +33,7 @@ public class MarkdownTextInputDecoratorView extends ReactViewGroup {
 
     View child = getChildAt(0);
     if (child instanceof ReactEditText) {
-      mMarkdownUtils = new MarkdownUtils((ReactContext) getContext(), mMarkdownParser);
+      mMarkdownUtils = new MarkdownUtils((ReactContext) getContext());
       mMarkdownUtils.setMarkdownStyle(mMarkdownStyle);
       mMarkdownUtils.setParserId(mParserId);
       mReactEditText = (ReactEditText) child;
@@ -70,7 +64,6 @@ public class MarkdownTextInputDecoratorView extends ReactViewGroup {
 
   protected void setParserId(int parserId) {
     mParserId = parserId;
-    mMarkdownParser.setParserId(parserId);
     if (mMarkdownUtils != null) {
       mMarkdownUtils.setParserId(mParserId);
     }

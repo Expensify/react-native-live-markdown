@@ -2,17 +2,27 @@ import {expect} from '@jest/globals';
 import React, {Activity, StrictMode, Suspense, act} from 'react';
 import {createRoot} from 'react-dom/client';
 import type {Root} from 'react-dom/client';
+import type {SerializableRef} from 'react-native-worklets';
 import type {MarkdownRange} from '../commonTypes';
 import MarkdownTextInput from '../MarkdownTextInput';
 import type {MarkdownTextInputProps} from '../MarkdownTextInput';
 
 /**
  * The parser worklet lives in a C++ registry keyed by the `parserId` prop the decorator view carries. The registry is
- * replaced by a map of worklets here, the decorator view by an element that exposes its `parserId` as a DOM attribute, and
- * the native text input by a plain `<input>`, so the component renders in jsdom through `react-dom`.
+ * replaced by a map of worklets here, the decorator view by an element that exposes its `parserId` as a DOM attribute and
+ * counts its renders, and the native text input by a plain `<input>`, so the component renders in jsdom through `react-dom`.
  */
-const liveParsers = new Map<number, MarkdownTextInputProps['parser']>();
-let nextParserId = 1;
+type Parser = MarkdownTextInputProps['parser'];
+
+// `createSerializable` is mocked to return the worklet itself, so the map holds the parser functions.
+const liveParsers = new Map<number, SerializableRef<Parser>>();
+const registerWorklet = jest.fn((parserId: number, worklet: SerializableRef<Parser>) => {
+  liveParsers.set(parserId, worklet);
+});
+const unregisterWorklet = jest.fn((parserId: number) => {
+  liveParsers.delete(parserId);
+});
+let decoratorRenderCount = 0;
 
 jest.mock('react-native', () => ({
   Platform: {OS: 'ios', select: (options: {ios?: unknown; default?: unknown}) => options.ios ?? options.default},
@@ -29,7 +39,10 @@ jest.mock('react-native-worklets', () => ({
 
 jest.mock('../MarkdownTextInputDecoratorViewNativeComponent', () => ({
   __esModule: true,
-  default: (props: {parserId: number; children: React.ReactNode}) => <div data-parser-id={props.parserId}>{props.children}</div>,
+  default: (props: {parserId: number; children: React.ReactNode}) => {
+    decoratorRenderCount += 1;
+    return <div data-parser-id={props.parserId}>{props.children}</div>;
+  },
 }));
 
 // The worklets babel plugin does not run under Jest, so the hash that marks a function as a worklet is attached by hand.
@@ -48,7 +61,7 @@ function renderIntoRoot(element: React.ReactElement) {
   });
 }
 
-function renderInActivity(isHidden: boolean, currentParser: MarkdownTextInputProps['parser'] = parser) {
+function renderInActivity(isHidden: boolean, currentParser: Parser = parser) {
   renderIntoRoot(
     <Activity mode={isHidden ? 'hidden' : 'visible'}>
       <MarkdownTextInput parser={currentParser} />
@@ -56,17 +69,27 @@ function renderInActivity(isHidden: boolean, currentParser: MarkdownTextInputPro
   );
 }
 
+function getDecoratorParserIds(): number[] {
+  return Array.from(container.querySelectorAll('[data-parser-id]'), (element) => {
+    const attribute = element.getAttribute('data-parser-id');
+    const parserId = Number(attribute);
+    if (attribute == null || !Number.isInteger(parserId) || parserId <= 0) {
+      throw new Error('The decorator view rendered without a parser id');
+    }
+    return parserId;
+  });
+}
+
 function getDecoratorParserId(): number {
-  const decorator = container.querySelector('[data-parser-id]');
-  const attribute = decorator?.getAttribute('data-parser-id');
-  const parserId = Number(attribute);
-  if (attribute == null || !Number.isInteger(parserId) || parserId < 0) {
-    throw new Error('The decorator view rendered without a parser id');
+  const parserIds = getDecoratorParserIds();
+  const [parserId] = parserIds;
+  if (parserId === undefined || parserIds.length !== 1) {
+    throw new Error(`Expected one decorator view, found ${parserIds.length}`);
   }
   return parserId;
 }
 
-function expectDecoratorOnTheOnlyLiveParserId(expectedParser: MarkdownTextInputProps['parser'] = parser) {
+function expectDecoratorOnTheOnlyLiveParserId(expectedParser: Parser = parser) {
   expect(liveParsers.get(getDecoratorParserId())).toBe(expectedParser);
   expect(liveParsers.size).toBe(1);
 }
@@ -74,17 +97,12 @@ function expectDecoratorOnTheOnlyLiveParserId(expectedParser: MarkdownTextInputP
 describe('MarkdownTextInput parser registration', () => {
   beforeEach(() => {
     liveParsers.clear();
-    nextParserId = 1;
+    registerWorklet.mockClear();
+    unregisterWorklet.mockClear();
+    decoratorRenderCount = 0;
     global.jsi_setMarkdownRuntime = jest.fn();
-    global.jsi_registerMarkdownWorklet = (worklet) => {
-      const parserId = nextParserId;
-      nextParserId += 1;
-      liveParsers.set(parserId, worklet as unknown as MarkdownTextInputProps['parser']);
-      return parserId;
-    };
-    global.jsi_unregisterMarkdownWorklet = (parserId: number) => {
-      liveParsers.delete(parserId);
-    };
+    global.jsi_registerMarkdownWorklet = registerWorklet;
+    global.jsi_unregisterMarkdownWorklet = unregisterWorklet;
 
     container = document.createElement('div');
     document.body.appendChild(container);
@@ -99,20 +117,23 @@ describe('MarkdownTextInput parser registration', () => {
     expect(liveParsers.size).toBe(0);
   });
 
-  it('registers the parser once and publishes its id after mount', () => {
+  it('registers the parser once and carries its id in the first render', () => {
     renderIntoRoot(<MarkdownTextInput parser={parser} />);
 
-    expect(nextParserId).toBe(2);
+    expect(decoratorRenderCount).toBe(1);
+    expect(registerWorklet).toHaveBeenCalledTimes(1);
     expectDecoratorOnTheOnlyLiveParserId();
   });
 
   it('unregisters the parser on unmount', () => {
     renderIntoRoot(<MarkdownTextInput parser={parser} />);
+    const parserId = getDecoratorParserId();
 
     act(() => {
       root.unmount();
     });
 
+    expect(unregisterWorklet).toHaveBeenCalledWith(parserId);
     expect(liveParsers.size).toBe(0);
   });
 
@@ -128,23 +149,21 @@ describe('MarkdownTextInput parser registration', () => {
     );
 
     expect(getDecoratorParserId()).toBe(initialParserId);
-    expect(nextParserId).toBe(2);
+    expect(registerWorklet).toHaveBeenCalledTimes(1);
+    expect(unregisterWorklet).not.toHaveBeenCalled();
     expectDecoratorOnTheOnlyLiveParserId();
   });
 
-  it('does not register a parser for an Activity that is removed without ever becoming visible', () => {
+  it('registers the parser of an initially hidden <Activity> and drops it when the Activity is removed while hidden', () => {
     renderInActivity(true);
-
-    expect(getDecoratorParserId()).toBe(0);
-    expect(liveParsers.size).toBe(0);
+    expectDecoratorOnTheOnlyLiveParserId();
 
     renderIntoRoot(<div />);
 
-    expect(nextParserId).toBe(1);
     expect(liveParsers.size).toBe(0);
   });
 
-  it('does not leak a registration when React abandons a suspended render', () => {
+  it('does not register a parser when React abandons a suspended render', () => {
     const pending = new Promise<never>(() => {
       // Keep the subtree suspended until its render is abandoned.
     });
@@ -160,50 +179,77 @@ describe('MarkdownTextInput parser registration', () => {
     );
 
     expect(container.textContent).toBe('Loading');
-    expect(nextParserId).toBe(1);
+    expect(registerWorklet).not.toHaveBeenCalled();
     expect(liveParsers.size).toBe(0);
 
     renderIntoRoot(<MarkdownTextInput parser={parser} />);
     expectDecoratorOnTheOnlyLiveParserId();
   });
 
-  it('keeps the decorator on a live id under StrictMode', () => {
+  it('registers once under StrictMode', () => {
     renderIntoRoot(
       <StrictMode>
         <MarkdownTextInput parser={parser} />
       </StrictMode>,
     );
 
+    expect(registerWorklet).toHaveBeenCalledTimes(1);
+    expect(unregisterWorklet).not.toHaveBeenCalled();
     expectDecoratorOnTheOnlyLiveParserId();
   });
 
-  it('keeps the decorator on a live id after a hidden <Activity> is revealed', () => {
+  it('keeps the same registration while a <Activity> is hidden and revealed', () => {
     renderInActivity(false);
-    expectDecoratorOnTheOnlyLiveParserId();
+    const parserId = getDecoratorParserId();
 
     renderInActivity(true);
-    renderInActivity(false);
+    expect(getDecoratorParserId()).toBe(parserId);
     expectDecoratorOnTheOnlyLiveParserId();
 
-    renderInActivity(true);
+    const renderCountBeforeReveal = decoratorRenderCount;
     renderInActivity(false);
+
+    expect(getDecoratorParserId()).toBe(parserId);
+    expect(decoratorRenderCount).toBe(renderCountBeforeReveal + 1);
+    expect(registerWorklet).toHaveBeenCalledTimes(1);
+    expect(unregisterWorklet).not.toHaveBeenCalled();
     expectDecoratorOnTheOnlyLiveParserId();
   });
 
-  it('registers a replacement parser when a previously visible Activity is revealed', () => {
+  it('switches to a replacement parser while the <Activity> is still hidden', () => {
     renderInActivity(false);
-    renderInActivity(true);
-    expect(liveParsers.size).toBe(0);
+    const initialParserId = getDecoratorParserId();
 
+    renderInActivity(true);
     const nextParser = createParserWorklet();
     renderInActivity(true, nextParser);
-    expect(liveParsers.size).toBe(0);
+
+    expect(getDecoratorParserId()).not.toBe(initialParserId);
+    expect(unregisterWorklet).toHaveBeenCalledWith(initialParserId);
+    expectDecoratorOnTheOnlyLiveParserId(nextParser);
 
     renderInActivity(false, nextParser);
+
+    expect(registerWorklet).toHaveBeenCalledTimes(2);
     expectDecoratorOnTheOnlyLiveParserId(nextParser);
   });
 
-  it('keeps registrations independent for inputs sharing the same parser', () => {
+  it('unregisters an input removed inside a hidden <Activity>', () => {
+    renderInActivity(false);
+    renderInActivity(true);
+    const parserId = getDecoratorParserId();
+
+    renderIntoRoot(
+      <Activity mode="hidden">
+        <div />
+      </Activity>,
+    );
+
+    expect(unregisterWorklet).toHaveBeenCalledWith(parserId);
+    expect(liveParsers.size).toBe(0);
+  });
+
+  it('shares one registration between inputs using the same parser', () => {
     renderIntoRoot(
       <div>
         <MarkdownTextInput
@@ -216,10 +262,11 @@ describe('MarkdownTextInput parser registration', () => {
         />
       </div>,
     );
-    const ids = Array.from(container.querySelectorAll('[data-parser-id]'), (element) => Number(element.getAttribute('data-parser-id')));
-    expect(new Set(ids).size).toBe(2);
-    expect(liveParsers.size).toBe(2);
-    ids.forEach((id) => expect(liveParsers.get(id)).toBe(parser));
+    const ids = getDecoratorParserIds();
+    expect(ids).toHaveLength(2);
+    expect(ids[0]).toBe(ids[1]);
+    expect(registerWorklet).toHaveBeenCalledTimes(1);
+    expect(liveParsers.size).toBe(1);
 
     renderIntoRoot(
       <div>
@@ -229,24 +276,15 @@ describe('MarkdownTextInput parser registration', () => {
         />
       </div>,
     );
-    expect(getDecoratorParserId()).toBe(ids[1]);
+    expect(unregisterWorklet).not.toHaveBeenCalled();
     expectDecoratorOnTheOnlyLiveParserId();
+
+    renderIntoRoot(<div />);
+    expect(unregisterWorklet).toHaveBeenCalledTimes(1);
+    expect(liveParsers.size).toBe(0);
   });
 
-  it('registers only the latest parser when an initially hidden <Activity> is revealed', () => {
-    const nextParser = createParserWorklet();
-
-    renderInActivity(true);
-    expect(liveParsers.size).toBe(0);
-    renderInActivity(true, nextParser);
-    expect(liveParsers.size).toBe(0);
-    renderInActivity(false, nextParser);
-
-    expect(nextParserId).toBe(2);
-    expectDecoratorOnTheOnlyLiveParserId(nextParser);
-  });
-
-  it('moves the decorator to a live id and drops the previous one when the parser changes identity', () => {
+  it('moves the decorator to a new id and drops the previous one when the parser changes identity', () => {
     renderIntoRoot(<MarkdownTextInput parser={parser} />);
     const initialParserId = getDecoratorParserId();
 
@@ -254,6 +292,7 @@ describe('MarkdownTextInput parser registration', () => {
     renderIntoRoot(<MarkdownTextInput parser={nextParser} />);
 
     expect(getDecoratorParserId()).not.toBe(initialParserId);
+    expect(unregisterWorklet).toHaveBeenCalledWith(initialParserId);
     expectDecoratorOnTheOnlyLiveParserId(nextParser);
   });
 });

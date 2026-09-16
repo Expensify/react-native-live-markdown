@@ -11,11 +11,7 @@ import java.util.List;
 
 public class MarkdownUtils {
   public MarkdownUtils(@NonNull ReactContext reactContext) {
-    this(reactContext, new MarkdownParser(reactContext));
-  }
-
-  public MarkdownUtils(@NonNull ReactContext reactContext, @NonNull MarkdownParser markdownParser) {
-    mMarkdownParser = markdownParser;
+    mMarkdownParser = new MarkdownParser(reactContext);
     mMarkdownFormatter = new MarkdownFormatter(reactContext.getAssets());
   }
 
@@ -31,7 +27,6 @@ public class MarkdownUtils {
 
   public void setParserId(int parserId) {
     mParserId = parserId;
-    mMarkdownParser.setParserId(parserId);
   }
 
   public void applyMarkdownFormatting(SpannableStringBuilder ssb) {
