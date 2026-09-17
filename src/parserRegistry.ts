@@ -2,10 +2,12 @@ import {createSerializable} from 'react-native-worklets';
 import {initializeLiveMarkdownIfNeeded} from './workletRuntime';
 import type {ParserWorklet} from './workletRuntime';
 
+// Every parser worklet gets one id that is chosen here and stays the same for as long as the function is alive, so a
+// render can hand it to the native view before any effect runs. The worklet is registered natively while at least one
+// mounted input retains it and unregistered when the last one releases it.
 const parserIds = new WeakMap<ParserWorklet, number>();
 let nextParserId = 1;
 
-// Idempotent, so a render can read the id before any effect registers the worklet under it.
 function getParserId(parser: ParserWorklet): number {
   const knownParserId = parserIds.get(parser);
   if (knownParserId !== undefined) {
