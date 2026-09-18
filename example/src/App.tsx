@@ -62,23 +62,6 @@ export default function App() {
 
   const ref = React.useRef<MarkdownTextInput>(null);
 
-  function toggleActivity(wrapper: ActivityWrapper) {
-    if (activityWrapper === wrapper) {
-      setActivityHidden(prev => !prev);
-      return;
-    }
-    setActivityWrapper(wrapper);
-    setActivityHidden(true);
-  }
-
-  function activityButtonTitle(wrapper: ActivityWrapper) {
-    const action =
-      activityWrapper === wrapper && activityHidden ? 'Show' : 'Hide';
-    return wrapper === 'alwaysPainted'
-      ? `${action} Activity (AlwaysPaintedView)`
-      : `${action} Activity`;
-  }
-
   const input = (
     <MarkdownTextInput
       multiline={multiline}
@@ -178,14 +161,21 @@ export default function App() {
         onPress={() => setCaretHidden(prev => !prev)}
       />
       <Button
-        title={activityButtonTitle('none')}
-        disabled={activityHidden && activityWrapper !== 'none'}
-        onPress={() => toggleActivity('none')}
+        title={
+          activityWrapper === 'none'
+            ? 'Use AlwaysPaintedView'
+            : 'Use regular view'
+        }
+        disabled={activityHidden}
+        onPress={() =>
+          setActivityWrapper(prev =>
+            prev === 'none' ? 'alwaysPainted' : 'none',
+          )
+        }
       />
       <Button
-        title={activityButtonTitle('alwaysPainted')}
-        disabled={activityHidden && activityWrapper !== 'alwaysPainted'}
-        onPress={() => toggleActivity('alwaysPainted')}
+        title={activityHidden ? 'Show Activity' : 'Hide Activity'}
+        onPress={() => setActivityHidden(prev => !prev)}
       />
       <Button
         title={
