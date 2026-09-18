@@ -2,12 +2,9 @@ import React from 'react';
 import {allocateParserId, registerParser, unregisterParser} from './parserRegistry';
 import type {ParserWorklet} from './workletRuntime';
 
-// Returns the id the native decorator view must carry for `parser` and keeps the worklet registered under that id while
-// the input is mounted. Every input gets its own id, and a new one whenever `parser` changes, so the native side sees a
-// prop change and its (text, parserId) cache never serves ranges from a previous parser.
-// The registration lives in an insertion effect because it is the only effect React runs before the host tree commits,
-// so the first measure already has the worklet. It is also the only effect a hidden <Activity> keeps connected and the
-// only one StrictMode does not run twice, so the id the native view holds stays valid.
+// An insertion effect is the only effect React runs before the host tree commits, does not run twice under StrictMode
+// and keeps connected inside a hidden <Activity>. A parser change gets a fresh id because the native side caches ranges
+// by text and parser id.
 function useParserId(parser: ParserWorklet): number {
   const registration = React.useMemo(() => ({parser, parserId: allocateParserId()}), [parser]);
 
