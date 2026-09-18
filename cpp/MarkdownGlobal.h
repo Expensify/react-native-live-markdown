@@ -14,7 +14,7 @@ void setMarkdownRuntime(const std::shared_ptr<WorkletRuntime> &markdownWorkletRu
 
 std::shared_ptr<WorkletRuntime> getMarkdownRuntime();
 
-// JS picks the id, one per parser worklet, so the decorator view can carry it
+// JS picks the id, one per mounted input, so the decorator view can carry it
 // in the same commit that registers the worklet.
 void registerMarkdownWorklet(const int parserId, const std::shared_ptr<SerializableWorklet> &markdownWorklet);
 

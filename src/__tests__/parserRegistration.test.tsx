@@ -249,7 +249,7 @@ describe('MarkdownTextInput parser registration', () => {
     expect(liveParsers.size).toBe(0);
   });
 
-  it('shares one registration between inputs using the same parser', () => {
+  it('gives inputs using the same parser their own registrations', () => {
     renderIntoRoot(
       <div>
         <MarkdownTextInput
@@ -264,9 +264,9 @@ describe('MarkdownTextInput parser registration', () => {
     );
     const ids = getDecoratorParserIds();
     expect(ids).toHaveLength(2);
-    expect(ids[0]).toBe(ids[1]);
-    expect(registerWorklet).toHaveBeenCalledTimes(1);
-    expect(liveParsers.size).toBe(1);
+    expect(ids[0]).not.toBe(ids[1]);
+    expect(registerWorklet).toHaveBeenCalledTimes(2);
+    expect(liveParsers.size).toBe(2);
 
     renderIntoRoot(
       <div>
@@ -276,11 +276,12 @@ describe('MarkdownTextInput parser registration', () => {
         />
       </div>,
     );
-    expect(unregisterWorklet).not.toHaveBeenCalled();
+    expect(unregisterWorklet).toHaveBeenCalledWith(ids[0]);
+    expect(getDecoratorParserId()).toBe(ids[1]);
     expectDecoratorOnTheOnlyLiveParserId();
 
     renderIntoRoot(<div />);
-    expect(unregisterWorklet).toHaveBeenCalledTimes(1);
+    expect(unregisterWorklet).toHaveBeenCalledTimes(2);
     expect(liveParsers.size).toBe(0);
   });
 
