@@ -8,9 +8,6 @@
 .vscode/
 jsconfig.json
 
-# NPM file created by GitHub actions
-.npmrc
-
 # Xcode
 build/
 *.pbxuser
