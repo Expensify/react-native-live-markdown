@@ -171,13 +171,13 @@ static const NSUInteger kMarkdownParserCacheCapacity = 4;
       _pendingCompletion = nil;
     }
 
-    [self parse:text withParserId:parserId];
+    BOOL cached = [self parseIfRegistered:text withParserId:parserId] != nil;
 
     BOOL superseded;
     @synchronized (self) {
       superseded = _pendingText != nil;
     }
-    if (completion != nil && !superseded) {
+    if (completion != nil && !superseded && cached) {
       completion();
     }
   }
@@ -185,6 +185,14 @@ static const NSUInteger kMarkdownParserCacheCapacity = 4;
 
 - (NSArray<MarkdownRange *> *)parse:(nonnull NSString *)text
                        withParserId:(nonnull NSNumber *)parserId
+{
+  return [self parseIfRegistered:text withParserId:parserId] ?: @[];
+}
+
+// Returns nil when no parser is registered under `parserId`. Nothing is cached
+// then, so the next parse picks the parser up once it is registered.
+- (nullable NSArray<MarkdownRange *> *)parseIfRegistered:(nonnull NSString *)text
+                                            withParserId:(nonnull NSNumber *)parserId
 {
   NSArray<MarkdownRange *> *cached = [self cachedRangesForText:text withParserId:parserId];
   if (cached != nil) {
@@ -200,18 +208,24 @@ static const NSUInteger kMarkdownParserCacheCapacity = 4;
   // Two threads may end up parsing the same text at the same time. That is
   // fine: they run one after the other and produce the same result.
   NSArray<MarkdownRange *> *markdownRanges = [self parseUncached:text withParserId:parserId];
+  if (markdownRanges == nil) {
+    return nil;
+  }
 
   [self cacheMarkdownRanges:markdownRanges forText:text withParserId:parserId];
 
   return markdownRanges;
 }
 
-- (NSArray<MarkdownRange *> *)parseUncached:(nonnull NSString *)text
-                               withParserId:(nonnull NSNumber *)parserId
+- (nullable NSArray<MarkdownRange *> *)parseUncached:(nonnull NSString *)text
+                                        withParserId:(nonnull NSNumber *)parserId
 {
   const auto markdownWorklet = expensify::livemarkdown::findMarkdownWorklet([parserId intValue]);
   if (markdownWorklet == nullptr) {
-    return @[];
+    // The parser is registered before the view is committed, but a queued
+    // warmup may run after it is unregistered on unmount or a parser change.
+    RCTLogWarn(@"[react-native-live-markdown] No parser registered for parserId %@", parserId);
+    return nil;
   }
 
   const auto &markdownRuntime = expensify::livemarkdown::getMarkdownRuntime();

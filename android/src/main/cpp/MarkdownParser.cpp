@@ -13,7 +13,8 @@ namespace livemarkdown {
       const int parserId) {
     const auto markdownWorklet = expensify::livemarkdown::findMarkdownWorklet(parserId);
     if (markdownWorklet == nullptr) {
-      return jni::make_jstring("[]");
+      // Null tells the Java side apart from a parser that returned no ranges.
+      return nullptr;
     }
 
     const auto markdownRuntime = expensify::livemarkdown::getMarkdownRuntime();
