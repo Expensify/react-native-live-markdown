@@ -223,9 +223,9 @@ static const NSUInteger kMarkdownParserCacheCapacity = 4;
 
   jsi::Value output;
   try {
-    output = markdownRuntime->runGuarded(markdownWorklet, input);
+    output = markdownRuntime->runSync(markdownWorklet, input);
   } catch (const jsi::JSError &error) {
-    // Skip formatting, runGuarded will show the error in LogBox
+    // Skip formatting, runSync shows the error in LogBox in debug builds and throws in release builds
     return @[];
   }
 
