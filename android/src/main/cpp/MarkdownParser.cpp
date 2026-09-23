@@ -17,7 +17,7 @@ namespace livemarkdown {
     const auto markdownWorklet = expensify::livemarkdown::getMarkdownWorklet(parserId);
 
     const auto input = jsi::String::createFromUtf8(rt, text->toStdString());
-    const auto output = markdownRuntime->runGuarded(markdownWorklet, input);
+    const auto output = markdownRuntime->runSync(markdownWorklet, input);
 
     const auto json = rt.global().getPropertyAsObject(rt, "JSON").getPropertyAsFunction(rt, "stringify").call(rt, output).asString(rt).utf8(rt);
     return jni::make_jstring(json);
