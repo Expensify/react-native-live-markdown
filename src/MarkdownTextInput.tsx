@@ -1,12 +1,11 @@
-import {StyleSheet, TextInput, processColor} from 'react-native';
+import {StyleSheet, TextInput} from 'react-native';
 import React from 'react';
 import type {TextInputProps} from 'react-native';
 import {createSerializable, createWorkletRuntime} from 'react-native-worklets';
 import type {SerializableRef, WorkletFunction, WorkletRuntime} from 'react-native-worklets';
 import MarkdownTextInputDecoratorViewNativeComponent from './MarkdownTextInputDecoratorViewNativeComponent';
-import type {MarkdownStyle} from './MarkdownTextInputDecoratorViewNativeComponent';
 import NativeLiveMarkdownModule from './NativeLiveMarkdownModule';
-import {mergeMarkdownStyleWithDefault} from './styleUtils';
+import {processMarkdownStyle} from './styleUtils';
 import type {PartialMarkdownStyle} from './styleUtils';
 import type {InlineImagesInputProps, MarkdownRange} from './commonTypes';
 
@@ -69,27 +68,6 @@ type FormatSelectionResult = {
 };
 
 type MarkdownTextInput = TextInput & React.Component<MarkdownTextInputProps>;
-
-function processColorsInMarkdownStyle(input: MarkdownStyle): MarkdownStyle {
-  const output = JSON.parse(JSON.stringify(input));
-
-  Object.keys(output).forEach((key) => {
-    const obj = output[key];
-    Object.keys(obj).forEach((prop) => {
-      // TODO: use ReactNativeStyleAttributes from 'react-native/Libraries/Components/View/ReactNativeStyleAttributes'
-      if (!(prop === 'color' || prop.endsWith('Color'))) {
-        return;
-      }
-      obj[prop] = processColor(obj[prop]);
-    });
-  });
-
-  return output as MarkdownStyle;
-}
-
-function processMarkdownStyle(input: PartialMarkdownStyle | undefined): MarkdownStyle {
-  return processColorsInMarkdownStyle(mergeMarkdownStyleWithDefault(input));
-}
 
 const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputProps>((props, ref) => {
   const markdownStyle = React.useMemo(() => processMarkdownStyle(props.markdownStyle), [props.markdownStyle]);

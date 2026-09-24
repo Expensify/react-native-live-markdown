@@ -1,4 +1,4 @@
-import {Platform} from 'react-native';
+import {Platform, processColor} from 'react-native';
 import type {MarkdownStyle} from './MarkdownTextInputDecoratorViewNativeComponent';
 
 type PartialMarkdownStyle = Partial<{
@@ -116,6 +116,31 @@ function parseStringWithUnitToNumber(value: string | number | null): number {
   return value ? parseInt(value.replace('px', ''), 10) : 0;
 }
 
+function processColorsInMarkdownStyle(input: MarkdownStyle): MarkdownStyle {
+  const output = JSON.parse(JSON.stringify(input));
+  const defaults = JSON.parse(JSON.stringify(makeDefaultMarkdownStyle()));
+
+  Object.keys(output).forEach((key) => {
+    const obj = output[key];
+    const defaultObj = defaults[key];
+    Object.keys(obj).forEach((prop) => {
+      // TODO: use ReactNativeStyleAttributes from 'react-native/Libraries/Components/View/ReactNativeStyleAttributes'
+      if (!(prop === 'color' || prop.endsWith('Color'))) {
+        return;
+      }
+      const processed = processColor(obj[prop]);
+      // processColor returns null/undefined for invalid names; nil colors crash iOS.
+      obj[prop] = processed ?? processColor(defaultObj?.[prop]);
+    });
+  });
+
+  return output as MarkdownStyle;
+}
+
+function processMarkdownStyle(input: PartialMarkdownStyle | undefined): MarkdownStyle {
+  return processColorsInMarkdownStyle(mergeMarkdownStyleWithDefault(input));
+}
+
 export type {PartialMarkdownStyle};
 
-export {mergeMarkdownStyleWithDefault, parseStringWithUnitToNumber};
+export {mergeMarkdownStyleWithDefault, parseStringWithUnitToNumber, processMarkdownStyle};
