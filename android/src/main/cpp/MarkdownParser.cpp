@@ -11,10 +11,14 @@ namespace livemarkdown {
       jni::alias_ref<jhybridobject> jThis,
       jni::alias_ref<jni::JString> text,
       const int parserId) {
+    const auto markdownWorklet = expensify::livemarkdown::findMarkdownWorklet(parserId);
+    if (markdownWorklet == nullptr) {
+      // Null tells the Java side apart from a parser that returned no ranges.
+      return nullptr;
+    }
+
     const auto markdownRuntime = expensify::livemarkdown::getMarkdownRuntime();
     jsi::Runtime &rt = markdownRuntime->getJSIRuntime();
-
-    const auto markdownWorklet = expensify::livemarkdown::getMarkdownWorklet(parserId);
 
     const auto input = jsi::String::createFromUtf8(rt, text->toStdString());
     const auto output = markdownRuntime->runGuarded(markdownWorklet, input);
