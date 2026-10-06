@@ -44,7 +44,7 @@ public class MarkdownParser {
         Systrace.beginSection(0, "nativeParse");
         json = nativeParse(text, parserId);
       } catch (Exception e) {
-        // Skip formatting, runGuarded will show the error in LogBox
+        // Skip formatting, runSync shows the error in LogBox in debug builds and throws in release builds
         mPrevText = text;
         mPrevParserId = parserId;
         mPrevMarkdownRanges = Collections.emptyList();
