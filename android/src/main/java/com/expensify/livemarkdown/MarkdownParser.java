@@ -1,6 +1,7 @@
 package com.expensify.livemarkdown;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.util.RNLog;
@@ -29,7 +30,8 @@ public class MarkdownParser {
     mReactContext = reactContext;
   }
 
-  private native String nativeParse(@NonNull String text, int parserId);
+  // Returns null when no parser is registered under `parserId`.
+  private native @Nullable String nativeParse(@NonNull String text, int parserId);
 
   public synchronized List<MarkdownRange> parse(@NonNull String text, int parserId) {
     try {
@@ -51,6 +53,13 @@ public class MarkdownParser {
         return mPrevMarkdownRanges;
       } finally {
         Systrace.endSection(0);
+      }
+
+      if (json == null) {
+        // The parser is registered before the view is committed, so this points at a broken registration. Leave the
+        // cache alone so the next parse picks the parser up once it is registered.
+        RNLog.w(mReactContext, "[react-native-live-markdown] No parser registered for parserId " + parserId);
+        return Collections.emptyList();
       }
 
       List<MarkdownRange> markdownRanges = new LinkedList<>();

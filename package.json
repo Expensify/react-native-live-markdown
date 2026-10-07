@@ -74,6 +74,7 @@
     "@release-it/conventional-changelog": "^5.0.0",
     "@types/jest": "^29.5.14",
     "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.7",
     "@typescript-eslint/eslint-plugin": "^8.53.1",
     "@typescript-eslint/parser": "^8.53.1",
     "del-cli": "^5.0.0",
