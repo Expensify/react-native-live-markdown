@@ -1,4 +1,5 @@
 import {Platform, Text, View, StyleSheet} from 'react-native';
+import {isBundleModeEnabled} from 'react-native-worklets';
 import React from 'react';
 
 function isWeb() {
@@ -62,6 +63,9 @@ export function PlatformInfo() {
           <Text>Bridgeless: {isBridgeless() ? 'yes' : 'no'}</Text>
           <Text>RN version: {getReactNativeVersion()}</Text>
           <Text>RN runtime: {getRuntime()}</Text>
+          <Text>
+            Worklets Bundle Mode: {isBundleModeEnabled() ? 'yes' : 'no'}
+          </Text>
         </>
       )}
     </View>
