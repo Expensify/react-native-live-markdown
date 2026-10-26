@@ -118,6 +118,11 @@
     "./example",
     "./WebExample"
   ],
+  "overrides": {
+    "react-native-builder-bob": {
+      "metro-config": "^0.84.6"
+    }
+  },
   "devEngines": {
     "runtime": {
       "name": "node",
