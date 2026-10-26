@@ -114,6 +114,9 @@
     "react-native": "*",
     "react-native-worklets": ">=0.7.0"
   },
+  "overrides": {
+    "lodash": "4.18.1"
+  },
   "workspaces": [
     "./example",
     "./WebExample"
