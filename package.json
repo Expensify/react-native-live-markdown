@@ -114,6 +114,9 @@
     "react-native": "*",
     "react-native-worklets": ">=0.7.0"
   },
+  "overrides": {
+    "minimatch@9.0.3": "^9.0.7"
+  },
   "workspaces": [
     "./example",
     "./WebExample"
