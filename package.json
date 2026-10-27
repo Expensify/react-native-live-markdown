@@ -1,6 +1,6 @@
 {
   "name": "@expensify/react-native-live-markdown",
-  "version": "0.1.345",
+  "version": "0.1.356",
   "description": "Drop-in replacement for React Native's TextInput component with Markdown formatting.",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -114,15 +114,16 @@
     "react-native": "*",
     "react-native-worklets": ">=0.7.0"
   },
-  "workspaces": [
-    "./example",
-    "./WebExample"
-  ],
   "overrides": {
+    "proxy-agent": "^6.5.0",
     "react-native-builder-bob": {
       "metro-config": "^0.84.6"
     }
   },
+  "workspaces": [
+    "./example",
+    "./WebExample"
+  ],
   "devEngines": {
     "runtime": {
       "name": "node",
