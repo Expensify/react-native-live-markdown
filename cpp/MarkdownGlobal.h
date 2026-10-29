@@ -14,11 +14,14 @@ void setMarkdownRuntime(const std::shared_ptr<WorkletRuntime> &markdownWorkletRu
 
 std::shared_ptr<WorkletRuntime> getMarkdownRuntime();
 
-const int registerMarkdownWorklet(const std::shared_ptr<SerializableWorklet> &markdownWorklet);
+// JS picks the id, one per mounted input, so the decorator view can carry it
+// in the same commit that registers the worklet.
+void registerMarkdownWorklet(const int parserId, const std::shared_ptr<SerializableWorklet> &markdownWorklet);
 
 void unregisterMarkdownWorklet(const int parserId);
 
-std::shared_ptr<SerializableWorklet> getMarkdownWorklet(const int parserId);
+// Returns nullptr when nothing is registered under `parserId`.
+std::shared_ptr<SerializableWorklet> findMarkdownWorklet(const int parserId);
 
 } // namespace livemarkdown
 } // namespace expensify

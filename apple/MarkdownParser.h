@@ -23,7 +23,9 @@ NS_ASSUME_NONNULL_BEGIN
 // is parsed as soon as it finishes.
 //
 // `completion` runs on the background queue once the text is cached. It is
-// skipped if a newer call replaced this one, since that call reports instead.
+// skipped if a newer call replaced this one, since that call reports instead,
+// and if no parser is registered under `parserId`, since nothing was cached
+// and a new measure would find nothing either.
 - (void)warmCacheAsyncForText:(nonnull NSString *)text
                  withParserId:(nonnull NSNumber *)parserId
                    completion:(nullable void (^)(void))completion;
