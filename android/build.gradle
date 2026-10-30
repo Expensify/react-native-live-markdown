@@ -131,6 +131,8 @@ android {
           java.srcDirs += "src/reactNativeVersionPatch/CustomMountingManager/80"
       } else if (REACT_NATIVE_MINOR_VERSION <= 85) {
           java.srcDirs += "src/reactNativeVersionPatch/CustomMountingManager/81"
+      } else if (REACT_NATIVE_MINOR_VERSION == 86) {
+          java.srcDirs += "src/reactNativeVersionPatch/CustomMountingManager/86"
       } else {
           java.srcDirs += "src/reactNativeVersionPatch/CustomMountingManager/latest"
       }

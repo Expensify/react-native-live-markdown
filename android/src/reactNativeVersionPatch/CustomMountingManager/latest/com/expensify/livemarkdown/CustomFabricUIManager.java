@@ -14,7 +14,9 @@ import com.facebook.react.common.mapbuffer.ReadableMapBuffer;
 import com.facebook.react.fabric.FabricUIManager;
 import com.facebook.react.uimanager.ViewManagerRegistry;
 import com.facebook.react.uimanager.events.BatchEventDispatchedListener;
+import com.facebook.react.views.text.TextEffectRegistry;
 import com.facebook.react.views.text.TextLayoutManager;
+import com.facebook.react.views.text.ReactTypefaceUtils;
 
 import java.lang.reflect.Field;
 
@@ -23,17 +25,20 @@ public class CustomFabricUIManager extends FabricUIManager {
 
   private final ReactApplicationContext mReactApplicationContext;
   private final MarkdownUtils mMarkdownUtils;
+  private final TextEffectRegistry mSourceTextEffectRegistry;
 
   public CustomFabricUIManager(
     ReactApplicationContext reactContext,
     ViewManagerRegistry viewManagerRegistry,
     BatchEventDispatchedListener batchEventDispatchedListener,
     ReadableMap markdownProps,
-    int parserId
+    int parserId,
+    TextEffectRegistry sourceTextEffectRegistry
   ) {
     super(reactContext, viewManagerRegistry, batchEventDispatchedListener);
 
     this.mReactApplicationContext = reactContext;
+    this.mSourceTextEffectRegistry = sourceTextEffectRegistry;
 
     this.mMarkdownUtils = new MarkdownUtils(reactContext);
     this.mMarkdownUtils.setMarkdownStyle(new MarkdownStyle(markdownProps, reactContext));
@@ -52,6 +57,7 @@ public class CustomFabricUIManager extends FabricUIManager {
 
     return TextLayoutManager.measureText(
       mReactApplicationContext.getAssets(),
+      ReactTypefaceUtils.getFontWeightAdjustment(mReactApplicationContext),
       attributedString,
       paragraphAttributes,
       getYogaSize(minWidth, maxWidth),
@@ -61,7 +67,8 @@ public class CustomFabricUIManager extends FabricUIManager {
       spannable -> {
         mMarkdownUtils.applyMarkdownFormatting((SpannableStringBuilder)spannable);
       },
-      attachmentsPositions);
+      attachmentsPositions,
+      mSourceTextEffectRegistry);
   }
 
   public static FabricUIManager create(FabricUIManager source, ReadableMap markdownProps, int parserId) {
@@ -75,7 +82,8 @@ public class CustomFabricUIManager extends FabricUIManager {
         viewManagerRegistry,
         batchEventDispatchedListener,
         markdownProps,
-        parserId
+        parserId,
+        source.getTextEffectRegistry()
       );
     } catch (NoSuchFieldException | IllegalAccessException e) {
       throw new RuntimeException("[LiveMarkdown] Cannot read data from FabricUIManager", e);
