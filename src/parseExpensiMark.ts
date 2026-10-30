@@ -245,8 +245,9 @@ function parseTreeToTextAndRanges(tree: StackItem): [string, MarkdownRange[]] {
  * @param maxLength - Maximum input length to parse; longer input returns `[]` without parsing. Defaults to 4000.
  * @returns The list of formatting ranges, or `[]` if input exceeds `maxLength` or fails to parse.
  */
-function parseExpensiMark(markdown: string, maxLength = MAX_PARSABLE_LENGTH): MarkdownRange[] {
-  if (markdown.length > maxLength) {
+function parseExpensiMark(markdown: string, maxLength?: number): MarkdownRange[] {
+  // Resolve the default here instead of in the parameter list, because a worklet unpacks its captured variables in the function body, after default parameter values are evaluated
+  if (markdown.length > (maxLength ?? MAX_PARSABLE_LENGTH)) {
     return [];
   }
   const html = parseMarkdownToHTML(markdown);
