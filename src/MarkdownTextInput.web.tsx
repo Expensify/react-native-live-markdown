@@ -38,6 +38,7 @@ interface MarkdownTextInputProps extends TextInputProps, InlineImagesInputProps 
 
 interface MarkdownNativeEvent extends Event {
   inputType?: string;
+  data?: string | null;
   isComposing?: boolean;
   keyCode?: number;
 }
@@ -358,6 +359,15 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
         let parsedText = normalizeValue(
           inputType === 'pasteText' ? pasteContent.current || '' : parseInnerHTMLToText(e.target as MarkdownTextInputElement, contentSelection.current.start, inputType, multiline),
         );
+
+        // Browsers may also remove nodes when inserting text (e.g. Firefox removes a trailing <br>), so if the DOM lost content, build the value from the inserted text instead
+        if (inputType === 'insertText' && !isComposing && typeof nativeEvent.data === 'string') {
+          const {start, end} = contentSelection.current;
+          const expectedText = normalizeValue(previousText.slice(0, start) + nativeEvent.data + previousText.slice(end));
+          if (parsedText.length !== expectedText.length) {
+            parsedText = expectedText;
+          }
+        }
 
         if (pasteContent.current) {
           pasteContent.current = null;
