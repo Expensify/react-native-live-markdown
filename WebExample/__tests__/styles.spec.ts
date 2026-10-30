@@ -51,25 +51,21 @@ test.describe('markdown content styling', () => {
     await testMarkdownContentStyle({testContent: 'mention-report', style: 'color: red; background-color: pink; border-radius: 5px;', page});
   });
 
-  test('blockquote', async ({page, browserName}) => {
+  test('blockquote', async ({page}) => {
     const blockquoteStyle =
       'border-color: gray; border-width: 6px; margin-left: 6px; padding-left: 6px; border-left-style: solid; display: inline-block; max-width: 100%; box-sizing: border-box; overflow-wrap: anywhere;';
 
-    // Firefox border properties are serialized slightly differently
-    const browserStyle = browserName === 'firefox' ? blockquoteStyle.replace('border-left-style: solid', 'border-left: 6px solid gray') : blockquoteStyle;
+    // Some browsers serialize the left border as a shorthand
+    const styles = [blockquoteStyle, blockquoteStyle.replace('border-left-style: solid', 'border-left: 6px solid gray')];
 
-    await testMarkdownContentStyle({testContent: 'blockquote', style: browserStyle, page});
+    await testMarkdownContentStyle({testContent: 'blockquote', style: styles, page});
   });
 
-  test('blockquote with strikethrough', async ({page, browserName}) => {
-    let blockquoteStyle = 'line-through';
-    if (browserName === 'firefox') {
-      blockquoteStyle = 'line-through rgb(0, 0, 0)';
-    } else if (browserName === 'chromium') {
-      blockquoteStyle = 'line-through solid rgb(0, 0, 0)';
-    }
+  test('blockquote with strikethrough', async ({page}) => {
+    // Older browsers include the default style and color in the serialized value
+    const styles = ['line-through', 'line-through solid rgb(0, 0, 0)', 'line-through rgb(0, 0, 0)'];
 
-    await testMarkdownElementHasComputedStyle({testContent: 'strikethrough_blockquote', propertyName: 'text-decoration', style: blockquoteStyle, page});
+    await testMarkdownElementHasComputedStyle({testContent: 'strikethrough_blockquote', propertyName: 'text-decoration', style: styles, page});
   });
 });
 
