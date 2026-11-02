@@ -119,7 +119,8 @@
       "tmp": "^0.2.6"
     },
     "minimatch@9.0.3": "^9.0.7",
-    "proxy-agent": "^6.5.0"
+    "proxy-agent": "^6.5.0",
+    "lodash": "4.18.1"
   },
   "workspaces": [
     "./example",
