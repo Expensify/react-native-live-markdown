@@ -30,4 +30,21 @@ test.describe('typing', () => {
 
     expect(cursorPosition.end).toBe(EXAMPLE_LONG_CONTENT.length);
   });
+
+  test('replace selected text', async ({page}) => {
+    const inputLocator = await setupInput(page, 'clear');
+
+    await inputLocator.focus();
+    await inputLocator.pressSequentially('Hello *bold* world');
+
+    // Select "bold"
+    await inputLocator.locator('span[data-type="text"]', {hasText: /^bold$/}).dblclick();
+    await inputLocator.pressSequentially('text');
+
+    expect(await getElementValue(inputLocator)).toBe('Hello *text* world');
+
+    const cursorPosition = await getCursorPosition(inputLocator);
+
+    expect(cursorPosition.end).toBe('Hello *text'.length);
+  });
 });
