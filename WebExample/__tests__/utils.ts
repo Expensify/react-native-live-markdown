@@ -35,12 +35,22 @@ const setCursorPosition = async (page: Page, elementIndex: number, offset?: numb
       if (node?.firstChild) {
         const range = new Range();
         const offsetValue = offset ?? node.firstChild.textContent?.length ?? 0;
-        range.setStart(node.firstChild, offsetValue);
-        range.setEnd(node.firstChild, offsetValue);
+        // Place the caret next to a <br> rather than inside it
+        const container = node.firstChild.nodeType === Node.TEXT_NODE ? node.firstChild : node;
+        range.setStart(container, offsetValue);
+        range.setEnd(container, offsetValue);
+
+        // selectionchange is dispatched asynchronously, so wait for it to let the input register the new cursor position
+        const selectionChanged = new Promise<void>((resolve) => {
+          document.addEventListener('selectionchange', () => resolve(), {once: true});
+          setTimeout(resolve, 500);
+        });
 
         const selection = window.getSelection();
         selection?.removeAllRanges();
         selection?.addRange(range);
+
+        await selectionChanged;
       }
 
       return filteredNode;
@@ -83,13 +93,32 @@ const setSelection = async (page: Page) => {
   await page.click(`[data-testid="${TEST_CONST.CHANGE_SELECTION}"]`);
 };
 
-const testMarkdownContentStyle = async ({testContent, style, page, dimmensions}: {testContent: string; style: string; page: Page; dimmensions?: {height: number; width: number}}) => {
+// Browsers serialize some styles differently across versions, so a style can be given as a list of accepted values
+const expectStyle = (elementStyle: string | null | undefined, style: string | string[]) => {
+  if (Array.isArray(style)) {
+    expect(style).toContain(elementStyle);
+  } else {
+    expect(elementStyle).toEqual(style);
+  }
+};
+
+const testMarkdownContentStyle = async ({
+  testContent,
+  style,
+  page,
+  dimmensions,
+}: {
+  testContent: string;
+  style: string | string[];
+  page: Page;
+  dimmensions?: {height: number; width: number};
+}) => {
   const inputLocator = await setupInput(page);
 
   const elementHandle = inputLocator.locator('span', {hasText: testContent}).last();
   const elementStyle = await getElementStyle(elementHandle);
 
-  expect(elementStyle).toEqual(style);
+  expectStyle(elementStyle, style);
 
   if (dimmensions && elementHandle) {
     await elementHandle.waitFor({state: 'attached'});
@@ -103,7 +132,7 @@ const testMarkdownContentStyle = async ({testContent, style, page, dimmensions}:
   }
 };
 
-const testMarkdownElementHasComputedStyle = async ({testContent, propertyName, style, page}: {testContent: string; propertyName: string; style: string; page: Page}) => {
+const testMarkdownElementHasComputedStyle = async ({testContent, propertyName, style, page}: {testContent: string; propertyName: string; style: string | string[]; page: Page}) => {
   const inputLocator = await setupInput(page);
 
   const elementHandle = inputLocator.locator('span', {hasText: testContent}).last();
@@ -114,7 +143,7 @@ const testMarkdownElementHasComputedStyle = async ({testContent, propertyName, s
     elementStyle = await elementHandle.evaluate((el, property) => window.getComputedStyle(el).getPropertyValue(property), propertyName);
   }
 
-  expect(elementStyle).toEqual(style);
+  expectStyle(elementStyle, style);
 };
 
 export {
