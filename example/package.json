@@ -6,7 +6,8 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "lint": "eslint .",
-    "start": "react-native start --client-logs"
+    "start": "react-native start --client-logs",
+    "bundle-mode-start": "BUNDLE_MODE=1 react-native start --reset-cache --client-logs"
   },
   "dependencies": {
     "expensify-common": "2.0.148",
