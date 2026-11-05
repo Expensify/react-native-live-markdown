@@ -42,6 +42,7 @@ jobs:
         uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903
         with:
           node-version-file: '.nvmrc'
+          check-latest: true
 
       # v4.3.0
       - name: Restore node_modules from cache
