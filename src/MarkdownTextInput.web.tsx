@@ -21,6 +21,7 @@ import {getCurrentCursorPosition, removeSelection, setCursorPosition} from './we
 import './web/MarkdownTextInput.css';
 import type {MarkdownStyle} from './MarkdownTextInputDecoratorViewNativeComponent';
 import {getElementHeight, getPlaceholderValue, isEventComposing, normalizeValue, parseInnerHTMLToText} from './web/utils/inputUtils';
+import BrowserUtils from './web/utils/browserUtils';
 import {idGenerator, parseToReactDOMStyle, processMarkdownStyle} from './web/utils/webStyleUtils';
 import {forceRefreshAllImages} from './web/inputElements/inlineImage';
 import type {MarkdownRange, InlineImagesInputProps} from './commonTypes';
@@ -360,8 +361,8 @@ const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputP
           inputType === 'pasteText' ? pasteContent.current || '' : parseInnerHTMLToText(e.target as MarkdownTextInputElement, contentSelection.current.start, inputType, multiline),
         );
 
-        // Browsers may also remove nodes when inserting text (e.g. Firefox removes a trailing <br>), so if the DOM lost content, build the value from the inserted text instead
-        if (inputType === 'insertText' && !isComposing && typeof nativeEvent.data === 'string') {
+        // Firefox can remove a trailing <br> while typing. Other browsers can replace text without first updating the cached selection, so preserve their DOM value.
+        if (BrowserUtils.isFirefox && inputType === 'insertText' && !isComposing && typeof nativeEvent.data === 'string') {
           const {start, end} = contentSelection.current;
           const expectedText = normalizeValue(previousText.slice(0, start) + nativeEvent.data + previousText.slice(end));
           if (parsedText.length !== expectedText.length) {
