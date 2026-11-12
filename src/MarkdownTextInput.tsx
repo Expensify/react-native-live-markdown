@@ -68,7 +68,9 @@ type FormatSelectionResult = {
   cursorOffset: number;
 };
 
-type MarkdownTextInput = TextInput & React.Component<MarkdownTextInputProps>;
+// `TextInput` is a function component under the React Native Strict TypeScript API, so its instance type has to come from
+// its ref rather than from `TextInput` itself. On older React Native types this is the same `TextInput` class instance.
+type MarkdownTextInput = React.ComponentRef<typeof TextInput>;
 
 function processColorsInMarkdownStyle(input: MarkdownStyle): MarkdownStyle {
   const output = JSON.parse(JSON.stringify(input));
