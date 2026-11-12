@@ -1,20 +1,18 @@
 import {codegenNativeComponent} from 'react-native';
-import type {ColorValue, ViewProps} from 'react-native';
-
-import type {Float, Int32} from 'react-native/Libraries/Types/CodegenTypes';
+import type {CodegenTypes, ColorValue, ViewProps} from 'react-native';
 
 interface CodeBlockStyle {
   fontFamily: string;
-  fontSize: Float;
+  fontSize: CodegenTypes.Float;
   color: ColorValue;
   backgroundColor: ColorValue;
   borderColor?: ColorValue;
-  borderWidth?: Float;
-  borderRadius?: Float;
+  borderWidth?: CodegenTypes.Float;
+  borderRadius?: CodegenTypes.Float;
   borderStyle?: string;
-  padding?: Float;
-  paddingVertical?: Float;
-  paddingHorizontal?: Float;
+  padding?: CodegenTypes.Float;
+  paddingVertical?: CodegenTypes.Float;
+  paddingHorizontal?: CodegenTypes.Float;
 }
 
 interface MarkdownStyle {
@@ -22,69 +20,69 @@ interface MarkdownStyle {
     color: ColorValue;
   };
   emoji: {
-    fontSize: Float;
+    fontSize: CodegenTypes.Float;
     fontFamily: string;
   };
   link: {
     color: ColorValue;
   };
   h1: {
-    fontSize: Float;
+    fontSize: CodegenTypes.Float;
   };
   blockquote: {
     borderColor: ColorValue;
-    borderWidth: Float;
-    marginLeft: Float;
-    paddingLeft: Float;
+    borderWidth: CodegenTypes.Float;
+    marginLeft: CodegenTypes.Float;
+    paddingLeft: CodegenTypes.Float;
   };
   code: CodeBlockStyle & {
-    h1NestedFontSize?: Float;
+    h1NestedFontSize?: CodegenTypes.Float;
   };
   pre: CodeBlockStyle;
   mentionHere: {
     color: ColorValue;
     backgroundColor: ColorValue;
-    borderRadius?: Float;
+    borderRadius?: CodegenTypes.Float;
   };
   mentionUser: {
     color: ColorValue;
     backgroundColor: ColorValue;
-    borderRadius?: Float;
+    borderRadius?: CodegenTypes.Float;
   };
   mentionReport: {
     color: ColorValue;
     backgroundColor: ColorValue;
-    borderRadius?: Float;
+    borderRadius?: CodegenTypes.Float;
   };
   inlineImage: {
-    minWidth: Float;
-    minHeight: Float;
-    maxWidth: Float;
-    maxHeight: Float;
-    marginTop: Float;
-    marginBottom: Float;
-    borderRadius: Float;
+    minWidth: CodegenTypes.Float;
+    minHeight: CodegenTypes.Float;
+    maxWidth: CodegenTypes.Float;
+    maxHeight: CodegenTypes.Float;
+    marginTop: CodegenTypes.Float;
+    marginBottom: CodegenTypes.Float;
+    borderRadius: CodegenTypes.Float;
   };
   loadingIndicatorContainer?: {
     backgroundColor?: ColorValue;
-    borderWidth?: Float;
+    borderWidth?: CodegenTypes.Float;
     borderColor?: ColorValue;
-    borderRadius?: Float;
-    width?: Float;
-    height?: Float;
+    borderRadius?: CodegenTypes.Float;
+    width?: CodegenTypes.Float;
+    height?: CodegenTypes.Float;
   };
   loadingIndicator?: {
     primaryColor?: ColorValue;
     secondaryColor?: ColorValue;
-    width?: Float;
-    height?: Float;
-    borderWidth?: Float;
+    width?: CodegenTypes.Float;
+    height?: CodegenTypes.Float;
+    borderWidth?: CodegenTypes.Float;
   };
 }
 
 interface NativeProps extends ViewProps {
   markdownStyle: MarkdownStyle;
-  parserId: Int32;
+  parserId: CodegenTypes.Int32;
 }
 
 export default codegenNativeComponent<NativeProps>('MarkdownTextInputDecoratorView', {
