@@ -91,6 +91,13 @@
   return [_originalTextInputDelegate textInputShouldSubmitOnReturn];
 }
 
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView
+{
+  if ([_originalTextInputDelegate respondsToSelector:_cmd]) {
+    [_originalTextInputDelegate scrollViewDidScroll:scrollView];
+  }
+}
+
 // This method is added as a patch in the New Expensify app.
 // See https://github.com/Expensify/App/blob/9a0afa06d2c35d6ef1928d944cf7d28c17dd2bb4/patches/react-native/react-native%2B0.81.4%2B011%2BAdd-onPaste-to-TextInput.patch
 - (void)textInputDidPaste:(NSString *)type withData:(NSString *)data
