@@ -89,6 +89,10 @@ function processMarkdownStyle(input: PartialMarkdownStyle | undefined): Markdown
   return processColorsInMarkdownStyle(mergeMarkdownStyleWithDefault(input));
 }
 
+// These are two different types on purpose:
+// - `MarkdownTextInput` is the instance a ref points to. It is exported under the component's name, so apps use it to type their refs.
+// - `MarkdownTextInputComponent` is the component itself. It is written out so that the built declarations keep `MarkdownTextInput`
+//   as the ref type. When it is inferred, TypeScript writes `TextInput` there, which under the Strict API is the component, not the instance.
 type MarkdownTextInput = React.ComponentRef<typeof TextInput>;
 type MarkdownTextInputComponent = React.ForwardRefExoticComponent<MarkdownTextInputProps & React.RefAttributes<MarkdownTextInput>>;
 
