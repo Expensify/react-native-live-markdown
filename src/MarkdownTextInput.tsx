@@ -93,7 +93,11 @@ function processMarkdownStyle(input: PartialMarkdownStyle | undefined): Markdown
   return processColorsInMarkdownStyle(mergeMarkdownStyleWithDefault(input));
 }
 
-const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputProps>((props, ref) => {
+// The component type is written out so that the built declarations keep `MarkdownTextInput` as the ref type. When it is inferred,
+// TypeScript replaces the alias with `TextInput`, which under the Strict API is the component, not its instance, so refs are rejected.
+type MarkdownTextInputComponent = React.ForwardRefExoticComponent<MarkdownTextInputProps & React.RefAttributes<MarkdownTextInput>>;
+
+const MarkdownTextInput: MarkdownTextInputComponent = React.forwardRef<MarkdownTextInput, MarkdownTextInputProps>((props, ref) => {
   const markdownStyle = React.useMemo(() => processMarkdownStyle(props.markdownStyle), [props.markdownStyle]);
 
   if (props.parser === undefined) {

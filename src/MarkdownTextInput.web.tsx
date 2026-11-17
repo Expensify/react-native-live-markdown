@@ -82,7 +82,9 @@ type HTMLMarkdownElement = HTMLElement & {
   value: string;
 };
 
-const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputProps>(
+type MarkdownTextInputComponent = React.ForwardRefExoticComponent<MarkdownTextInputProps & React.RefAttributes<MarkdownTextInput>>;
+
+const MarkdownTextInput: MarkdownTextInputComponent = React.forwardRef<MarkdownTextInput, MarkdownTextInputProps>(
   (
     {
       accessibilityLabel,
