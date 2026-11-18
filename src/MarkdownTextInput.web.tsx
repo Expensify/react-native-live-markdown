@@ -44,8 +44,6 @@ interface MarkdownNativeEvent extends Event {
   keyCode?: number;
 }
 
-type MarkdownTextInput = TextInput & React.Component<MarkdownTextInputProps>;
-
 type Selection = {
   start: number;
   end: number;
@@ -80,7 +78,11 @@ type HTMLMarkdownElement = HTMLElement & {
   value: string;
 };
 
-const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputProps>(
+// The component type is explicit so that the built declarations keep `MarkdownTextInput` (the instance) as the ref type instead of `TextInput`.
+type MarkdownTextInput = React.ComponentRef<typeof TextInput>;
+type MarkdownTextInputComponent = React.ForwardRefExoticComponent<MarkdownTextInputProps & React.RefAttributes<MarkdownTextInput>>;
+
+const MarkdownTextInput: MarkdownTextInputComponent = React.forwardRef<MarkdownTextInput, MarkdownTextInputProps>(
   (
     {
       accessibilityLabel,

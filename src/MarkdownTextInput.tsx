@@ -68,8 +68,6 @@ type FormatSelectionResult = {
   cursorOffset: number;
 };
 
-type MarkdownTextInput = TextInput & React.Component<MarkdownTextInputProps>;
-
 function processColorsInMarkdownStyle(input: MarkdownStyle): MarkdownStyle {
   const output = JSON.parse(JSON.stringify(input));
 
@@ -91,7 +89,11 @@ function processMarkdownStyle(input: PartialMarkdownStyle | undefined): Markdown
   return processColorsInMarkdownStyle(mergeMarkdownStyleWithDefault(input));
 }
 
-const MarkdownTextInput = React.forwardRef<MarkdownTextInput, MarkdownTextInputProps>((props, ref) => {
+// The component type is explicit so that the built declarations keep `MarkdownTextInput` (the instance) as the ref type instead of `TextInput`.
+type MarkdownTextInput = React.ComponentRef<typeof TextInput>;
+type MarkdownTextInputComponent = React.ForwardRefExoticComponent<MarkdownTextInputProps & React.RefAttributes<MarkdownTextInput>>;
+
+const MarkdownTextInput: MarkdownTextInputComponent = React.forwardRef<MarkdownTextInput, MarkdownTextInputProps>((props, ref) => {
   const markdownStyle = React.useMemo(() => processMarkdownStyle(props.markdownStyle), [props.markdownStyle]);
 
   if (props.parser === undefined) {
