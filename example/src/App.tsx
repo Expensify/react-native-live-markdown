@@ -4,9 +4,30 @@ import {
   MarkdownTextInput,
   parseExpensiMark,
 } from '@expensify/react-native-live-markdown';
+import type {MarkdownRange} from '@expensify/react-native-live-markdown';
 import * as TEST_CONST from './testConstants';
 import {PlatformInfo} from './PlatformInfo';
 import {handleFormatSelection} from './formatSelectionUtils';
+import AlwaysPaintedView from './AlwaysPaintedView';
+
+// Passes an explicit max length: with react-native-worklets 0.10.2 the default parameter of `parseExpensiMark` is
+// evaluated before the worklet closure is available and throws on the worklet runtime.
+function parser(input: string) {
+  'worklet';
+
+  return parseExpensiMark(input, 4000);
+}
+
+function strikethroughParser(input: string): MarkdownRange[] {
+  'worklet';
+
+  return input.length === 0
+    ? []
+    : [{type: 'strikethrough', start: 0, length: input.length}];
+}
+
+// Choosing a wrapper while the input is visible remounts it, so each hide and reveal cycle runs with a fixed wrapper.
+type ActivityWrapper = 'none' | 'alwaysPainted';
 
 export default function App() {
   const [value, setValue] = React.useState(TEST_CONST.EXAMPLE_CONTENT);
@@ -16,6 +37,11 @@ export default function App() {
   const [textFontSizeState, setTextFontSizeState] = React.useState(false);
   const [emojiFontSizeState, setEmojiFontSizeState] = React.useState(false);
   const [caretHidden, setCaretHidden] = React.useState(false);
+  const [activityWrapper, setActivityWrapper] =
+    React.useState<ActivityWrapper>('none');
+  const [activityHidden, setActivityHidden] = React.useState(false);
+  const [useStrikethroughParser, setUseStrikethroughParser] =
+    React.useState(false);
   const [selection, setSelection] = React.useState({start: 0, end: 0});
 
   const style = React.useMemo(() => {
@@ -36,27 +62,39 @@ export default function App() {
 
   const ref = React.useRef<MarkdownTextInput>(null);
 
+  const input = (
+    <MarkdownTextInput
+      multiline={multiline}
+      formatSelection={handleFormatSelection}
+      autoCapitalize="none"
+      caretHidden={caretHidden}
+      value={value}
+      onChangeText={setValue}
+      style={[styles.input, style]}
+      ref={ref}
+      markdownStyle={markdownStyle}
+      parser={useStrikethroughParser ? strikethroughParser : parser}
+      placeholder="Type here..."
+      onSelectionChange={e => setSelection(e.nativeEvent.selection)}
+      selection={selection}
+      id={TEST_CONST.INPUT_ID}
+      maxLength={30000}
+    />
+  );
+
   return (
     <ScrollView contentContainerStyle={styles.container} style={styles.content}>
       <PlatformInfo />
       <Text>{multiline ? 'multiline' : 'singleline'}</Text>
-      <MarkdownTextInput
-        multiline={multiline}
-        formatSelection={handleFormatSelection}
-        autoCapitalize="none"
-        caretHidden={caretHidden}
-        value={value}
-        onChangeText={setValue}
-        style={[styles.input, style]}
-        ref={ref}
-        markdownStyle={markdownStyle}
-        parser={parseExpensiMark}
-        placeholder="Type here..."
-        onSelectionChange={e => setSelection(e.nativeEvent.selection)}
-        selection={selection}
-        id={TEST_CONST.INPUT_ID}
-        maxLength={30000}
-      />
+      <React.Activity mode={activityHidden ? 'hidden' : 'visible'}>
+        {activityWrapper === 'alwaysPainted' ? (
+          <AlwaysPaintedView style={styles.alwaysPainted}>
+            {input}
+          </AlwaysPaintedView>
+        ) : (
+          input
+        )}
+      </React.Activity>
       <Text style={styles.text}>{JSON.stringify(value)}</Text>
       <Button
         testID="focus"
@@ -123,6 +161,31 @@ export default function App() {
         onPress={() => setCaretHidden(prev => !prev)}
       />
       <Button
+        title={
+          activityWrapper === 'none'
+            ? 'Use AlwaysPaintedView'
+            : 'Use regular view'
+        }
+        disabled={activityHidden}
+        onPress={() =>
+          setActivityWrapper(prev =>
+            prev === 'none' ? 'alwaysPainted' : 'none',
+          )
+        }
+      />
+      <Button
+        title={activityHidden ? 'Show Activity' : 'Hide Activity'}
+        onPress={() => setActivityHidden(prev => !prev)}
+      />
+      <Button
+        title={
+          useStrikethroughParser
+            ? 'Use ExpensiMark parser'
+            : 'Use strikethrough parser'
+        }
+        onPress={() => setUseStrikethroughParser(prev => !prev)}
+      />
+      <Button
         title="Toggle all"
         onPress={() => {
           setTextColorState(prev => !prev);
@@ -153,6 +216,9 @@ const styles = StyleSheet.create({
   },
   content: {
     marginTop: 60,
+  },
+  alwaysPainted: {
+    display: 'contents',
   },
   input: {
     fontSize: 20,
