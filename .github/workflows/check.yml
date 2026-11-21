@@ -11,7 +11,8 @@ on:
 jobs:
   check:
     if: github.repository == 'Expensify/react-native-live-markdown'
-    runs-on: ubuntu-latest
+    # Use a 4 vCPU runner: it runs three full typechecks, lint and Jest, which needs more memory than the 2 vCPU runner.
+    runs-on: blacksmith-4vcpu-ubuntu-2404-arm
     concurrency:
       group: check-root-${{ github.ref }}
       cancel-in-progress: true

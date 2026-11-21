@@ -19,7 +19,7 @@ on:
 jobs:
   build:
     if: github.repository == 'Expensify/react-native-live-markdown'
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2404-arm
     concurrency:
       group: build-web-${{ github.ref }}
       cancel-in-progress: true
