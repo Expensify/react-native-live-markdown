@@ -19,7 +19,8 @@ on:
 jobs:
   test:
     if: github.repository == 'Expensify/react-native-live-markdown'
-    runs-on: ubuntu-latest
+    # Use a 4 vCPU Ubuntu runner as it runs multiple browser tests in parallel and uses higher memory than the default 2 vCPU runner.
+    runs-on: blacksmith-4vcpu-ubuntu-2404-arm
 
     concurrency:
       group: web-e2e-test-${{ github.ref }}

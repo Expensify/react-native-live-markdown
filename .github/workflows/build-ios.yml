@@ -25,7 +25,7 @@ on:
 jobs:
   build:
     if: github.repository == 'Expensify/react-native-live-markdown'
-    runs-on: macos-15
+    runs-on: blacksmith-6vcpu-macos-15
     concurrency:
       group: build-ios-${{ github.ref }}
       cancel-in-progress: true
